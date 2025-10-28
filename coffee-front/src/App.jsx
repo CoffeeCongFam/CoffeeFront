@@ -1,7 +1,13 @@
-import "./App.css";
+import { Outlet } from "react-router-dom";
 
 function App() {
-  return <h1>커피 프론트 레포 생성 ☕️</h1>;
+  return (
+    <div>
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 
 export default App;
