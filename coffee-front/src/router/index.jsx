@@ -4,6 +4,12 @@ import App from "../App";
 import LandingPage from "../pages/home/Landing";
 import Login from "../pages/home/Login";
 import SignUp from "../pages/home/SignUp";
+import CustomerLayout from "../common/CustomerLayout";
+import CustomerHome from "../pages/customer/CustomerHome";
+import StoreLayout from "../common/StoreLayout";
+import StoreHome from "../pages/cafe/StoreHome";
+import AdminLayout from "../common/AdminLayout";
+import AdminHome from "../pages/admin/AdminHome";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +30,8 @@ const router = createBrowserRouter([
       },
     ],
   },
+
+  // 일반 회원
   {
     path: "/me",
     element: <CustomerLayout />,
@@ -31,6 +39,30 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <CustomerHome />,
+      },
+    ],
+  },
+
+  // 점주
+  {
+    path: "/store",
+    element: <StoreLayout />,
+    children: [
+      {
+        index: true,
+        element: <StoreHome />,
+      },
+    ],
+  },
+
+  // 관리자
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminHome />,
       },
     ],
   },

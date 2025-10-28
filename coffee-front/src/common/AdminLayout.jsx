@@ -1,13 +1,13 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-function CustomerLayout() {
+function AdminLayout() {
   return (
     <div>
-      일반회원 레이아웃
+      관리자 레이아웃
       <Outlet />
     </div>
   );
 }
 
-export default CustomerLayout;
+export default AdminLayout;
