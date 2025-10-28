@@ -10,6 +10,7 @@ import StoreLayout from "../common/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
+import OrderPage from "../pages/customer/OrderPage";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <CustomerHome />,
+      },
+      {
+        path: "order",
+        element: <OrderPage />,
       },
     ],
   },
