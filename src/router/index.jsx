@@ -16,6 +16,9 @@ import CustomerSignUp from "../pages/home/CustomerSignUp";
 import MemberSignUp from "../pages/home/MemberSignUp";
 import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
+import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CustomerSignUp from "../pages/home/CustomerSignUp";
+import MemberSignUp from "../pages/home/MemberSignUp";
 
 const router = createBrowserRouter([
   {
@@ -39,11 +42,19 @@ const router = createBrowserRouter([
         element: <KakaoRedirect />,
       },
       {
+<<<<<<< HEAD
         path: "customerSignUp",
         element: <CustomerSignUp />,
       },
       {
         path: "memberSignUp",
+=======
+        path: "CustomerSignUp",
+        element: <CustomerSignUp />,
+      },
+      {
+        path: "MemberSignUp",
+>>>>>>> 2dcdb9d (일반 회원 회원가입 진행중)
         element: <MemberSignUp />,
       },
     ],

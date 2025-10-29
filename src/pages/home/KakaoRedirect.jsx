@@ -6,7 +6,9 @@ import { useNavigate } from 'react-router-dom';
 function KakaoRedirect() { 
     const navigate = useNavigate();
     // 2. 인가 코드를 백엔드 서버로 전송하는 비동기 함수 정의
+
     const kakaoLoginHandler = async (code, role) => {
+
         try {
             // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
             const res = await axios({
@@ -14,10 +16,10 @@ function KakaoRedirect() {
                 url: `http://127.0.0.1:8080/oauth/callback/kakao?code=${code}`,
                 withCredentials: true,
             });
-
             if (res.status !== 200) {
                 throw new Error(`Unexpected status: ${res.status}`);
             }
+
 
             // 3. 성공 응답 처리
             const ACCESS_TOKEN = res.data.accessToken;
@@ -34,6 +36,8 @@ function KakaoRedirect() {
             } else {
                 navigate('/main');
             }
+            // 4. 메인 페이지로 이동
+            navigate('/main');
             
         } catch (err) {
             // 5. 에러 처리
@@ -49,11 +53,12 @@ function KakaoRedirect() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const role = urlParams.get('role');
-        
+
         if (code) {
             console.log("인가 코드 획득:", code);
             // 인가 코드를 백엔드로 보내는 함수 실행
             kakaoLoginHandler(code, role);
+
         } else {
             // 인가 코드가 없는 경우 (로그인 취소 또는 에러)
             console.error("인가 코드를 획득하지 못했습니다.");

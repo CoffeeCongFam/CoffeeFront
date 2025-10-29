@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button, FormControl, Select, MenuItem, TextField } from "@mui/material";
 
@@ -41,6 +42,7 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
     minWidth: '70px', // 라벨 너비를 일정하게 유지
     textAlign: 'right', // 텍스트 우측 정렬
   };
+
 
   return (
     <div style={{
@@ -129,12 +131,12 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
             {/* 정렬을 맞추기 위한 빈 공간 (Flexbox 균형) */}
             <div style={{ flexGrow: 1 }}></div>
           </div>
-          
           <Button type="submit" variant="contained"
             sx={{
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },
               textTransform: 'none',
+
               marginTop: '15px',
               width: '100%',
               padding: '10px 0'
