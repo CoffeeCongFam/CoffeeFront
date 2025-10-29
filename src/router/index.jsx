@@ -42,19 +42,11 @@ const router = createBrowserRouter([
         element: <KakaoRedirect />,
       },
       {
-<<<<<<< HEAD
-        path: "customerSignUp",
-        element: <CustomerSignUp />,
-      },
-      {
-        path: "memberSignUp",
-=======
         path: "CustomerSignUp",
         element: <CustomerSignUp />,
       },
       {
         path: "MemberSignUp",
->>>>>>> 2dcdb9d (일반 회원 회원가입 진행중)
         element: <MemberSignUp />,
       },
     ],

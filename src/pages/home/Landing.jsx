@@ -1,7 +1,5 @@
 import React from "react";
-
 import { Button } from "@mui/material";
-
 import kakaoBtn from "../../assets/kakao_login_medium_wide.png";
 import { useNavigate } from "react-router-dom";
 
@@ -75,7 +73,6 @@ function Landing() {
             padding: '8px 16px'
           }}
         >회원가입</Button>
-
       </div>
     </div>
   )
