@@ -17,7 +17,4 @@ function loadNaverMaps(clientId) {
   }
   return naverMapsPromise;
 }
-
 export default loadNaverMaps;
-
-
