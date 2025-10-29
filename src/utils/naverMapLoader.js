@@ -1,17 +1,23 @@
-// utils/naverMapLoader.js
-let naverMapsPromise;
+// naver Maps API 로더
 
-export function loadNaverMaps(clientId) {
+let naverMapsPromise = null;
+
+function loadNaverMaps(clientId) {
+  if (typeof window === "undefined") return Promise.reject("SSR");
   if (window.naver?.maps) return Promise.resolve(window.naver.maps);
   if (!naverMapsPromise) {
     naverMapsPromise = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
-      script.defer = true;
-      script.onload = () => resolve(window.naver.maps);
-      script.onerror = reject;
-      document.head.appendChild(script);
+      const s = document.createElement("script");
+      s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
+      s.defer = true;
+      s.onload = () => resolve(window.naver.maps);
+      s.onerror = reject;
+      document.head.appendChild(s);
     });
   }
   return naverMapsPromise;
 }
+
+export default loadNaverMaps;
+
+
