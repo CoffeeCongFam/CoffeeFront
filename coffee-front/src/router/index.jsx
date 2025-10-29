@@ -37,11 +37,11 @@ const router = createBrowserRouter([
         element: <KakaoRedirect />,
       },
       {
-        path: "CustomerSignUp",
+        path: "customerSignUp",
         element: <CustomerSignUp />,
       },
       {
-        path: "MemberSignUp",
+        path: "memberSignUp",
         element: <MemberSignUp />,
       },
     ],

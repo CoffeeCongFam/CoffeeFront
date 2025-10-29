@@ -4,6 +4,11 @@ import { Button } from "@mui/material";
 
 function SignUp() {
   let navigate = useNavigate();
+  const REST_API_KEY = '2ceea440100a5441ab093de7a7f761b3';
+  const buildKakaoUrl = (role) => {
+    const REDIRECT_URI = `http://localhost:5173/kakaoRedirect?role=${role}`;
+    return `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+  };
   return (
     <div style={{
       display: 'flex',
@@ -35,7 +40,7 @@ function SignUp() {
         }}>
           <Button
             variant="contained"
-            onClick={() => navigate('/memberSignUp')}
+            onClick={() => { window.location.href = buildKakaoUrl('member'); }}
             sx={{
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },
@@ -51,7 +56,7 @@ function SignUp() {
           </Button>
           <Button
             variant="contained"
-            onClick={() => navigate('/customerSignUp')}
+            onClick={() => { window.location.href = buildKakaoUrl('customer'); }}
             sx={{
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },

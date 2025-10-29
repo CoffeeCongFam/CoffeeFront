@@ -14,6 +14,22 @@ function CustomerSignUp() {
 
   const fileInputRef = useRef(null);
 
+  // 사업자번호 입력값을 000-00-00000 형태로 포맷팅
+  const formatBusinessNumber = (raw) => {
+    const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 10);
+    if (digitsOnly.length <= 3) return digitsOnly;
+    if (digitsOnly.length <= 5) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
+    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 5)}-${digitsOnly.slice(5)}`;
+  };
+
+  // 매장 전화번호를 000-0000-0000 형태로 포맷팅 (3-4-4)
+  const formatPhoneNumber = (raw) => {
+    const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 11);
+    if (digitsOnly.length <= 3) return digitsOnly;
+    if (digitsOnly.length <= 7) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
+    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
@@ -99,13 +115,13 @@ function CustomerSignUp() {
             <span style={labelTextStyle}>사업자번호:</span>
             <TextField
               value={businessNumber}
-              onChange={(e) => setBusinessNumber(e.target.value)}
-              placeholder="사업자번호"
+              onChange={(e) => setBusinessNumber(formatBusinessNumber(e.target.value))}
+              placeholder="000-00-00000"
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
-              type="number"
-              inputProps={{ inputMode: 'numeric' }}
+              type="text"
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9-]*', maxLength: 12 }}
             />
           </div>
 
@@ -193,11 +209,13 @@ function CustomerSignUp() {
             <span style={labelTextStyle}>매장 전화번호:</span>
             <TextField
               value={storePhone}
-              onChange={(e) => setStorePhone(e.target.value)}
+              onChange={(e) => setStorePhone(formatPhoneNumber(e.target.value))}
               placeholder="000-0000-0000"
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
+              type="text"
+              inputProps={{ inputMode: 'tel', pattern: '[0-9-]*', maxLength: 13 }}
             />
           </div>
 

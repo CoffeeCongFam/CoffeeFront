@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@mui/material";
 import kakaoBtn from "../../assets/kakao_login_medium_wide.png";
 import { useNavigate } from "react-router-dom";
 
@@ -61,7 +62,17 @@ function Landing() {
             style={{ height: '45px', borderRadius: '8px' }}
           />
         </button>
-        <button onClick={() => navigate('/signup')}>회원가입</button>
+        <Button
+          variant="contained"
+          onClick={() => navigate('/signup')}
+          sx={{
+            backgroundColor: 'black',
+            '&:hover': { backgroundColor: '#111' },
+            textTransform: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px'
+          }}
+        >회원가입</Button>
       </div>
     </div>
   )
