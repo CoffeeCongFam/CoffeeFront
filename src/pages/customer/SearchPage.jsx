@@ -134,7 +134,7 @@ export default function SearchPage() {
 
     let bounds = null;
 
-    cafeMarkersRef.current = cafes.map((cafe, idx) => {
+    cafeMarkersRef.current = cafes.map((cafe) => {
       // ⚠️ xPoint=위도(lat), yPoint=경도(lng)인지 확인!
       const pos = new maps.LatLng(cafe.xPoint, cafe.yPoint);
 
