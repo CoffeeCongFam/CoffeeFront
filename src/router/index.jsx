@@ -11,17 +11,17 @@ import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
 import OrderPage from "../pages/customer/OrderPage";
-<<<<<<< HEAD:src/router/index.jsx
 import KakaoRedirect from "../pages/home/KakaoRedirect";
 import CafeSignUp from "../pages/home/CafeSignUp";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
-=======
->>>>>>> b1e1ae4 (Setting : api, recoil, maps api):coffee-front/src/router/index.jsx
 import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/StoreDetailPage";
+import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CustomerSignUp from "../pages/home/CustomerSignUp";
+import MemberSignUp from "../pages/home/MemberSignUp";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "cafeSignUp",
         element: <CafeSignUp />,
+      },
+      {
+        path: "MemberSignUp",
+        element: <MemberSignUp />,
       },
     ],
   },

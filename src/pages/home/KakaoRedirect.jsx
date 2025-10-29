@@ -11,6 +11,7 @@ function KakaoRedirect() {
             // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
             const res = await axios({
                 method: 'GET',
+
                 url: `http://localhost:8080/login/oauth2/code/kakao?code=${code}`,
                 withCredentials: true,
             });
@@ -38,6 +39,8 @@ function KakaoRedirect() {
             } else {
                 navigate('/main');
             }
+            // 4. 메인 페이지로 이동
+            navigate('/main');
             
         } catch (err) {
             // 5. 에러 처리
