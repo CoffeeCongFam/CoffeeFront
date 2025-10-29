@@ -1,7 +1,9 @@
-// src/pages/SearchPage.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import SearchCafe from "../../components/customer/search/SearchCafe";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 
-// 간단한 동적 로더(중복 로드 방지)
 let naverMapsPromise;
 function loadNaverMaps(clientId) {
   if (window.naver?.maps) return Promise.resolve(window.naver.maps);
@@ -18,71 +20,140 @@ function loadNaverMaps(clientId) {
   return naverMapsPromise;
 }
 
-function SearchPage() {
+export default function SearchPage() {
   const mapRef = useRef(null);
+  const [status, setStatus] = useState("loading");
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         const clientId = import.meta.env.VITE_NAVER_MAPS_CLIENT_ID;
-        if (!clientId) {
-          console.error("❌ VITE_NAVER_MAPS_CLIENT_ID 환경변수가 없습니다.");
-          return;
-        }
-
         const maps = await loadNaverMaps(clientId);
         if (!mounted || !mapRef.current) return;
 
-        // 초기 중심(서울시청 근처)
-        const center = new maps.LatLng(37.5665, 126.978);
-        const map = new maps.Map(mapRef.current, {
-          center,
-          zoom: 13,
-        });
+        // 기본 좌표
+        const defaultCenter = new maps.LatLng(37.5665, 126.978);
 
-        // 마커 하나
-        const marker = new maps.Marker({
-          position: center,
-          map,
-          title: "테스트 마커",
-        });
+        const initMap = (center) => {
+          const map = new maps.Map(mapRef.current, {
+            center,
+            zoom: 15,
+          });
 
-        // 클릭 시 좌표 로그 + 마커 이동
-        maps.Event.addListener(map, "click", (e) => {
-          const lat = e.coord.lat();
-          const lng = e.coord.lng();
-          console.log("지도 클릭:", lat, lng);
-          marker.setPosition(new maps.LatLng(lat, lng));
-        });
-      } catch (err) {
-        console.error("네이버 지도 로드 실패:", err);
+          const marker = new maps.Marker({
+            position: center,
+            map,
+            title: "현재 위치",
+          });
+
+          maps.Event.addListener(map, "click", (e) => {
+            marker.setPosition(e.coord);
+            console.log("클릭 좌표:", e.coord.lat(), e.coord.lng());
+          });
+
+          setStatus("ready");
+        };
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+              if (!mounted) return;
+              initMap(new maps.LatLng(coords.latitude, coords.longitude));
+            },
+            (err) => {
+              console.warn("위치 접근 실패:", err);
+              initMap(defaultCenter);
+            },
+            { enableHighAccuracy: true, timeout: 5000 }
+          );
+        } else {
+          console.warn("Geolocation 미지원");
+          initMap(defaultCenter);
+        }
+      } catch (e) {
+        console.error("네이버 지도 로드 실패:", e);
+        setStatus("error");
       }
     })();
-
     return () => {
       mounted = false;
     };
   }, []);
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2>매장 탐색 페이지</h2>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100vh", // 화면 꽉 채우기
+      }}
+    >
+      {/* 지도 레이어 */}
       <div
         ref={mapRef}
         style={{
-          width: "100%",
-          height: "60vh",
-          borderRadius: 12,
+          position: "absolute",
+          inset: 0, // top:0, right:0, bottom:0, left:0
           overflow: "hidden",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
         }}
       />
-      <p style={{ marginTop: 8, color: "#666" }}>
-        지도를 클릭하면 콘솔에 좌표가 찍히고 마커가 이동합니다.
-      </p>
+
+      {/* 지도 위 오버레이 UI */}
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          left: 16,
+          zIndex: 10,
+          alignItems: "center",
+          // background: "white",
+          // borderRadius: "50px",
+          // padding: "8px 12px",
+          // fontSize: 14,
+        }}
+      >
+        <TextField
+          style={{
+            borderRadius: "10px",
+            // boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+          }}
+          variant="outlined"
+          placeholder="카페를 검색해주세요."
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "50px", // Set desired border-radius
+              backgroundColor: "white",
+              "& fieldset": {
+                borderRadius: "50px", // Ensure fieldset also has the same border-radius
+              },
+            },
+          }}
+        ></TextField>
+        <IconButton
+          aria-label="current-location"
+          // color="primary"
+          style={{ backgroundColor: "white" }}
+        >
+          <LocationSearchingIcon />
+        </IconButton>
+      </div>
     </div>
   );
 }
 
-export default SearchPage;
+{
+  /* {status === "loading" && "현재 위치를 불러오는 중..."}
+        {status === "ready" && "지도를 클릭하면 마커가 이동합니다."}
+        {status === "error" && "지도를 불러오지 못했습니다."} */
+}

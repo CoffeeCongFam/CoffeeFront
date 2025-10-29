@@ -131,7 +131,7 @@ export default function CustomerLayout() {
         <Toolbar />
 
         {/* 페이지 콘텐츠 */}
-        <Box sx={{ p: 1 }}>
+        <Box sx={{}}>
           <Outlet />
         </Box>
       </Box>
