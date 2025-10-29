@@ -11,9 +11,12 @@ import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
 import OrderPage from "../pages/customer/OrderPage";
+<<<<<<< HEAD:src/router/index.jsx
 import KakaoRedirect from "../pages/home/KakaoRedirect";
 import CafeSignUp from "../pages/home/CafeSignUp";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
+=======
+>>>>>>> b1e1ae4 (Setting : api, recoil, maps api):coffee-front/src/router/index.jsx
 import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
 
