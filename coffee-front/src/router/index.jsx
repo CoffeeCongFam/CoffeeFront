@@ -11,6 +11,9 @@ import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
 import OrderPage from "../pages/customer/OrderPage";
+import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CustomerSignUp from "../pages/home/CustomerSignUp";
+import MemberSignUp from "../pages/home/MemberSignUp";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +31,18 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <SignUp />,
+      },
+      {
+        path: "kakaoRedirect",
+        element: <KakaoRedirect />,
+      },
+      {
+        path: "CustomerSignUp",
+        element: <CustomerSignUp />,
+      },
+      {
+        path: "MemberSignUp",
+        element: <MemberSignUp />,
       },
     ],
   },
