@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import { Button, FormControl, Select, MenuItem, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +84,6 @@ function CustomerSignUp({ initialEmail = "member123@example.com" }) {
   const isFormValid =
     formState.name.trim() !== "" &&
     formState.tel.length >= 12; // 010-123-4567 (12자리) 이상
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -108,8 +108,8 @@ function CustomerSignUp({ initialEmail = "member123@example.com" }) {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
         backgroundColor: '#fff',
       }}>
+
         <div style={{ fontWeight: 'bold', fontSize: '22px', color: 'black', marginBottom: '10px' }}>일반회원</div>
-        
         <form onSubmit={handleSubmit} style={{
           display: 'flex',
           flexDirection: 'column',
@@ -129,7 +129,6 @@ function CustomerSignUp({ initialEmail = "member123@example.com" }) {
               sx={{ minWidth: 240 }}
             />
           </div>
-
           {/* 이메일 - 일반 텍스트 형태로만 표시 (수정 불가) */}
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>이메일:</span>
