@@ -24,6 +24,10 @@ function KakaoRedirect() {
                 throw new Error(`Unexpected status: ${res.status}`);
             }
 
+            if (res.status !== 200) {
+                throw new Error(`Unexpected status: ${res.status}`);
+            }
+
             // 3. 성공 응답 처리
             const ACCESS_TOKEN = res.data.accessToken;
             
