@@ -1,7 +1,5 @@
-
 import React, { useState } from "react";
 import { Button, FormControl, Select, MenuItem, TextField } from "@mui/material";
-
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function MemberSignUp({ initialEmail = "member123@example.com" }) {
   // 상태 관리
@@ -42,8 +40,6 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
     minWidth: '70px', // 라벨 너비를 일정하게 유지
     textAlign: 'right', // 텍스트 우측 정렬
   };
-
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -136,7 +132,6 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },
               textTransform: 'none',
-
               marginTop: '15px',
               width: '100%',
               padding: '10px 0'
