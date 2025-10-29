@@ -28,7 +28,7 @@ export default function CustomerLayout() {
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
     { to: "/me/order", label: "주문하기", icon: <ShoppingCartIcon /> },
-    { to: "/mypage", label: "마이페이지", icon: <PersonIcon /> },
+    { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
 
   const DrawerContent = (

@@ -14,6 +14,8 @@ import OrderPage from "../pages/customer/OrderPage";
 import KakaoRedirect from "../pages/home/KakaoRedirect";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
 import MemberSignUp from "../pages/home/MemberSignUp";
+import SearchPage from "../pages/customer/SearchPage";
+import MyPage from "../pages/customer/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -57,8 +59,16 @@ const router = createBrowserRouter([
         element: <CustomerHome />,
       },
       {
+        path: "search",
+        element: <SearchPage />,
+      },
+      {
         path: "order",
         element: <OrderPage />,
+      },
+      {
+        path: "mypage",
+        element: <MyPage />,
       },
     ],
   },
