@@ -33,6 +33,7 @@ export default function CustomerLayout() {
       icon: <ShoppingCartIcon />,
       end: true,
     },
+    { to: "/me/order", label: "주문하기", icon: <ShoppingCartIcon /> },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
 

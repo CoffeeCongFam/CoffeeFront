@@ -22,6 +22,8 @@ import StoreDetailPage from "../pages/customer/StoreDetailPage";
 import KakaoRedirect from "../pages/home/KakaoRedirect";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
 import MemberSignUp from "../pages/home/MemberSignUp";
+import SearchPage from "../pages/customer/SearchPage";
+import MyPage from "../pages/customer/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +79,7 @@ const router = createBrowserRouter([
         element: <OrderPage />,
       },
       {
+<<<<<<< HEAD:src/router/index.jsx
         path: "order/new",
         element: <CreateOrderPage />,
       },
@@ -92,6 +95,11 @@ const router = createBrowserRouter([
         path: "store/:storeId",
         element: <StoreDetailPage />
       },
+=======
+        path: "mypage",
+        element: <MyPage />,
+      },
+>>>>>>> 48e9389 (Setting : api, recoil, maps api):coffee-front/src/router/index.jsx
     ],
   },
 
