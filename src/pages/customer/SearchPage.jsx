@@ -67,7 +67,54 @@ function SearchPage() {
       mapsRef.current = null;
     };
   }, []);
+  // 카페 데이터 변경 시 마커만 업데이트 (diff)
+  useEffect(() => {
+    if (status !== "ready") return;
+    if (!mmRef.current) return;
+    mmRef.current.setData(cafes ?? []);
+  }, [status, cafes]);
 
+  // 현재 위치로 이동
+  const setCurrentLocation = useCallback(() => {
+    const map = mapRef.current;
+    const maps = mapsRef.current;
+    if (!map || !maps) return;
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const here = new maps.LatLng(coords.latitude, coords.longitude);
+        if (typeof map.panTo === "function") map.panTo(here);
+        else map.setCenter(here);
+        if (hereMarkerRef.current) hereMarkerRef.current.setPosition(here);
+        else {
+          hereMarkerRef.current = new maps.Marker({
+            position: here,
+            map,
+            title: "현재 위치",
+          });
+        }
+      },
+      (err) => console.warn("현재 위치 실패:", err),
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
+  }, []);
+
+  // # TODO 키워드 필터링
+
+  // useEffect(() => {
+  //   if (!keyword) {
+  //     setCafes(cafeList ?? []);
+  //     return;
+  //   }
+  //   const lower = keyword.trim().toLowerCase();
+  //   const filtered = (cafeList ?? []).filter((c) => {
+  //     const name = (c.storeName ?? "").toLowerCase();
+  //     const addr = (c.roadAddress ?? "").toLowerCase();
+  //     return name.includes(lower) || addr.includes(lower);
+  //   });
+  //   setCafes(filtered);
+  // }, [keyword]);
   return (
     <div style={{ padding: 16 }}>
       <h2>매장 탐색 페이지</h2>
