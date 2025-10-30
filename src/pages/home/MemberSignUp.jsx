@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { Button, FormControl, Select, MenuItem, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function MemberSignUp({ initialEmail = "member123@example.com" }) {
+  const navigate = useNavigate();
   // 상태 관리
   const [formState, setFormState] = useState({
     name: '',
-    phone: '',
-    gender: '남',
+    tel: '',
+    gender: 'M',
+    memberType: "GENERAL",
+    email: initialEmail
   });
   
   // 전화번호를 000-0000-0000 형태로 포맷팅 (3-4-4)
-  const formatPhoneNumber = (raw) => {
+  const formatTelNumber = (raw) => {
     const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 11);
     if (digitsOnly.length <= 3) return digitsOnly;
     if (digitsOnly.length <= 7) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
@@ -18,20 +23,43 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
   };
 
   // 폼 제출 핸들러
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 서버로 전송할 최종 데이터 객체
-    const formData = {
+    const payload = {
       name: formState.name,
-      email: initialEmail, 
-      phone: formState.phone.replace(/\D/g, ''), // 숫자만 추출
+      tel: formState.tel.replace(/\D/g, ''), // 숫자만 추출
       gender: formState.gender,
+      memberType: formState.memberType,
+      email: formState.email,
     };
 
-    console.log("전송할 회원가입 데이터:", formData);
+    try {
+      const accessToken = localStorage.getItem('token');
+      if (!accessToken) {
+        alert("인증 토큰이 없습니다. 다시 로그인해주세요.");
+        navigate('/login'); // 로그인 페이지로 이동
+        return;
+      }
 
-    // alert(`회원가입 데이터 전송 준비 완료!\n이름: ${name}, 이메일: ${initialEmail}, 전화번호: ${phone}, 성별: ${gender}`);
+      console.log("회원가입 요청 데이터:", payload);
+      const response = await axios.post(
+        "http://localhost:8080/member/signup",
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+      if (response.status === 200) {
+        alert("회원가입이 성공적으로 완료되었습니다.");
+        navigate("/"); // 메인 페이지로 이동
+      }
+    } catch (error) {
+      console.error("회원가입 API 호출 중 에러 발생:", error.response || error);
+      alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 라벨 텍스트와 입력 필드를 포함하는 컨테이너의 스타일 정의
@@ -54,7 +82,7 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
   // 모든 필수 필드가 채워졌는지 확인하는 변수
   const isFormValid =
     formState.name.trim() !== "" &&
-    formState.phone.length >= 12; // 010-123-4567 (12자리) 이상
+    formState.tel.length >= 12; // 010-123-4567 (12자리) 이상
 
   return (
     <div style={{
@@ -117,8 +145,8 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>전화번호:</span>
             <TextField
-              value={formState.phone}
-              onChange={(e) => setFormState(prev => ({ ...prev, phone: formatPhoneNumber(e.target.value) }))}
+              value={formState.tel}
+              onChange={(e) => setFormState(prev => ({ ...prev, tel: formatTelNumber(e.target.value) }))}
               placeholder="000-0000-0000"
               size="small"
               variant="outlined"
@@ -136,8 +164,8 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
                 onChange={(e) => setFormState(prev => ({ ...prev, gender: e.target.value }))}
                 displayEmpty
               >
-                <MenuItem value={"남"}>남</MenuItem>
-                <MenuItem value={"여"}>여</MenuItem>
+                <MenuItem value={"M"}>남</MenuItem>
+                <MenuItem value={"F"}>여</MenuItem>
               </Select>
             </FormControl>
             {/* 정렬을 맞추기 위한 빈 공간 (Flexbox 균형) */}
