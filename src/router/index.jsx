@@ -16,9 +16,6 @@ import CustomerSignUp from "../pages/home/CustomerSignUp";
 import MemberSignUp from "../pages/home/MemberSignUp";
 import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
-import KakaoRedirect from "../pages/home/KakaoRedirect";
-import CustomerSignUp from "../pages/home/CustomerSignUp";
-import MemberSignUp from "../pages/home/MemberSignUp";
 
 const router = createBrowserRouter([
   {

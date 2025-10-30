@@ -3,20 +3,30 @@ import { Button, FormControl, Select, MenuItem, TextField } from "@mui/material"
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function MemberSignUp({ initialEmail = "member123@example.com" }) {
   // 상태 관리
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [gender, setGender] = useState('남');
+  const [formState, setFormState] = useState({
+    name: '',
+    phone: '',
+    gender: '남',
+  });
   
+  // 전화번호를 000-0000-0000 형태로 포맷팅 (3-4-4)
+  const formatPhoneNumber = (raw) => {
+    const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 11);
+    if (digitsOnly.length <= 3) return digitsOnly;
+    if (digitsOnly.length <= 7) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
+    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
+  };
+
   // 폼 제출 핸들러
   const handleSubmit = (e) => {
     e.preventDefault();
 
     // 서버로 전송할 최종 데이터 객체
     const formData = {
-      name,
+      name: formState.name,
       email: initialEmail, 
-      phone,
-      gender,
+      phone: formState.phone.replace(/\D/g, ''), // 숫자만 추출
+      gender: formState.gender,
     };
 
     console.log("전송할 회원가입 데이터:", formData);
@@ -40,6 +50,12 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
     minWidth: '70px', // 라벨 너비를 일정하게 유지
     textAlign: 'right', // 텍스트 우측 정렬
   };
+
+  // 모든 필수 필드가 채워졌는지 확인하는 변수
+  const isFormValid =
+    formState.name.trim() !== "" &&
+    formState.phone.length >= 12; // 010-123-4567 (12자리) 이상
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -77,8 +93,8 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>이름:</span>
             <TextField
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formState.name}
+              onChange={(e) => setFormState(prev => ({ ...prev, name: e.target.value }))}
               placeholder="이름"
               size="small"
               variant="outlined"
@@ -101,13 +117,13 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>전화번호:</span>
             <TextField
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              value={formState.phone}
+              onChange={(e) => setFormState(prev => ({ ...prev, phone: formatPhoneNumber(e.target.value) }))}
               placeholder="000-0000-0000"
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
-              inputProps={{ inputMode: 'tel' }}
+              inputProps={{ inputMode: 'tel', pattern: '[0-9-]*', maxLength: 13 }}
             />
           </div>
 
@@ -116,8 +132,8 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
             <span style={labelTextStyle}>성별:</span>
             <FormControl size="small" sx={{ minWidth: 160 }}>
               <Select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
+                value={formState.gender}
+                onChange={(e) => setFormState(prev => ({ ...prev, gender: e.target.value }))}
                 displayEmpty
               >
                 <MenuItem value={"남"}>남</MenuItem>
@@ -128,6 +144,7 @@ function MemberSignUp({ initialEmail = "member123@example.com" }) {
             <div style={{ flexGrow: 1 }}></div>
           </div>
           <Button type="submit" variant="contained"
+            disabled={!isFormValid}
             sx={{
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },

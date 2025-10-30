@@ -1,19 +1,24 @@
 import React, { useRef, useState } from "react";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Chip } from "@mui/material";
+import axios from "axios";
 
 function CustomerSignUp() {
   const JAVASCRIPT_API_KEY = 'bfc6a794411e9c59db71d143bcc3d704';
   // 상태 관리
-  const [businessNumber, setBusinessNumber] = useState("");
-  const [storeName, setStoreName] = useState("");
-  const [roadAddress, setRoadAddress] = useState("");
-  const [detailAddress, setDetailAddress] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [extraAddress, setExtraAddress] = useState("");
-  const [extraInfo, setExtraInfo] = useState("");
-  const [storePhone, setStorePhone] = useState("");
-  const [storeImage, setStoreImage] = useState(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [formState, setFormState] = useState({
+    businessNumber: "", // 사업자번호
+    storeName: "", // 상호명
+    roadAddress: "", // 도로명 주소
+    detailAddress: "", // 상세주소
+    postcode: "", // 우편번호
+    extraInfo: "", // 가게 상세정보
+    storePhone: "", // 매장 번호
+    storeImage: null, // 매장 이미지
+    xPoint: "", // X좌표(경도)
+    yPoint: "", // Y좌표(위도)
+    imagePreviewUrl: "",
+    isBusinessVerified: false, // 사업자번호 인증 상태
+  });
 
   const fileInputRef = useRef(null);
   const detailAddressRef = useRef(null);
@@ -37,15 +42,61 @@ function CustomerSignUp() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
-      businessNumber,
-      storeName,
-      roadAddress,
-      detailAddress,
-      extraInfo,
-      storePhone,
-      hasImage: Boolean(storeImage),
+      businessNumber: formState.businessNumber.replace(/\D/g, ''), // 숫자만 추출
+      storeName: formState.storeName,
+      roadAddress: formState.roadAddress,
+      detailAddress: formState.detailAddress,
+      extraInfo: formState.extraInfo,
+      storePhone: formState.storePhone.replace(/\D/g, ''), // 숫자만 추출
+      hasImage: Boolean(formState.storeImage),
+      xPoint: formState.xPoint,
+      yPoint: formState.yPoint,
     };
     // submit 처리 로직 연동 예정
+  };
+
+  // 사업자번호 인증 함수
+  const handleVerifyBusinessNumber = async () => {
+    const SERVICE_KEY = '4fe0dcce5252dbe501922fa22c734b67127a5944ad51aa556d3dd90f12a66b46'; // 여기에 실제 발급받은 서비스 키를 입력하세요.
+    const cleanedBusinessNumber = formState.businessNumber.replace(/\D/g, '');
+
+    if (cleanedBusinessNumber.length !== 10) {
+      alert("사업자번호 10자리를 정확히 입력해주세요.");
+      return;
+    }
+
+    const data = {
+      "b_no": [cleanedBusinessNumber]
+    };
+
+    try {
+      const response = await axios.post(
+        `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${SERVICE_KEY}`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        }
+      );
+      
+      // API 응답 전체를 콘솔에 출력
+      console.log("사업자번호 인증 API 응답:", response.data);
+
+      const businessInfo = response.data?.data?.[0];
+      if (businessInfo && businessInfo.b_stt_cd === '01') { // '01'은 계속사업자를 의미
+        alert(`[${businessInfo.tax_type}] 사업자 인증이 완료되었습니다.`);
+        setFormState(prev => ({ ...prev, isBusinessVerified: true }));
+      } else {
+        alert(`국세청에 등록되지 않았거나 휴/폐업 상태의 사업자입니다.\n상태: ${businessInfo?.b_stt || '알 수 없음'}`);
+        setFormState(prev => ({ ...prev, isBusinessVerified: false }));
+      }
+    } catch (error) {
+      console.error("사업자번호 인증 API 호출 중 에러 발생:", error.response || error);
+      alert("사업자번호 인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      setFormState(prev => ({ ...prev, isBusinessVerified: false }));
+    }
   };
 
   // Daum Postcode 스크립트를 동적으로 로드
@@ -99,28 +150,13 @@ function CustomerSignUp() {
       new window.daum.Postcode({
         oncomplete: async function(data) {
           let addr = '';
-          let extraAddr = '';
           if (data.userSelectedType === 'R') {
             addr = data.roadAddress;
           } else {
             addr = data.jibunAddress;
           }
-          if (data.userSelectedType === 'R') {
-            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-              extraAddr += data.bname;
-            }
-            if (data.buildingName !== '' && data.apartment === 'Y') {
-              extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-            }
-            if (extraAddr !== '') {
-              extraAddr = ' (' + extraAddr + ')';
-            }
-            setExtraAddress(extraAddr);
-          } else {
-            setExtraAddress('');
-          }
-          setPostcode(data.zonecode);
-          setRoadAddress(addr);
+          setFormState(prev => ({ ...prev, postcode: data.zonecode, roadAddress: addr }));
+
           try {
             const ok = await loadKakaoMapsSdk();
             if (!ok) {
@@ -133,8 +169,13 @@ function CustomerSignUp() {
                     if (status === window.kakao.maps.services.Status.OK) {
                       const coordinateX = result[0].x;
                       const coordinateY = result[0].y;
-                      console.log('X좌표(경도):', coordinateX);
-                      console.log('Y좌표(위도):', coordinateY);
+                      // 상태에 좌표 저장
+                      setFormState(prev => ({
+                        ...prev,
+                        xPoint: coordinateX,
+                        yPoint: coordinateY,
+                      }));
+                      console.log("주소 검색 완료, 좌표가 상태에 저장되었습니다:", { x: coordinateX, y: coordinateY });
                     }
                   });
                 } catch (innerErr) {
@@ -157,14 +198,14 @@ function CustomerSignUp() {
   const handleFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) {
-      setStoreImage(null);
-      setImagePreviewUrl("");
+      setFormState(prev => ({ ...prev, storeImage: null, imagePreviewUrl: "" }));
       return;
     }
-    setStoreImage(file);
+    setFormState(prev => ({ ...prev, storeImage: file }));
+
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setImagePreviewUrl(String(ev.target.result));
+      setFormState(prev => ({ ...prev, imagePreviewUrl: String(ev.target.result) }));
     };
     reader.readAsDataURL(file);
   };
@@ -182,6 +223,14 @@ function CustomerSignUp() {
     minWidth: '90px',
     textAlign: 'right',
   };
+
+  // 모든 필수 필드가 채워졌는지 확인하는 변수
+  const isFormValid =
+    formState.isBusinessVerified &&
+    formState.storeName.trim() !== "" &&
+    formState.roadAddress.trim() !== "" &&
+    formState.detailAddress.trim() !== "" &&
+    formState.storePhone.trim() !== "";
 
   return (
     <div style={{
@@ -219,23 +268,37 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>사업자번호:</span>
             <TextField
-              value={businessNumber}
-              onChange={(e) => setBusinessNumber(formatBusinessNumber(e.target.value))}
+              disabled={formState.isBusinessVerified} // 인증 후 비활성화
+              value={formState.businessNumber}
+              onChange={(e) => {
+                setFormState(prev => ({
+                  ...prev,
+                  businessNumber: formatBusinessNumber(e.target.value),
+                  isBusinessVerified: false // 번호 변경 시 인증 상태 초기화
+                }));
+              }}
               placeholder="000-00-00000"
               size="small"
               variant="outlined"
-              sx={{ minWidth: 240 }}
+              sx={{ minWidth: 150, flexGrow: 1 }}
               type="text"
               inputProps={{ inputMode: 'numeric', pattern: '[0-9-]*', maxLength: 12 }}
             />
+            <Button
+              variant="outlined"
+              onClick={handleVerifyBusinessNumber}
+              disabled={formState.isBusinessVerified}
+              sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+            >사업자 인증</Button>
+            {formState.isBusinessVerified && <Chip label="인증완료" color="success" size="small" />}
           </div>
 
           {/* 상호명 */}
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>상호명:</span>
             <TextField
-              value={storeName}
-              onChange={(e) => setStoreName(e.target.value)}
+              value={formState.storeName}
+              onChange={(e) => setFormState(prev => ({ ...prev, storeName: e.target.value }))}
               placeholder="상호명"
               size="small"
               variant="outlined"
@@ -247,7 +310,7 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>우편번호:</span>
             <TextField
-              value={postcode}
+              value={formState.postcode}
               onChange={() => {}}
               placeholder="우편번호"
               size="small"
@@ -267,7 +330,7 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>도로명 주소:</span>
             <TextField
-              value={roadAddress}
+              value={formState.roadAddress}
               onChange={() => {}}
               placeholder="도로명 주소"
               size="small"
@@ -281,8 +344,8 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>상세주소:</span>
             <TextField
-              value={detailAddress}
-              onChange={(e) => setDetailAddress(e.target.value)}
+              value={formState.detailAddress}
+              onChange={(e) => setFormState(prev => ({ ...prev, detailAddress: e.target.value }))}
               placeholder="상세주소"
               size="small"
               variant="outlined"
@@ -295,26 +358,12 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>상세정보:</span>
             <TextField
-              value={extraInfo}
-              onChange={(e) => setExtraInfo(e.target.value)}
+              value={formState.extraInfo}
+              onChange={(e) => setFormState(prev => ({ ...prev, extraInfo: e.target.value }))}
               placeholder="매장을 소개글을 작성해주세요"
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
-            />
-          </div>
-
-          {/* 참고항목 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>참고항목:</span>
-            <TextField
-              value={extraAddress}
-              onChange={() => {}}
-              placeholder="참고항목"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240 }}
-              inputProps={{ readOnly: true }}
             />
           </div>
 
@@ -337,10 +386,10 @@ function CustomerSignUp() {
           </div>
 
           {/* 이미지 미리보기 */}
-          {imagePreviewUrl && (
+          {formState.imagePreviewUrl && (
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               <img
-                src={imagePreviewUrl}
+                src={formState.imagePreviewUrl}
                 alt="store-preview"
                 style={{ maxWidth: '320px', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee' }}
               />
@@ -351,8 +400,8 @@ function CustomerSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>매장 전화번호:</span>
             <TextField
-              value={storePhone}
-              onChange={(e) => setStorePhone(formatPhoneNumber(e.target.value))}
+              value={formState.storePhone}
+              onChange={(e) => setFormState(prev => ({ ...prev, storePhone: formatPhoneNumber(e.target.value) }))}
               placeholder="000-0000-0000"
               size="small"
               variant="outlined"
@@ -362,7 +411,15 @@ function CustomerSignUp() {
             />
           </div>
 
+          {/* 안내 메시지 */}
+          {!formState.isBusinessVerified && (
+            <div style={{ color: '#d32f2f', fontSize: '12px', marginTop: '10px', textAlign: 'center' }}>
+              사업자 인증을 먼저 진행해주세요.
+            </div>
+          )}
+
           <Button type="submit" variant="contained"
+            disabled={!isFormValid}
             sx={{
               backgroundColor: 'black',
               '&:hover': { backgroundColor: '#111' },
