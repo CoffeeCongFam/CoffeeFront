@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Box,
@@ -8,38 +8,52 @@ import {
   Button,
   Avatar,
   IconButton,
-  Divider,
+  Drawer,
 } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
+import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from "react-router-dom";
+import SubscriptionPage from "./Subscription";
 
-// 필요한 메뉴 항목
-// const topMenus = ["구독권 관리", "내 기프티콘", "내 선물함", "선물하기"];
-// const bottomMenus = ["리뷰 내역", "결제 관리"];
+// TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
+import MyGiftPage from "./MyGift";
+// import GiftPage from "./Gift";
+// import PaymentHistoryPage from "./PaymentHistory";
+
+// 임시 플레이스홀더 컴포넌트
+const PlaceholderComponent = ({ title }) => (
+  <Box sx={{ p: 3, textAlign: 'center' }}>
+    <Typography variant="h5">{title}</Typography>
+    <Typography>이곳에 {title} 페이지 내용이 표시됩니다.</Typography>
+  </Box>
+);
 
 function MyPage() {
   let navigate = useNavigate();
-  const userName = "커피콩빵_러버"; // 하드코딩된 유저 이름
+  const userName = "커피콩빵"; // 하드코딩된 유저 이름
+
+  const [drawerContent, setDrawerContent] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = ["구독권 관리", "내 선물함", "선물하기", "결제 내역"];
   
   const handleMenuClick = (menu) => {
-    switch (menu) {
-      case "구독권 관리":
-        navigate("/me/subscription");
-        break;
-      case "내 선물함":
-        navigate("/me/mygift");
-        break;
-      case "선물하기":
-        navigate("/me/gift");
-        break;
-      case "결제 내역":
-        navigate("/me/paymenthistory");
-        break;
-      default:
-        console.log(`${menu} 클릭 - 정의되지 않은 경로`);
+    setDrawerContent(menu);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
+  // Drawer에 표시할 컨텐츠를 렌더링하는 함수
+  const renderDrawerContent = () => {
+    switch (drawerContent) {
+      case "구독권 관리": return <SubscriptionPage />;
+      case "내 선물함": return <MyGiftPage />;
+      case "선물하기": return <PlaceholderComponent title="선물하기" />;
+      case "결제 내역": return <PlaceholderComponent title="결제 내역" />;
+      default: return null;
     }
   };
 
@@ -74,17 +88,6 @@ function MyPage() {
         mb={3}
       >
         <Box display="flex" alignItems="center">
-          {/* 원형의 검정색 프로필 사진 (아바타) */}
-          <Avatar
-            sx={{
-              width: 64,
-              height: 64,
-              bgcolor: "black", // 검정색 배경
-              mr: 2,
-            }}
-          >
-            {/* 필요하다면 여기에 아이콘이나 이니셜 추가 가능 */}
-          </Avatar>
           {/* 유저 이름 (하드코딩) */}
           <Box>
             <Typography variant="h5" component="h1" fontWeight="bold">
@@ -93,18 +96,38 @@ function MyPage() {
             {/* 이미지에 있던 추가 정보는 요청에 없으므로 생략 */}
           </Box>
         </Box>
-        {/* 설정 아이콘 */}
-        <IconButton aria-label="settings" color="default">
-          <SettingsIcon />
-        </IconButton>
       </Box>
-
       {/* 흰색 구역 (Paper 컴포넌트 사용) */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Grid container spacing={1} justifyContent="flex-start">
           {renderGridItems(finalMenus)}
         </Grid>
       </Paper>
+
+      {/* 하단에서 올라오는 Drawer */}
+      <Drawer
+        anchor="bottom"
+        open={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        sx={{
+          '& .MuiDrawer-paper': {
+            height: '80vh', // 화면의 80% 높이
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+          },
+        }}
+      >
+        <Box sx={{ position: 'relative', height: '100%' }}>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDrawer}
+            sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Box sx={{ height: '100%', overflowY: 'auto', pt: 2 }}>{renderDrawerContent()}</Box>
+        </Box>
+      </Drawer>
     </Container>
   );
 }

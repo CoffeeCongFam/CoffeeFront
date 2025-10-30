@@ -10,12 +10,15 @@ import {
   MenuItem,
   Select,
   FormControl,
+  IconButton,
 } from '@mui/material';
 import StandardTag from '../../components/customer/subcription/StandardTag';
 import subscriptionList from '../../data/customer/subscriptionList';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 // 구독권 상세 정보 컴포넌트
 const SubscriptionDetailCard = ({ subscriptionData }) => {
@@ -169,6 +172,56 @@ const SubscriptionDetailCard = ({ subscriptionData }) => {
   );
 };
 
+// 커스텀 다음 화살표 컴포넌트
+function NextArrow(props) {
+  const { onClick } = props;
+  return (
+    <IconButton
+      onClick={onClick}
+      sx={{
+        position: 'absolute',
+        top: '50%',
+        right: '-40px', // 캐러셀 바깥으로 위치 조정
+        transform: 'translateY(-50%)',
+        zIndex: 2,
+        color: 'black',
+        backgroundColor: 'white',
+        boxShadow: 3,
+        '&:hover': {
+          backgroundColor: 'rgba(255, 255, 255, 0.8)'
+        }
+      }}
+    >
+      <ArrowForwardIosIcon fontSize="small" />
+    </IconButton>
+  );
+}
+
+// 커스텀 이전 화살표 컴포넌트
+function PrevArrow(props) {
+  const { onClick } = props;
+  return (
+    <IconButton
+      onClick={onClick}
+      sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '-40px', // 캐러셀 바깥으로 위치 조정
+        transform: 'translateY(-50%)',
+        zIndex: 2,
+        color: 'black',
+        backgroundColor: 'white',
+        boxShadow: 3,
+        '&:hover': {
+          backgroundColor: 'rgba(255, 255, 255, 0.8)'
+        }
+      }}
+    >
+      <ArrowBackIosNewIcon fontSize="small" />
+    </IconButton>
+  );
+}
+
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
   const settings = {
@@ -177,7 +230,8 @@ const SubscriptionPage = () => {
     speed: 500, // 넘어가는 속도
     slidesToShow: 2, // 한 번에 보여줄 슬라이드 수
     slidesToScroll: 1,
-    arrows: true,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
     responsive: [
       {
         breakpoint: 600, // 600px 이하에서는
@@ -194,13 +248,15 @@ const SubscriptionPage = () => {
         나의 구독권
       </Typography>
       {subscriptionList.length > 0 ? (
-        <Slider {...settings}>
-          {subscriptionList.map((subscription, index) => (
-            <Box key={index} sx={{ padding: '0 8px' }}>
-              <SubscriptionDetailCard subscriptionData={subscription} />
-            </Box>
-          ))}
-        </Slider>
+        <Box sx={{ position: 'relative', padding: '0 20px' }}>
+          <Slider {...settings}>
+            {subscriptionList.map((subscription, index) => (
+              <Box key={index} sx={{ padding: '0 8px' }}>
+                <SubscriptionDetailCard subscriptionData={subscription} />
+              </Box>
+            ))}
+          </Slider>
+        </Box>
       ) : (
         <Typography>보유한 구독권이 없습니다.</Typography>
       )}
