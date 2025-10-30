@@ -107,8 +107,8 @@ function CustomerSignUp({ initialEmail = "member123@example.com" }) {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
         backgroundColor: '#fff',
       }}>
-
         <div style={{ fontWeight: 'bold', fontSize: '22px', color: 'black', marginBottom: '10px' }}>일반회원</div>
+        
         <form onSubmit={handleSubmit} style={{
           display: 'flex',
           flexDirection: 'column',
