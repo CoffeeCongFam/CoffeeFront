@@ -3,6 +3,7 @@ const cafeList = [
   {
     storeId: 1,
     storeName: "카페 모나카",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 테헤란로 110",
     detailAddress: "지하 1층",
     xPoint: 37.501,
@@ -11,6 +12,7 @@ const cafeList = [
   {
     storeId: 2,
     storeName: "어글리베이커 강남점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 강남대로94길 10",
     detailAddress: "1층",
     xPoint: 37.4991,
@@ -19,6 +21,7 @@ const cafeList = [
   {
     storeId: 3,
     storeName: "카페 노티드 삼성점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 영동대로 513",
     detailAddress: "1층 101호",
     xPoint: 37.5082,
@@ -27,6 +30,7 @@ const cafeList = [
   {
     storeId: 4,
     storeName: "앤드테일 신논현점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 서초구 강남대로 431",
     detailAddress: "2층",
     xPoint: 37.5048,
@@ -35,6 +39,7 @@ const cafeList = [
   {
     storeId: 5,
     storeName: "펄스커피 교대점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 서초구 서초대로 325",
     detailAddress: "1층 103호",
     xPoint: 37.4938,
@@ -43,6 +48,7 @@ const cafeList = [
   {
     storeId: 6,
     storeName: "블루보틀 삼성점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 봉은사로 524",
     detailAddress: "1층",
     xPoint: 37.5134,
@@ -51,6 +57,7 @@ const cafeList = [
   {
     storeId: 7,
     storeName: "빈브라더스 역삼점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 논현로 508",
     detailAddress: "1층",
     xPoint: 37.4962,
@@ -59,6 +66,7 @@ const cafeList = [
   {
     storeId: 8,
     storeName: "할리스커피 강남역 1번출구점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 강남대로 396",
     detailAddress: "2층",
     xPoint: 37.498,
@@ -67,6 +75,7 @@ const cafeList = [
   {
     storeId: 9,
     storeName: "컴포즈커피 신논현점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 서초구 서초대로77길 55",
     detailAddress: "1층",
     xPoint: 37.5033,
@@ -75,6 +84,7 @@ const cafeList = [
   {
     storeId: 10,
     storeName: "스타벅스 강남R점",
+    storeImage: "https://picsum.photos/400/400",
     roadAddress: "서울특별시 강남구 강남대로 390",
     detailAddress: "1~2층",
     xPoint: 37.4979,

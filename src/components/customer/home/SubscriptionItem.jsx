@@ -5,7 +5,9 @@ import {
   Typography,
   Button,
   Box,
+  Chip,
 } from "@mui/material";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
@@ -21,68 +23,93 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
   return (
     <Card
       sx={{
-        width: 250,
+        width: 230,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
-        margin: "0 auto",
-        borderRadius: "8px",
+        m: "0 auto",
+        borderRadius: "10px",
         overflow: "hidden",
+        bgcolor: "white",
       }}
     >
-      <Box sx={{ width: "100%" }}>
+      {/* 상단 이미지 */}
+      <Box sx={{ width: "100%", bgcolor: "#e9e9e9" }}>
         <CardMedia
           component="img"
           sx={{
             width: "100%",
-            height: 70,
+            height: 100,
             objectFit: "cover",
+            backgroundColor: "#ddd",
           }}
           image={item.store.storeImage}
           alt={item.store.storeName}
         />
-        <CardContent sx={{ p: 1.5 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight="bold">
-              {item.subName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {item.store.storeName}
-            </Typography>
-          </Box>
-
-          <Typography
-            variant="body2"
-            sx={{ fontSize: "10px", textAlign: "right", mt: 0.5 }}
-          >
-            {item.subStart} ~ {item.subEnd}
-          </Typography>
-          <Typography
-            color="error"
-            sx={{ fontSize: "12px", textAlign: "right", mt: 0.5 }}
-          >
-            남은 이용일: {getRemainingDays(today, item.subEnd)}일
-          </Typography>
-        </CardContent>
       </Box>
 
+      {/* 본문 */}
+      <CardContent sx={{ width: "100%", p: 2, pt: 1.5 }}>
+        {/* 1줄 : 카페 이름 + 구독권 뱃지 */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 1,
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="700">
+            {item.store.storeName}
+          </Typography>
+
+          <Chip
+            icon={<StarBorderIcon sx={{ color: "white" }} />}
+            label={item.subName}
+            size="small"
+            style={{ fontSize: "10px", width: "fit-content" }}
+            sx={{
+              bgcolor: "black",
+              color: "white",
+              "& .MuiChip-icon": { mr: 0 },
+              borderRadius: "16px",
+            }}
+          />
+        </Box>
+
+        {/* 이용 기간 (가운데 정렬, 회색) */}
+        <Typography
+          variant="body2"
+          sx={{ fontSize: "12px", textAlign: "right", color: "grey.600" }}
+        >
+          {item.subStart} ~ {item.subEnd}
+        </Typography>
+
+        {/* 남은 이용일 (가운데, 핑크) */}
+        <Typography
+          sx={{
+            fontSize: "12px",
+            textAlign: "right",
+            mt: 0.5,
+            color: "#ff1493", // 핫핑크 쪽
+            fontWeight: 500,
+          }}
+        >
+          남은 이용일: {getRemainingDays(today, item.subEnd)}일
+        </Typography>
+      </CardContent>
+
       {/* 하단 버튼 */}
-      <Box sx={{ width: "100%", p: 1 }}>
+      <Box sx={{ width: "100%", px: 2, pb: 2 }}>
         {item.remainingCount > 0 ? (
           <Button
             onClick={() => handleOrderClick(item)}
-            size="small"
             fullWidth
             sx={{
               backgroundColor: "black",
               color: "white",
+              borderRadius: "6px",
               "&:hover": { backgroundColor: "#333" },
             }}
           >
@@ -91,9 +118,12 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         ) : (
           <Button
             disabled
-            size="small"
             fullWidth
-            sx={{ backgroundColor: "#f0f0f0", color: "#888" }}
+            sx={{
+              backgroundColor: "#f0f0f0",
+              color: "#888",
+              borderRadius: "6px",
+            }}
           >
             오늘 이용 완료
           </Button>
