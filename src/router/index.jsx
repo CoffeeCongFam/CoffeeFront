@@ -12,8 +12,8 @@ import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
 import OrderPage from "../pages/customer/OrderPage";
 import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CafeSignUp from "../pages/home/CafeSignUp";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
-import MemberSignUp from "../pages/home/MemberSignUp";
 import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
 
@@ -39,12 +39,12 @@ const router = createBrowserRouter([
         element: <KakaoRedirect />,
       },
       {
-        path: "CustomerSignUp",
+        path: "customerSignUp",
         element: <CustomerSignUp />,
       },
       {
-        path: "MemberSignUp",
-        element: <MemberSignUp />,
+        path: "cafeSignUp",
+        element: <CafeSignUp />,
       },
     ],
   },
