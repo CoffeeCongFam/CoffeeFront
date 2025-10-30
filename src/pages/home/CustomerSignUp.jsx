@@ -128,7 +128,6 @@ function CustomerSignUp({ initialEmail = "member123@example.com" }) {
               sx={{ minWidth: 240 }}
             />
           </div>
-
           {/* 이메일 - 일반 텍스트 형태로만 표시 (수정 불가) */}
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>이메일:</span>
