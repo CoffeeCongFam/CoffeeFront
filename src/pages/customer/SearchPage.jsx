@@ -121,6 +121,7 @@ export default function SearchPage() {
   }, []);
 
   // # TODO 키워드 필터링
+
   // useEffect(() => {
   //   if (!keyword) {
   //     setCafes(cafeList ?? []);
