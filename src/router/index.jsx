@@ -11,6 +11,8 @@ import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
 import OrderPage from "../pages/customer/OrderPage";
+import SearchPage from "../pages/customer/SearchPage";
+import MyPage from "../pages/customer/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -42,8 +44,16 @@ const router = createBrowserRouter([
         element: <CustomerHome />,
       },
       {
+        path: "search",
+        element: <SearchPage />,
+      },
+      {
         path: "order",
         element: <OrderPage />,
+      },
+      {
+        path: "mypage",
+        element: <MyPage />,
       },
     ],
   },
