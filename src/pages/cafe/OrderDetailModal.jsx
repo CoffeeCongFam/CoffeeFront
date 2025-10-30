@@ -28,10 +28,10 @@ const REFUSAL_REASONS = [
 
 // 모달 컴포넌트 - 상세 정보 확인, 거절 사유 버튼, 접수거절 버튼
 
-const DetailField = ({ label, value, isStatus = false }) => {
+const DetailField = ({ label, value, isState = false }) => {
   let content;
 
-  if (isStatus) {
+  if (isState) {
     // 주문 상태 필드인 경우 (객체 전달됨): value.name을 렌더링
     content = (
       <Typography

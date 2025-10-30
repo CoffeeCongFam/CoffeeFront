@@ -49,6 +49,7 @@ export default function StoreLayout() {
       label: '매장 정보',
       icon: <ShoppingCartIcon />,
     },
+    { to: '/me/search', label: '상품 관리', icon: <SearchIcon /> },
   ];
 
   const DrawerContent = (

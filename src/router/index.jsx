@@ -91,7 +91,7 @@ const router = createBrowserRouter([
         element: <CompleteOrderPage />,
       },
       {
-        path: 'mypage',
+        path: "mypage",
         element: <MyPage />,
       },
       {
