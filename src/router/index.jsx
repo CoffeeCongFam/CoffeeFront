@@ -15,6 +15,7 @@ import SearchPage from "../pages/customer/SearchPage";
 import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
+import StoreDetailPage from "../pages/customer/StoreDetailPage";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
         path: "mypage",
         element: <MyPage />,
       },
+      {
+        path: "store/:storeId",
+        element: <StoreDetailPage />
+      },
     ],
   },
 
@@ -77,6 +82,7 @@ const router = createBrowserRouter([
         index: true,
         element: <StoreHome />,
       },
+      
     ],
   },
 

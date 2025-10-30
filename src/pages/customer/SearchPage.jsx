@@ -10,6 +10,11 @@ import {
   Box,
   Typography,
   Paper,
+  ListItemAvatar,
+  Avatar,
+  Chip,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
@@ -22,19 +27,50 @@ import loadNaverMaps from "../../utils/naverMapLoader.js";
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
   left: "50%",
-  bottom: 70,
-  transform: "translate(-50%, 100%)", // 기본은 화면 아래로 숨기기
-  // width: "min(90vw, 380px)", // 너비 조절
+  bottom: 0,
+  transform: "translate(-50%, 100%)", // 기본: 숨김
   width: "100%",
-  maxHeight: "50vh",
-  borderRadius: 16,
-  overflow: "hidden",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+  maxHeight: "80vh",
+  borderTopLeftRadius: 16,
+  borderTopRightRadius: 16,
+  boxShadow: "0 -4px 20px rgba(0,0,0,0.2)",
   backgroundColor: theme.palette.background.paper,
   display: "flex",
   flexDirection: "column",
-  transition: "transform 0.25s ease-out",
+  transition: "transform 0.3s ease-in-out",
+  overflow: "hidden",
+  zIndex: 20,
+  padding: "10px"
 }));
+
+
+// 매장 상태 
+const STATUS_MAP = {
+  OPEN: {
+    label: "영업중",
+    sx: {
+      backgroundColor: "#E6F4EA", // 연한 민트/그린톤
+      color: "#137333", // 진한 초록
+      fontWeight: 600,
+    },
+  },
+  CLOSED: {
+    label: "영업종료",
+    sx: {
+      backgroundColor: "#F1F3F4", // 밝은 회색
+      color: "#5F6368", // 중간톤 회색 텍스트
+      fontWeight: 500,
+    },
+  },
+  HOLIDAY: {
+    label: "휴무일",
+    sx: {
+      backgroundColor: "#FFF8E1", // 연한 크림 노랑
+      color: "#B28704", // 따뜻한 머스타드색 텍스트
+      fontWeight: 600,
+    },
+  },
+};
 
 export default function SearchPage() {
   const mapContainerRef = useRef(null);
@@ -46,6 +82,9 @@ export default function SearchPage() {
   const [status, setStatus] = useState("loading");
   const [keyword, setKeyword] = useState("");
   const [cafes, setCafes] = useState([]);
+
+  const [sortOption, setSortOption] = useState("distance"); // distance | latest | subscribers | reviews
+
 
   // 패널 열림 여부
   const [openCafeList, setOpenCafeList] = useState(false);
@@ -152,15 +191,63 @@ export default function SearchPage() {
   const handleSelectCafe = (cafe) => {
     const map = mapRef.current;
     const maps = mapsRef.current;
+    const mm = mmRef.current;
     if (!map || !maps) return;
-    if (!cafe.latitude || !cafe.longitude) return;
 
-    const pos = new maps.LatLng(cafe.latitude, cafe.longitude);
-    if (typeof map.panTo === "function") map.panTo(pos);
-    else map.setCenter(pos);
+    // MarkerManager가 있으면 그쪽에 먼저 맡긴다
+    const id = cafe.id ?? cafe.storeId;
+    if (mm && id != null) {
+      mm.focusCafe(id, cafe);   // ✅ 우리가 방금 MarkerManager에 만든 메서드
+    } else {
+      // 혹시 모를 fallback
+      if (!cafe.xPoint || !cafe.yPoint) return;
+      const pos = new maps.LatLng(cafe.xPoint, cafe.yPoint);
+      if (typeof map.panTo === "function") map.panTo(pos);
+      else map.setCenter(pos);
+    }
 
+    // 패널 닫기
     setOpenCafeList(false);
   };
+
+
+
+  // 매장 상태 칩 
+  function renderStoreStatus(status) {
+    const config = STATUS_MAP[status] || {
+      label: "정보없음",
+      sx: { backgroundColor: "#ECEFF1", color: "#5F6368" },
+    };
+
+    return (
+      <Chip
+        label={config.label}
+        size="small"
+        sx={{
+          textAlign: "center",
+          fontSize: "0.75rem",
+          width: "fit-content",
+          ...config.sx, // 상태별 색상 적용
+        }}
+      />
+    );
+  }
+
+  // 매장 리스트 정렬
+  const sortedCafes = [...cafes].sort((a, b) => {
+    switch (sortOption) {
+      case "latest":
+        return new Date(b.createdAt) - new Date(a.createdAt); // 최신순
+      case "subscribers":
+        return (b.subscriberCount || 0) - (a.subscriberCount || 0); // 구독자수순
+      case "reviews":
+        return (b.reviewCount || 0) - (a.reviewCount || 0); // 리뷰순
+      case "distance":
+      default:
+        return (a.distance || 0) - (b.distance || 0); // 거리순 (가까운 순)
+    }
+  });
+
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
@@ -199,15 +286,14 @@ export default function SearchPage() {
         </Button>
       </div>
 
-      {/* 작은 바텀 패널 (OUTLINE용) */}
+      {/* 카페 리스트용 패널 */}
       <Panel
         sx={{
           transform: openCafeList
-            ? "translate(-50%, 0)" // 열렸을 때
-            : "translate(-50%, 100%)", // 닫혔을 때
+            ? "translate(-50%, 0)"     // 위로 올라오기 (열림)
+            : "translate(-50%, 100%)", // 아래로 내려가기 (닫힘)
         }}
       >
-        {/* 헤더 */}
         <Box
           sx={{
             px: 2,
@@ -219,34 +305,159 @@ export default function SearchPage() {
           }}
         >
           <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
-          <Button size="small" onClick={() => setOpenCafeList(false)}>
-            닫기
-          </Button>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Select
+              size="small"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              sx={{ fontSize: "0.875rem", height: 32 }}
+            >
+              <MenuItem value="distance">거리순</MenuItem>
+              <MenuItem value="latest">최신순</MenuItem>
+              <MenuItem value="subscribers">구독자순</MenuItem>
+              <MenuItem value="reviews">리뷰순</MenuItem>
+            </Select>
+            <Button size="small" onClick={() => setOpenCafeList(false)}>
+              닫기
+            </Button>
+          </Box>
         </Box>
 
-        {/* 리스트 */}
-        <Box sx={{ overflowY: "auto", width: "100%" }}>
-          <List dense>
-            {cafes.map((cafe) => (
-              <React.Fragment key={cafe.storeId ?? cafe.id}>
-                <ListItem
-                  button={true}
+        <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
+          {/* dense */}
+          <List >
+            <Box sx={{ overflowY: "auto", flexGrow: 1, gap: 2, display: "flex", flexDirection: "column",  }}>
+              {/* 정렬 기준 */}
+              {sortedCafes.map((cafe) => (
+                <Box
+                  key={cafe.storeId}
                   onClick={() => handleSelectCafe(cafe)}
-                  style={{ cursor: "pointer" }}
+                  sx={{
+                    bgcolor: "#f8f9fa",
+                    borderRadius: 2,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+                    p: 2,
+                    mb: 2,
+                    display: "flex",
+                    gap: 2,
+                    alignItems: "stretch",
+                    cursor:"pointer"
+                  }}
                 >
-                  <ListItemText
-                    primary={cafe.storeName}
-                    secondary={
-                      cafe.roadAddress || cafe.address || "주소 정보 없음"
-                    }
-                  />
+                  {/* 썸네일 */}
+                  <Box
+                    sx={{
+                      width: 72,
+                      height: 72,
+                      bgcolor: grey[100],
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Avatar
+                      src={cafe.storeImage}
+                      alt={cafe.storeName}
+                      sx={{ width: "100%", height: "100%", borderRadius: 2 }}
+                      variant="rounded"
+                    />
+                  </Box>
+
+                  {/* 가운데 정보 영역 */}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    {/* 위줄: 상태칩 + 거리 */}
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+                      {renderStoreStatus(cafe.storeStatus)}
+                      <Typography variant="caption" color="text.secondary">
+                        {cafe.distance ?? "454m"}
+                      </Typography>
+                    </Box>
+
+                    {/* 카페 이름 / 주소 */}
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}>
+                      {cafe.storeName}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                      {cafe.roadAddress || cafe.address || "주소 정보 없음"}
+                    </Typography>
+
+                    {/* 구독자/리뷰 줄 */}
+                    <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+                      <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        👥 {cafe.subscriberCount ?? 0}명 구독
+                      </Typography>
+                      <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                        ⭐ {cafe.reviewCount ?? 0}개 리뷰
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* 오른쪽 버튼 영역 */}
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {cafe.isSubscribed ? (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<span style={{ fontSize: 14 }}>✓</span>}
+                        sx={{
+                          borderRadius: 999,
+                          borderColor: grey[400],
+                          color: grey[800],
+                          px: 2,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        구독 중인 카페
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          borderRadius: 999,
+                          bgcolor: "black",
+                          "&:hover": { bgcolor: "#222" },
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        + 구독하기
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+            {/* {cafes.map((cafe) => (
+              <React.Fragment key={cafe.id}>
+                <ListItem button={true} onClick={() => handleSelectCafe(cafe)} style={{cursor: "pointer"}}>
+                  <ListItemAvatar>
+                    <Avatar alt={cafe.id} src={cafe.storeImage} />
+                  </ListItemAvatar>
+                    <ListItemText
+                      primary={cafe.storeName}
+                      secondary={cafe.roadAddress || cafe.address || "주소 정보 없음"}
+                      primaryTypographyProps={{
+                        fontWeight: "bold",     
+                        fontSize: "1rem",       
+                      }}
+                      secondaryTypographyProps={{
+                        color: "text.secondary", 
+                        fontSize: "0.875rem",
+                      }}
+                    />
+                  {renderStoreStatus(cafe.storeStatus)}
                 </ListItem>
                 <Divider />
               </React.Fragment>
-            ))}
+            ))} */}
           </List>
         </Box>
       </Panel>
+
     </div>
   );
 }
