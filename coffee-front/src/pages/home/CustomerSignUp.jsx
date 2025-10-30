@@ -2,17 +2,21 @@ import React, { useRef, useState } from "react";
 import { Button, TextField } from "@mui/material";
 
 function CustomerSignUp() {
+  const JAVASCRIPT_API_KEY = 'bfc6a794411e9c59db71d143bcc3d704';
   // 상태 관리
   const [businessNumber, setBusinessNumber] = useState("");
   const [storeName, setStoreName] = useState("");
   const [roadAddress, setRoadAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [extraAddress, setExtraAddress] = useState("");
   const [extraInfo, setExtraInfo] = useState("");
   const [storePhone, setStorePhone] = useState("");
   const [storeImage, setStoreImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
   const fileInputRef = useRef(null);
+  const detailAddressRef = useRef(null);
 
   // 사업자번호 입력값을 000-00-00000 형태로 포맷팅
   const formatBusinessNumber = (raw) => {
@@ -41,12 +45,113 @@ function CustomerSignUp() {
       storePhone,
       hasImage: Boolean(storeImage),
     };
-    console.log("전송할 점주회원 회원가입 데이터:", formData);
+    // submit 처리 로직 연동 예정
   };
 
-  const handleClickAddressSearch = () => {
-    // 도로명 주소 검색 로직 연동 예정 (모달/외부 라이브러리 등)
-    console.log("도로명 주소 검색 클릭");
+  // Daum Postcode 스크립트를 동적으로 로드
+  const loadDaumPostcodeScript = () => new Promise((resolve, reject) => {
+    if (window.daum && window.daum.Postcode) {
+      resolve();
+      return;
+    }
+    const existing = document.querySelector('script[data-daum-postcode]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', reject);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-daum-postcode', 'true');
+    script.onload = () => resolve();
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+
+  // Kakao Maps SDK 동적 로드 (권장 방식: autoload=false 후 kakao.maps.load로 초기화)
+  const loadKakaoMapsSdk = () => new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+      resolve(true);
+      return;
+    }
+    const existing = document.querySelector('script[data-kakao-maps]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(true));
+      existing.addEventListener('error', reject);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${JAVASCRIPT_API_KEY}&libraries=services&autoload=false`;
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-kakao-maps', 'true');
+    script.onload = () => resolve(true);
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+
+  const handleClickAddressSearch = async () => {
+    try {
+      await loadDaumPostcodeScript();
+      // eslint-disable-next-line no-undef
+      new window.daum.Postcode({
+        oncomplete: async function(data) {
+          let addr = '';
+          let extraAddr = '';
+          if (data.userSelectedType === 'R') {
+            addr = data.roadAddress;
+          } else {
+            addr = data.jibunAddress;
+          }
+          if (data.userSelectedType === 'R') {
+            if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+              extraAddr += data.bname;
+            }
+            if (data.buildingName !== '' && data.apartment === 'Y') {
+              extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+            }
+            if (extraAddr !== '') {
+              extraAddr = ' (' + extraAddr + ')';
+            }
+            setExtraAddress(extraAddr);
+          } else {
+            setExtraAddress('');
+          }
+          setPostcode(data.zonecode);
+          setRoadAddress(addr);
+          try {
+            const ok = await loadKakaoMapsSdk();
+            if (!ok) {
+              console.warn('Kakao Maps SDK key 미설정으로 지오코딩을 생략합니다.');
+            } else {
+              window.kakao.maps.load(() => {
+                try {
+                  const geocoder = new window.kakao.maps.services.Geocoder();
+                  geocoder.addressSearch(addr, function (result, status) {
+                    if (status === window.kakao.maps.services.Status.OK) {
+                      const coordinateX = result[0].x;
+                      const coordinateY = result[0].y;
+                      console.log('X좌표(경도):', coordinateX);
+                      console.log('Y좌표(위도):', coordinateY);
+                    }
+                  });
+                } catch (innerErr) {
+                  console.error('Geocoding failed inside kakao.maps.load:', innerErr);
+                }
+              });
+            }
+          } catch (geoErr) {
+            console.error('Kakao Maps SDK load failed:', geoErr);
+          }
+          // 상세주소 입력으로 포커스 이동
+          setTimeout(() => { if (detailAddressRef.current) { detailAddressRef.current.focus(); } }, 0);
+        }
+      }).open();
+    } catch (e) {
+      console.error('주소 검색 스크립트 로드 실패', e);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -138,15 +243,38 @@ function CustomerSignUp() {
             />
           </div>
 
-          {/* 도로명 주소 - 검색 버튼 */}
+          {/* 우편번호 - 주소 찾기 버튼 */}
           <div style={inputRowStyle}>
-            <span style={labelTextStyle}>도로명 주소:</span>
+            <span style={labelTextStyle}>우편번호:</span>
+            <TextField
+              value={postcode}
+              onChange={() => {}}
+              placeholder="우편번호"
+              size="small"
+              variant="outlined"
+              sx={{ minWidth: 160 }}
+              inputProps={{ readOnly: true }}
+            />
             <Button
               variant="outlined"
               onClick={handleClickAddressSearch}
               sx={{ textTransform: 'none' }}
-            >도로명 주소 검색</Button>
+            >주소 찾기</Button>
             <div style={{ flexGrow: 1 }}></div>
+          </div>
+
+          {/* 도로명 주소 */}
+          <div style={inputRowStyle}>
+            <span style={labelTextStyle}>도로명 주소:</span>
+            <TextField
+              value={roadAddress}
+              onChange={() => {}}
+              placeholder="도로명 주소"
+              size="small"
+              variant="outlined"
+              sx={{ minWidth: 240, flexGrow: 1 }}
+              inputProps={{ readOnly: true }}
+            />
           </div>
 
           {/* 상세주소 */}
@@ -159,6 +287,7 @@ function CustomerSignUp() {
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
+              inputRef={detailAddressRef}
             />
           </div>
 
@@ -172,6 +301,20 @@ function CustomerSignUp() {
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
+            />
+          </div>
+
+          {/* 참고항목 */}
+          <div style={inputRowStyle}>
+            <span style={labelTextStyle}>참고항목:</span>
+            <TextField
+              value={extraAddress}
+              onChange={() => {}}
+              placeholder="참고항목"
+              size="small"
+              variant="outlined"
+              sx={{ minWidth: 240 }}
+              inputProps={{ readOnly: true }}
             />
           </div>
 

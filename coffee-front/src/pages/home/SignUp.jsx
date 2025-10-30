@@ -4,10 +4,10 @@ import { Button } from "@mui/material";
 
 function SignUp() {
   let navigate = useNavigate();
-  const REST_API_KEY = '2ceea440100a5441ab093de7a7f761b3';
+  const JAVASCRIPT_API_KEY = 'bfc6a794411e9c59db71d143bcc3d704';
   const buildKakaoUrl = (role) => {
     const REDIRECT_URI = `http://localhost:5173/kakaoRedirect?role=${role}`;
-    return `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
+    return `https://kauth.kakao.com/oauth/authorize?client_id=${JAVASCRIPT_API_KEY}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code`;
   };
   return (
     <div style={{
