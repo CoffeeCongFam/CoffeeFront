@@ -1,6 +1,6 @@
 import React from "react";
 
-function ExceptionPage(props) {
+function ExceptionPage() {
   return <div>ERROR!!!!!!!!!!!!!!!!!!!</div>;
 }
 
