@@ -44,7 +44,8 @@ function CompleteOrderPage() {
     }
   }, [isCancel]);
 
-  async function handleCancelOrder(orderId) {
+  async function handleCancelOrder() {
+    // parameter 로 orderId 받아와야 함.
     try {
       // await api.post(`/api/orders/${orderId}/cancel`);
       const now = new Date();
