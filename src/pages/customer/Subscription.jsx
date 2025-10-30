@@ -1,7 +1,211 @@
-import React from "react";
+import React, { useState } from 'react';
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Button,
+  Divider,
+  MenuItem,
+  Select,
+  FormControl,
+} from '@mui/material';
+import StandardTag from '../../components/customer/subcription/StandardTag';
+import subscriptionList from '../../data/customer/subscriptionList';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-function Subscription() {
-  return <div>구독권 관리</div>;
-}
+// 구독권 상세 정보 컴포넌트
+const SubscriptionDetailCard = ({ subscriptionData }) => {
+  const [selectedMenu, setSelectedMenu] = useState('');
 
-export default Subscription;
+  const {
+    storeName,
+    subscriptionType,
+    price,
+    maxDailyUsage,
+    subscriptionDesc,
+    menuNameList,
+  } = subscriptionData;
+  
+  // subscriptionPeriod는 InfoBox 내부에서 1개월로 고정 사용해도 무방하지만,
+  // 더미 데이터의 subscriptionPeriod를 활용하려면 아래와 같이 사용 가능합니다.
+  // const subscriptionPeriod = subscriptionData.subscriptionPeriod;
+
+  const formattedPrice = price.toLocaleString();
+
+  // 금액 정보를 보여주는 박스 서브 컴포넌트
+  const InfoBox = ({ title, content, subContent = null, isPrice = false }) => (
+    <Box
+      sx={{
+        flexGrow: 1,
+        padding: 1,
+        backgroundColor: '#FFFFFF',
+        borderRadius: '8px',
+        minHeight: '70px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        border: '1px solid #E0E0E0',
+        marginRight: 1,
+      }}
+    >
+      <Typography variant="caption" color="textSecondary" fontWeight="bold" sx={{ mb: 0.25 }}>
+        {title}
+      </Typography>
+      <Typography variant="body2" fontWeight="bold">
+        {content}
+      </Typography>
+      {subContent && (
+        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+          {subContent}
+        </Typography>
+      )}
+    </Box>
+  );
+
+  return (
+    <Paper
+      elevation={3}
+      sx={{
+        maxWidth: 400,
+        margin: 'auto',
+        padding: 2.5,
+        borderRadius: '12px',
+        height: '450px', // 정사각형에 가까운 높이 설정
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between', // 내부 요소들의 간격을 균등하게 배분
+      }}>
+      
+      <Box sx={{ textAlign: 'center' }}>
+        <StandardTag type={subscriptionType} />
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: '#333' }}>
+          {storeName}
+        </Typography>
+        <Typography variant="body1" fontWeight="light" sx={{ mt: 1, color: '#333' }}>
+          <span style={{ fontWeight: 'bold' }}>₩{formattedPrice}</span>/월
+        </Typography>
+      </Box>
+
+      <Grid container spacing={1}>
+        <Grid item xs={4}>
+          <InfoBox
+            title="금액"
+            content={`월 ${formattedPrice}원`}
+            isPrice
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <InfoBox
+            title="구독 주기"
+            content={`1개월`} // 사진에 맞춰 1개월로 고정
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <InfoBox
+            title="일일 사용가능 횟수"
+            content={`매일, 하루 ${maxDailyUsage}잔`}
+          />
+        </Grid>
+      </Grid>
+
+      <Box>
+        <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{ mb: 1 }}>
+          상세설명
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+          {subscriptionDesc}
+        </Typography>
+      </Box>
+
+      <FormControl fullWidth variant="outlined">
+        <Select
+          value={selectedMenu}
+          onChange={(e) => setSelectedMenu(e.target.value)}
+          displayEmpty
+          inputProps={{ 'aria-label': 'Without label' }}
+          size="small"
+        >
+          <MenuItem value="" disabled>
+            제공메뉴
+          </MenuItem>
+          {menuNameList.map((menu, index) => (
+            <MenuItem key={index} value={menu}>
+              {menu}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+        <Button
+          variant="outlined"
+          sx={{
+            flex: 1, // padding: '12px 0',
+            borderColor: '#E0E0E0',
+            color: '#757575',
+            fontWeight: 'bold',
+          }}
+        >
+          결제 취소
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            flex: 1,
+            backgroundColor: '#424242',
+            '&:hover': {
+              backgroundColor: '#616161',
+            },
+          }}
+        >
+          사용 내역
+        </Button>
+      </Box>
+    </Paper>
+  );
+};
+
+// 구독권 목록을 보여주는 페이지 컴포넌트
+const SubscriptionPage = () => {
+  const settings = {
+    dots: true,
+    infinite: subscriptionList.length > 2, // 아이템이 2개 초과일 때만 무한으로 슬라이드
+    speed: 500, // 넘어가는 속도
+    slidesToShow: 2, // 한 번에 보여줄 슬라이드 수
+    slidesToScroll: 1,
+    arrows: true,
+    responsive: [
+      {
+        breakpoint: 600, // 600px 이하에서는
+        settings: {
+          slidesToShow: 1,
+        }
+      }
+    ]
+  };
+
+  return (
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+        나의 구독권
+      </Typography>
+      {subscriptionList.length > 0 ? (
+        <Slider {...settings}>
+          {subscriptionList.map((subscription, index) => (
+            <Box key={index} sx={{ padding: '0 8px' }}>
+              <SubscriptionDetailCard subscriptionData={subscription} />
+            </Box>
+          ))}
+        </Slider>
+      ) : (
+        <Typography>보유한 구독권이 없습니다.</Typography>
+      )}
+    </Container>
+  );
+};
+
+export default SubscriptionPage;
