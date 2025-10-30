@@ -34,22 +34,6 @@ function CustomerSignUp() {
     return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
   };
 
-  // 사업자번호 입력값을 000-00-00000 형태로 포맷팅
-  const formatBusinessNumber = (raw) => {
-    const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 10);
-    if (digitsOnly.length <= 3) return digitsOnly;
-    if (digitsOnly.length <= 5) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
-    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 5)}-${digitsOnly.slice(5)}`;
-  };
-
-  // 매장 전화번호를 000-0000-0000 형태로 포맷팅 (3-4-4)
-  const formatPhoneNumber = (raw) => {
-    const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 11);
-    if (digitsOnly.length <= 3) return digitsOnly;
-    if (digitsOnly.length <= 7) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
-    return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
