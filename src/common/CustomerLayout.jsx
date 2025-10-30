@@ -108,6 +108,7 @@ export default function CustomerLayout() {
         }}
       >
         {/* 상단 헤더(AppBar) */}
+        {/* 상단 헤더(AppBar) */}
         <AppBar
           position="fixed"
           color="inherit"
@@ -115,20 +116,15 @@ export default function CustomerLayout() {
           sx={{
             width: `calc(100% - ${drawerWidth}px)`,
             ml: `${drawerWidth}px`,
-            borderBottom: "1px solid #e0e0e0",
+            backgroundColor: "transparent", // 배경 투명하게
           }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="h6" noWrap>
-              고객 화면
-            </Typography>
-            <Box>
-              <IconButton color="inherit">
-                <Badge badgeContent={3} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Box>
+          <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton color="inherit">
+              <Badge badgeContent={3} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
           </Toolbar>
         </AppBar>
 

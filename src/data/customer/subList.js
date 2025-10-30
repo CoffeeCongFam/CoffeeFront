@@ -41,6 +41,48 @@ const subList = [
     subEnd: "2025-09-30",
     remainingCount: 0,
   },
+  {
+    subId: 4,
+    store: {
+      storeId: 3,
+      storeName: "카페 모나카",
+      storeImage: "https://picsum.photos/400/400",
+    },
+    subName: "테스트 구독권",
+    isGift: "N", // Y | N
+    isExpired: "Y", // Y | N
+    subStart: "2025-09-01",
+    subEnd: "2025-09-30",
+    remainingCount: 0,
+  },
+  {
+    subId: 5,
+    store: {
+      storeId: 3,
+      storeName: "카페 모나카",
+      storeImage: "https://picsum.photos/400/400",
+    },
+    subName: "테스트 구독권",
+    isGift: "N", // Y | N
+    isExpired: "Y", // Y | N
+    subStart: "2025-09-01",
+    subEnd: "2025-09-30",
+    remainingCount: 0,
+  },
+  {
+    subId: 6,
+    store: {
+      storeId: 3,
+      storeName: "카페 모나카",
+      storeImage: "https://picsum.photos/400/400",
+    },
+    subName: "테스트 구독권",
+    isGift: "N", // Y | N
+    isExpired: "Y", // Y | N
+    subStart: "2025-09-01",
+    subEnd: "2025-09-30",
+    remainingCount: 0,
+  },
 ];
 
 export default subList;
