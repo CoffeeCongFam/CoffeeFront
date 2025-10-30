@@ -7,7 +7,6 @@ function Landing() {
   let navigate = useNavigate();
   // 카카오 소셜로그인 필요한 코드 및 주소
   const JAVASCRIPT_API_KEY = 'bfc6a794411e9c59db71d143bcc3d704';
-  // const REST_API_KEY = '2ceea440100a5441ab093de7a7f761b3';
   const REDIRECT_URI = `http://localhost:5173/kakaoRedirect`;
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${JAVASCRIPT_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
   // 카카오 로그인 버튼

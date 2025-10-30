@@ -11,7 +11,7 @@ function KakaoRedirect() {
             // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
             const res = await axios({
                 method: 'GET',
-                url: `http://127.0.0.1:8080/oauth/callback/kakao?code=${code}`,
+                url: `http://localhost:8080/oauth/callback/kakao?code=${code}`,
                 withCredentials: true,
             });
             if (res.status !== 200) {
