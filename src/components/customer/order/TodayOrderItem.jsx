@@ -31,7 +31,7 @@ function TodayOrderItem({ order }) {
         >
           <CardMedia
             component="img"
-            style={{ borderRadius: "12px" }}
+            style={{ borderRadius: "8px" }}
             sx={{ width: 100, height: 70, objectFit: "cover" }}
             image={order.store.storeImage}
             alt={order.store.storeName}
@@ -43,7 +43,7 @@ function TodayOrderItem({ order }) {
               justifyContent: "center",
             }}
           >
-            <Typography variant="subtitle1">{order.store.storeName}</Typography>
+            <Typography variant="subtitle1" fontWeight="bold">{order.store.storeName}</Typography>
             <Typography variant="body2" color="text.secondary">
               {order.orderMenu[0].menuName} × {order.orderMenu[0].quantity}
             </Typography>
