@@ -1,4 +1,5 @@
-import { Typography, Paper, Button } from '@mui/material';
+import { Button, Paper } from '@mui/material';
+import CalendarCustomThree from './calendar/CustomCalendar';
 
 // 가데이터
 const DUMMY_PAST_ORDERS = [
@@ -127,6 +128,8 @@ export default function PastOrders() {
         <Button>오늘</Button>
         <Button>어제</Button>
         <Button>그제</Button>
+
+        <CalendarCustomThree />
 
         <Button variant="contained" size="small" sx={{ ml: 'auto' }}>
           조회 🔍
