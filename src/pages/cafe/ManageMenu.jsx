@@ -484,8 +484,4 @@ export default function ManageMenu() {
       />
     </Container>
   );
-=======
-export default function ManageMenu() {
-  return <>ㅎㅇ</>;
->>>>>>> eb975df (주문홈, 지난 주문 내역까지 ui 완료 / 메뉴 관리 페이지 시작해야 함)
 }

@@ -513,7 +513,6 @@ export default function PastOrdersList() {
               />
             </Box>
           </Box>
-
           {/* 로딩, 에러, 데이터 없음 상태 표시 */}
           <Box
             sx={{
