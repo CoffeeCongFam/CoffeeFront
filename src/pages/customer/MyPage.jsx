@@ -8,7 +8,7 @@ import {
   Button,
   Avatar,
   IconButton,
-  Drawer,
+  Slide,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from "react-router-dom";
@@ -97,37 +97,47 @@ function MyPage() {
           </Box>
         </Box>
       </Box>
-      {/* 흰색 구역 (Paper 컴포넌트 사용) */}
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Grid container spacing={1} justifyContent="flex-start">
-          {renderGridItems(finalMenus)}
-        </Grid>
-      </Paper>
+      {/* 흰색 구역 (Paper 컴포넌트 사용) - 시트가 열리면 숨김 */}
+      {!isDrawerOpen && (
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+          <Grid container spacing={1} justifyContent="flex-start">
+            {renderGridItems(finalMenus)}
+          </Grid>
+        </Paper>
+      )}
 
-      {/* 하단에서 올라오는 Drawer */}
-      <Drawer
-        anchor="bottom"
-        open={isDrawerOpen}
-        onClose={handleCloseDrawer}
-        sx={{
-          '& .MuiDrawer-paper': {
-            height: '80vh', // 화면의 80% 높이
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-          },
-        }}
-      >
-        <Box sx={{ position: 'relative', height: '100%' }}>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDrawer}
-            sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Box sx={{ height: '100%', overflowY: 'auto', pt: 2 }}>{renderDrawerContent()}</Box>
+      {/* 하단에서 올라오는 Bottom Sheet (전체 화면 덮지 않음) */}
+      <Slide direction="up" in={isDrawerOpen} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            position: 'fixed',
+            left: '30%',
+            transform: 'translateX(-50%)',
+            bottom: 0,
+            width: '100%',
+            maxWidth: 800, // Container maxWidth="md"(약 900px)에 맞춤
+            height: '80vh', // 화면 일부만 차지
+            bgcolor: 'background.paper',
+            borderTopLeftRadius: 2,
+            borderTopRightRadius: 2,
+            boxShadow: 24,
+            zIndex: (theme) => theme.zIndex.drawer, // AppBar 위로
+          }}
+        >
+          <Box sx={{ position: 'relative', height: '100%' }}>
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseDrawer}
+              sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+            >
+              <CloseIcon />
+            </IconButton>
+            <Box sx={{ height: '100%', overflowY: 'auto', pt: 2 }}>
+              {renderDrawerContent()}
+            </Box>
+          </Box>
         </Box>
-      </Drawer>
+      </Slide>
     </Container>
   );
 }

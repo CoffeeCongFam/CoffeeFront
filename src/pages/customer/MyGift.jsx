@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import myGiftList from "../../data/customer/myGiftList";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button, ButtonGroup } from '@mui/material';
+import ReceiveGift from "../../components/customer/gift/ReceiveGift";
+import SendGift from "../../components/customer/gift/SendGift";
 
 function MyGift() {
     const MY_USER_NAME = "커피콩빵";
     const HARDCODED_DATE = "2025.10.26";
+  const [filter, setFilter] = useState('ALL'); // 'ALL' | 'RECEIVED' | 'SENT'
+
+  const filteredGiftList = useMemo(() => {
+    const base = myGiftList.filter(
+      (it) => it.sender === MY_USER_NAME || it.receiver === MY_USER_NAME
+    );
+    if (filter === 'RECEIVED') return base.filter((it) => it.receiver === MY_USER_NAME);
+    if (filter === 'SENT') return base.filter((it) => it.sender === MY_USER_NAME);
+    return base; // ALL
+  }, [filter]);
  const formatMessage = (item) => {
     let messageComponent = null;
     let isSent = false;
@@ -58,22 +70,45 @@ function MyGift() {
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: 'white' }}>
-        <h2>내 선물함</h2>
-      {myGiftList.map((item, index) => {
-        
-        // 내가 보거나 받은 내역만 처리
-        if (item.sender === MY_USER_NAME || item.receiver === MY_USER_NAME) {
-            const { messageComponent, isSent } = formatMessage(item);
-            return (
-                <GiftListItem
-                    key={index}
-                    messageComponent={messageComponent}
-                    date={HARDCODED_DATE}
-                    isSent={isSent}
-                />
-            );
-        }
-        return null;
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>내 선물함</Typography>
+        <ButtonGroup size="small" aria-label="gift filter">
+          <Button
+            variant={filter === 'ALL' ? 'contained' : 'outlined'}
+            onClick={() => setFilter('ALL')}
+          >전체</Button>
+          <Button
+            variant={filter === 'RECEIVED' ? 'contained' : 'outlined'}
+            onClick={() => setFilter('RECEIVED')}
+          >받은선물</Button>
+          <Button
+            variant={filter === 'SENT' ? 'contained' : 'outlined'}
+            onClick={() => setFilter('SENT')}
+          >보낸선물</Button>
+        </ButtonGroup>
+      </Box>
+      {filteredGiftList.map((item, index) => {
+        const { messageComponent, isSent } = formatMessage(item);
+        return (
+          <Button
+            key={index}
+            fullWidth
+            variant="text"
+            onClick={() => console.log('gift clicked', item)}
+            sx={{
+              p: 0,
+              justifyContent: 'flex-start',
+              textTransform: 'none',
+              mb: 1,
+            }}
+          >
+            <GiftListItem
+              messageComponent={messageComponent}
+              date={HARDCODED_DATE}
+              isSent={isSent}
+            />
+          </Button>
+        );
       })}
     </Box>
   );

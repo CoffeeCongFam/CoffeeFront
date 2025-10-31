@@ -77,7 +77,7 @@ const SubscriptionDetailCard = ({ subscriptionData }) => {
         margin: 'auto',
         padding: 2.5,
         borderRadius: '12px',
-        height: '450px', // 정사각형에 가까운 높이 설정
+        height: '430px', // 정사각형에 가까운 높이 설정
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between', // 내부 요소들의 간격을 균등하게 배분
@@ -248,7 +248,17 @@ const SubscriptionPage = () => {
         나의 구독권
       </Typography>
       {subscriptionList.length > 0 ? (
-        <Box sx={{ position: 'relative', padding: '0 20px' }}>
+        <Box sx={{
+          position: 'relative',
+          padding: '0 20px 72px', // 아래 여백을 더 늘려 점과 카드 사이 간격 확보
+          '& .slick-list': {
+            overflow: 'visible',       // 카드 그림자/하단이 잘리지 않도록
+            paddingBottom: '24px',     // 리스트 자체에 하단 여백 추가
+          },
+          '& .slick-dots': {
+            bottom: '-36px',           // 점 위치 조금 더 아래
+          },
+        }}>
           <Slider {...settings}>
             {subscriptionList.map((subscription, index) => (
               <Box key={index} sx={{ padding: '0 8px' }}>

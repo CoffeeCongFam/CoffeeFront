@@ -1,5 +1,5 @@
 
-const myGiftList = [
+const receiveGiftList = [
   {
     id: 1,
     sender: "카페 모나카",
@@ -32,4 +32,4 @@ const myGiftList = [
   },
 ];
 
-export default myGiftList;
+export default receiveGiftList;
