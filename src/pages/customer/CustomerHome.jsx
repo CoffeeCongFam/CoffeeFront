@@ -1,38 +1,67 @@
 import React, { useEffect, useState } from "react";
 import SubscriptionItem from "../../components/customer/home/SubscriptionItem";
 import subList from "../../data/customer/subList";
-import cafeList from "../../data/customer/cafeList";
+import cafeList from '../../data/customer/cafeList';
 import { Box, IconButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../components/customer/home/LocalCafeCard";
+import api from '../../utils/api';
 
 function CustomerHome() {
   const navigate = useNavigate();
   const [subscriptions, setSubscriptions] = useState([]);
   const [today, setToday] = useState(null);
+  const [nearbyCafes, setNearbyCafes] = useState([]);
+  const [locError, setLocError] = useState("");
 
-  // 스크롤 박스 ref
   const scrollRef = React.useRef(null);
 
   useEffect(() => {
     const todayDate = new Date();
     setToday(todayDate.toISOString().split("T")[0]);
     setSubscriptions(subList);
+
+    // 위치 가져와서 근처 카페 요청
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log("현재 위치>>", latitude, longitude);
+
+          try {
+            // const res = await api.get("/stores/nearby", {
+            //   params: {
+            //     lat: latitude,
+            //     lng: longitude,
+            //     radius: 500,
+            //   },
+            // });
+            // setNearbyCafes(res.data);
+            setNearbyCafes(cafeList)
+          } catch (err) {
+            console.error(err);
+            setLocError("주변 카페를 불러오는 데 실패했어요.");
+          }
+        },
+        (err) => {
+          console.log("위치 권한 거부", err);
+          setLocError("위치 권한을 허용하면 근처 카페를 보여줄 수 있어요.");
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      setLocError("이 브라우저에서는 위치 정보를 사용할 수 없어요.");
+    }
   }, []);
 
-  // 주문하기 클릭 시 이동
   function handleOrderClick(sub) {
-    console.log(sub.subId + " 구독권으로 주문하기");
     navigate("/me/order/new", {
-      state: {
-        subscription: sub,
-      },
+      state: { subscription: sub },
     });
   }
 
-  // 좌우 버튼으로 스크롤
   const scrollBy = (offset) => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
@@ -43,7 +72,7 @@ function CustomerHome() {
 
   return (
     <Box sx={{ px: 12, py: 8 }}>
-      {/* 헤더 영역 */}
+      {/* 헤더 */}
       <Box
         sx={{
           display: "flex",
@@ -52,8 +81,8 @@ function CustomerHome() {
           mb: 1.5,
         }}
       >
-        <Box style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <Typography style={{ fontSize: "25px", fontWeight: "bold" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+          <Typography sx={{ fontSize: "25px", fontWeight: "bold" }}>
             유저 님, 오늘도 한 잔의 여유를 즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
@@ -69,7 +98,7 @@ function CustomerHome() {
         </Box>
       </Box>
 
-      {/* 가로 캐러셀 영역 */}
+      {/* 구독권 캐러셀 */}
       <Box
         ref={scrollRef}
         sx={{
@@ -79,10 +108,7 @@ function CustomerHome() {
           scrollSnapType: "x mandatory",
           mb: 5,
           py: 1,
-          // 스크롤바 살짝 감추기
-          "&::-webkit-scrollbar": {
-            height: 6,
-          },
+          "&::-webkit-scrollbar": { height: 6 },
           "&::-webkit-scrollbar-thumb": {
             backgroundColor: "#ccc",
             borderRadius: 8,
@@ -92,10 +118,7 @@ function CustomerHome() {
         {subscriptions.map((item) => (
           <Box
             key={item.subId}
-            sx={{
-              scrollSnapAlign: "start",
-              flex: "0 0 auto", // 줄어들지 않게
-            }}
+            sx={{ scrollSnapAlign: "start", flex: "0 0 auto" }}
           >
             <SubscriptionItem
               today={today}
@@ -106,14 +129,30 @@ function CustomerHome() {
         ))}
       </Box>
 
+      {/* 내 근처 카페 */}
       <Box>
-        <Typography style={{ fontSize: "20px", fontWeight: "bold" }}>
+        <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>
-        <Box style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-          {cafeList?.map((store) => {
-            return <LocalCafeCard store={store} key={store.storeId} />;
-          })}
+
+        {locError && (
+          <Typography color="error" sx={{ mb: 1 }}>
+            {locError}
+          </Typography>
+        )}
+
+        <Box sx={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {nearbyCafes.map((store) => (
+            <LocalCafeCard
+              store={store}
+              key={store.id || store.storeId}
+            />
+          ))}
+          {!locError && nearbyCafes.length === 0 && (
+            <Typography sx={{ color: "text.secondary" }}>
+              500m 안에 등록된 카페가 아직 없어요 ☕
+            </Typography>
+          )}
         </Box>
       </Box>
     </Box>

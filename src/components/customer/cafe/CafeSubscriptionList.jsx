@@ -338,7 +338,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             </List>
             {/* 버튼 */}
             <Box sx={{ mt: 2 }}>
-              {currentSub.isSubscribed !== "Y" ? (
+              
                 <Box
                   style={{
                     display: "flex",
@@ -355,6 +355,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   >
                     구독권 선물하기
                   </Button>
+                  {currentSub.isSubscribed !== "Y" ? (
                   <Button
                     style={subButtonStyle}
                     size="small"
@@ -363,7 +364,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   >
                     구독권 구매하기
                   </Button>
-                </Box>
               ) : (
                 <Button
                   style={subButtonStyle}
@@ -371,9 +371,10 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   onClick={() => goToOrder(currentSub)}
                   startIcon={<CoffeeIcon />}
                 >
-                  구독권 사용하기
+                  주문하기
                 </Button>
               )}
+              </Box>
             </Box>
           </Box>
 
