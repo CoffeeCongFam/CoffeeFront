@@ -29,6 +29,7 @@ jobs:
       - name: Build project         
         env:
           # VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_NAVER_MAPS_CLIENT_ID: ${{ secrets.VITE_NAVER_MAPS_CLIENT_ID }}
           NODE_OPTIONS: --max_old_space_size=4096
         run: npm run build
 
