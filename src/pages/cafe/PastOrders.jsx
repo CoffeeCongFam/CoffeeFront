@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Typography,
@@ -499,7 +500,6 @@ export default function PastOrdersList() {
             <Typography variant="h5" component="h1" fontWeight="bold">
               지난 주문 내역 ({selectedDate.replace(/-/g, '.')})
             </Typography>
-
             <Box display="flex" alignItems="center" gap={1}>
               <Typography variant="body1" color="text.secondary">
                 날짜 선택:
