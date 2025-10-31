@@ -5,7 +5,7 @@ import { Box, Typography, Button, ButtonGroup, Collapse } from '@mui/material';
 import ReceiveGift from "../../components/customer/gift/ReceiveGift";
 import SendGift from "../../components/customer/gift/SendGift";
 import sendGiftList from "../../data/customer/sendGiftList";
-import receiveGiftList from "../../data/customer/ReceiveGiftList";
+import receiveGiftList from "../../data/customer/receiveGiftList";
 
 function MyGift() {
     const MY_USER_NAME = "커피콩빵";
