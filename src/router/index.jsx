@@ -19,6 +19,10 @@ import StoreDetailPage from "../pages/customer/StoreDetailPage";
 import PurchaseSubscriptionPage from "../pages/customer/PurchaseSubscriptionPage";
 import CompletePurchasePage from "../pages/customer/CompletePurchasePage";
 import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
+import Gift from "../pages/customer/Gift";
+import PaymentHistory from "../pages/customer/PaymentHistory";
+import MyGift from "../pages/customer/MyGift";
+import Subscription from "../pages/customer/Subscription";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +92,38 @@ const router = createBrowserRouter([
       {
         path: "subscriptions/:subId/gift",
         element: <GiftSubscriptionPage />,
+      },
+      {
+        path: "subscription",
+        element: <Subscription />,
+      },
+      {
+        path: "gift",
+        element: <Gift />,
+      },
+      {
+        path: "mygift",
+        element: <MyGift />,
+      },
+      {
+        path: "paymentHistory",
+        element: <PaymentHistory />,
+      },
+      {
+        path: "subscription",
+        element: <Subscription />,
+      },
+      {
+        path: "gift",
+        element: <Gift />,
+      },
+      {
+        path: "mygift",
+        element: <MyGift />,
+      },
+      {
+        path: "paymentHistory",
+        element: <PaymentHistory />,
       },
     ],
   },
