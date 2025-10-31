@@ -39,6 +39,10 @@ function MyPage() {
   const finalMenus = ["구독권 관리", "내 선물함", "선물하기", "결제 내역"];
   
   const handleMenuClick = (menu) => {
+    if (menu === "선물하기") {
+      navigate("me/oreder/new");
+      return;
+    }
     setDrawerContent(menu);
     setIsDrawerOpen(true);
   };
