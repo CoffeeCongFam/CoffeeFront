@@ -10,7 +10,8 @@ const sendGiftList = [
     storeName: "스타벅스 발산역점",
     paidAt: "2025-11-30T05:06:40.992Z",
     purchaseType: "우리카드",
-    giftMessage: "선물!"
+    giftMessage: "선물!",
+    purchaseId: 12345678
   },
     {
     id: 5,
@@ -22,7 +23,8 @@ const sendGiftList = [
     storeName: "더리터 발산역점",
     paidAt: "2025-10-30T05:06:40.992Z",
     purchaseType: "신한카드",
-    giftMessage: "맛있게 먹엉!"
+    giftMessage: "맛있게 먹엉!",
+    purchaseId: 87654321
   },
 ];
 

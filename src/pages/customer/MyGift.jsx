@@ -1,14 +1,17 @@
 import React, { useState, useMemo } from "react";
 import myGiftList from "../../data/customer/myGiftList";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
-import { Box, Typography, Button, ButtonGroup } from '@mui/material';
+import { Box, Typography, Button, ButtonGroup, Collapse } from '@mui/material';
 import ReceiveGift from "../../components/customer/gift/ReceiveGift";
 import SendGift from "../../components/customer/gift/SendGift";
+import sendGiftList from "../../data/customer/sendGiftList";
+import receiveGiftList from "../../data/customer/ReceiveGiftList";
 
 function MyGift() {
     const MY_USER_NAME = "커피콩빵";
     const HARDCODED_DATE = "2025.10.26";
   const [filter, setFilter] = useState('ALL'); // 'ALL' | 'RECEIVED' | 'SENT'
+  const [openIndex, setOpenIndex] = useState(null); // 드롭다운 오픈 인덱스
 
   const filteredGiftList = useMemo(() => {
     const base = myGiftList.filter(
@@ -89,25 +92,51 @@ function MyGift() {
       </Box>
       {filteredGiftList.map((item, index) => {
         const { messageComponent, isSent } = formatMessage(item);
+        const isMineSent = item.sender === MY_USER_NAME;
+        const isMineReceived = item.receiver === MY_USER_NAME;
+        const canToggle = isMineSent || isMineReceived;
+        const handleClick = () => {
+          if (canToggle) {
+            setOpenIndex(openIndex === index ? null : index);
+          }
+        };
         return (
-          <Button
-            key={index}
-            fullWidth
-            variant="text"
-            onClick={() => console.log('gift clicked', item)}
-            sx={{
-              p: 0,
-              justifyContent: 'flex-start',
-              textTransform: 'none',
-              mb: 1,
-            }}
-          >
-            <GiftListItem
-              messageComponent={messageComponent}
-              date={HARDCODED_DATE}
-              isSent={isSent}
-            />
-          </Button>
+          <Box key={index} sx={{ mb: 1 }}>
+            <Button
+              fullWidth
+              variant="text"
+              onClick={handleClick}
+              sx={{
+                p: 0,
+                justifyContent: 'flex-start',
+                textTransform: 'none',
+              }}
+            >
+              <GiftListItem
+                messageComponent={messageComponent}
+                date={HARDCODED_DATE}
+                isSent={isSent}
+              />
+            </Button>
+
+            {/* 내가 보낸 선물: SendGift 드롭다운 */}
+            {isMineSent && (
+              <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+                <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                  <SendGift sendGiftList={sendGiftList} />
+                </Box>
+              </Collapse>
+            )}
+
+            {/* 내가 받은 선물: ReceiveGift 드롭다운 */}
+            {isMineReceived && (
+              <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+                <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                  <ReceiveGift receiveGiftList={receiveGiftList} />
+                </Box>
+              </Collapse>
+            )}
+          </Box>
         );
       })}
     </Box>
