@@ -72,16 +72,128 @@ export default class MarkerManager {
         });
 
         // 마커 클릭 시 InfoWindow 오픈 (내용만 교체해서 재사용)
+        // this.maps.Event.addListener(marker, "click", () => {
+        //   const html = `
+        //     <div style="padding:8px 10px; font-size:12px;">
+        //       <b>${cafe.storeName ?? ""}</b><br/>
+        //       <div>${cafe.roadAddress ?? ""}</div>
+        //       <div style="color:#666;">${cafe.detailAddress ?? ""}</div>
+        //     </div>`;
+        //   this.infoWindow.setContent(html);
+        //   this.infoWindow.open(this.map, marker);
+        // });
+
         this.maps.Event.addListener(marker, "click", () => {
+          const stockInfo = cafe.subscriptionStock != null
+            ? `<div style="color:#137333; font-weight:600; font-size:12px; margin-top:4px;">
+                남은 구독권 ${cafe.subscriptionStock}개
+              </div>`
+            : "";
+
+          const statusColor =
+            cafe.storeStatus === "OPEN" ? "#E6F4EA" :
+            cafe.storeStatus === "CLOSED" ? "#F1F3F4" :
+            cafe.storeStatus === "HOLIDAY" ? "#FFF8E1" : "#EEE";
+          const statusText =
+            cafe.storeStatus === "OPEN" ? "영업중" :
+            cafe.storeStatus === "CLOSED" ? "영업종료" :
+            cafe.storeStatus === "HOLIDAY" ? "휴무일" : "정보없음";
+
+          const actionButton = cafe.isSubscribed
+            ? `<button style="
+                  background:#fff;
+                  border:1px solid #aaa;
+                  color:#333;
+                  border-radius:20px;
+                  font-size:12px;
+                  padding:3px 10px;
+                  margin-top:6px;
+                  cursor:default;
+                ">✓ 구독중</button>`
+            : `<button style="
+                  background:#000;
+                  color:#fff;
+                  border:none;
+                  border-radius:20px;
+                  font-size:12px;
+                  padding:4px 12px;
+                  margin-top:6px;
+                  cursor:pointer;
+                ">+ 구독하기</button>`;
+
+          // 상세 보기 버튼 (라우팅 링크)
+          const detailButton = `
+            <a href="/me/store/${cafe.storeId}" 
+              style="
+                display:inline-block;
+                margin-top:6px;
+                text-decoration:none;
+                color:#fff;
+                background:#1976d2;
+                border-radius:20px;
+                padding:4px 10px;
+                font-size:12px;
+              ">
+              자세히 보기 →
+            </a>
+          `;
+
           const html = `
-            <div style="padding:8px 10px; font-size:12px;">
-              <b>${cafe.storeName ?? ""}</b><br/>
-              <div>${cafe.roadAddress ?? ""}</div>
-              <div style="color:#666;">${cafe.detailAddress ?? ""}</div>
-            </div>`;
+            <div style="
+              display:flex;
+              align-items:flex-start;
+              gap:10px;
+              padding:10px;
+              width:350px;
+              background:white;
+              box-shadow:0 2px 8px rgba(0,0,0,0.15);
+              font-family:'Pretendard', sans-serif;
+            ">
+              <img src="${cafe.storeImage ?? ""}" 
+                  style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;"
+                  alt="thumbnail" />
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                  <span style="
+                    background:${statusColor};
+                    color:#333;
+                    font-size:11px;
+                    padding:2px 6px;
+                    border-radius:10px;
+                    font-weight:600;
+                    white-space:nowrap;
+                  ">${statusText}</span>
+                  <span style="font-size:11px; color:#666; white-space:nowrap;">
+                    ${cafe.distance ? `${cafe.distance}m` : ""}
+                  </span>
+                </div>
+                <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all;">
+                  ${cafe.storeName ?? ""}
+                </div>
+                <div style="
+                  font-size:12px; color:#666;
+                  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+                  max-width:100%;
+                ">
+                  ${cafe.roadAddress ?? ""}
+                </div>
+                ${stockInfo}
+                <div style="font-size:12px; color:#444; margin-top:3px;">
+                  👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${cafe.reviewCount ?? 0}개
+                </div>
+                <div style="margin-top:6px; display:flex; gap:6px; align-items:center;">
+                  ${actionButton}
+                  ${detailButton}
+                </div>
+              </div>
+            </div>
+          `;
+
           this.infoWindow.setContent(html);
           this.infoWindow.open(this.map, marker);
         });
+
+
 
         // 등록
         this.markers.set(id, marker);
@@ -107,6 +219,32 @@ export default class MarkerManager {
       this.map.fitBounds(bounds);
     }
   }
+
+    /**
+   * 리스트에서 선택한 카페를 지도에서도 선택한 것처럼 보여주기
+   * @param {string|number} cafeId
+   * @param {object} cafe (옵션) - 리스트에서 넘어온 원본 데이터
+   */
+  focusCafe(cafeId, cafe) {
+    const marker = this.markers.get(cafeId);
+    if (!marker) return;
+
+    // 지도 중심 이동
+    const pos = marker.getPosition();
+    this.map.setCenter(pos);
+
+    // 말풍선 내용
+    const html = `
+      <div style="padding:8px 10px; font-size:12px;">
+        <b>${cafe?.storeName ?? ""}</b><br/>
+        <div>${cafe?.roadAddress ?? ""}</div>
+        <div style="color:#666;">${cafe?.detailAddress ?? ""}</div>
+      </div>
+    `;
+    this.infoWindow.setContent(html);
+    this.infoWindow.open(this.map, marker);
+  }
+
 
   /**
    * 모든 마커/말풍선 닫기 (지도는 유지)

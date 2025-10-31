@@ -7,14 +7,16 @@ function OrderPage() {
   const [todayDate, setTodayDate] = useState(null);
 
   useEffect(() => {
+    // 오늘 날짜 및 시간 초기화
     const currentDate = new Date();
     console.log(currentDate);
     const formatted = currentDate.toISOString().split("T")[0];
     const time = currentDate.toISOString().split("T")[1];
-    setTodayDate(formatted + " " + time);
+    setTodayDate(formatted + " " + time.split(".")[0]);
   }, []);
+
   return (
-    <div>
+    <Box  sx={{ px: 10, py: 2 }}>
       <h2>현재 진행 중인 주문 ...</h2>
       {todayDate}
 
@@ -23,7 +25,7 @@ function OrderPage() {
           return <TodayOrderItem order={order} key={order.orderId} />;
         })}
       </Box>
-    </div>
+    </Box>
   );
 }
 
