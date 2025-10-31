@@ -42,7 +42,7 @@ function CustomerHome() {
   };
 
   return (
-    <Box sx={{ px: 10, py: 2 }}>
+    <Box sx={{ px: 12, py: 8 }}>
       {/* 헤더 영역 */}
       <Box
         sx={{

@@ -5,6 +5,7 @@ const storeDetail = {
     "매일 아침 직접 로스팅한 원두와 따뜻한 햇살이 어우러진 공간. 루미에르에서 커피 한 잔의 여유를 즐겨보세요.",
   address: "서울특별시 성동구 서울숲2길 22-1",
   phone: "010-2323-2323",
+  storeStatus: "OPEN",
   storeHours: [
     { dayOfWeek: "MON", openTime: null, closeTime: null, isHoliday: true },
     { dayOfWeek: "TUE", openTime: "09:00", closeTime: "22:00" },
@@ -123,6 +124,8 @@ const storeDetail = {
       description: "구독권에 대한 간단한 설명",
       isGift: "Y", // Y | N
       isSubscribed: "N",
+      maxDailyUsage: 2,
+      menuList: ["아메리카노", "아이스카페라떼"],
     },
     {
       subId: 3,
@@ -134,7 +137,7 @@ const storeDetail = {
       price: 19900,
       subImage:
         "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
-      subName: "프리미엄 구독권",
+      subName: "!!!스페셜 구독권",
       subType: "PREMIUM",
       isExpired: "N", // Y | N
       limitEntity: 10,
@@ -142,6 +145,29 @@ const storeDetail = {
       description: "구독권에 대한 간단한 설명",
       isGift: "Y", // Y | N
       isSubscribed: "Y",
+      maxDailyUsage: 1,
+      menuList: ["아메리카노", "아이스카페라떼"],
+    },
+    {
+      subId: 4,
+      store: {
+        storeId: 1,
+        storeName: "카페 모나카",
+        storeImage: "https://picsum.photos/400/400",
+      },
+      price: 19900,
+      subImage:
+        "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
+      subName: "!!!그냥 기본 구독권",
+      subType: "BASIC",
+      isExpired: "N", // Y | N
+      limitEntity: 10,
+      stock: 10,
+      description: "구독권에 대한 간단한 설명",
+      isGift: "Y", // Y | N
+      isSubscribed: "Y",
+      maxDailyUsage: 1,
+      menuList: ["아메리카노", "아이스카페라떼"],
     },
   ],
 };

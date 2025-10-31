@@ -18,6 +18,7 @@ import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/StoreDetailPage";
 import PurchaseSubscriptionPage from "../pages/customer/PurchaseSubscriptionPage";
 import CompletePurchasePage from "../pages/customer/CompletePurchasePage";
+import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
 
 const router = createBrowserRouter([
   {
@@ -84,10 +85,15 @@ const router = createBrowserRouter([
         path: "purchase/:purchaseId/complete",
         element: <CompletePurchasePage />,
       },
+      {
+        path: "subscriptions/:subId/gift",
+        element: <GiftSubscriptionPage />,
+      },
     ],
   },
 
   // 점주
+  // :storeId 붙여야 함.
   {
     path: "/store",
     element: <StoreLayout />,

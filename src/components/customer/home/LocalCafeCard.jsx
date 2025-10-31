@@ -1,8 +1,11 @@
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import RoomIcon from "@mui/icons-material/Room"; // ✅ LocationPinIcon 대신 일반적으로 많이 쓰는 RoomIcon
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function LocalCafeCard({ store }) {
+  const navigate = useNavigate();
+
   return (
     <Card
       sx={{
@@ -15,7 +18,9 @@ function LocalCafeCard({ store }) {
         borderRadius: "10px",
         overflow: "hidden",
         bgcolor: "white",
+        cursor: "pointer",
       }}
+      onClick={() => navigate(`/me/store/${store.storeId}`)}
     >
       {/* 상단 이미지 */}
       <Box

@@ -6,8 +6,11 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
+import { useNavigate } from "react-router-dom";
 
 function TodayOrderItem({ order }) {
+  const navigate = useNavigate();
+
   return (
     <div>
       <Card
@@ -19,6 +22,10 @@ function TodayOrderItem({ order }) {
           alignItems: "center", // 🔹 세로 중앙 정렬
           padding: "16px",
           borderRadius: "12px",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          navigate(`/me/order/${order.orderId}`);
         }}
       >
         <div
@@ -43,7 +50,9 @@ function TodayOrderItem({ order }) {
               justifyContent: "center",
             }}
           >
-            <Typography variant="subtitle1" fontWeight="bold">{order.store.storeName}</Typography>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {order.store.storeName}
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               {order.orderMenu[0].menuName} × {order.orderMenu[0].quantity}
             </Typography>

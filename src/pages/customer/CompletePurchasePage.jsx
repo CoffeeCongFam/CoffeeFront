@@ -22,6 +22,7 @@ function CompletePurchasePage() {
       paidAt: "2025.10.26 13:28",
       approvalNo: "2342389819",
       payMethod: "[신한] 카드",
+      isGift: "Y", // "N"
     });
   }, [purchaseId]);
 
@@ -42,7 +43,11 @@ function CompletePurchasePage() {
 
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 3 }}>
-        <Typography variant="h6">결제가 완료되었습니다.</Typography>
+        <Typography variant="h6">
+          {purchase.isGift === "Y"
+            ? "선물이 전달되었습니다."
+            : "결제가 완료되었습니다."}
+        </Typography>
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -61,6 +66,7 @@ function CompletePurchasePage() {
         <Typography variant="h5" sx={{ fontWeight: 700, color: "#555", mb: 4 }}>
           {purchase.storeName}
         </Typography>
+        {purchase.isGift === "Y" && <Box>보내는 사람 받는 사람</Box>}
 
         {/* 구독 정보 */}
         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>

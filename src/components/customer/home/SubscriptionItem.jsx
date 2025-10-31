@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
+  const navigate = useNavigate();
   // 남은 일수 계산
   function getRemainingDays(today, subEnd) {
     const todayDate = new Date(today);
@@ -32,7 +34,9 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         borderRadius: "10px",
         overflow: "hidden",
         bgcolor: "white",
+        cursor: "pointer",
       }}
+      onClick={() => navigate(`/me/store/${item.store.storeId}`)}
     >
       {/* 상단 이미지 */}
       <Box sx={{ width: "100%", bgcolor: "#e9e9e9" }}>
@@ -104,7 +108,10 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
       <Box sx={{ width: "100%", px: 2, pb: 2 }}>
         {item.remainingCount > 0 ? (
           <Button
-            onClick={() => handleOrderClick(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOrderClick(item);
+            }}
             fullWidth
             sx={{
               backgroundColor: "black",

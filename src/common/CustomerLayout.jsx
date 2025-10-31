@@ -43,7 +43,7 @@ export default function CustomerLayout() {
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
         <Typography variant="h6" component="div">
-          Local Pass
+          CoffeeEns
         </Typography>
       </Toolbar>
       <Divider />
@@ -113,7 +113,7 @@ export default function CustomerLayout() {
         sx={{
           flexGrow: 1,
           height: "100vh",
-          // ✅ 검색 페이지일 때만 스크롤 막기
+          // 검색 페이지일 때만 스크롤 막기
           overflow: isSearchPage ? "hidden" : "auto",
           position: "relative",
         }}
@@ -139,7 +139,7 @@ export default function CustomerLayout() {
         </AppBar>
 
         {/* Toolbar 높이만큼 여백 */}
-        <Toolbar />
+        {/* <Toolbar /> */}
 
         {/* 페이지 콘텐츠 */}
         {/* 여기 높이는 유지 */}

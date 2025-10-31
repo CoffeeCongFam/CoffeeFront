@@ -13,7 +13,7 @@ function SubscriptionItem({ subscription }) {
       ? "프리미엄"
       : subscription.subType === "STANDARD"
       ? "스탠다드"
-      : "베이식";
+      : "베이직";
 
   return (
     <Box

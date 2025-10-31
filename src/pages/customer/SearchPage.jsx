@@ -1,16 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import cafeList from "../../data/customer/cafeList.js";
 import {
   Button,
   IconButton,
   List,
-  ListItem,
-  ListItemText,
-  Divider,
   Box,
   Typography,
   Paper,
-  ListItemAvatar,
   Avatar,
   Chip,
   Select,
@@ -21,7 +23,7 @@ import { grey } from "@mui/material/colors";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SearchCafeInput from "../../components/customer/search/SearchCafeInput";
-import MarkerManager from "../../components/customer/search/MarkerManager.js";
+import MarkerManager from "../../utils/MarkerManager.js";
 import loadNaverMaps from "../../utils/naverMapLoader.js";
 
 const Panel = styled(Paper)(({ theme }) => ({
@@ -39,34 +41,33 @@ const Panel = styled(Paper)(({ theme }) => ({
   flexDirection: "column",
   transition: "transform 0.3s ease-in-out",
   overflow: "hidden",
-  zIndex: 20,
-  padding: "10px"
+  zIndex: 1300,
+  padding: "10px",
 }));
 
-
-// 매장 상태 
+// 매장 상태
 const STATUS_MAP = {
   OPEN: {
     label: "영업중",
     sx: {
-      backgroundColor: "#E6F4EA", // 연한 민트/그린톤
-      color: "#137333", // 진한 초록
+      backgroundColor: "#E6F4EA",
+      color: "#44a986ff",
       fontWeight: 600,
     },
   },
   CLOSED: {
     label: "영업종료",
     sx: {
-      backgroundColor: "#F1F3F4", // 밝은 회색
-      color: "#5F6368", // 중간톤 회색 텍스트
+      backgroundColor: "#F1F3F4",
+      color: "#5F6368",
       fontWeight: 500,
     },
   },
   HOLIDAY: {
     label: "휴무일",
     sx: {
-      backgroundColor: "#FFF8E1", // 연한 크림 노랑
-      color: "#B28704", // 따뜻한 머스타드색 텍스트
+      backgroundColor: "#FFF8E1",
+      color: "#B28704",
       fontWeight: 600,
     },
   },
@@ -80,14 +81,17 @@ export default function SearchPage() {
   const mmRef = useRef(null);
 
   const [status, setStatus] = useState("loading");
+
+  // 검색 관련
   const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
   const [cafes, setCafes] = useState([]);
-
-  const [sortOption, setSortOption] = useState("distance"); // distance | latest | subscribers | reviews
-
-
-  // 패널 열림 여부
+  const [sortOption, setSortOption] = useState("distance");
   const [openCafeList, setOpenCafeList] = useState(false);
+
+  // ✅ 검색창 아래 드롭다운 보여줄지
+  const [showSearchResult, setShowSearchResult] = useState(false);
 
   useEffect(() => {
     setCafes(cafeList ?? []);
@@ -187,32 +191,38 @@ export default function SearchPage() {
     );
   }, []);
 
-  // 리스트에서 선택
+  // 검색어 디바운스
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 200); // 200~300ms면 자연스러움
+    return () => clearTimeout(t);
+  }, [keyword]);
+
+  // ✅ 리스트에서 선택
   const handleSelectCafe = (cafe) => {
     const map = mapRef.current;
     const maps = mapsRef.current;
     const mm = mmRef.current;
     if (!map || !maps) return;
 
-    // MarkerManager가 있으면 그쪽에 먼저 맡긴다
     const id = cafe.id ?? cafe.storeId;
     if (mm && id != null) {
-      mm.focusCafe(id, cafe);   // ✅ 우리가 방금 MarkerManager에 만든 메서드
+      mm.focusCafe(id, cafe);
     } else {
-      // 혹시 모를 fallback
       if (!cafe.xPoint || !cafe.yPoint) return;
       const pos = new maps.LatLng(cafe.xPoint, cafe.yPoint);
       if (typeof map.panTo === "function") map.panTo(pos);
       else map.setCenter(pos);
     }
 
+    // ✅ 검색 드롭다운 닫기
+    setShowSearchResult(false);
     // 패널 닫기
     setOpenCafeList(false);
   };
 
-
-
-  // 매장 상태 칩 
+  // 매장 상태 칩
   function renderStoreStatus(status) {
     const config = STATUS_MAP[status] || {
       label: "정보없음",
@@ -227,27 +237,45 @@ export default function SearchPage() {
           textAlign: "center",
           fontSize: "0.75rem",
           width: "fit-content",
-          ...config.sx, // 상태별 색상 적용
+          ...config.sx,
         }}
       />
     );
   }
 
+  // ✅ 검색어로 필터링 (이름 + 주소)
+  const filteredCafes = useMemo(() => {
+    if (!debouncedKeyword) return [];
+    const k = debouncedKeyword.toLowerCase();
+    return cafes
+      .filter(
+        (c) =>
+          (c.storeName && c.storeName.toLowerCase().includes(k)) ||
+          (c.roadAddress && c.roadAddress.toLowerCase().includes(k)) ||
+          (c.address && c.address.toLowerCase().includes(k))
+      )
+      .slice(0, 6);
+  }, [debouncedKeyword, cafes]);
+
   // 매장 리스트 정렬
-  const sortedCafes = [...cafes].sort((a, b) => {
+  const sortedCafes = useMemo(() => {
+    const arr = [...cafes];
     switch (sortOption) {
       case "latest":
-        return new Date(b.createdAt) - new Date(a.createdAt); // 최신순
+        return arr.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
       case "subscribers":
-        return (b.subscriberCount || 0) - (a.subscriberCount || 0); // 구독자수순
+        return arr.sort(
+          (a, b) => (b.subscriberCount || 0) - (a.subscriberCount || 0)
+        );
       case "reviews":
-        return (b.reviewCount || 0) - (a.reviewCount || 0); // 리뷰순
+        return arr.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
       case "distance":
       default:
-        return (a.distance || 0) - (b.distance || 0); // 거리순 (가까운 순)
+        return arr.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     }
-  });
-
+  }, [cafes, sortOption]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
@@ -257,19 +285,82 @@ export default function SearchPage() {
         style={{ position: "absolute", inset: 0, overflow: "hidden" }}
       />
 
-      {/* 상단 컨트롤 */}
+      {/* 상단 컨트롤 + 검색 드롭다운 컨테이너 */}
       <div
         style={{
           position: "absolute",
           top: 16,
           left: 16,
-          zIndex: 10,
+          zIndex: 1300,
           display: "flex",
           gap: 8,
           alignItems: "center",
         }}
       >
-        <SearchCafeInput keyword={keyword} setKeyword={setKeyword} />
+        {/* 왼쪽에 검색창 */}
+        <div style={{ position: "relative" }}>
+          <SearchCafeInput
+            keyword={keyword}
+            setKeyword={(v) => {
+              setKeyword(v);
+              // 입력값 있을 때만 보여주기
+              setShowSearchResult(!!v);
+            }}
+          />
+
+          {/* ✅ 검색결과 드롭다운 */}
+          {showSearchResult && filteredCafes.length > 0 && (
+            <Paper
+              elevation={3}
+              sx={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                mt: 1,
+                width: 320,
+                maxHeight: 280,
+                overflowY: "auto",
+                borderRadius: 2,
+                p: 1,
+              }}
+            >
+              {filteredCafes.map((cafe) => (
+                <Box
+                  key={cafe.storeId}
+                  onClick={() => handleSelectCafe(cafe)}
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    alignItems: "center",
+                    p: 1,
+                    borderRadius: 1.5,
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: grey[100],
+                    },
+                  }}
+                >
+                  <Avatar
+                    src={cafe.storeImage}
+                    alt={cafe.storeName}
+                    sx={{ width: 40, height: 40 }}
+                  />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                      {cafe.storeName}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" noWrap>
+                      {cafe.roadAddress || cafe.address || "주소 정보 없음"}
+                    </Typography>
+                  </Box>
+                  {renderStoreStatus(cafe.storeStatus)}
+                </Box>
+              ))}
+            </Paper>
+          )}
+        </div>
+
+        {/* 현재 위치 버튼 */}
         <IconButton
           onClick={setCurrentLocation}
           aria-label="current-location"
@@ -277,8 +368,14 @@ export default function SearchPage() {
         >
           <LocationSearchingIcon />
         </IconButton>
+
+        {/* 리스트 토글 버튼 */}
         <Button
-          style={{ backgroundColor: "black", color: "white" }}
+          style={{
+            backgroundColor: "black",
+            color: "white",
+            cursor: "pointer",
+          }}
           startIcon={<FormatListBulletedIcon />}
           onClick={() => setOpenCafeList((prev) => !prev)}
         >
@@ -290,8 +387,8 @@ export default function SearchPage() {
       <Panel
         sx={{
           transform: openCafeList
-            ? "translate(-50%, 0)"     // 위로 올라오기 (열림)
-            : "translate(-50%, 100%)", // 아래로 내려가기 (닫힘)
+            ? "translate(-50%, 0)"
+            : "translate(-50%, 100%)",
         }}
       >
         <Box
@@ -325,10 +422,16 @@ export default function SearchPage() {
         </Box>
 
         <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
-          {/* dense */}
-          <List >
-            <Box sx={{ overflowY: "auto", flexGrow: 1, gap: 2, display: "flex", flexDirection: "column",  }}>
-              {/* 정렬 기준 */}
+          <List>
+            <Box
+              sx={{
+                overflowY: "auto",
+                flexGrow: 1,
+                gap: 2,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               {sortedCafes.map((cafe) => (
                 <Box
                   key={cafe.storeId}
@@ -342,7 +445,7 @@ export default function SearchPage() {
                     display: "flex",
                     gap: 2,
                     alignItems: "stretch",
-                    cursor:"pointer"
+                    cursor: "pointer",
                   }}
                 >
                   {/* 썸네일 */}
@@ -369,28 +472,41 @@ export default function SearchPage() {
 
                   {/* 가운데 정보 영역 */}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    {/* 위줄: 상태칩 + 거리 */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 0.5,
+                      }}
+                    >
                       {renderStoreStatus(cafe.storeStatus)}
                       <Typography variant="caption" color="text.secondary">
                         {cafe.distance ?? "454m"}
                       </Typography>
                     </Box>
 
-                    {/* 카페 이름 / 주소 */}
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}
+                    >
                       {cafe.storeName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" noWrap>
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
 
-                    {/* 구독자/리뷰 줄 */}
                     <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                      <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
                         👥 {cafe.subscriberCount ?? 0}명 구독
                       </Typography>
-                      <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                      >
                         ⭐ {cafe.reviewCount ?? 0}개 리뷰
                       </Typography>
                     </Box>
@@ -431,33 +547,9 @@ export default function SearchPage() {
                 </Box>
               ))}
             </Box>
-            {/* {cafes.map((cafe) => (
-              <React.Fragment key={cafe.id}>
-                <ListItem button={true} onClick={() => handleSelectCafe(cafe)} style={{cursor: "pointer"}}>
-                  <ListItemAvatar>
-                    <Avatar alt={cafe.id} src={cafe.storeImage} />
-                  </ListItemAvatar>
-                    <ListItemText
-                      primary={cafe.storeName}
-                      secondary={cafe.roadAddress || cafe.address || "주소 정보 없음"}
-                      primaryTypographyProps={{
-                        fontWeight: "bold",     
-                        fontSize: "1rem",       
-                      }}
-                      secondaryTypographyProps={{
-                        color: "text.secondary", 
-                        fontSize: "0.875rem",
-                      }}
-                    />
-                  {renderStoreStatus(cafe.storeStatus)}
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))} */}
           </List>
         </Box>
       </Panel>
-
     </div>
   );
 }

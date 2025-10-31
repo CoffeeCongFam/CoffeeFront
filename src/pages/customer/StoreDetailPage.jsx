@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography, Divider } from "@mui/material";
+import { Box, Tabs, Tab, Typography, Divider, Chip } from "@mui/material";
 import { useParams } from "react-router-dom";
 import storeDetail from "../../data/customer/storeDetail.js";
 import CafeInfo from "../../components/customer/cafe/CafeInfo.jsx";
 import CafeMenuList from "../../components/customer/cafe/CafeMenuList.jsx";
 import CafeSubscriptionList from "../../components/customer/cafe/CafeSubscriptionList.jsx";
+import CafeReviewList from "../../components/customer/cafe/CafeReviewList.jsx";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -34,6 +35,7 @@ function StoreDetailPage() {
   const [store, setStore] = useState({
     storeId: null,
     storeName: "",
+    storeStatus: "",
     summary: "",
     address: "",
     phone: "",
@@ -41,6 +43,8 @@ function StoreDetailPage() {
     menus: [], // 메뉴 탭용
     subscriptions: [], // 구독권 탭용
     reviews: [], // 리뷰 탭용
+    storeImage: "https://picsum.photos/400/400",
+    maxDailyUsage: 0,
   });
 
   const [tab, setTab] = useState(0);
@@ -56,19 +60,38 @@ function StoreDetailPage() {
   }, [storeId]);
 
   return (
-    <Box sx={{ px: 4, py: 2, maxWidth: "1080px", mx: "auto" }}>
+    <Box sx={{ width: "60%", mx: "auto" }}>
+      {/* 상단 대표 이미지 */}
+
+      <Box
+        sx={{
+          width: "100%",
+          height: 300,
+          // borderRadius: 2,
+          overflow: "hidden",
+          mb: 2,
+        }}
+      >
+        <img
+          src="https://picsum.photos/400/400"
+          alt={store.storeName}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      </Box>
+
       {/* 상단 기본 정보 */}
+      <Chip
+        label={store.storeStatus}
+        size="small"
+        style={{ marginBottom: "10px" }}
+      />
       <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
         {store.storeName || "카페 이름"}
-      </Typography>
-      <Typography variant="body1" sx={{ mb: 0.5 }}>
-        {store.summary}
-      </Typography>
-      <Typography variant="body2" sx={{ color: "text.secondary" }}>
-        {store.address}
-      </Typography>
-      <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-        {store.phone}
       </Typography>
 
       {/* 탭 */}
@@ -104,26 +127,7 @@ function StoreDetailPage() {
 
       {/* 3. 리뷰 탭 */}
       <TabPanel value={tab} index={3}>
-        {store.reviews && store.reviews.length > 0 ? (
-          store.reviews.map((review) => (
-            <Box key={review.id} sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {review.nickname || "익명"}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                {review.content}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {review.createdAt}
-              </Typography>
-              <Divider sx={{ mt: 1 }} />
-            </Box>
-          ))
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            아직 등록된 리뷰가 없습니다.
-          </Typography>
-        )}
+        <CafeReviewList store={store} />
       </TabPanel>
     </Box>
   );

@@ -84,20 +84,29 @@ export default class MarkerManager {
         // });
 
         this.maps.Event.addListener(marker, "click", () => {
-          const stockInfo = cafe.subscriptionStock != null
-            ? `<div style="color:#137333; font-weight:600; font-size:12px; margin-top:4px;">
+          const stockInfo =
+            cafe.subscriptionStock != null
+              ? `<div style="color:#137333; font-weight:600; font-size:12px; margin-top:4px;">
                 남은 구독권 ${cafe.subscriptionStock}개
               </div>`
-            : "";
+              : "";
 
           const statusColor =
-            cafe.storeStatus === "OPEN" ? "#E6F4EA" :
-            cafe.storeStatus === "CLOSED" ? "#F1F3F4" :
-            cafe.storeStatus === "HOLIDAY" ? "#FFF8E1" : "#EEE";
+            cafe.storeStatus === "OPEN"
+              ? "#E6F4EA"
+              : cafe.storeStatus === "CLOSED"
+              ? "#F1F3F4"
+              : cafe.storeStatus === "HOLIDAY"
+              ? "#FFF8E1"
+              : "#EEE";
           const statusText =
-            cafe.storeStatus === "OPEN" ? "영업중" :
-            cafe.storeStatus === "CLOSED" ? "영업종료" :
-            cafe.storeStatus === "HOLIDAY" ? "휴무일" : "정보없음";
+            cafe.storeStatus === "OPEN"
+              ? "영업중"
+              : cafe.storeStatus === "CLOSED"
+              ? "영업종료"
+              : cafe.storeStatus === "HOLIDAY"
+              ? "휴무일"
+              : "정보없음";
 
           const actionButton = cafe.isSubscribed
             ? `<button style="
@@ -179,7 +188,9 @@ export default class MarkerManager {
                 </div>
                 ${stockInfo}
                 <div style="font-size:12px; color:#444; margin-top:3px;">
-                  👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${cafe.reviewCount ?? 0}개
+                  👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${
+            cafe.reviewCount ?? 0
+          }개
                 </div>
                 <div style="margin-top:6px; display:flex; gap:6px; align-items:center;">
                   ${actionButton}
@@ -192,8 +203,6 @@ export default class MarkerManager {
           this.infoWindow.setContent(html);
           this.infoWindow.open(this.map, marker);
         });
-
-
 
         // 등록
         this.markers.set(id, marker);
@@ -211,7 +220,10 @@ export default class MarkerManager {
     // ─ 화면 뷰 조정: 0개면 그대로, 1개면 center/zoom, 여러 개면 bounds에 맞춤
     if (cafes.length === 1) {
       const only = cafes[0];
-      const center = new this.maps.LatLng(Number(only.xPoint), Number(only.yPoint));
+      const center = new this.maps.LatLng(
+        Number(only.xPoint),
+        Number(only.yPoint)
+      );
       this.map.setCenter(center);
       // 너무 확대되어 있으면 적당히(예: 17)로
       if (this.map.getZoom() > 17) this.map.setZoom(17);
@@ -220,7 +232,7 @@ export default class MarkerManager {
     }
   }
 
-    /**
+  /**
    * 리스트에서 선택한 카페를 지도에서도 선택한 것처럼 보여주기
    * @param {string|number} cafeId
    * @param {object} cafe (옵션) - 리스트에서 넘어온 원본 데이터
@@ -244,7 +256,6 @@ export default class MarkerManager {
     this.infoWindow.setContent(html);
     this.infoWindow.open(this.map, marker);
   }
-
 
   /**
    * 모든 마커/말풍선 닫기 (지도는 유지)
