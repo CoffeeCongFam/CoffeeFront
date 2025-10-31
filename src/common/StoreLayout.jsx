@@ -36,9 +36,14 @@ export default function StoreLayout() {
     {
       to: '/store/pastorders',
       label: '지난 주문 내역',
+      icon: <SearchIcon />,
+    },
+    {
+      to: '/store/manageproduct',
+      label: '상품 관리',
       icon: <ShoppingCartIcon />,
     },
-    { to: '/me/search', label: '상품 관리', icon: <SearchIcon /> },
+    { to: '/store/manageMenu', label: '메뉴 관리', icon: <ShoppingCartIcon /> },
   ];
 
   const DrawerContent = (
