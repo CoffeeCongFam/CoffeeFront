@@ -16,6 +16,10 @@ import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/StoreDetailPage";
+import Gift from "../pages/customer/Gift";
+import PaymentHistory from "../pages/customer/PaymentHistory";
+import MyGift from "../pages/customer/MyGift";
+import Subscription from "../pages/customer/Subscription";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +73,22 @@ const router = createBrowserRouter([
       {
         path: "store/:storeId",
         element: <StoreDetailPage />
+      },
+      {
+        path: "subscription",
+        element: <Subscription />,
+      },
+      {
+        path: "gift",
+        element: <Gift />,
+      },
+      {
+        path: "mygift",
+        element: <MyGift />,
+      },
+      {
+        path: "paymentHistory",
+        element: <PaymentHistory />,
       },
     ],
   },
