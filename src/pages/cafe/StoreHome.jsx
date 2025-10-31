@@ -2,53 +2,129 @@ import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import OrderDetailModal from './OrderDetailModal';
 
-function StoreHome() {
-  // 가데이터
-  const DUMMY_ORDERS = [
-    {
-      id: 1,
-      type: '테이크아웃',
-      status: 'REQUEST',
-      menu: '핫 카페라떼(4)',
-      createdAt: '2025-10-30T10:15:00.000Z',
-    },
-    {
-      id: 2,
-      type: '매장이용',
-      status: 'INPROGRESS',
-      menu: '아이스 아메리카노(1)',
-      createdAt: '2025-10-30T10:10:00.000Z',
-    },
-    {
-      id: 3,
-      type: '매장이용',
-      status: 'COMPLETED',
-      menu: '아이스 아메리카노(1)',
-      createdAt: '2025-10-30T10:05:00.000Z',
-    },
-    {
-      id: 4,
-      type: '테이크아웃',
-      status: 'RECEIVED',
-      menu: '핫 아메리카노(3)',
-      createdAt: '2025-10-30T10:25:00.000Z',
-    },
-    {
-      id: 5,
-      type: '테이크아웃',
-      status: 'CANCELED',
-      menu: '아이스 라떼(2)',
-      createdAt: '2025-10-30T10:20:00.000Z',
-    },
-    {
-      id: 6,
-      type: '테이크아웃',
-      status: 'REJECTED',
-      menu: '오트라떼(12)',
-      createdAt: '2025-10-30T10:25:00.000Z',
-    },
-  ];
+const DUMMY_ORDERS = [
+  // ----------------------------------------
+  // 1. 요청 (REQUEST) - 접수 대기 중 (가장 최근 주문)
+  // ----------------------------------------
+  {
+    orderNumber: 1009, // 화면에 크게 표시될 주문 번호 (카운터 역할)
+    memberId: 156,
+    orderId: 21,
+    orderType: '테이크아웃',
+    orderStatus: 'REQUEST', // 🚩 주문 접수 대기 중
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:25:00.000Z', // KST 13:25
+    paymentType: '구독권 고정',
+  },
+  {
+    orderNumber: 1008,
+    memberId: 155,
+    orderId: 20,
+    orderType: '매장이용',
+    orderStatus: 'REQUEST', // 🚩 주문 접수 대기 중
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:20:00.000Z', // KST 13:20
+    paymentType: '구독권 고정',
+  },
 
+  // ----------------------------------------
+  // 2. 제조 중 (INPROGRESS)
+  // ----------------------------------------
+  {
+    orderNumber: 1007,
+    memberId: 154,
+    orderId: 19,
+    orderType: '테이크아웃',
+    orderStatus: 'INPROGRESS', // 🚩 제조 중
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:15:00.000Z', // KST 13:15
+    paymentType: '구독권 고정',
+  },
+  {
+    orderNumber: 1006,
+    memberId: 153,
+    orderId: 18,
+    orderType: '매장이용',
+    orderStatus: 'INPROGRESS', // 🚩 제조 중
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:10:00.000Z', // KST 13:10
+    paymentType: '구독권 고정',
+  },
+
+  // ----------------------------------------
+  // 3. 준비 완료 (READY)
+  // ----------------------------------------
+  {
+    orderNumber: 1005,
+    memberId: 152,
+    orderId: 17,
+    orderType: '테이크아웃',
+    orderStatus: 'READY', // 🚩 준비 완료 (픽업 대기)
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:05:00.000Z', // KST 13:05
+    paymentType: '구독권 고정',
+  },
+  {
+    orderNumber: 1004,
+    memberId: 151,
+    orderId: 16,
+    orderType: '매장이용',
+    orderStatus: 'READY', // 🚩 준비 완료 (픽업 대기)
+    menuId: '2',
+    menuName: '라떼',
+    createdAt: '2025-10-31T04:00:00.000Z', // KST 13:00
+    paymentType: '구독권 고정',
+  },
+
+  // ----------------------------------------
+  // 4. 취소/거부 (CANCELED, REJECTED)
+  // ----------------------------------------
+  {
+    orderNumber: 1003,
+    memberId: 150,
+    orderId: 15,
+    orderType: '테이크아웃',
+    orderStatus: 'CANCELED', // 🚩 취소된 주문
+    menuId: '1',
+    menuName: '아메리카노',
+    createdAt: '2025-10-31T03:55:00.000Z', // KST 12:55
+    paymentType: '구독권 고정',
+  },
+  {
+    orderNumber: 1002,
+    memberId: 149,
+    orderId: 14,
+    orderType: '매장이용',
+    orderStatus: 'REJECTED', // 🚩 거부된 주문
+    menuId: '1',
+    menuName: '아메리카노',
+    createdAt: '2025-10-31T03:50:00.000Z', // KST 12:50
+    paymentType: '구독권 고정',
+  },
+
+  // ----------------------------------------
+  // 5. 완료 (COMPLETED)
+  // ----------------------------------------
+  {
+    orderNumber: 1001,
+    memberId: 148,
+    orderId: 13,
+    orderType: '테이크아웃',
+    orderStatus: 'COMPLETED', // 🚩 완료된 주문
+    menuId: '1',
+    menuName: '아메리카노',
+    createdAt: '2025-10-31T03:45:00.000Z', // KST 12:45
+    paymentType: '구독권 고정',
+  },
+];
+
+// order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
+function StoreHome() {
   const [orders, setOrders] = useState(DUMMY_ORDERS);
 
   // 모달 상태 정의
@@ -77,8 +153,8 @@ function StoreHome() {
   const handleStatusChange = (orderId, nextStatus) => {
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
-        order.id === orderId
-          ? { ...order, status: nextStatus } // 해당 주문의 상태만 변경
+        order.orderId === orderId
+          ? { ...order, orderStatus: nextStatus } // 해당 주문의 상태만 변경
           : order
       )
     );
@@ -166,14 +242,14 @@ function StoreHome() {
 
   // 주문 상태와 주문 접수 시간에 따라 주문들을 sorting(오름차순)
   const sortedOrders = [...orders].sort((a, b) => {
-    const priorityA = STATUS_COLORS[a.status]?.priority || 1000;
+    const priorityA = STATUS_COLORS[a.orderStatus]?.priority || 1000;
     // 1. STATUS_COLORS[a.status]가 존재하면 -> .priority 값을 가져오고,
     // 2. STATUS_COLORS[a.status]가 null 또는 undefined라면 -> *코드를 멈추지 않고 즉시 undefined를 반환
-    const priorityB = STATUS_COLORS[b.status]?.priority || 1000;
+    const priorityB = STATUS_COLORS[b.orderStatus]?.priority || 1000;
 
     // 🚩 우선순위 값 확인
-    console.log(`A 상태: ${a.status}, A 우선순위: ${priorityA}`);
-    console.log(`B 상태: ${b.status}, B 우선순위: ${priorityB}`);
+    console.log(`A 상태: ${a.orderStatus}, A 우선순위: ${priorityA}`);
+    console.log(`B 상태: ${b.orderStatus}, B 우선순위: ${priorityB}`);
 
     // 1차 정렬 : 우선순위 비교(낮은 숫자일수록 앞으로)
     if (priorityA !== priorityB) {
@@ -197,18 +273,18 @@ function StoreHome() {
       <Grid container spacing={2}>
         {sortedOrders.map((order) => {
           const statusInfo =
-            STATUS_COLORS[order.status] || STATUS_COLORS['CANCELED'];
-          console.log(order.status);
+            STATUS_COLORS[order.orderStatus] || STATUS_COLORS['CANCELED'];
+          console.log(order.orderStatus);
 
           // 현재 상태에 따른 액션 정보 가져오기
-          const actionDetails = getNextActionAndState(order.status);
+          const actionDetails = getNextActionAndState(order.orderStatus);
 
           return (
             // Grid Item : 각 카드를 감싸는 아이템
             // xs = 12 : 가장 작은 화면에서는 한 줄에 1개 (12/12)
             // sm = 6 : 중간 화면(태블릿) 한 줄에 2개
             // md = 4 : 데스크톱 화면에서는 한 줄에 3개 (12/4)
-            <Grid item xs={12} sm={6} md={4} key={order.id}>
+            <Grid item xs={12} sm={6} md={4} key={order.orderId}>
               <Card sx={{ height: '100%', boxShadow: 2 }}>
                 <Box sx={{ p: 2 }}>
                   <Typography
@@ -224,7 +300,7 @@ function StoreHome() {
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {/* 타입, 상세보기 버튼 */}
                     <Box sx={{ border: 1, padding: 1 }}>A01</Box>
-                    <Typography>{order.type}</Typography>
+                    <Typography>{order.orderType}</Typography>
                     <Box sx={{ mt: 1, textAlign: 'right' }}>
                       {/* 상세보기 버튼 */}
                       <Button
@@ -239,7 +315,7 @@ function StoreHome() {
                     </Box>
                   </Box>
 
-                  <Typography>{order.menu}</Typography>
+                  <Typography>{order.menuName}</Typography>
 
                   <Typography variant="body2" color="text.secondary">
                     {new Date(order.createdAt).toLocaleString()}
@@ -251,7 +327,10 @@ function StoreHome() {
                     fullWidth
                     variant="contained"
                     onClick={() =>
-                      handleStatusChange(order.id, actionDetails.nextStatus)
+                      handleStatusChange(
+                        order.orderId,
+                        actionDetails.nextStatus
+                      )
                     }
                     sx={{ bgcolor: statusInfo.action, color: 'white' }}
                   >

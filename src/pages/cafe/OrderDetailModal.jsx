@@ -86,7 +86,7 @@ export default function OrderDetailModal({
   // order 객체가 없으면 렌더링하지 않음
   if (!order) return null;
 
-  const statusInfo = statusColors[order.status];
+  const statusInfo = statusColors[order.orderStatus];
 
   // 주문 거부 사유 선택 핸들러
   const handleSelectReason = (code) => {
@@ -97,11 +97,11 @@ export default function OrderDetailModal({
   const isSubmitEnabled = selectedReasonCode !== null;
 
   // 접수 거절 버튼은 REQUEST, INPROGRESS 상태일 때만 표시
-  const showRejectBtn = order.status === 'REQUEST';
+  const showRejectBtn = order.orderStatus === 'REQUEST';
 
   // 거절 버튼 클릭 핸들러 : 부모로부터 전달받은 onReject 함수를 호출하고 모달을 닫는다.
   const handleReject = () => {
-    onReject(order.id, 'REJECTED');
+    onReject(order.orderId, 'REJECTED');
   };
 
   return (
@@ -142,12 +142,12 @@ export default function OrderDetailModal({
             </Typography>
           </Box>
           <Typography variant="h6" fontWeight="bold">
-            {order.type}
+            {order.orderType}
           </Typography>
         </Box>
 
         {/* 상세 정보 필드 */}
-        <DetailField label="주문일시" value={order.time} />
+        <DetailField label="주문일시" value={order.createdAt} />
         <DetailField label="주문자" value="커피빵커피커피" />
         <DetailField label="전화번호" value="010-1111-1111" />
         <DetailField label="주문상태" value={statusInfo} isStatus={true} />
@@ -163,10 +163,12 @@ export default function OrderDetailModal({
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="body2">{order.menu.split('(')[0]}</Typography>
             <Typography variant="body2">
-              {order.menu.match(/\((\d+)\)/)
-                ? order.menu.match(/\((\d+)\)/)[1]
+              {order.menuId.split('(')[0]}
+            </Typography>
+            <Typography variant="body2">
+              {order.menuId.match(/\((\d+)\)/)
+                ? order.menuId.match(/\((\d+)\)/)[1]
                 : 1}
             </Typography>
           </Box>
