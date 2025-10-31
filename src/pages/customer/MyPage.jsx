@@ -13,7 +13,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
-import CreateOrderPage from "./CreateOrderPage";
+import PaymentHistory from "./PaymentHistory";
+
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
@@ -39,8 +40,8 @@ function MyPage() {
   const finalMenus = ["구독권 관리", "내 선물함", "선물하기", "결제 내역"];
   
   const handleMenuClick = (menu) => {
-    if (menu === "선물하기") {
-      navigate("me/oreder/new");
+    if (menu === "선물하기") { // "선물하기" 클릭 시 주문 페이지로 이동
+      navigate("/me/order/new"); // 절대 경로로 수정 및 오타 수정
       return;
     }
     setDrawerContent(menu);
@@ -57,7 +58,7 @@ function MyPage() {
       case "구독권 관리": return <SubscriptionPage />;
       case "내 선물함": return <MyGiftPage />;
       case "선물하기": return <PlaceholderComponent title="선물하기" />;
-      case "결제 내역": return <PlaceholderComponent title="결제 내역" />;
+      case "결제 내역": return <PaymentHistory />;
       default: return null;
     }
   };
