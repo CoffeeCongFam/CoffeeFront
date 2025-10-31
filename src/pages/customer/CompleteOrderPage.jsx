@@ -131,7 +131,7 @@ function CompleteOrderPage() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton onClick={() => handleBack()} sx={{ mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>

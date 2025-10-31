@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -24,6 +24,9 @@ import PersonIcon from "@mui/icons-material/Person";
 const drawerWidth = 240;
 
 export default function CustomerLayout() {
+  const location = useLocation();
+  const isSearchPage = location.pathname.startsWith("/me/search");
+
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
@@ -77,65 +80,73 @@ export default function CustomerLayout() {
   );
 
   return (
-    <Box sx={{ display: "flex", width: "100vw", height: "100vh", overflow: "hidden" }}>
-  <CssBaseline />
-
-  {/* 왼쪽 사이드바 */}
-  <Drawer
-    variant="permanent"
-    sx={{
-      width: drawerWidth,
-      flexShrink: 0,
-      [`& .MuiDrawer-paper`]: {
-        width: drawerWidth,
-        boxSizing: "border-box",
-        backgroundImage: "none",
-      },
-    }}
-    open
-  >
-    {DrawerContent}
-  </Drawer>
-
-  {/* 오른쪽 메인 영역 */}
-  <Box
-    component="main"
-    sx={{
-      flexGrow: 1,
-      height: "100vh",
-      overflow: "hidden", // ✅ 스크롤 막기
-      position: "relative", // 내부 절대배치용
-    }}
-  >
-    {/* 상단 헤더(AppBar) */}
-    <AppBar
-      position="fixed"
-      color="inherit"
-      elevation={0}
+    <Box
       sx={{
-        width: `calc(100% - ${drawerWidth}px)`,
-        ml: `${drawerWidth}px`,
-        backgroundColor: "transparent",
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
       }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <IconButton color="inherit">
-          <Badge badgeContent={3} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-      </Toolbar>
-    </AppBar>
+      <CssBaseline />
 
-    {/* Toolbar 높이만큼 여백 */}
-    <Toolbar />
+      {/* 왼쪽 사이드바 */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundImage: "none",
+          },
+        }}
+        open
+      >
+        {DrawerContent}
+      </Drawer>
 
-    {/* 페이지 콘텐츠 */}
-    <Box sx={{ width: "100%", height: "calc(100vh - 64px)" }}>
-      <Outlet />
+      {/* 오른쪽 메인 영역 */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          height: "100vh",
+          // ✅ 검색 페이지일 때만 스크롤 막기
+          overflow: isSearchPage ? "hidden" : "auto",
+          position: "relative",
+        }}
+      >
+        {/* 상단 헤더(AppBar) */}
+        <AppBar
+          position="fixed"
+          color="inherit"
+          elevation={0}
+          sx={{
+            width: `calc(100% - ${drawerWidth}px)`,
+            ml: `${drawerWidth}px`,
+            backgroundColor: "transparent",
+          }}
+        >
+          <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton color="inherit">
+              <Badge badgeContent={3} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        {/* Toolbar 높이만큼 여백 */}
+        <Toolbar />
+
+        {/* 페이지 콘텐츠 */}
+        {/* 여기 높이는 유지 */}
+        <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)" }}>
+          <Outlet />
+        </Box>
+      </Box>
     </Box>
-  </Box>
-</Box>
-
   );
 }

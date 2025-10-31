@@ -16,6 +16,8 @@ import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/StoreDetailPage";
+import PurchaseSubscriptionPage from "../pages/customer/PurchaseSubscriptionPage";
+import CompletePurchasePage from "../pages/customer/CompletePurchasePage";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +40,7 @@ const router = createBrowserRouter([
   },
 
   // 일반 회원
+  // TODO!!! me 뒤에 :memberId 추가 필요
   {
     path: "/me",
     element: <CustomerLayout />,
@@ -68,7 +71,18 @@ const router = createBrowserRouter([
       },
       {
         path: "store/:storeId",
-        element: <StoreDetailPage />
+        element: <StoreDetailPage />,
+      },
+
+      // 구독권 구매
+      {
+        path: "subscriptions/:subId/purchase",
+        element: <PurchaseSubscriptionPage />,
+      },
+      //
+      {
+        path: "purchase/:purchaseId/complete",
+        element: <CompletePurchasePage />,
       },
     ],
   },
@@ -82,7 +96,6 @@ const router = createBrowserRouter([
         index: true,
         element: <StoreHome />,
       },
-      
     ],
   },
 
