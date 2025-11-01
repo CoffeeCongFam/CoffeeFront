@@ -20,6 +20,11 @@ import Gift from "../pages/customer/Gift";
 import PaymentHistory from "../pages/customer/PaymentHistory";
 import MyGift from "../pages/customer/MyGift";
 import Subscription from "../pages/customer/Subscription";
+import KakaoRedirect from '../pages/home/KakaoRedirect';
+import CustomerSignUp from '../pages/home/CustomerSignUp';
+import CafeSignUp from '../pages/home/CafeSignUp';
+import MemberSignUp  from '../pages/home/MemberSignUp';
+
 
 const router = createBrowserRouter([
   {
@@ -38,7 +43,7 @@ const router = createBrowserRouter([
         path: "signup",
         element: <SignUp />,
       },
-            {
+      {
         path: "kakaoRedirect",
         element: <KakaoRedirect />,
       },
