@@ -33,7 +33,7 @@ function CreateOrderPage() {
   const navigate = useNavigate();
 
   const [inventoryList, setInventoryList] = useState([]);   // 보유 구독권 목록
-  const [selectedInventory, setSelectedInventory] = useState(""); // 사용할 구독권
+  const [selectedInventory, setSelectedInventory] = useState(null); // 사용할 구독권
   const [orderType, setOrderType] = useState("IN");   // 매장 || 포장
   const [subMenu, setSubMenu] = useState(null);       // 구독권별 메뉴
 
@@ -49,37 +49,37 @@ function CreateOrderPage() {
   const [dessertQty, setDessertQty] = useState(1);
 
   useEffect(() => {
-    // 소비자 보유 구독권 목록 가져오기
-    // /api/customers/subscriptions
     (async () => {
-      try{
+      try {
         const res = await api.get("/customers/subscriptions");
         const list = res.data?.data ?? [];
-        setInventoryList(list);  
+        setInventoryList(list);
 
-        // 이전 페이지에서 특정 구독권 id 를 들고 왔으면 
-        // 해당 구독권 미리 선택됨
-        if(subscription?.subId){
-          setSelectedInventory(subscription.subId); 
-        }else if(list.length > 0){
-          // 아니면 첫번째 보유 구독권으로 자동 선택됨
-          setSelectedInventory(list[0].subId);
+        if (subscription?.subId) {
+          setSelectedInventory(Number(subscription.subId));
+        } else if (list.length > 0) {
+          setSelectedInventory(Number(list[0].subId));
         }
-      }catch(err){
-          console.error("구독권 목록 조회 실패: ", err);
-
-          // 실패했을 때 더미데이터 넣기 
-          setInventoryList(subList); // subList 는 dummy data
-
+      } catch (err) {
+        console.error("구독권 목록 조회 실패: ", err);
+        setInventoryList(subList);
+        if (subscription?.subId) {
+          setSelectedInventory(Number(subscription.subId));
+        } else if (subList.length > 0) {
+          setSelectedInventory(Number(subList[0].subId));
         }
+      }
     })();
-    
   }, [subscription]);
+
 
   // 구독권 바뀔 때마다 메뉴 구조 다시 넣기 (지금은 공통 더미)
   useEffect(() => {
-    setSubMenu(selectedInventory.menuList || subMenuListData);
-  }, [selectedInventory]);
+    const inv = inventoryList.find((it) => Number(it.subId) === Number(selectedInventory));
+    // 실제로 구독권마다 메뉴가 다르면 inv.menuList 쓰고,
+    // 아직 백에서 안 내려오면 공통 더미 사용
+    setSubMenu(inv?.menuList || subMenuListData);
+  }, [selectedInventory, inventoryList]);
 
   const beverageMenus = subMenu?.menusByType?.BEVERAGE || [];
   const dessertMenus = subMenu?.menusByType?.DESSERT || [];
@@ -87,7 +87,10 @@ function CreateOrderPage() {
 
   // 구독권 선택
   function handleSelectInventory(subId){
-    const targetInventory = inventoryList.find((it) => it.subId === subId);
+    const realId = Number(subId);
+
+    const targetInventory = inventoryList.find((it) => Number(it.subId) === realId);
+
     if (!targetInventory) {
       console.warn("선택한 구독권을 찾을 수 없습니다.");
       return;
@@ -278,7 +281,7 @@ function CreateOrderPage() {
           <Select
             id="order-target-store"
             value={selectedInventory}
-            onChange={(e) => handleSelectInventory(e.target.value)}
+            onChange={(e) => handleSelectInventory(Number(e.target.value))}
             fullWidth
           >
             {inventoryList.map((inventory) => (

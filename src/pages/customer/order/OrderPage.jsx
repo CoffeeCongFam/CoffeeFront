@@ -1,10 +1,10 @@
-import { 
-  Box, 
-  Button, 
-  Tabs, 
-  Tab, 
-  Typography, 
-  CircularProgress 
+import {
+  Box,
+  Button,
+  Tabs,
+  Tab,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
@@ -56,22 +56,19 @@ function OrderPage() {
         minHeight: "100%",
       }}
     >
-      {/* 헤더 영역 */}
+      {/* 헤더 영역 - 항상 같은 레이아웃 */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column", 
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          flexDirection: "column", // 데스크탑도 무조건 column
           gap: 1.5,
-          width: "100%",
           mb: 2,
         }}
       >
         {/* 제목 */}
         <Typography
           sx={{
-            fontSize: { xs: "1.5rem", sm: isAppLike ? "1.7rem" : "1.9rem" },
+            fontSize: { xs: "1.5rem", md: "1.9rem" },
             fontWeight: "bold",
             lineHeight: 1.1,
           }}
@@ -79,36 +76,33 @@ function OrderPage() {
           나의 주문 현황
         </Typography>
 
+        {/* 날짜 + 버튼 한 줄 */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "row",
             gap: 1,
-            width:  "100%",
             justifyContent: "space-between",
             alignItems: "center",
+            width: "100%",
             minWidth: 0,
           }}
         >
-          {/* 날짜 */}
           <Typography
             sx={{
-              fontSize: { xs: "1.15rem", sm: "1rem" },
+              fontSize: { xs: "0.95rem", md: "1rem" },
               fontWeight: 600,
-              mb: 0,
               flex: "1 1 auto",
               minWidth: 0,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              textAlign: { xs: "left", sm: "right" },
             }}
             title={todayDate || ""}
           >
             {todayDate}
           </Typography>
 
-          {/* 주문하기 버튼 */}
           <Button
             variant="contained"
             size="small"
@@ -117,7 +111,7 @@ function OrderPage() {
               borderRadius: "999px",
               "&:hover": { bgcolor: "#222" },
               flexShrink: 0,
-              px: { xs: 2, sm: 3 },
+              px: { xs: 2, md: 3 },
             }}
             onClick={() => navigate("/me/order/new")}
             endIcon={<CoffeeIcon />}
@@ -136,7 +130,6 @@ function OrderPage() {
           "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
           "& .Mui-selected": { color: "black" },
           "& .MuiTabs-indicator": { backgroundColor: "black" },
-          minHeight: 42,
         }}
       >
         <Tab label={`진행 중 (${inProgressOrders.length})`} />
