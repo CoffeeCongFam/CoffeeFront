@@ -7,7 +7,7 @@ import Modal from "@mui/material/Modal";
 const style = {
   position: "absolute",
   top: "50%",
-  left: "55%",
+  left: "50%",      
   transform: "translate(-50%, -50%)",
   width: "fit-content",
   minWidth: "360px",
@@ -28,6 +28,12 @@ export default function OrderCancleCheckModal({ open, setOpen, setIsCancel }) {
     <Modal
       open={open}
       onClose={handleClose}
+      sx={{
+          display: 'flex',
+          p: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+      }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -41,7 +47,7 @@ export default function OrderCancleCheckModal({ open, setOpen, setIsCancel }) {
           </Typography>
         </Box>
 
-        {/* 🔹 하단 오른쪽 버튼 */}
+        {/* 하단 오른쪽 버튼 */}
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Button
             sx={{

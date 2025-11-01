@@ -23,7 +23,7 @@ function GiftSubscriptionPage() {
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // ✅ 결제 처리 로딩 상태
+  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
   const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
 
   const [keyword, setKeyword] = useState(""); // 유저 전화번호 검색
@@ -427,7 +427,7 @@ function GiftSubscriptionPage() {
         </Fade>
       </Backdrop>
 
-      {/* ✅ 결제 로딩 화면 */}
+      {/* 결제 로딩 화면 */}
       <Backdrop
         open={isLoading}
         sx={{

@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
 import todayOrderList from "../../../data/customer/todayOrderList";
 import { Box, Divider, Typography } from "@mui/material";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function OrderPage() {
+
+  const { isAppLike } = useAppShellMode();
   const [todayDate, setTodayDate] = useState(null);
 
   useEffect(() => {
@@ -16,7 +19,15 @@ function OrderPage() {
   }, []);
 
   return (
-    <Box sx={{ px: 12, py: 8 }}>
+    <Box
+            sx={{
+              // PWA/모바일이면 여백 작게
+              px: isAppLike ? 2 : 12,
+              py: isAppLike ? 2 : 5,
+              pb: isAppLike ? 9 : 8, // 하단 BottomNav 공간 확보
+              minHeight: "100%",
+            }}
+          >
       {/* TODO. npm install dayjs 다운받기 */}
       {/* <StaticTimePicker defaultValue={dayjs("2022-04-17T15:30")} /> */}
       <Box

@@ -12,7 +12,13 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response);
+    if (error.response) {
+      console.error("✅ 서버 응답 에러:", error.response);
+    } else if (error.request) {
+      console.error("❌ 요청은 갔는데 응답이 없음:", error.request);
+    } else {
+      console.error("🚨 요청 설정 중 에러:", error.message);
+    }
     return Promise.reject(error);
   }
 );
