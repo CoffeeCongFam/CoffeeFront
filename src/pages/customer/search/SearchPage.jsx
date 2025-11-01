@@ -495,7 +495,7 @@ export default function SearchPage() {
           </Box>
         </Box>
 
-        <Box sx={{ overflowY: "auto", flexGrow: 1 }}>
+        <Box sx={{ overflowY: "auto", flexGrow: 1, pb: '25%' }}>
           <List>
             <Box
               sx={{

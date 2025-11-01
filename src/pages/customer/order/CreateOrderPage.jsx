@@ -12,11 +12,16 @@ import {
   Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import subList from "../../../data/customer/subList";
 import subMenuListData from "../../../data/common/subMenuListData";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function CreateOrderPage() {
+
+  const { isAppLike } = useAppShellMode();
+  
   // 구독권에서 주문하기로 넘어오는 경우
   const { state } = useLocation();
   const subscription = state?.subscription;
@@ -38,6 +43,8 @@ function CreateOrderPage() {
   const [dessertQty, setDessertQty] = useState(1);
 
   useEffect(() => {
+    // 소비자 보유 구독권 목록 가져오기
+    // /api/customers/subscriptions
     setInventoryList(subList);
 
     if (subscription) {
@@ -126,16 +133,29 @@ function CreateOrderPage() {
     navigate("/me/order/1");
   }
 
+  // 뒤로 이동
+  function handleBack() {
+    navigate(-1);
+  }
+
   const payload = buildOrderPayload();
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        주문하기
-      </Typography>
+    <Box sx={{ px: isAppLike ? 3 : 30, py: 3, pb: 10 }}>
+      {/* 뒤로가기 */}
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+          <ArrowBackIcon />
+        </IconButton>
+      </Box>
+
+       {/* 제목 */}
+      <Box sx={{ textAlign: "center", mb: 2 }}>
+        <Typography variant={isAppLike ? "h6" : "h5"} fontWeight={'bold'}>주문하기</Typography>
+      </Box>
 
       {/* 1. 구독권(매장) 선택 */}
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
         주문 매장
       </Typography>
 
@@ -166,13 +186,15 @@ function CreateOrderPage() {
       </Select>
 
       {/* 2. 이용 타입 */}
-      <Box sx={{ mt: 2, mb: 2 }}>
+      <Box sx={{ mt: 2, mb: 2 }} >
         <ToggleButtonGroup
+          fullWidth
           color="primary"
           value={orderType}
           exclusive
           onChange={(e, v) => v && setOrderType(v)}
           aria-label="order-type"
+          sx={{ mb : 1 }}
         >
           <ToggleButton value="IN">매장 이용</ToggleButton>
           <ToggleButton value="OUT">포장 이용</ToggleButton>
@@ -180,11 +202,11 @@ function CreateOrderPage() {
       </Box>
 
       {/* 3. 메뉴 선택 */}
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
         메뉴 선택
       </Typography>
 
-      {/* ✅ 음료 여러 개 선택 */}
+      {/* 음료 여러 개 선택 */}
       {beverageMenus.length > 0 && (
         <Box sx={{ mb: 2 }}>
           <Typography variant="caption" sx={{ mb: 1, display: "block" }}>
@@ -287,6 +309,15 @@ function CreateOrderPage() {
               value={dessertQty}
               onChange={(e) => setDessertQty(Number(e.target.value))}
               fullWidth
+              sx={{
+                flex: 1,
+                height: "100%",                
+                "& .MuiSelect-select": {
+                  height: "100%",              
+                  display: "flex",
+                  alignItems: "center",       
+                },
+              }}
             >
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
@@ -305,6 +336,8 @@ function CreateOrderPage() {
           width: "100%",
           padding: "10px",
           borderRadius: "10px",
+          minHeight: "50px",
+          marginTop: "20px"
         }}
       >
         {payload.items.map((menu) => (
@@ -318,6 +351,7 @@ function CreateOrderPage() {
           </Box>
         ))}
       </Box>
+
       <Box
         style={{
           width: "100%",

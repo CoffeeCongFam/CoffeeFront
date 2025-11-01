@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import {
   Box,
   Typography,
@@ -7,37 +7,30 @@ import {
   Button,
   IconButton,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   ListItemIcon,
-  ListItemButton,
   Collapse,
   Chip,
 } from "@mui/material";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { ExpandLess, ExpandMore, ConfirmationNumber } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {
-  ExpandLess,
-  ExpandMore,
-  StarBorder,
-  Troubleshoot,
-} from "@mui/icons-material";
-
-const subButtonStyle = {
-  backgroundColor: "black",
-  color: "white",
-  width: "100%",
-};
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 const subDescBoxStyle = {
   backgroundColor: "#F2F2F2",
-  padding: "2% 3%",
+  padding: "12px 14px",
   borderRadius: "8px",
   width: "100%",
+  display: "flex", 
+  flexDirection: "column",
+  gap: "0.8rem",
+  justifyContent: "space-around"
 };
 
 function getChipStyle(type) {
@@ -45,9 +38,9 @@ function getChipStyle(type) {
     case "BASIC":
       return { bgcolor: "#E0E0E0", color: "#333" };
     case "STANDARD":
-      return { bgcolor: "#E6F4EA", color: "#9ae39eff" };
+      return { bgcolor: "#E6F4EA", color: "#2e7d32" };
     case "PREMIUM":
-      return { bgcolor: "#FFF3CD", color: "#cfc123ff" };
+      return { bgcolor: "#FFF3CD", color: "#B28704" };
     default:
       return { bgcolor: "#F1F3F4", color: "#5F6368" };
   }
@@ -55,12 +48,14 @@ function getChipStyle(type) {
 
 function CafeSubscriptionList({ subscriptions = [] }) {
   const navigate = useNavigate();
+  const { isAppLike } = useAppShellMode();
+
   const [filter, setFilter] = useState("ALL");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [openMenuId, setOpenMenuId] = useState(null); // 카드별 메뉴 열기
+  const [openDescId, setOpenDescId] = useState(null); // 구독권 설명
+  const scrollRef = useRef(null);
 
-  const [oepnMenu, setOpenMenu] = useState(false); // 이용 가능 메뉴 리스트
-
-  // 실제 데이터에 있는 타입만
+  // 실제 데이터에 있는 타입만 추출
   const subscriptionTypes = useMemo(() => {
     const set = new Set();
     subscriptions.forEach((s) => {
@@ -69,25 +64,44 @@ function CafeSubscriptionList({ subscriptions = [] }) {
     return Array.from(set);
   }, [subscriptions]);
 
-  // 필터 변경
-  const handleFilterChange = (event, newValue) => {
-    if (newValue !== null) {
-      setFilter(newValue);
-      setCurrentIndex(0); // ✅ 필터 바꾸면 첫 번째로 리셋
-    }
-  };
-
-  // 필터링된 목록
+  // 필터 적용
   const filteredList =
     filter === "ALL"
       ? subscriptions
       : subscriptions.filter((sub) => sub.subType === filter);
 
-  // 현재 보여줄 구독권
-  const currentSub =
-    filteredList.length > 0 ? filteredList[currentIndex] : null;
+  const handleFilterChange = (_, newValue) => {
+    if (newValue !== null) {
+      setFilter(newValue);
+      // 필터 바꾸면 맨 앞으로 스크롤
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      }
+    }
+  };
 
-  // 타입 라벨 한글화
+  // 좌우 스크롤
+  const scrollBy = (offset) => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollBy({
+      left: offset,
+      behavior: "smooth",
+    });
+  };
+
+  // 페이지 이동 함수들
+  const goToPurchaseSub = (subId) => {
+    navigate(`/me/subscriptions/${subId}/purchase`);
+  };
+  const goToOrder = (sub) => {
+    navigate("/me/order/new", {
+      state: { subscription: sub },
+    });
+  };
+  const goToSendGift = (subId) => {
+    navigate(`/me/subscriptions/${subId}/gift`);
+  };
+
   const getTypeLabel = (type) => {
     switch (type) {
       case "STANDARD":
@@ -101,41 +115,18 @@ function CafeSubscriptionList({ subscriptions = [] }) {
     }
   };
 
-  function goToPurchaseSub(subId) {
-    // 구독권 구매 페이지로 이동
-    navigate(`/me/subscriptions/${subId}/purchase`);
-  }
-
-  function goToOrder(sub) {
-    // 구독권 자동 선택, 주문하기로 이동
-    navigate("/me/order/new", {
-      state: {
-        subscription: sub,
-      },
-    });
-  }
-  function goToSendGift(subId) {
-    // 선물하기로 이동
-    navigate(`/me/subscriptions/${subId}/gift`);
-  }
-
-  // 캐러셀 이동
-  const handlePrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? filteredList.length - 1 : prev - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) =>
-      prev === filteredList.length - 1 ? 0 : prev + 1
-    );
-  };
-
   return (
-    <Box sx={{ minHeight: "400px", position: "relative" }}>
-      {/* 필터 */}
-      <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+    <Box sx={{ position: "relative" }}>
+      {/* 상단: 필터 + 화살표 */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 1,
+          mb: 2,
+          alignItems: "center",
+        }}
+      >
         <ToggleButtonGroup
           value={filter}
           exclusive
@@ -151,247 +142,341 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             ) : null
           )}
         </ToggleButtonGroup>
+
+        {/* 우측 화살표는 항상 보이게 */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+          }}
+        >
+          <IconButton onClick={() => scrollBy(-320)} size="small">
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+          <IconButton onClick={() => scrollBy(320)} size="small">
+            <ArrowForwardIosIcon fontSize="small" />
+          </IconButton>
+        </Box>
       </Box>
 
       {/* 캐러셀 영역 */}
-      {currentSub ? (
-        <Box
-          sx={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-          }}
-        >
-          {/* 왼쪽 화살표 */}
-          <IconButton
-            onClick={handlePrev}
-            disabled={filteredList.length <= 1}
-            sx={{ flexShrink: 0 }}
-          >
-            <ChevronLeftIcon />
-          </IconButton>
+      <Box
+        ref={scrollRef}
+        sx={{
+          display: "flex",
+          gap: 2,
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          py: 1,
+          "&::-webkit-scrollbar": {
+            height: isAppLike ? 0 : 6,
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#ccc",
+            borderRadius: 8,
+          },
+        }}
+      >
+        {filteredList.length === 0 && (
+          <Typography color="text.secondary">
+            이 조건에 맞는 구독권이 없습니다.
+          </Typography>
+        )}
 
-          {/* 카드 하나만 */}
+        {filteredList.map((sub) => (
           <Box
-            key={currentSub.subId || currentSub.id || currentSub.subName}
+            key={sub.subId || sub.id || sub.subName}
             sx={{
-              flexGrow: 1,
-              px: 2,
-              pt: 2,
-              pb: 4,
-              border: "1px solid #e0e0e0",
-              borderRadius: 2,
-              backgroundColor: "white",
+              scrollSnapAlign: "start",
+              px: isAppLike ? 0 : "10%",
+              flex: "0 0 100%",
+              // flex: isAppLike ? "0 0 100%" : "0 0 340px",
             }}
           >
-            {/* 상단 제목 + 인덱스 표시 */}
+            {/* 카드 */}
             <Box
               sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                backgroundColor: "white",
+                p: 2,
+                minHeight: 380,
+                height: "100%",
                 display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
+                flexDirection: "column",
+                gap: 1.5,
               }}
             >
-              <Typography variant="caption" color="text.secondary">
-                {filteredList.length > 0
-                  ? `${currentIndex + 1} / ${filteredList.length}`
-                  : null}
-              </Typography>
-            </Box>
+              {/* 타입 / 이름 / 가격 */}
+              <Box sx={{ textAlign: "center" }}>
+                <Chip
+                  label={getTypeLabel(sub.subType)}
+                  size="small"
+                  sx={{
+                    mb: 1,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    borderRadius: "999px",
+                    ...getChipStyle(sub.subType),
+                  }}
+                />
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {sub.subName || sub.name}
+                </Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: 28 }}>
+                  ₩{sub.price?.toLocaleString()}
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: 14, ml: 0.5, fontWeight: 400 }}
+                  >
+                    /월
+                  </Typography>
+                </Typography>
+              </Box>
 
-            <Box sx={{ textAlign: "center", mb: 1 }}>
-              <Chip
-                label={getTypeLabel(currentSub.subType)}
-                style={{ marginBottom: "13px" }}
-                size="small"
+              {/* 설명 3칸 - 모바일에서는 세로 */}
+              <Box
                 sx={{
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  borderRadius: "12px",
-                  ...getChipStyle(currentSub.subType),
+                  display: "grid",
+                  gridTemplateColumns: {
+                    // xs: "1fr",
+                    xs: "repeat(3, minmax(0, 1fr))",
+                    sm: "repeat(3, minmax(0, 1fr))",
+                  },
+                  gap: 1,
                 }}
-              />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {currentSub.subName || currentSub.name}
-              </Typography>
-              <Typography
-                // variant="h5"
-                sx={{ fontWeight: 800, fontSize: "32px" }}
               >
-                ₩{currentSub.price?.toLocaleString()}
-                <Typography
-                  component="span"
-                  sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
-                >
-                  /월
-                </Typography>
-              </Typography>
-            </Box>
-
-            {/* 설명 3칸 */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "10px",
-                width: "100%",
-                justifyContent: "space-around",
-                mt: 2,
-              }}
-            >
-              <Box style={subDescBoxStyle}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                  금액
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    textAlign: "right",
-                    gap: "5px",
-                  }}
-                >
-                  <Typography>
-                    월 {currentSub.price?.toLocaleString()}원
+                <Box sx={subDescBoxStyle}>
+                  <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+                    금액
                   </Typography>
-                  <Typography sx={{ fontSize: "10px", color: "#ff39caff" }}>
-                    한 잔당 약 ₩
-                    {currentSub.price
-                      ? Math.round(currentSub.price / 30).toLocaleString()
-                      : 0}
-                    원
+                  <Box>
+                    <Typography 
+                      sx={{ textAlign: "right", 
+                      fontSize: { xs: "0.8rem" , sm : "1rem"} 
+                      }}
+                    >
+                      월 {sub.price?.toLocaleString()}원
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                    >
+                      한 잔당 약 ₩
+                      {sub.price
+                        ? Math.round(sub.price / 30).toLocaleString()
+                        : 0}
+                    </Typography>
+                  </Box>
+                  
+                </Box>
+
+                <Box sx={subDescBoxStyle}>
+                  <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+                    구독 주기
+                  </Typography>
+                      
+                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"}   }}>
+                    1개월
                   </Typography>
                 </Box>
-              </Box>
 
-              <Box style={subDescBoxStyle}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                  구독 주기
-                </Typography>
-                <Box>
-                  <Typography sx={{ textAlign: "right" }}>1개월</Typography>
-                </Box>
-              </Box>
-
-              <Box style={subDescBoxStyle}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "14px" }}>
-                  사용 가능 일수
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    textAlign: "right",
-                    gap: "5px",
-                  }}
-                >
-                  <Typography sx={{ textAlign: "right" }}>
-                    매일, 하루 {currentSub.maxDailyUsage} 잔
+                <Box sx={subDescBoxStyle}>
+                  <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+                    사용 가능
                   </Typography>
-                  <Typography sx={{ fontSize: "10px", color: "#ff39caff" }}>
+                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"} }}>
+                    매일, 하루 {sub.maxDailyUsage}잔
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                  >
                     결제일로부터 시작
                   </Typography>
                 </Box>
               </Box>
-            </Box>
-            <Box sx={{ p: 2 }}>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {currentSub.description}
-              </Typography>
-            </Box>
 
-            {/* 이용 가능 메뉴 */}
-            <List>
-              <ListItemButton onClick={() => setOpenMenu(!oepnMenu)}>
-                <ListItemText
-                  primary="이용 가능 메뉴"
-                  primaryTypographyProps={{
-                    fontSize: "0.9rem", // 🔹 주 텍스트 크기 (기본 16px)
-                    // fontWeight: 600,
-                    color: "#4d4d4dff",
+              {/* 잔여 구독권 수량 */}
+              <List sx={{ py: 0 }}>
+                <ListItemButton
+                  sx={{
+                    borderRadius: 1,
+                    gap: 1,
                   }}
-                />
-                {oepnMenu ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-              <Collapse in={oepnMenu} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {currentSub.menuList.map((menu) => {
-                    return (
-                      <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                          <CoffeeIcon />
+                >
+                  {/* 왼쪽: 아이콘 + 라벨 */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
+                    
+                    <ListItemText
+                      primary="잔여 구독권 수량"
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        color: "#4d4d4d",
+                      }}
+                    />
+                  </Box>
+
+                  {/* 오른쪽: 개수 뱃지 */}
+                  <Box
+                    sx={{
+                      px: 1.5,
+                      py: 0.4,
+                      borderRadius: 999,
+                      bgcolor: "#f1f3f4",
+                      minWidth: 54,
+                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "0.3rem"
+                    }}
+                  >
+                    <Typography
+                      sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#202124" }}
+                    >
+                      {sub.remain || 0} 개
+                    </Typography>
+                    <ConfirmationNumber
+                      sx={{ fontSize: 20, color: "#4d4d4d" }}
+                    />
+                  </Box>
+                </ListItemButton>
+              </List>
+
+              {/* 간단 설명 */}
+              <List sx={{ py: 0 }}>
+                <ListItemButton
+                  onClick={() =>
+                    setOpenDescId((prev) =>
+                      prev === sub.subId ? null : sub.subId
+                    )
+                  }
+                  sx={{ borderRadius: 1 }}
+                >
+                  <ListItemText
+                    primary="구독권 설명"
+                    primaryTypographyProps={{
+                      fontSize: "0.9rem",
+                      color: "#4d4d4d",
+                    }}
+                  />
+                  {openDescId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                <Collapse
+                  in={openDescId === sub.subId}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <Box sx={{ px: 2, py: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary", whiteSpace: "pre-line" }}
+                    >
+                      {sub.description || "설명 정보가 없습니다."}
+                    </Typography>
+                  </Box>
+                </Collapse>
+              </List>
+
+              {/* 이용 가능 메뉴 (접기) */}
+              <List sx={{ py: 0 }}>
+                <ListItemButton
+                  onClick={() =>
+                    setOpenMenuId((prev) =>
+                      prev === sub.subId ? null : sub.subId
+                    )
+                  }
+                  sx={{ borderRadius: 1 }}
+                >
+                  <ListItemText
+                    primary="이용 가능 메뉴"
+                    primaryTypographyProps={{
+                      fontSize: "0.9rem",
+                      color: "#4d4d4d",
+                    }}
+                  />
+                  {openMenuId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+                <Collapse
+                  in={openMenuId === sub.subId}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <List component="div" disablePadding>
+                    {(sub.menuList || []).map((menu) => (
+                      <ListItemButton key={menu} sx={{ pl: 4 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <CoffeeIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
                           primary={menu}
                           primaryTypographyProps={{
                             fontSize: "0.8rem",
-                            fontWeight: 300,
                             color: "#333",
                           }}
                         />
                       </ListItemButton>
-                    );
-                  })}
-                </List>
-              </Collapse>
-            </List>
-            {/* 버튼 */}
-            <Box sx={{ mt: 2 }}>
-              
-                <Box
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    gap: "10px",
+                    ))}
+                  </List>
+                </Collapse>
+              </List>
+
+              {/* 버튼 영역 */}
+              <Box
+                sx={{
+                  mt: "auto",
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 1,
+                }}
+              >
+                <Button
+                  fullWidth
+                  size="small"
+                  onClick={() => goToSendGift(sub.subId)}
+                  startIcon={<CardGiftcardIcon />}
+                  sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#222" },
                   }}
                 >
-                  <Button
-                    style={subButtonStyle}
-                    size="small"
-                    onClick={() => goToSendGift(currentSub.subId)}
-                    startIcon={<CardGiftcardIcon />}
-                  >
-                    구독권 선물하기
-                  </Button>
-                  {currentSub.isSubscribed !== "Y" ? (
-                  <Button
-                    style={subButtonStyle}
-                    size="small"
-                    onClick={() => goToPurchaseSub(currentSub.subId)}
-                    startIcon={<CreditCardIcon />}
-                  >
-                    구독권 구매하기
-                  </Button>
-              ) : (
-                <Button
-                  style={subButtonStyle}
-                  size="small"
-                  onClick={() => goToOrder(currentSub)}
-                  startIcon={<CoffeeIcon />}
-                >
-                  주문하기
+                  선물하기
                 </Button>
-              )}
+
+                {sub.isSubscribed !== "Y" ? (
+                  <Button
+                    fullWidth
+                    size="small"
+                    onClick={() => goToPurchaseSub(sub.subId)}
+                    startIcon={<CreditCardIcon />}
+                    sx={{
+                      backgroundColor: "black",
+                      color: "white",
+                      "&:hover": { backgroundColor: "#222" },
+                    }}
+                  >
+                    구매하기
+                  </Button>
+                ) : (
+                  <Button
+                    fullWidth
+                    size="small"
+                    onClick={() => goToOrder(sub)}
+                    startIcon={<CoffeeIcon />}
+                    sx={{
+                      backgroundColor: "black",
+                      color: "white",
+                      "&:hover": { backgroundColor: "#222" },
+                    }}
+                  >
+                    주문하기
+                  </Button>
+
+                )}
               </Box>
             </Box>
           </Box>
-
-          {/* 오른쪽 화살표 */}
-          <IconButton
-            onClick={handleNext}
-            disabled={filteredList.length <= 1}
-            sx={{ flexShrink: 0 }}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Box>
-      ) : (
-        <Typography variant="body2" color="text.secondary">
-          이 조건에 맞는 구독권이 없습니다.
-        </Typography>
-      )}
+        ))}
+      </Box>
     </Box>
   );
 }

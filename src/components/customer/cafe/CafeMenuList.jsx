@@ -48,7 +48,7 @@ function CafeMenuList({ menus = [] }) {
         Object.keys(grouped).map((type) => (
           <Box
             key={type}
-            sx={{ mb: 2, border: "1px solid #eee", borderRadius: 1 }}
+            sx={{ mb: 2, border: "1px solid #eee", borderRadius: 1, overflow: "hidden" }}
           >
             {/* 섹션 헤더 */}
             <Box
@@ -58,7 +58,7 @@ function CafeMenuList({ menus = [] }) {
                 justifyContent: "space-between",
                 px: 2,
                 py: 1.2,
-                bgcolor: "#fafafa",
+                bgcolor: "#f8f8f8ff",
                 cursor: "pointer",
               }}
               onClick={() => toggleSection(type)}
@@ -79,67 +79,93 @@ function CafeMenuList({ menus = [] }) {
                     key={menu.menuId || menu.id || menu.menuName || menu.name}
                     sx={{
                       display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
                       justifyContent: "space-between",
+                      gap: { xs: 1.5, sm: 2 },
                       alignItems: "center",
-                      py: 1,
-                      borderBottom: "1px solid #f0f0f0",
+                      py: 1.2,
+                      borderBottom: "1px solid #cacacaff",
                       "&:last-of-type": { borderBottom: "none" },
                       cursor: "pointer",
-                      transition: "background-color 0.2s ease", // 부드럽게 색 전환
+                      transition: "background-color 0.2s ease", 
                       "&:hover": {
-                        backgroundColor: "#f9f9f9", // ✅ hover 시 연한 회색 배경
+                        backgroundColor: "#f9f9f9", 
                       },
                     }}
                   >
+                    {/* 왼쪽: 이미지 + 이름/설명 */}
                     <Box
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: "15px",
-                      }}
-                    >
-                      <img
-                        src={menu.menuImage}
-                        alt={menu.menuName}
-                        style={{
-                          width: "100px",
-                          height: "70px",
-                          objectFit: "cover",
-                          borderRadius: "6px",
+                      sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: { xs: "flex-start", sm: "center" },
+                          gap: 2,
+                          flex: 1, 
+                          minWidth: 0, 
                         }}
-                      />
+                      >
+                      {menu.menuImage && (
+                        <Box
+                          component="img"
+                          src={menu.menuImage}
+                          alt={menu.menuName}
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            objectFit: "cover",
+                            borderRadius: 1.2,
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
 
-                      <Box>
-                        <Typography variant="subtitle1">
+                      <Box sx={{
+                          flex: 1,
+                          minWidth: 0, 
+                        }}
+                      >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 500, wordBreak: "keep-all" }}>
                           {menu.menuName || menu.name}
                         </Typography>
                         {menu.description && (
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography 
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mt: 0.3,
+                              display: { xs: "block", sm: "block" },
+                              whiteSpace: "normal",
+                            }}
+                          >
                             {menu.description}
                           </Typography>
                         )}
                       </Box>
                     </Box>
+
+                    {/* 오른쪽: 가격 / 상태 */}
                     <Box
-                      style={{
+                      sx={{
+                        width: { xs: "100%", sm: "auto" },   
+                        flexShrink: 0,                        
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
-                        gap: "10px",
+                        justifyContent: { xs: "flex-end", sm: "flex-start" },
+                        gap: 1,
+                        ml: { sm: 2 },                        
                       }}
                     >
                       {/* 비활성 메뉴 표시 */}
                       {menu.isActive === false && (
-                        <Typography
-                          variant="caption"
-                          color="error"
-                          sx={{ display: "block" }}
-                        >
+                        <Typography variant="caption" color="error">
                           판매중단
                         </Typography>
                       )}
-                      <Typography variant="subtitle1">
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color:"#4d4d4dff" , fontWeight: 600, whiteSpace: "nowrap" }}
+                      >
                         {menu.price ? menu.price.toLocaleString() : "-"}원
                       </Typography>
                     </Box>
