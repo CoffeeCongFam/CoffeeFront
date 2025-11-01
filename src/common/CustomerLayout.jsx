@@ -1,5 +1,6 @@
 import React from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+
 import {
   AppBar,
   Toolbar,
@@ -20,12 +21,16 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
+import logo from '../assets/CoffeiensLogo.png';
 
 const drawerWidth = 240;
 
 export default function CustomerLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isSearchPage = location.pathname.startsWith("/me/search");
+
+  
 
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
@@ -42,9 +47,18 @@ export default function CustomerLayout() {
   const DrawerContent = (
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
-        <Typography variant="h6" component="div">
+        <Box style={{ height:120 , margin: "0 auto", cursor:"pointer", marginTop: "10px", marginBottom: "10px"}}>
+          <img
+          src={logo}
+          alt="CoffeeEns 로고"
+          // 원하는 크기로 조정
+          style={{height: "100%"}}
+        />
+        </Box>
+        
+        {/* <Typography variant="h6" component="div">
           CoffeeEns
-        </Typography>
+        </Typography> */}
       </Toolbar>
       <Divider />
       <List sx={{ mt: 1 }}>
