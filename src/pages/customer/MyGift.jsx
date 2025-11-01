@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import myGiftList from "../../data/customer/myGiftList";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
-import { Box, Typography, Button, ButtonGroup, Collapse } from '@mui/material';
+import { Box, Typography, Button, Tabs, Tab, Collapse } from '@mui/material';
 import ReceiveGift from "../../components/customer/gift/ReceiveGift";
 import SendGift from "../../components/customer/gift/SendGift";
 import sendGiftList from "../../data/customer/sendGiftList";
@@ -13,14 +13,19 @@ function MyGift() {
   const [filter, setFilter] = useState('ALL'); // 'ALL' | 'RECEIVED' | 'SENT'
   const [openIndex, setOpenIndex] = useState(null); // 드롭다운 오픈 인덱스
 
+  const baseList = useMemo(() =>
+    myGiftList.filter((it) => it.sender === MY_USER_NAME || it.receiver === MY_USER_NAME),
+    []
+  );
+  const countAll = baseList.length;
+  const countReceived = baseList.filter((it) => it.receiver === MY_USER_NAME).length;
+  const countSent = baseList.filter((it) => it.sender === MY_USER_NAME).length;
+
   const filteredGiftList = useMemo(() => {
-    const base = myGiftList.filter(
-      (it) => it.sender === MY_USER_NAME || it.receiver === MY_USER_NAME
-    );
-    if (filter === 'RECEIVED') return base.filter((it) => it.receiver === MY_USER_NAME);
-    if (filter === 'SENT') return base.filter((it) => it.sender === MY_USER_NAME);
-    return base; // ALL
-  }, [filter]);
+    if (filter === 'RECEIVED') return baseList.filter((it) => it.receiver === MY_USER_NAME);
+    if (filter === 'SENT') return baseList.filter((it) => it.sender === MY_USER_NAME);
+    return baseList; // ALL
+  }, [filter, baseList]);
  const formatMessage = (item) => {
     let messageComponent = null;
     let isSent = false;
@@ -73,23 +78,18 @@ function MyGift() {
 
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: 'white' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>내 선물함</Typography>
-        <ButtonGroup size="small" aria-label="gift filter">
-          <Button
-            variant={filter === 'ALL' ? 'contained' : 'outlined'}
-            onClick={() => setFilter('ALL')}
-          >전체</Button>
-          <Button
-            variant={filter === 'RECEIVED' ? 'contained' : 'outlined'}
-            onClick={() => setFilter('RECEIVED')}
-          >받은선물</Button>
-          <Button
-            variant={filter === 'SENT' ? 'contained' : 'outlined'}
-            onClick={() => setFilter('SENT')}
-          >보낸선물</Button>
-        </ButtonGroup>
       </Box>
+      <Tabs
+        value={filter}
+        onChange={(_, v) => setFilter(v)}
+        sx={{ borderBottom: 1, borderColor: 'divider', mt: 0.5, mb: 1 }}
+      >
+        <Tab value="ALL" label={`전체 (${countAll})`} />
+        <Tab value="RECEIVED" label={`받은선물 (${countReceived})`} />
+        <Tab value="SENT" label={`보낸선물 (${countSent})`} />
+      </Tabs>
       {filteredGiftList.map((item, index) => {
         const { messageComponent, isSent } = formatMessage(item);
         const isMineSent = item.sender === MY_USER_NAME;
