@@ -80,6 +80,7 @@ export default function SearchPage() {
   const hereMarkerRef = useRef(null);
   const mmRef = useRef(null);
 
+  const [isMapError, setIsMapError] = useState(false);    // 지도 렌더링 에러 여부
   const [status, setStatus] = useState("loading");
 
   // 검색 관련
@@ -104,6 +105,13 @@ export default function SearchPage() {
       try {
         const clientId = import.meta.env.VITE_NAVER_MAPS_CLIENT_ID;
         const maps = await loadNaverMaps(clientId);
+
+        if (!maps) {
+          console.warn("네이버 지도 로딩 실패 → 오프라인이거나 외부 스크립트 불러오기 실패");
+          setIsMapError(true);
+          return;
+        }
+    
         if (!mounted || !mapContainerRef.current) return;
 
         mapsRef.current = maps;
@@ -279,11 +287,36 @@ export default function SearchPage() {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      {/* 지도 */}
-      <div
-        ref={mapContainerRef}
-        style={{ position: "absolute", inset: 0, overflow: "hidden" }}
-      />
+      {isMapError ? (
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            bgcolor: "background.default",
+            zIndex: 1400,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6">지도를 불러올 수 없어요</Typography>
+          <Typography variant="body2" color="text.secondary">
+            오프라인이거나 네이버 지도 스크립트를 불러오지 못했습니다.
+            <br />
+            온라인으로 다시 접속하거나 새로고침 해주세요.
+          </Typography>
+        </Box>
+      ) : (
+        // 지도 정상일 때만 지도 컨테이너 렌더
+        <div
+          ref={mapContainerRef}
+          style={{ position: "absolute", inset: 0, overflow: "hidden" }}
+        />
+      )}
 
       {/* 상단 컨트롤 + 검색 드롭다운 컨테이너 */}
       <div

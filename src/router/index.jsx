@@ -4,7 +4,8 @@ import App from "../App";
 import LandingPage from "../pages/home/Landing";
 import Login from "../pages/home/Login";
 import SignUp from "../pages/home/SignUp";
-import CustomerLayout from "../common/CustomerLayout";
+import CustomerLayout from "../layout/CustomerLayout" // PWA 레이아웃
+// import CustomerLayout from "../common/CustomerLayout";   // 데스크탑 전용 레이아웃
 import CustomerHome from "../pages/customer/CustomerHome";
 import StoreLayout from "../common/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";

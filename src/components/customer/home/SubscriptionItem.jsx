@@ -25,7 +25,8 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
   return (
     <Card
       sx={{
-        width: 230,
+        width: "100%",
+        minWidth: "250px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
