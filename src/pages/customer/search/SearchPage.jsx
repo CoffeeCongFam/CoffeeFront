@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import cafeList from "../../data/customer/cafeList.js";
+import cafeList from "../../../data/customer/cafeList.js";
 import {
   Button,
   IconButton,
@@ -22,9 +22,11 @@ import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import SearchCafeInput from "../../components/customer/search/SearchCafeInput";
-import MarkerManager from "../../utils/MarkerManager.js";
-import loadNaverMaps from "../../utils/naverMapLoader.js";
+import SearchCafeInput from "../../../components/customer/search/SearchCafeInput.jsx";
+import MarkerManager from "../../../utils/MarkerManager.js";
+import loadNaverMaps from "../../../utils/naverMapLoader.js";
+import useAppShellMode from "../../../hooks/useAppShellMode.js";
+import { useNavigate } from "react-router-dom";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -74,6 +76,11 @@ const STATUS_MAP = {
 };
 
 export default function SearchPage() {
+
+  const { isAppLike } = useAppShellMode();
+
+  const navigate = useNavigate();
+
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const mapsRef = useRef(null);
@@ -224,7 +231,7 @@ export default function SearchPage() {
       else map.setCenter(pos);
     }
 
-    // ✅ 검색 드롭다운 닫기
+    // 검색 드롭다운 닫기
     setShowSearchResult(false);
     // 패널 닫기
     setOpenCafeList(false);
@@ -251,7 +258,7 @@ export default function SearchPage() {
     );
   }
 
-  // ✅ 검색어로 필터링 (이름 + 주소)
+  // 검색어로 필터링 (이름 + 주소)
   const filteredCafes = useMemo(() => {
     if (!debouncedKeyword) return [];
     const k = debouncedKeyword.toLowerCase();
@@ -319,19 +326,26 @@ export default function SearchPage() {
       )}
 
       {/* 상단 컨트롤 + 검색 드롭다운 컨테이너 */}
-      <div
+      <Box
         style={{
           position: "absolute",
           top: 16,
           left: 16,
+          right: 16,       // 모바일 오른쪽 여백 확보
           zIndex: 1300,
           display: "flex",
           gap: 8,
           alignItems: "center",
+          flexWrap: { xs: "wrap", sm: "nowrap" },
         }}
       >
         {/* 왼쪽에 검색창 */}
-        <div style={{ position: "relative" }}>
+        <Box sx={{
+            position: "relative",
+            flex: { xs: "1 1 100%", sm: "0 0 auto" }, // 모바일: 가로 꽉, 데스크탑: 원래처럼
+            maxWidth: { xs: "100%", sm: 320 },
+          }}
+        >
           <SearchCafeInput
             keyword={keyword}
             setKeyword={(v) => {
@@ -341,7 +355,7 @@ export default function SearchPage() {
             }}
           />
 
-          {/* ✅ 검색결과 드롭다운 */}
+          {/* 검색결과 드롭다운 */}
           {showSearchResult && filteredCafes.length > 0 && (
             <Paper
               elevation={3}
@@ -350,7 +364,7 @@ export default function SearchPage() {
                 top: "100%",
                 left: 0,
                 mt: 1,
-                width: 320,
+                width: "120%",
                 maxHeight: 280,
                 overflowY: "auto",
                 borderRadius: 2,
@@ -391,30 +405,57 @@ export default function SearchPage() {
               ))}
             </Paper>
           )}
-        </div>
+        </Box>
 
         {/* 현재 위치 버튼 */}
         <IconButton
           onClick={setCurrentLocation}
           aria-label="current-location"
-          style={{ backgroundColor: "white" }}
+          sx={{
+              backgroundColor: "white",
+              color: "gray",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              "&:hover": {
+                backgroundColor: "#f5f5f5",            // hover 시 살짝 밝게
+                boxShadow: "0 4px 10px rgba(0,0,0,0.25)", // hover 시 그림자 강화
+              },
+            }}
         >
           <LocationSearchingIcon />
         </IconButton>
 
         {/* 리스트 토글 버튼 */}
-        <Button
-          style={{
-            backgroundColor: "black",
-            color: "white",
-            cursor: "pointer",
-          }}
-          startIcon={<FormatListBulletedIcon />}
-          onClick={() => setOpenCafeList((prev) => !prev)}
-        >
-          카페 리스트
-        </Button>
-      </div>
+        {isAppLike ? (
+          <IconButton
+            onClick={() => setOpenCafeList((prev) => !prev)}
+            aria-label="카페 리스트"
+            sx={{
+              backgroundColor: "black",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#333",
+              },
+            }}
+          >
+            <FormatListBulletedIcon />
+          </IconButton>
+        ) : (
+          <Button
+            startIcon={<FormatListBulletedIcon />}
+            onClick={() => setOpenCafeList((prev) => !prev)}
+            sx={{
+              backgroundColor: "black",
+              color: "white",
+              cursor: "pointer",
+              "&:hover": {
+                backgroundColor: "#333",
+              },
+            }}
+          >
+            카페 리스트
+          </Button>
+        )}
+      </Box>
 
       {/* 카페 리스트용 패널 */}
       <Panel
@@ -448,7 +489,7 @@ export default function SearchPage() {
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
-            <Button size="small" onClick={() => setOpenCafeList(false)}>
+            <Button size="small" onClick={() => setOpenCafeList(false)} >
               닫기
             </Button>
           </Box>
@@ -472,20 +513,21 @@ export default function SearchPage() {
                   sx={{
                     bgcolor: "#f8f9fa",
                     borderRadius: 2,
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-                    p: 2,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    p: isAppLike ? 2 : 4,
                     mb: 2,
                     display: "flex",
                     gap: 2,
                     alignItems: "stretch",
                     cursor: "pointer",
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   {/* 썸네일 */}
                   <Box
                     sx={{
-                      width: 72,
-                      height: 72,
+                      width: { xs: "100%", sm: "10%" },
+                      height: { xs: 140, sm: 100 },
                       bgcolor: grey[100],
                       borderRadius: 2,
                       overflow: "hidden",
@@ -504,19 +546,18 @@ export default function SearchPage() {
                   </Box>
 
                   {/* 가운데 정보 영역 */}
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
                     <Box
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "flex-start",
                         mb: 0.5,
+                        gap: 1,
                       }}
                     >
                       {renderStoreStatus(cafe.storeStatus)}
-                      <Typography variant="caption" color="text.secondary">
-                        {cafe.distance ?? "454m"}
-                      </Typography>
+                     
                     </Box>
 
                     <Typography
@@ -525,32 +566,44 @@ export default function SearchPage() {
                     >
                       {cafe.storeName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap>
+                    <Typography variant="body2" color="text.secondary" noWrap={false}   >
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
 
-                    <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                      >
+                    <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
+                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
                         👥 {cafe.subscriberCount ?? 0}명 구독
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                      >
+                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
                         ⭐ {cafe.reviewCount ?? 0}개 리뷰
                       </Typography>
                     </Box>
                   </Box>
 
                   {/* 오른쪽 버튼 영역 */}
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Box sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
+                      mt: { xs: 1.5, sm: 0 },           // 
+                      width: { xs: "100%", sm: "auto" }, // 
+                    }}
+                  >
+                    {!isAppLike && 
+                      <Typography 
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ whiteSpace: "nowrap" }} 
+                      >
+                        {cafe.distance ?? "454m"}
+                      </Typography>
+                    }
+                     
                     {cafe.isSubscribed ? (
                       <Button
                         variant="outlined"
-                        size="small"
+                        size= {isAppLike ? "small" : "medium"}
                         startIcon={<span style={{ fontSize: 14 }}>✓</span>}
                         sx={{
                           borderRadius: 999,
@@ -558,22 +611,28 @@ export default function SearchPage() {
                           color: grey[800],
                           px: 2,
                           whiteSpace: "nowrap",
+                          width: { xs: "100%", sm: 150 },
                         }}
                       >
                         구독 중인 카페
                       </Button>
                     ) : (
                       <Button
-                        variant="contained"
-                        size="small"
+                        variant="outlined"
+                        size= {isAppLike ? "small" : "medium"}
+                        onClick={(e) => {
+                          e.stopPropagation(); // 리스트 전체 클릭과 겹치지 않게
+                          navigate(`/me/store/${cafe.storeId}`)
+                        }}
                         sx={{
                           borderRadius: 999,
-                          bgcolor: "black",
+                          // bgcolor: "#ffa137ff",
                           "&:hover": { bgcolor: "#222" },
                           whiteSpace: "nowrap",
+                          width: { xs: "100%", sm: 150 },
                         }}
                       >
-                        + 구독하기
+                        자세히 보기
                       </Button>
                     )}
                   </Box>

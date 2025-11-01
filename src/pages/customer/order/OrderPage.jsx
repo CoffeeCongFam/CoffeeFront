@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import TodayOrderItem from "../../components/customer/order/TodayOrderItem";
-import todayOrderList from "../../data/customer/todayOrderList";
+import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
+import todayOrderList from "../../../data/customer/todayOrderList";
 import { Box, Divider, Typography } from "@mui/material";
 
 function OrderPage() {

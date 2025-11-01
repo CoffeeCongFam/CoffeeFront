@@ -6,19 +6,19 @@ import Login from "../pages/home/Login";
 import SignUp from "../pages/home/SignUp";
 import CustomerLayout from "../layout/CustomerLayout" // PWA 레이아웃
 // import CustomerLayout from "../common/CustomerLayout";   // 데스크탑 전용 레이아웃
-import CustomerHome from "../pages/customer/CustomerHome";
+import CustomerHome from "../pages/customer/home/CustomerHome";
 import StoreLayout from "../common/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
-import OrderPage from "../pages/customer/OrderPage";
-import SearchPage from "../pages/customer/SearchPage";
+import OrderPage from "../pages/customer/order/OrderPage";
+import SearchPage from "../pages/customer/search/SearchPage";
 import MyPage from "../pages/customer/MyPage";
-import CreateOrderPage from "../pages/customer/CreateOrderPage";
-import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
-import StoreDetailPage from "../pages/customer/StoreDetailPage";
-import PurchaseSubscriptionPage from "../pages/customer/PurchaseSubscriptionPage";
-import CompletePurchasePage from "../pages/customer/CompletePurchasePage";
+import CreateOrderPage from "../pages/customer/order/CreateOrderPage";
+import CompleteOrderPage from "../pages/customer/order/CompleteOrderPage";
+import StoreDetailPage from "../pages/customer/home/StoreDetailPage";
+import PurchaseSubscriptionPage from "../pages/customer/home/PurchaseSubscriptionPage";
+import CompletePurchasePage from "../pages/customer/order/CompletePurchasePage";
 import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
 import Gift from "../pages/customer/Gift";
 import PaymentHistory from "../pages/customer/PaymentHistory";

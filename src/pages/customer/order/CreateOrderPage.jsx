@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import subList from "../../data/customer/subList";
-import subMenuListData from "../../data/common/subMenuListData";
+import subList from "../../../data/customer/subList";
+import subMenuListData from "../../../data/common/subMenuListData";
 
 function CreateOrderPage() {
   // 구독권에서 주문하기로 넘어오는 경우

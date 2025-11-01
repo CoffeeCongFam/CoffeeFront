@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import SubscriptionItem from "../../components/customer/home/SubscriptionItem";
-import subList from "../../data/customer/subList";
-import cafeList from '../../data/customer/cafeList';
+import SubscriptionItem from "../../../components/customer/home/SubscriptionItem";
+import subList from "../../../data/customer/subList";
+import cafeList from '../../../data/customer/cafeList';
 import { Box, IconButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import LocalCafeCard from "../../components/customer/home/LocalCafeCard";
-import api from '../../utils/api';
-import useAppShellMode from "../../hooks/useAppShellMode";
+import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
+import api from '../../../utils/api';
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function CustomerHome() {
   const navigate = useNavigate();

@@ -12,7 +12,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SubscriptItem from "../../components/customer/purchase/SubscriptionItem";
+import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();

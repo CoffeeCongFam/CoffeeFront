@@ -1,8 +1,8 @@
 import { Box, Typography, Divider, Chip, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
-import OrderStepper from "../../components/customer/order/OrderStepper";
-import OrderCheckModal from "../../components/customer/order/OrderCancleCheckModal";
+import OrderStepper from "../../../components/customer/order/OrderStepper";
+import OrderCheckModal from "../../../components/customer/order/OrderCancleCheckModal";
 import { useNavigate, useParams } from "react-router-dom";
 
 function orderStatusMessage(status) {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Tabs, Tab, Typography, Divider, Chip } from "@mui/material";
 import { useParams } from "react-router-dom";
-import storeDetail from "../../data/customer/storeDetail.js";
-import CafeInfo from "../../components/customer/cafe/CafeInfo.jsx";
-import CafeMenuList from "../../components/customer/cafe/CafeMenuList.jsx";
-import CafeSubscriptionList from "../../components/customer/cafe/CafeSubscriptionList.jsx";
-import CafeReviewList from "../../components/customer/cafe/CafeReviewList.jsx";
+import storeDetail from "../../../data/customer/storeDetail.js";
+import CafeInfo from "../../../components/customer/cafe/CafeInfo.jsx";
+import CafeMenuList from "../../../components/customer/cafe/CafeMenuList.jsx";
+import CafeSubscriptionList from "../../../components/customer/cafe/CafeSubscriptionList.jsx";
+import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
