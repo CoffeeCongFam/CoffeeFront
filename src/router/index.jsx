@@ -42,6 +42,22 @@ const router = createBrowserRouter([
         path: 'signup',
         element: <SignUp />,
       },
+            {
+        path: "kakaoRedirect",
+        element: <KakaoRedirect />,
+      },
+      {
+        path: "customerSignUp",
+        element: <CustomerSignUp />,
+      },
+      {
+        path: "cafeSignUp",
+        element: <CafeSignUp />,
+      },
+      {
+        path: "MemberSignUp",
+        element: <MemberSignUp />,
+      },
     ],
   },
 
