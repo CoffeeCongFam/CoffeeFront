@@ -17,8 +17,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../components/customer/purchase/SubscriptionItem";
 import SearchGiftReceiver from "../../components/customer/purchase/SearchGiftReceiver";
+import useAppShellMode from "../../hooks/useAppShellMode";
 
 function GiftSubscriptionPage() {
+  const { isAppLike } = useAppShellMode();
   const { subId } = useParams();
   const navigate = useNavigate();
 
@@ -110,7 +112,7 @@ function GiftSubscriptionPage() {
       <Box
         sx={{
           p: 3,
-          pb: 10,
+          pb:  isAppLike ? "100px" : 10,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -153,6 +155,7 @@ function GiftSubscriptionPage() {
           <Box
             sx={{
               display: "flex",
+              flexDirection: isAppLike ? "column" : "row",
               gap: 2,
               width: "100%",
               maxWidth: "900px",
@@ -220,14 +223,17 @@ function GiftSubscriptionPage() {
                     backgroundColor: "#f4f4f4",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "space-between",
                     gap: 2,
                     // height: "100%",
                     height: "fit-content",
                     padding: "15px 25px",
                   }}
                 >
+                  <Box sx={{ display: 'flex', gap: "10px"}}>
                   <AccountCircleIcon />
                   <Typography>{receiver.name}</Typography>
+                  </Box>
                   <IconButton
                     onClick={() => {
                       setSearchOpen(true);
@@ -407,7 +413,7 @@ function GiftSubscriptionPage() {
             </Box>
 
             {/* 밑에 실제 결제 버튼 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", pb: isAppLike ? 11 : 0 }}>
               <Box
                 sx={{
                   bgcolor: "white",

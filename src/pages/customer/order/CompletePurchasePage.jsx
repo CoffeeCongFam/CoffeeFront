@@ -1,7 +1,9 @@
 import { Box, IconButton, Typography, Divider } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 
 function CompletePurchasePage() {
   const { purchaseId } = useParams();
@@ -48,6 +50,7 @@ function CompletePurchasePage() {
             ? "선물이 전달되었습니다."
             : "결제가 완료되었습니다."}
         </Typography>
+        <CardGiftcardIcon />
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -63,10 +66,32 @@ function CompletePurchasePage() {
         }}
       >
         {/* 상단 매장명 */}
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "#555", mb: 4 }}>
+        {/* <Typography variant="h5" sx={{ fontWeight: 700, color: "#555", mb: 4 }}>
           {purchase.storeName}
-        </Typography>
-        {purchase.isGift === "Y" && <Box>보내는 사람 받는 사람</Box>}
+        </Typography> */}
+        {purchase.isGift === "Y" && 
+          <Box sx={{display: "flex", flex: 1, justifyContent: "space-around", mb: 3, }}>
+            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+              <Typography fontWeight={"bold"}>보내는 사람</Typography>
+              <Typography>아무개</Typography>
+            </Box>
+            <Box
+              sx={{
+                width: 40,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ForwardIcon />
+            </Box>
+            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+              <Typography fontWeight={"bold"}>받는 사람</Typography>
+              <Typography>아무개</Typography>
+            </Box>
+          </Box>
+        }
+        <Divider sx={{ my: 3 }} />
 
         {/* 구독 정보 */}
         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
