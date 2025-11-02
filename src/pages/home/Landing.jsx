@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import kakaoBtn from "../../assets/kakao_login_medium_wide.png";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,8 @@ function Landing() {
   };
   
   return (
-    <div style={{
+    <Box
+      sx={{
       display: 'flex',
       height: '100vh',
       width: '100vw',
@@ -73,7 +74,7 @@ function Landing() {
           }}
         >회원가입</Button>
       </div>
-    </div>
+    </Box>
   )
 }
 
