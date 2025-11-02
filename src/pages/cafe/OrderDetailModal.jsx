@@ -28,10 +28,10 @@ const REFUSAL_REASONS = [
 
 // 모달 컴포넌트 - 상세 정보 확인, 거절 사유 버튼, 접수거절 버튼
 
-const DetailField = ({ label, value, isState = false }) => {
+const DetailField = ({ label, value, isStatus = false }) => {
   let content;
 
-  if (isState) {
+  if (isStatus) {
     // 주문 상태 필드인 경우 (객체 전달됨): value.name을 렌더링
     content = (
       <Typography
@@ -101,7 +101,18 @@ export default function OrderDetailModal({
 
   // 거절 버튼 클릭 핸들러 : 부모로부터 전달받은 onReject 함수를 호출하고 모달을 닫는다.
   const handleReject = () => {
-    onReject(order.orderId, 'REJECTED');
+    // 선택된 코드에 해당하는 객체를 찾고
+    const selectedReason = REFUSAL_REASONS.find(
+      (r) => r.code === selectedReasonCode
+    );
+
+    // 해당 객체의 Label을 가져옴
+    const reasonTextToSend = selectedReason
+      ? selectedReason.label
+      : '시스템 문제 이슈';
+
+    // 실제 사유 텍스트까지 부모에게 전달
+    onReject(order.orderId, 'REJECTED', reasonTextToSend);
   };
 
   return (
@@ -138,7 +149,7 @@ export default function OrderDetailModal({
             }}
           >
             <Typography variant="body1" fontWeight="bold">
-              A01
+              {order.orderNumber}
             </Typography>
           </Box>
           <Typography variant="h6" fontWeight="bold">
@@ -147,9 +158,12 @@ export default function OrderDetailModal({
         </Box>
 
         {/* 상세 정보 필드 */}
-        <DetailField label="주문일시" value={order.createdAt} />
-        <DetailField label="주문자" value="커피빵커피커피" />
-        <DetailField label="전화번호" value="010-1111-1111" />
+        <DetailField
+          label="주문일시"
+          value={new Date(order.createdAt).toLocaleString()}
+        />
+        <DetailField label="주문자" value={order.name} />
+        <DetailField label="전화번호" value={order.tel} />
         <DetailField label="주문상태" value={statusInfo} isStatus={true} />
 
         {/* 메뉴 및 수량 영역 */}
@@ -162,16 +176,17 @@ export default function OrderDetailModal({
               수량
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="body2">
-              {order.menuId.split('(')[0]}
-            </Typography>
-            <Typography variant="body2">
-              {order.menuId.match(/\((\d+)\)/)
-                ? order.menuId.match(/\((\d+)\)/)[1]
-                : 1}
-            </Typography>
-          </Box>
+
+          {/* 🚩 menuList 배열을 순회하여 각 메뉴 항목을 렌더링합니다. */}
+          {order.menuList.map((menuItem) => (
+            <Box
+              key={menuItem.menuId}
+              sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}
+            >
+              <Typography variant="body2">{menuItem.menuName}</Typography>
+              <Typography variant="body2">{menuItem.quantity}</Typography>
+            </Box>
+          ))}
         </Box>
       </DialogContent>
       {/* 하단 버튼 영역 */}

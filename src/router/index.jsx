@@ -16,13 +16,14 @@ import MyPage from '../pages/customer/MyPage';
 import CreateOrderPage from '../pages/customer/CreateOrderPage';
 import CompleteOrderPage from '../pages/customer/CompleteOrderPage';
 import StoreDetailPage from '../pages/customer/StoreDetailPage';
+import Gift from '../pages/customer/Gift';
+import PaymentHistory from '../pages/customer/PaymentHistory';
+import MyGift from '../pages/customer/MyGift';
+import Subscription from '../pages/customer/Subscription';
 import PastOrders from '../pages/cafe/PastOrders';
-import ManageProduct from '../pages/cafe/ManageProduct';
 import ManageMenu from '../pages/cafe/ManageMenu';
-import Gift from "../pages/customer/Gift";
-import PaymentHistory from "../pages/customer/PaymentHistory";
-import MyGift from "../pages/customer/MyGift";
-import Subscription from "../pages/customer/Subscription";
+import ManageProduct from '../pages/cafe/ManageProduct';
+import ManageStoreInfo from '../pages/cafe/ManageStoreInfo';
 
 const router = createBrowserRouter([
   {
@@ -116,6 +117,10 @@ const router = createBrowserRouter([
       {
         path: 'manageproduct',
         element: <ManageProduct />,
+      },
+      {
+        path: 'manageStoreInfo',
+        element: <ManageStoreInfo />,
       },
     ],
   },

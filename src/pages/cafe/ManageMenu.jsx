@@ -39,6 +39,7 @@ const DUMMY_STORE_MENUS = [
     menuStatus: 'ACTIVE',
     menuType: 'BEVERAGE',
     createdAt: '2025-10-10T09:00:00Z',
+    updatedAt: "2025-10-31T14:44:25.581717",
   },
   {
     menuId: 'M002',
@@ -50,6 +51,7 @@ const DUMMY_STORE_MENUS = [
     menuStatus: 'ACTIVE',
     menuType: 'BEVERAGE',
     createdAt: '2025-10-10T09:05:00Z',
+    updatedAt: "2025-10-31T14:44:25.581717",
   },
   {
     menuId: 'M003',
@@ -61,6 +63,7 @@ const DUMMY_STORE_MENUS = [
     menuStatus: 'INACTIVE',
     menuType: 'BEVERAGE',
     createdAt: '2025-10-15T15:30:00Z',
+    updatedAt: "2025-10-31T14:44:25.581717",
   },
   {
     menuId: 'M004',
@@ -72,6 +75,7 @@ const DUMMY_STORE_MENUS = [
     menuStatus: 'ACTIVE',
     menuType: 'DESSERT',
     createdAt: '2025-10-20T11:00:00Z',
+    updatedAt: "2025-10-31T14:44:25.581717",
   },
   {
     menuId: 'M005',
@@ -83,6 +87,7 @@ const DUMMY_STORE_MENUS = [
     menuStatus: 'ACTIVE',
     menuType: 'DESSERT',
     createdAt: '2025-10-20T11:05:00Z',
+    updatedAt: "2025-10-31T14:44:25.581717",
   },
 ];
 
