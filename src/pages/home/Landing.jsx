@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Button } from "@mui/material";
 import kakaoBtn from "../../assets/kakao_login_medium_wide.png";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/common/Loading";
 
 function Landing() {
+  const [isLoading, setIsLoading] = useState(false);
   let navigate = useNavigate();
   // 카카오 소셜로그인 필요한 코드 및 주소
   const JAVASCRIPT_API_KEY = '46061414e5a25e9d2320da056e3f4407';
@@ -46,6 +48,7 @@ function Landing() {
         fontSize: '24px',
         color: 'black'
       }}>
+        <Button onClick={() => setIsLoading(!isLoading)}>로딩 화면 테스트</Button>
         <button
           onClick={kakaoLogin}
           style={{
@@ -74,6 +77,9 @@ function Landing() {
           }}
         >회원가입</Button>
       </div>
+      {
+        isLoading && <Loading />
+      }
     </Box>
   )
 }

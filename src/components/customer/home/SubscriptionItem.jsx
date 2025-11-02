@@ -7,12 +7,15 @@ import {
   Box,
   Chip,
 } from "@mui/material";
+import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
   const navigate = useNavigate();
+
+  const isUsedToday = item.remainingCount <= 0;
   // 남은 일수 계산
   function getRemainingDays(today, subEnd) {
     const todayDate = new Date(today);
@@ -36,9 +39,34 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         overflow: "hidden",
         bgcolor: "white",
         cursor: "pointer",
+        position: "relative",
       }}
       onClick={() => navigate(`/me/store/${item.store.storeId}`)}
     >
+
+      {/* 도장 오버레이 */}
+      {isUsedToday && (
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0, // top:0, right:0, bottom:0, left:0
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 1,
+            backgroundColor: "rgba(0,0,0,0.25)",
+            backdropFilter: "blur(1.5px)",
+            zIndex: 10,
+          }}
+        >
+          <CoffeeIcon sx={{ fontSize: 80, color: "#ffffffd2" }} />
+          <Typography sx={{ fontSize: 25, fontWeight: 600, color: "#ffffffd2" }}>
+            오늘 이용 완료
+          </Typography>
+        </Box>
+      )}
+
       {/* 상단 이미지 */}
       <Box sx={{ width: "100%", bgcolor: "#e9e9e9" }}>
         <CardMedia
@@ -49,7 +77,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             objectFit: "cover",
             backgroundColor: "#ddd",
           }}
-          image={item.store.storeImage}
+          image={item.store.storeImg}
           alt={item.store.storeName}
         />
       </Box>
@@ -119,9 +147,11 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
               color: "white",
               borderRadius: "6px",
               "&:hover": { backgroundColor: "#333" },
+              alignItems: "center",
             }}
+            endIcon={<CoffeeIcon />}
           >
-            주문하기
+            {item?.remainingCount}잔 주문 가능
           </Button>
         ) : (
           <Button
