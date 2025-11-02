@@ -1,9 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
 function SignUp() {
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const JAVASCRIPT_API_KEY = 'bfc6a794411e9c59db71d143bcc3d704';
   const buildKakaoUrl = (role) => {
     const REDIRECT_URI = `http://localhost:5173/kakaoRedirect?role=${role}`;

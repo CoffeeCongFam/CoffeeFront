@@ -40,7 +40,7 @@ const SubscriptionDetailCard = ({ subscriptionData }) => {
   const formattedPrice = price.toLocaleString();
 
   // 금액 정보를 보여주는 박스 서브 컴포넌트
-  const InfoBox = ({ title, content, subContent = null, isPrice = false }) => (
+  const InfoBox = ({ title, content, subContent = null }) => (
     <Box
       sx={{
         flexGrow: 1,

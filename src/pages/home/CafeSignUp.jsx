@@ -41,7 +41,7 @@ function CafeSignUp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = {
+    const _formData = {
       businessNumber: formState.businessNumber.replace(/\D/g, ''), // 숫자만 추출
       storeName: formState.storeName,
       roadAddress: formState.roadAddress,

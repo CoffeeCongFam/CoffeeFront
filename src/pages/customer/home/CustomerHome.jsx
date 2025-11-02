@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
-import api from '../../../utils/api';
 import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function CustomerHome() {

@@ -1,6 +1,6 @@
 import React from "react";
 
-import sendGiftList from "../../data/customer/sendGiftList";
+// import sendGiftList from "../../data/customer/sendGiftList";
 
 
 function PaymentHistory() {
