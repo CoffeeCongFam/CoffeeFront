@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Loading({message}) {
+function Loading() {
     return (
         <div>
             

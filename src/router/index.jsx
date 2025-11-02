@@ -28,7 +28,7 @@ import KakaoRedirect from '../pages/home/KakaoRedirect';
 import CustomerSignUp from '../pages/home/CustomerSignUp';
 import CafeSignUp from '../pages/home/CafeSignUp';
 import MemberSignUp  from '../pages/home/MemberSignUp';
-import ErrorPage from "../pages/error/ErrorPage";
+import ErrorPage from "../common/error/ErrorPage";
 
 
 const router = createBrowserRouter([
