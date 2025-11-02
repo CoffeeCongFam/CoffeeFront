@@ -1,131 +1,97 @@
 import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
 
-const DUMMY_ORDERS = [
-  // ----------------------------------------
-  // 1. 요청 (REQUEST) - 접수 대기 중 (가장 최근 주문)
-  // ----------------------------------------
-  {
-    orderNumber: 1009, // 화면에 크게 표시될 주문 번호 (카운터 역할)
-    memberId: 156,
-    orderId: 21,
-    orderType: '테이크아웃',
-    orderStatus: 'REQUEST', // 🚩 주문 접수 대기 중
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:25:00.000Z', // KST 13:25
-    paymentType: '구독권 고정',
-  },
-  {
-    orderNumber: 1008,
-    memberId: 155,
-    orderId: 20,
-    orderType: '매장이용',
-    orderStatus: 'REQUEST', // 🚩 주문 접수 대기 중
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:20:00.000Z', // KST 13:20
-    paymentType: '구독권 고정',
-  },
+export const DUMMY_TODAY_ORDERS_RESPONSE = {
+  success: true,
+  data: [
+    // ----------------------------------------
+    // 1. 요청 (REQUEST) - 접수 대기 중 (가장 최근 주문)
+    // ----------------------------------------
+    {
+      orderId: 21,
+      memberSubscriptionId: 1,
+      dailyRemainCount: 1, // 일 잔여 횟수
+      orderType: 'OUT', // 테이크아웃
+      orderStatus: 'REQUEST',
+      rejectedReason: null,
+      orderNumber: 1009,
+      createdAt: '2025-10-31T04:25:00.000Z',
+      tel: '010-1234-5678',
+      name: '홍길동',
+      menuList: [
+        { menuId: 21, quantity: 2, menuName: '카페라떼', price: 9000 },
+        { menuId: 32, quantity: 1, menuName: '브라우니', price: 4000 },
+      ],
+    },
+    // ----------------------------------------
+    // 2. 제조 중 (INPROGRESS)
+    // ----------------------------------------
+    {
+      orderId: 19,
+      memberSubscriptionId: 1,
+      dailyRemainCount: 1, // 일 잔여 횟수
+      orderType: 'IN', // 매장이용
+      orderStatus: 'INPROGRESS',
+      rejectedReason: null,
+      orderNumber: 1007,
+      createdAt: '2025-10-31T04:15:00.000Z',
+      tel: '010-5555-4444',
+      name: '김철수',
+      menuList: [
+        { menuId: 1, quantity: 1, menuName: '아메리카노', price: 3500 },
+      ],
+    },
+    // ----------------------------------------
+    // 3. 완료 (COMPLETED) - 픽업 대기 중
+    // ----------------------------------------
+    {
+      orderId: 17,
+      memberSubscriptionId: 2,
+      dailyRemainCount: 2, // 일 잔여 횟수
+      orderType: 'OUT',
+      orderStatus: 'COMPLETED',
+      rejectedReason: null,
+      orderNumber: 1005,
+      createdAt: '2025-10-31T04:05:00.000Z',
+      tel: '010-8888-7777',
+      name: '박영희',
+      menuList: [
+        { menuId: 21, quantity: 1, menuName: '바닐라 라떼', price: 5000 },
+        { menuId: 41, quantity: 1, menuName: '딸기 케이크', price: 6000 },
+      ],
+    },
+  ],
+  message: '요청이 성공적으로 처리되었습니다.',
+};
 
-  // ----------------------------------------
-  // 2. 제조 중 (INPROGRESS)
-  // ----------------------------------------
-  {
-    orderNumber: 1007,
-    memberId: 154,
-    orderId: 19,
-    orderType: '테이크아웃',
-    orderStatus: 'INPROGRESS', // 🚩 제조 중
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:15:00.000Z', // KST 13:15
-    paymentType: '구독권 고정',
-  },
-  {
-    orderNumber: 1006,
-    memberId: 153,
-    orderId: 18,
-    orderType: '매장이용',
-    orderStatus: 'INPROGRESS', // 🚩 제조 중
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:10:00.000Z', // KST 13:10
-    paymentType: '구독권 고정',
-  },
+const getOrderTypeLabel = (typeCode) => {
+  switch (typeCode) {
+    case 'IN':
+      return '매장 내 이용';
+    case 'OUT':
+      return '테이크아웃';
+    default:
+      return '정보 없음';
+  }
+};
 
-  // ----------------------------------------
-  // 3. 준비 완료 (READY)
-  // ----------------------------------------
-  {
-    orderNumber: 1005,
-    memberId: 152,
-    orderId: 17,
-    orderType: '테이크아웃',
-    orderStatus: 'READY', // 🚩 준비 완료 (픽업 대기)
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:05:00.000Z', // KST 13:05
-    paymentType: '구독권 고정',
-  },
-  {
-    orderNumber: 1004,
-    memberId: 151,
-    orderId: 16,
-    orderType: '매장이용',
-    orderStatus: 'READY', // 🚩 준비 완료 (픽업 대기)
-    menuId: '2',
-    menuName: '라떼',
-    createdAt: '2025-10-31T04:00:00.000Z', // KST 13:00
-    paymentType: '구독권 고정',
-  },
+const getFormattedMenuList = (menuList) => {
+  if (!menuList || menuList.length === 0) return '메뉴 없음';
 
-  // ----------------------------------------
-  // 4. 취소/거부 (CANCELED, REJECTED)
-  // ----------------------------------------
-  {
-    orderNumber: 1003,
-    memberId: 150,
-    orderId: 15,
-    orderType: '테이크아웃',
-    orderStatus: 'CANCELED', // 🚩 취소된 주문
-    menuId: '1',
-    menuName: '아메리카노',
-    createdAt: '2025-10-31T03:55:00.000Z', // KST 12:55
-    paymentType: '구독권 고정',
-  },
-  {
-    orderNumber: 1002,
-    memberId: 149,
-    orderId: 14,
-    orderType: '매장이용',
-    orderStatus: 'REJECTED', // 🚩 거부된 주문
-    menuId: '1',
-    menuName: '아메리카노',
-    createdAt: '2025-10-31T03:50:00.000Z', // KST 12:50
-    paymentType: '구독권 고정',
-  },
+  // 메뉴 이름과 수량을 조합하여 문자열 배열 생성: ['아메리카노 (2개)', '브라우니 (1개)']
+  const formattedItems = menuList.map((menu) => {
+    return `${menu.menuName} (${menu.quantity}개)`;
+  });
 
-  // ----------------------------------------
-  // 5. 완료 (COMPLETED)
-  // ----------------------------------------
-  {
-    orderNumber: 1001,
-    memberId: 148,
-    orderId: 13,
-    orderType: '테이크아웃',
-    orderStatus: 'COMPLETED', // 🚩 완료된 주문
-    menuId: '1',
-    menuName: '아메리카노',
-    createdAt: '2025-10-31T03:45:00.000Z', // KST 12:45
-    paymentType: '구독권 고정',
-  },
-];
+  // 쉼표와 공백으로 연결
+  return formattedItems.join(', ');
+};
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
-  const [orders, setOrders] = useState(DUMMY_ORDERS);
+  const [orders, setOrders] = useState(DUMMY_TODAY_ORDERS_RESPONSE.data);
 
   // 모달 상태 정의
   const [modalState, setModalState] = useState({
@@ -142,25 +108,136 @@ function StoreHome() {
     setModalState({ open: true, selectedOrder: order });
   };
 
-  // 모달에서 최종 '주문 거부'를 눌렀을 때 실행되는 함수
-  const handleModalOrderReject = (orderId, nextStatus) => {
+  // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
+  // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.
+  const handleModalOrderReject = async (
+    orderId,
+    nextStatus,
+    rejectedReasonText
+  ) => {
+    try {
+      // nextStatus는 'REJECTED'
+
+      // 백엔드 요청
+      const response = await axios.patch(
+        `/api/stores/orders/reject/${orderId}`,
+        {
+          rejectedReason: rejectedReasonText,
+        }
+      );
+
+      // 성공 시 FE 상태 업데이트
+      if (response.status === 200) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.orderId === orderId
+              ? {
+                  ...order,
+                  orderStatus: 'REJECTED',
+                  rejectedReason: rejectedReasonText,
+                }
+              : order
+          )
+        );
+        console.log(
+          `주문 ID ${orderId} 거절 처리 완료 (사유 : ${rejectedReasonText})`
+        );
+        handleModalClose();
+      }
+    } catch (error) {
+      console.error(`주문 거부 API 호출 오류:`, error);
+      alert(`주문 거부 처리중 오류가 발생했습니다.`);
+    }
+    // axios 연결 전 가데이터로 테스트용도 코드
     handleStatusChange(orderId, nextStatus); // 상태 업데이트
     handleModalClose();
     console.log(`거절 처리 요청: ID ${orderId}, 다음 상태: ${nextStatus}`);
   };
 
-  // 버튼 클릭 시 orders 상태를 실제로 업데이트 하는 함수
-  const handleStatusChange = (orderId, nextStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.orderId === orderId
-          ? { ...order, orderStatus: nextStatus } // 해당 주문의 상태만 변경
-          : order
-      )
-    );
-    // 실제 백엔드 API 호출 로직은 여기다 추가해야 함
-    console.log(`주문 ID : ${orderId}를 ${nextStatus}로 변경 요청`);
-  };
+  // ⭐️버튼 클릭 시 orders 상태를 실제로 업데이트 하는 함수
+  const handleStatusChange = async (orderId, nextStatus) => {
+    try {
+      // 백엔드 요청
+      const response = await axios.patch(`/api/stores/orders/${orderId}`, {
+        orderStatus: nextStatus,
+      });
+
+      // 성공 시 FE 상태 업데이트
+      if (response.status === 200) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) => {
+            order.orderId === orderId
+              ? {
+                  ...order,
+                  orderStatus: nextStatus,
+                  // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
+                  dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
+                }
+              : order;
+          })
+        );
+        console.log(`주문 ID ${orderId} 상태가 ${nextStatus}로 변경완료`);
+      }
+    } catch (error) {
+      console.error(`주문 상태 변경 API 호출 오류 :`, error);
+      alert(`주문 상태 변경에 실패했습니다.`);
+    }
+
+    // axios 연결 전 가데이터로 테스트용도 코드
+    setOrders((prevOrders) => {
+
+      // 주문 접수 버튼을 누르고 주문 상태가 INPROGRESS로 바뀌었을 때만
+      // memberSubscriptionId의 dailyRemainCount 횟수를 차감시켜줘야해서
+      // 그에 따른 로직으로 수정
+      
+      const currentOrder = prevOrders.find(order => order.orderId === orderId);
+      if (!currentOrder) return prevOrders;
+
+      const memberSubscriptionIdToUpdate = currentOrder.memberSubscriptionId;
+      
+      // 잔여 횟수를 차감해야 하는 경우인지 판단
+      // (REQUEST => INPROGRESS로 접수될 때만 차감)
+      const isInprogress = nextStatus === 'INPROGRESS';
+      
+      const newOrders = prevOrders.map((order) => {
+        let newDailyRemainCount = order.dailyRemainCount;
+        let newStatus = order.orderStatus;
+
+        if (order.orderId === orderId){
+          newStatus = nextStatus;
+        }
+
+        if (isInprogress && order.memberSubscriptionId === memberSubscriptionIdToUpdate) {
+          newDailyRemainCount = Math.max(0, order.dailyRemainCount - 1);
+        }
+
+        return {
+          ...order,
+          orderStatus : newStatus,
+          dailyRemainCount : newDailyRemainCount,
+        };
+      });
+
+      console.log(`[${memberSubscriptionIdToUpdate} 구독] 상태 변경 및 잔여 횟수 차감 결과:`);
+        newOrders
+            .filter(o => o.memberSubscriptionId === memberSubscriptionIdToUpdate)
+            .forEach(o => {
+                console.log(`- 주문 ID: ${o.orderId}, 상태: ${o.orderStatus}, 잔여횟수: ${o.dailyRemainCount}`);
+            });
+      return newOrders;
+    //   prevOrders.map((order) =>
+    //     order.orderId === orderId
+    //       ? {
+    //           ...order,
+    //           orderStatus: nextStatus, // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
+    //           dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
+    //         } // 해당 주문의 상태만 변경
+    //       : order
+    //   )
+    // );
+    // console.log(`주문 ID : ${orderId}를 ${nextStatus}로 변경 요청`);
+  });
+}
 
   // 현재 주문 상태를 기반으로 다음 수행 동작과 다음 상태를 결정하는 함수
   const getNextActionAndState = (currentStatus) => {
@@ -247,10 +324,6 @@ function StoreHome() {
     // 2. STATUS_COLORS[a.status]가 null 또는 undefined라면 -> *코드를 멈추지 않고 즉시 undefined를 반환
     const priorityB = STATUS_COLORS[b.orderStatus]?.priority || 1000;
 
-    // 🚩 우선순위 값 확인
-    console.log(`A 상태: ${a.orderStatus}, A 우선순위: ${priorityA}`);
-    console.log(`B 상태: ${b.orderStatus}, B 우선순위: ${priorityB}`);
-
     // 1차 정렬 : 우선순위 비교(낮은 숫자일수록 앞으로)
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
@@ -279,6 +352,9 @@ function StoreHome() {
           // 현재 상태에 따른 액션 정보 가져오기
           const actionDetails = getNextActionAndState(order.orderStatus);
 
+          // 포맷된 메뉴 목록 문자열 
+          const formattedMenuString = getFormattedMenuList(order.menuList);
+
           return (
             // Grid Item : 각 카드를 감싸는 아이템
             // xs = 12 : 가장 작은 화면에서는 한 줄에 1개 (12/12)
@@ -299,8 +375,12 @@ function StoreHome() {
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {/* 타입, 상세보기 버튼 */}
-                    <Box sx={{ border: 1, padding: 1 }}>A01</Box>
-                    <Typography>{order.orderType}</Typography>
+                    <Box sx={{ border: 1, padding: 1 }}>
+                      {order.orderNumber}
+                    </Box>
+                    <Typography>
+                      {getOrderTypeLabel(order.orderType)}
+                    </Typography>
                     <Box sx={{ mt: 1, textAlign: 'right' }}>
                       {/* 상세보기 버튼 */}
                       <Button
@@ -315,7 +395,7 @@ function StoreHome() {
                     </Box>
                   </Box>
 
-                  <Typography>{order.menuName}</Typography>
+                  <Typography>{formattedMenuString}</Typography>
 
                   <Typography variant="body2" color="text.secondary">
                     {new Date(order.createdAt).toLocaleString()}
@@ -344,13 +424,15 @@ function StoreHome() {
       </Grid>
 
       {/* 상세 모달 렌더링 및 로직 연결 - props 주는 식으로 */}
-      <OrderDetailModal
-        open={modalState.open}
-        onClose={handleModalClose}
-        order={modalState.selectedOrder}
-        statusColors={STATUS_COLORS}
-        onReject={handleModalOrderReject}
-      />
+      {modalState.selectedOrder && (
+        <OrderDetailModal
+          open={modalState.open}
+          onClose={handleModalClose}
+          order={modalState.selectedOrder}
+          statusColors={STATUS_COLORS}
+          onReject={handleModalOrderReject}
+        />
+      )}
     </div>
   );
 }
