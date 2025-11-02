@@ -20,6 +20,8 @@ import Gift from '../pages/customer/Gift';
 import PaymentHistory from '../pages/customer/PaymentHistory';
 import MyGift from '../pages/customer/MyGift';
 import Subscription from '../pages/customer/Subscription';
+import ManageMenu from '../pages/cafe/ManageMenu';
+import ManageProduct from '../pages/cafe/ManageProduct';
 
 const router = createBrowserRouter([
   {
@@ -101,6 +103,18 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <StoreHome />,
+      },
+      {
+        path: 'pastOrders',
+        element: <PastOrders />,
+      },
+      {
+        path: 'manageMenu',
+        element: <ManageMenu />,
+      },
+      {
+        path: 'manageProduct',
+        element: <ManageProduct />,
       },
     ],
   },
