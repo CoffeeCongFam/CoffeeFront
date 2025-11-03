@@ -1,34 +1,37 @@
-import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "../App";
-import LandingPage from "../pages/home/Landing";
-import Login from "../pages/home/Login";
-import SignUp from "../pages/home/SignUp";
-import CustomerLayout from "../common/CustomerLayout";
-import CustomerHome from "../pages/customer/CustomerHome";
-import StoreLayout from "../common/StoreLayout";
-import StoreHome from "../pages/cafe/StoreHome";
-import AdminLayout from "../common/AdminLayout";
-import AdminHome from "../pages/admin/AdminHome";
-import OrderPage from "../pages/customer/OrderPage";
-import SearchPage from "../pages/customer/SearchPage";
-import MyPage from "../pages/customer/MyPage";
-import CreateOrderPage from "../pages/customer/CreateOrderPage";
-import CompleteOrderPage from "../pages/customer/CompleteOrderPage";
-import StoreDetailPage from "../pages/customer/StoreDetailPage";
-import Gift from "../pages/customer/Gift";
-import PaymentHistory from "../pages/customer/PaymentHistory";
-import MyGift from "../pages/customer/MyGift";
-import Subscription from "../pages/customer/Subscription";
+import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from '../App';
+import LandingPage from '../pages/home/Landing';
+import Login from '../pages/home/Login';
+import SignUp from '../pages/home/SignUp';
+import CustomerLayout from '../common/CustomerLayout';
+import CustomerHome from '../pages/customer/CustomerHome';
+import StoreLayout from '../common/StoreLayout';
+import StoreHome from '../pages/cafe/StoreHome';
+import AdminLayout from '../common/AdminLayout';
+import AdminHome from '../pages/admin/AdminHome';
+import OrderPage from '../pages/customer/OrderPage';
+import SearchPage from '../pages/customer/SearchPage';
+import MyPage from '../pages/customer/MyPage';
+import CreateOrderPage from '../pages/customer/CreateOrderPage';
+import CompleteOrderPage from '../pages/customer/CompleteOrderPage';
+import StoreDetailPage from '../pages/customer/StoreDetailPage';
+import Gift from '../pages/customer/Gift';
+import PaymentHistory from '../pages/customer/PaymentHistory';
+import MyGift from '../pages/customer/MyGift';
+import Subscription from '../pages/customer/Subscription';
 import KakaoRedirect from '../pages/home/KakaoRedirect';
 import CustomerSignUp from '../pages/home/CustomerSignUp';
 import CafeSignUp from '../pages/home/CafeSignUp';
-import MemberSignUp  from '../pages/home/MemberSignUp';
-
+import MemberSignUp from '../pages/home/MemberSignUp';
+import PastOrders from '../pages/cafe/PastOrders';
+import ManageMenu from '../pages/cafe/ManageMenu';
+import ManageProduct from '../pages/cafe/ManageProduct';
+import ManageStoreInfo from '../pages/cafe/ManageStoreInfo';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       {
@@ -36,27 +39,27 @@ const router = createBrowserRouter([
         element: <LandingPage />,
       },
       {
-        path: "login",
+        path: 'login',
         element: <Login />,
       },
       {
-        path: "signup",
+        path: 'signup',
         element: <SignUp />,
       },
       {
-        path: "kakaoRedirect",
+        path: 'kakaoRedirect',
         element: <KakaoRedirect />,
       },
       {
-        path: "customerSignUp",
+        path: 'customerSignUp',
         element: <CustomerSignUp />,
       },
       {
-        path: "cafeSignUp",
+        path: 'cafeSignUp',
         element: <CafeSignUp />,
       },
       {
-        path: "MemberSignUp",
+        path: 'MemberSignUp',
         element: <MemberSignUp />,
       },
     ],
@@ -64,7 +67,7 @@ const router = createBrowserRouter([
 
   // 일반 회원
   {
-    path: "/me",
+    path: '/me',
     element: <CustomerLayout />,
     children: [
       {
@@ -72,43 +75,43 @@ const router = createBrowserRouter([
         element: <CustomerHome />,
       },
       {
-        path: "search",
+        path: 'search',
         element: <SearchPage />,
       },
       {
-        path: "order",
+        path: 'order',
         element: <OrderPage />,
       },
       {
-        path: "order/new",
+        path: 'order/new',
         element: <CreateOrderPage />,
       },
       {
-        path: "order/:orderId",
+        path: 'order/:orderId',
         element: <CompleteOrderPage />,
       },
       {
-        path: "mypage",
+        path: 'mypage',
         element: <MyPage />,
       },
       {
-        path: "store/:storeId",
-        element: <StoreDetailPage />
+        path: 'store/:storeId',
+        element: <StoreDetailPage />,
       },
       {
-        path: "subscription",
+        path: 'subscription',
         element: <Subscription />,
       },
       {
-        path: "gift",
+        path: 'gift',
         element: <Gift />,
       },
       {
-        path: "mygift",
+        path: 'mygift',
         element: <MyGift />,
       },
       {
-        path: "paymentHistory",
+        path: 'paymentHistory',
         element: <PaymentHistory />,
       },
     ],
@@ -116,20 +119,35 @@ const router = createBrowserRouter([
 
   // 점주
   {
-    path: "/store",
+    path: '/store',
     element: <StoreLayout />,
     children: [
       {
         index: true,
         element: <StoreHome />,
       },
-      
+      {
+        path: 'pastOrders',
+        element: <PastOrders />,
+      },
+      {
+        path: 'manageMenu',
+        element: <ManageMenu />,
+      },
+      {
+        path: 'manageProduct',
+        element: <ManageProduct />,
+      },
+      {
+        path: 'manageStoreInfo',
+        element: <ManageStoreInfo />,
+      },
     ],
   },
 
   // 관리자
   {
-    path: "/admin",
+    path: '/admin',
     element: <AdminLayout />,
     children: [
       {
