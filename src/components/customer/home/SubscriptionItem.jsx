@@ -43,7 +43,6 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
       }}
       onClick={() => navigate(`/me/store/${item.store.storeId}`)}
     >
-
       {/* 도장 오버레이 */}
       {isUsedToday && (
         <Box
@@ -60,8 +59,10 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             zIndex: 10,
           }}
         >
-          <CoffeeIcon sx={{ fontSize: 80, color: "#ffffffd2" }} />
-          <Typography sx={{ fontSize: 25, fontWeight: 600, color: "#ffffffd2" }}>
+          <CoffeeIcon sx={{ fontSize: 65, color: "#ffffffd2" }} />
+          <Typography
+            sx={{ fontSize: 20, fontWeight: 600, color: "#ffffffd2" }}
+          >
             오늘 이용 완료
           </Typography>
         </Box>
