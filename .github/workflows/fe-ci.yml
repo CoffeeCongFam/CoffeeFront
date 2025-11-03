@@ -1,0 +1,41 @@
+name: FE CI  
+
+on:          
+  pull_request:         
+    branches: [ main, develop ] # PR이 main이나 develop 브랜치 대상으로 열리거나 업데이트될 때 실행
+  push:                 
+    branches: [ main ]  # main 브랜치에 직접 push될 때도 실행
+
+jobs:       
+  ci:
+    runs-on: ubuntu-latest     
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4  
+
+      - name: Set up Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci                 
+
+      - name: Lint
+        run: npm run lint -- --quiet
+
+      - name: Build project         
+        env:
+          VITE_API_URL: ${{ secrets.STAGING_API_URL }}
+          VITE_NAVER_MAPS_CLIENT_ID: ${{ secrets.VITE_NAVER_MAPS_CLIENT_ID }}
+          NODE_OPTIONS: --max_old_space_size=4096
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4       
+        with:
+          name: fe-dist
+          path: dist
+          retention-days: 7

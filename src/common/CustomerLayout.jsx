@@ -1,0 +1,166 @@
+import React from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Badge,
+  Box,
+  CssBaseline,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Typography,
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import HomeIcon from "@mui/icons-material/Home";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PersonIcon from "@mui/icons-material/Person";
+import logo from '../assets/CoffeiensLogo.png';
+
+const drawerWidth = 240;
+
+export default function CustomerLayout() {
+  const location = useLocation();
+  // const navigate = useNavigate();
+  const isSearchPage = location.pathname.startsWith("/me/search");
+
+  
+
+  const links = [
+    { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
+    { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
+    {
+      to: "/me/order",
+      label: "주문하기",
+      icon: <ShoppingCartIcon />,
+      end: true,
+    },
+    { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
+  ];
+
+  const DrawerContent = (
+    <Box role="navigation" sx={{ width: drawerWidth }}>
+      <Toolbar>
+        <Box style={{ height:120 , margin: "0 auto", cursor:"pointer", marginTop: "10px", marginBottom: "10px"}}>
+          <img
+          src={logo}
+          alt="CoffeeEns 로고"
+          // 원하는 크기로 조정
+          style={{height: "100%"}}
+        />
+        </Box>
+        
+        {/* <Typography variant="h6" component="div">
+          CoffeeEns
+        </Typography> */}
+      </Toolbar>
+      <Divider />
+      <List sx={{ mt: 1 }}>
+        {links.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            {({ isActive }) => (
+              <ListItemButton
+                selected={isActive}
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  my: 0.5,
+                  "&.Mui-selected": {
+                    backgroundColor: "primary.light",
+                    color: "white",
+                    "& .MuiListItemIcon-root": { color: "white" },
+                  },
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            )}
+          </NavLink>
+        ))}
+      </List>
+    </Box>
+  );
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      <CssBaseline />
+
+      {/* 왼쪽 사이드바 */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundImage: "none",
+          },
+        }}
+        open
+      >
+        {DrawerContent}
+      </Drawer>
+
+      {/* 오른쪽 메인 영역 */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          height: "100vh",
+          // 검색 페이지일 때만 스크롤 막기
+          overflow: isSearchPage ? "hidden" : "auto",
+          position: "relative",
+        }}
+      >
+        {/* 상단 헤더(AppBar) */}
+        <AppBar
+          position="fixed"
+          color="inherit"
+          elevation={0}
+          sx={{
+            width: `calc(100% - ${drawerWidth}px)`,
+            ml: `${drawerWidth}px`,
+            backgroundColor: "transparent",
+          }}
+        >
+          <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton color="inherit">
+              <Badge badgeContent={3} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        {/* Toolbar 높이만큼 여백 */}
+        {/* <Toolbar /> */}
+
+        {/* 페이지 콘텐츠 */}
+        {/* 여기 높이는 유지 */}
+        <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)" }}>
+          <Outlet />
+        </Box>
+      </Box>
+    </Box>
+  );
+}
