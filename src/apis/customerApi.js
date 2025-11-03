@@ -4,6 +4,8 @@ import api from "../utils/api";
     소비자 요청 api 모음
 */
 
+/*  메인 홈 */
+
 // 보유 구독권 목록 조회
 export async function fetchCustomerSubscriptions() {
   const res = await api.get("/customers/subscriptions");
@@ -17,3 +19,5 @@ export async function fetchNearbyCafes({ xPoint, yPoint, radius = 500 }) {
   });
   return res.data ?? [];
 }
+
+//

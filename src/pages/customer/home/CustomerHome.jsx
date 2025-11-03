@@ -8,7 +8,10 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-import { fetchCustomerSubscriptions, fetchNearbyCafes } from "../../../apis/customerApi";
+import {
+  fetchCustomerSubscriptions,
+  fetchNearbyCafes,
+} from "../../../apis/customerApi";
 
 function CustomerHome() {
   const navigate = useNavigate();
@@ -22,8 +25,8 @@ function CustomerHome() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    loadToday();
-    loadSubscriptions();
+    loadToday(); // 오늘 날짜
+    loadSubscriptions(); // 보유 구독권 조회
 
     // 위치 가져와서 근처 카페 요청
     if ("geolocation" in navigator) {
@@ -53,7 +56,7 @@ function CustomerHome() {
       setSubscriptions(data);
     } catch (e) {
       console.log(e);
-      setSubscriptions(subList); // 실패 시 목데이터
+      // setSubscriptions(subList); // 실패 시 더미 데이터
     }
   };
 
@@ -68,7 +71,7 @@ function CustomerHome() {
       setNearbyCafes(data);
     } catch (e) {
       console.error(e);
-      setNearbyCafes(cafeList); // 개발 중엔 더미
+      // setNearbyCafes(cafeList); // 개발 중엔 더미
       setLocError("주변 카페를 불러오는 데 실패했어요.");
     }
   };
@@ -107,14 +110,25 @@ function CustomerHome() {
           mb: 1.5,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px", mb: "2%" }}>
-          <Typography sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            mb: "2%",
+          }}
+        >
+          <Typography
+            sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
+          >
             유저 님, {isAppLike && <br />} 오늘도 한 잔의 여유를 즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
 
-        <Box style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}>
+        <Box
+          style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
+        >
           <IconButton onClick={() => scrollBy(-260)} size="small">
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
@@ -152,7 +166,11 @@ function CustomerHome() {
               flex: isAppLike ? "0 0 100%" : "0 0 auto",
             }}
           >
-            <SubscriptionItem today={today} item={item} handleOrderClick={handleOrderClick} />
+            <SubscriptionItem
+              today={today}
+              item={item}
+              handleOrderClick={handleOrderClick}
+            />
           </Box>
         ))}
       </Box>
@@ -172,7 +190,9 @@ function CustomerHome() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: isAppLike ? "1fr" : "repeat(auto-fit, minmax(240px, 1fr))",
+            gridTemplateColumns: isAppLike
+              ? "1fr"
+              : "repeat(auto-fit, minmax(240px, 1fr))",
             gap: "10px",
           }}
         >
