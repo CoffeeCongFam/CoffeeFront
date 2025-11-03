@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,35 +12,40 @@ import {
   Select,
   MenuItem,
   Typography,
+  Divider,
 } from '@mui/material';
 
 // 모달 스타일 설정
 const modalStyle = {
   '& .MuiDialog-paper': {
     width: '100%',
-    maxWidth: 600,
+    maxWidth: 700,
     borderRadius: 2,
   },
 };
 
-// 신규 구독권 등록 모달 컴포넌트
-const ProductRegistModal = ({ open, onClose, onRegister }) => {
-  // 폼 상태 관리(초기값 설정)
-  const [formData, setFormData] = useState({
-    subscriptionName: '',
-    price: 0,
-    subscriptionDesc: '',
-    subscriptionPeriod: 30,
-    subscriptionStatus: 'ONSALE',
-    remainSalesQuantity: 100,
-    maxDailyUsage: 1,
-    subscriptionType: 'BASIC',
-    salesLimitQuantity: 100,
-  });
-
+/**
+ * 구독권 상세 조회 및 수정 모달 컴포넌트
+ * @param {boolean} open 모달 열림/닫힘 상태
+ * @param {object} subscription 현재 선택된 구독권 데이터
+ * @param {function} onClose 모달 닫기 핸들러
+ * @param {function} onSave 수정 완료 버튼 클릭 시 호출될 함수 (컨테이너의 handleUpdateSubscription과 연결)
+ */
+const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
+  // 폼 상태를 subscription prop으로 초기화
+  const [formData, setFormData] = useState(subscription);
   const [imageFile, setImageFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState(subscription.subscriptionImg);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // subscription prop이 변경될 때마다 폼 상태를 업데이트
+  useEffect(() => {
+    if (subscription) {
+      setFormData(subscription);
+      setPreviewUrl(subscription.subscriptionImg);
+      setImageFile(null); // 새 모달 열리면 파일 초기화
+    }
+  }, [subscription]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +57,7 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
         name === 'salesLimitQuantity' ||
         name === 'subscriptionPeriod' ||
         name === 'maxDailyUsage'
-          ? parseInt(value) || '' // 숫자 필드는 숫자로 변환
+          ? parseInt(value) || ''
           : value,
     }));
   };
@@ -61,12 +66,22 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      // 브라우저에서 미리보기 URL 생성
+      // 브라우저에서 새 이미지 미리보기 URL 생성
       setPreviewUrl(URL.createObjectURL(file));
     } else {
       setImageFile(null);
-      setPreviewUrl('');
     }
+  };
+
+  const handleRemoveImage = () => {
+    // 이미지 파일 제거 및 미리보기 초기화
+    setImageFile(null);
+    setPreviewUrl('');
+    // 데이터 필드에서 이미지 URL을 제거하여 Service 계층에 이미지 제거를 요청하도록 설정
+    setFormData((prev) => ({
+      ...prev,
+      subscriptionImg: '',
+    }));
   };
 
   const handleSubmit = async () => {
@@ -76,15 +91,17 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
     }
 
     setIsSubmitting(true);
-    // 컨테이너로 데이터와 이미지 파일을 전달하여 등록 로직 실행
-    await onRegister(formData, imageFile);
-    // onRegister에서 성공적으로 모달을 닫아주기 때문에 여기서는 isSubmitting만 해제
+    // 컨테이너로 ID, 수정된 데이터, 이미지 파일을 전달하여 수정 로직 실행
+    await onSave(subscription.subscriptionId, formData, imageFile);
     setIsSubmitting(false);
   };
 
+  // subscription prop이 없으면 모달을 렌더링하지 않음
+  if (!subscription) return null;
+
   return (
     <Dialog open={open} onClose={onClose} sx={modalStyle} fullWidth>
-      <DialogTitle sx={{ fontWeight: 'bold' }}>새 구독권 등록</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 'bold' }}>구독권 상세/수정</DialogTitle>
       <DialogContent dividers>
         <Box
           component="form"
@@ -92,7 +109,23 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
           autoComplete="off"
           sx={{ display: 'grid', gap: 2 }}
         >
-          {/* 이미지 등록 섹션 */}
+          {/* 상단 정보 (ID 및 최종 수정일) */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            mb={2}
+            p={1}
+            sx={{ backgroundColor: '#f5f5f5', borderRadius: 1 }}
+          >
+            <Typography variant="subtitle1" color="text.secondary">
+              ID: {subscription.subscriptionId}
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              최종 수정일: {subscription.modifyDate}
+            </Typography>
+          </Box>
+
+          {/* 이미지 수정 섹션 */}
           <Box
             mb={2}
             sx={{
@@ -105,29 +138,52 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
             <Typography variant="subtitle1" gutterBottom>
               구독권 대표 이미지
             </Typography>
+            {previewUrl ? (
+              <Box sx={{ position: 'relative', mb: 1 }}>
+                <Box
+                  component="img"
+                  src={previewUrl}
+                  alt="Image Preview"
+                  sx={{
+                    width: '100%',
+                    height: 150,
+                    objectFit: 'cover',
+                    borderRadius: 1,
+                    mt: 1,
+                  }}
+                />
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={handleRemoveImage}
+                  variant="contained"
+                  sx={{
+                    position: 'absolute',
+                    top: 5,
+                    right: 5,
+                    backgroundColor: 'white',
+                    '&:hover': { backgroundColor: '#ffebee' },
+                    color: 'black',
+                  }}
+                >
+                  이미지 삭제
+                </Button>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.disabled" sx={{ py: 2 }}>
+                등록된 이미지가 없습니다.
+              </Typography>
+            )}
             <input
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              style={{ marginBottom: 10 }}
+              style={{ display: 'block', width: '100%', marginTop: 10 }}
             />
-            {previewUrl && (
-              <Box
-                component="img"
-                src={previewUrl}
-                alt="Image Preview"
-                sx={{
-                  width: '100%',
-                  height: 150,
-                  objectFit: 'cover',
-                  borderRadius: 1,
-                  mt: 1,
-                }}
-              />
-            )}
           </Box>
+          <Divider />
 
-          {/* 기본 정보 입력 */}
+          {/* 기본 정보 수정 필드 */}
           <TextField
             label="구독권 이름"
             name="subscriptionName"
@@ -172,10 +228,10 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
               </Select>
             </FormControl>
             <TextField
-              label="판매 가능 수량"
-              name="salesLimitQuantity"
+              label="남은 판매 수량"
+              name="remainSalesQuantity"
               type="number"
-              value={formData.salesLimitQuantity}
+              value={formData.remainSalesQuantity}
               onChange={handleChange}
               fullWidth
               inputProps={{ min: 0 }}
@@ -193,8 +249,8 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
                 onChange={handleChange}
               >
                 <MenuItem value="BASIC">BASIC</MenuItem>
-                <MenuItem value="STANDARD">STANDARD</MenuItem>
                 <MenuItem value="PREMIUM">PREMIUM</MenuItem>
+                <MenuItem value="LIMITED">LIMITED</MenuItem>
               </Select>
             </FormControl>
             <TextField
@@ -207,6 +263,7 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
               inputProps={{ min: 1 }}
             />
           </Box>
+
           <TextField
             label="일일 최대 사용 횟수"
             name="maxDailyUsage"
@@ -220,7 +277,7 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
       </DialogContent>
       <DialogActions sx={{ p: 3 }}>
         <Button onClick={onClose} disabled={isSubmitting} color="secondary">
-          취소
+          닫기
         </Button>
         <Button
           onClick={handleSubmit}
@@ -228,10 +285,11 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
           variant="contained"
           color="primary"
         >
-          {isSubmitting ? '등록 중...' : '등록 완료'}
+          {isSubmitting ? '저장 중...' : '수정 완료'}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
-export default ProductRegistModal;
+
+export default ProductDetailEditModal;

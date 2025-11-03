@@ -7,7 +7,7 @@ import MenuTable from './ManageMenuSoC/MenuTable';
 import MenuRegistModal from './ManageMenuSoC/MenuRegistModal';
 import MenuEditModal from './ManageMenuSoC/MenuEditModal';
 
-// 이걸 여기다 선언해서 써야하나 ***
+// axios 전까지만 갖다 쓰는 용 ***
 const CURRENT_STORE_ID = 'S001';
 
 // axios 로직을 담고 있는 서비스 함수 임포트

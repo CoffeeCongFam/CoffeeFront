@@ -17,9 +17,12 @@ import {
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PersonIcon from '@mui/icons-material/Person';
+import {
+  History,
+  LocalCafe,
+  CardGiftcard,
+  LocationOn,
+} from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -36,18 +39,18 @@ export default function StoreLayout() {
     {
       to: '/store/pastorders',
       label: '지난 주문 내역',
-      icon: <SearchIcon />,
+      icon: <History />,
     },
-    { to: '/store/manageMenu', label: '메뉴 관리', icon: <ShoppingCartIcon /> },
+    { to: '/store/manageMenu', label: '메뉴 관리', icon: <LocalCafe /> },
     {
       to: '/store/manageproduct',
       label: '상품 관리',
-      icon: <ShoppingCartIcon />,
+      icon: <CardGiftcard />,
     },
     {
       to: '/store/manageStoreInfo',
       label: '매장 정보',
-      icon: <ShoppingCartIcon />,
+      icon: <LocationOn />,
     },
   ];
 
