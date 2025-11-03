@@ -8,7 +8,6 @@ import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
-import defaultCafeThumbnail from '../../../assets/defaultCafeThumbnail.jpg';
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -92,7 +91,7 @@ function StoreDetailPage() {
         }}
       >
         <img
-          src={store.storeImg || defaultCafeThumbnail}
+          src={store.storeImg || ''}
           alt={store.storeName}
           sx={{
             width: "100%",

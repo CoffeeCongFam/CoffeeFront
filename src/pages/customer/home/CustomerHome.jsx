@@ -29,8 +29,8 @@ function CustomerHome() {
     loadSubscriptions(); // 보유 구독권 조회
 
     // 위치 가져와서 근처 카페 요청
-    if ("geolocation" in navigate) {
-      navigate.geolocation.getCurrentPosition(
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
           console.log("근처 카페 요청");
           loadNearbyCafes(coords);
@@ -65,11 +65,11 @@ function CustomerHome() {
   const loadNearbyCafes = async (coords) => {
     try {
       console.log("LOAD NEAR BY CAFES");
-      const data = await fetchNearbyCafes({
-        lat: coords.latitude,
-        lng: coords.longitude,
-        radius: 500,
-      });
+      const data = await fetchNearbyCafes(
+        coords.latitude,
+        coords.longitude,
+        500,
+      );
       console.log("LOCAL CAFES>> ", data);
 
       setNearbyCafes(data);

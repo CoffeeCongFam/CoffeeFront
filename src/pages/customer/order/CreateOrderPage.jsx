@@ -21,9 +21,13 @@ import subList from "../../../data/customer/subList";
 import subMenuListData from "../../../data/common/subMenuListData";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import { fetchUserSubscriptions, requestNewOrder } from "../../../apis/customerApi";
+import { userState } from "../../../stores/userState";
 
 function CreateOrderPage() {
   const { isAppLike } = useAppShellMode();
+
+  // 스토어에서 authUser 상태값 가져오기
+  const authUser = userState((state) => state.user);
 
   // 구독권에서 주문하기로 넘어오는 경우
   const { state } = useLocation();
@@ -218,7 +222,7 @@ function CreateOrderPage() {
 
     // 최종 payload
     const orderPayload = {
-      memberId,
+      memberId : authUser?.memberId,
       storeId,
       memberSubscriptionId,
       orderType: orderType,

@@ -22,7 +22,7 @@ const api = axios.create({
 
 
 // Access Token을 관리 헬퍼 함수 (localStorage 사용)
-const TokenService = {
+export const TokenService = {
   getLocalAccessToken: () => {
     return localStorage.getItem('accessToken');
   },

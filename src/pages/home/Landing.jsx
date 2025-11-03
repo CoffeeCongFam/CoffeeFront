@@ -6,7 +6,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { Element, Link, scroller } from "react-scroll";
+import { Element, Link, } from "react-scroll";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../hooks/useAppShellMode";
 
