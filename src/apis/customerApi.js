@@ -14,10 +14,11 @@ export async function fetchCustomerSubscriptions() {
 }
 
 // 내 위치 기반 근처 카페 목록 조회
-export async function fetchNearbyCafes({ xPoint, yPoint, radius = 500 }) {
+export async function fetchNearbyCafes(xPoint, yPoint, radius = 500) {
   const res = await api.get("/customers/stores/nearby", {
     params: { xPoint, yPoint, radius },
   });
+  console.log("xPoint>> ", xPoint, "yPoint>> ", yPoint);
   return res.data ?? [];
 }
 

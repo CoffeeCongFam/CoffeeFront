@@ -90,6 +90,7 @@ export default function SearchPage() {
   const [isMapError, setIsMapError] = useState(false); // 지도 렌더링 에러 여부
   const [status, setStatus] = useState("loading");
   const [isLoading, setIsLoading] = useState(true);
+  const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // 현재 x, y 좌표
 
   // 검색 관련
   const [keyword, setKeyword] = useState("");
@@ -102,20 +103,52 @@ export default function SearchPage() {
   // 검색창 아래 드롭다운 보여줄지
   const [showSearchResult, setShowSearchResult] = useState(false);
 
-  useEffect(() => {
-    // 카페 목록 가져오기
-    try {
-      const res = fetchNearbyCafes();
-      if (res) {
-        setCafes(res);
+  // 현재 위치 가져오는 함수 (Promise)
+  function getCurrentPositionAsync(options) {
+    return new Promise((resolve, reject) => {
+      if (!("geolocation" in navigator)) {
+        reject(new Error("Geolocation not supported"));
+        return;
       }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setCafes(cafeList);
-      setIsLoading(false);
-    }
-  }, [cafes]);
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+  }
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        // 현재 위치 먼저 가져오기
+        const pos = await getCurrentPositionAsync({
+          enableHighAccuracy: true,
+          timeout: 5000,
+        });
+
+        const { latitude: y, longitude: x } = pos.coords;
+        const loc = { xPoint: x, yPoint: y };
+        if (!mounted) return;
+        setCurrentLoc(loc);
+        console.log("현재 좌표", loc);
+
+        // 현재 좌표 기반으로 카페 API 호출
+        const res = await fetchNearbyCafes(x, y);
+        if (res && mounted) {
+          setCafes(res);
+        } else if (mounted) {
+          setCafes(cafeList);
+        }
+      } catch (err) {
+        console.error("현재 위치 또는 카페 API 실패:", err);
+        if (mounted) setCafes(cafeList);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // 지도 init
   useEffect(() => {

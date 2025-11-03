@@ -26,12 +26,13 @@ function CustomerHome() {
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
-    loadSubscriptions(); // 보유 구독권 조회
+    // loadSubscriptions(); // 보유 구독권 조회
 
     // 위치 가져와서 근처 카페 요청
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
+    if ("geolocation" in navigate) {
+      navigate.geolocation.getCurrentPosition(
         ({ coords }) => {
+          console.log("근처 카페 요청");
           loadNearbyCafes(coords);
         },
         (err) => {
@@ -60,14 +61,17 @@ function CustomerHome() {
     }
   };
 
-  // ⬇⬇⬇ 여기서만 실제 API 호출
+  //
   const loadNearbyCafes = async (coords) => {
     try {
+      console.log("LOAD NEAR BY CAFES");
       const data = await fetchNearbyCafes({
         lat: coords.latitude,
         lng: coords.longitude,
         radius: 500,
       });
+      console.log("LOCAL CAFES>> ", data);
+
       setNearbyCafes(data);
     } catch (e) {
       console.error(e);

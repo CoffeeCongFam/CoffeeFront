@@ -22,6 +22,7 @@ function Landing() {
   // 카카오 소셜로그인 필요한 코드 및 주소
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
   const REDIRECT_URI = `http://localhost:8080/auth/kakao/callback`;
+
   // 카카오 로그인 버튼
   const kakaoLogin = () => {
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
