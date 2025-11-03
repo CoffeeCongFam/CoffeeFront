@@ -1,138 +1,697 @@
-import React, { useState, useMemo } from "react";
-import myGiftList from "../../data/customer/myGiftList";
+// /src/pages/customer/MyGift.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
-import { Box, Typography, Button, Tabs, Tab, Collapse } from '@mui/material';
-import ReceiveGift from "../../components/customer/gift/ReceiveGift";
-import SendGift from "../../components/customer/gift/SendGift";
-import sendGiftList from "../../data/customer/sendGiftList";
-import receiveGiftList from "../../data/customer/receiveGiftList";
+import { Box, Typography, Button, Tabs, Tab, Collapse, Grid, Divider, Chip, Paper, Card, CardContent, CardHeader, Avatar, Stack, List, ListItem, ListItemText } from '@mui/material';
+import { getGiftData, getSendGiftData, getReceievGiftData, getSendGift, getReceiveGift } from "../../api/gift";
+import { SubscriptionDetailCard } from "./Subscription";
 
 function MyGift() {
-    const MY_USER_NAME = "커피콩빵";
-    const HARDCODED_DATE = "2025.10.26";
-  const [filter, setFilter] = useState('ALL'); // 'ALL' | 'RECEIVED' | 'SENT'
-  const [openIndex, setOpenIndex] = useState(null); // 드롭다운 오픈 인덱스
+  const MY_USER_NAME = "커피콩빵";
+  const [filter, setFilter] = useState("ALL");
+  const [openIndex, setOpenIndex] = useState(null);
+  const [giftList, setGiftList] = useState([]);
+  const [sentGiftList, setSentGiftList, ] = useState([]);
+  const [receivedGiftList, setReceivedGiftList] = useState([]);
+  const [sendDetailById, setSendDetailById] = useState({});
+  const [loadingSendDetailId, setLoadingSendDetailId] = useState(null);
+  const [receiveDetailById, setReceiveDetailById] = useState({});
+  const [loadingReceiveDetailId, setLoadingReceiveDetailId] = useState(null);
 
-  const baseList = useMemo(() =>
-    myGiftList.filter((it) => it.sender === MY_USER_NAME || it.receiver === MY_USER_NAME),
-    []
-  );
+  // ✅ 날짜 포맷터: "2025.11.08  오후 10시 26분"
+  const formatKST = (isoLike) => {
+    if (!isoLike) return "";
+    let s = String(isoLike);
+    // Normalize fractional seconds to max 3 digits (milliseconds)
+    // e.g., "2025-11-01T11:52:14.683351" -> "2025-11-01T11:52:14.683"
+    s = s.replace(
+      /(T\d{2}:\d{2}:\d{2}\.)(\d{1,})(.*)?$/,
+      (_, head, frac, tail = "") => head + frac.slice(0, 3) + (tail || "")
+    );
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return "";
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    let h = d.getHours();
+    const m = String(d.getMinutes()).padStart(2, "0");
+    const ampm = h >= 12 ? "오후" : "오전";
+    h = h % 12 || 12;
+    return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+  };
+
+  // ✅ API에서 목록 받아오기 (항상 배열 보장)
+  useEffect(() => {
+    if (filter !== "ALL") return;
+    (async () => {
+      const data = await getGiftData();
+      setGiftList(Array.isArray(data) ? data : []);
+    })();
+  }, [filter]);
+
+  useEffect(() => {
+    if (filter !== "SENT") return;
+    (async () => {
+      const res = await getSendGiftData();
+      // API returns the array directly; still safely handle axios-shape just in case
+      const list = Array.isArray(res)
+        ? res
+        : (res && typeof res === "object" && Array.isArray(res.data))
+          ? res.data
+          : [];
+      const normalized = list.map((it) => ({
+        ...it,
+        maxDailyUsage: it.maxDailyUsage ?? it.dailyRemainCount ?? 0,
+        menuList: Array.isArray(it.menuList)
+          ? it.menuList
+          : Array.isArray(it.menuNameList)
+          ? it.menuNameList
+          : [],
+      }));
+      setSentGiftList(normalized);
+    })();
+  }, [filter]);
+
+  useEffect(() => {
+    if (filter !== "RECEIVED") return;
+    (async () => {
+      const res = await getReceievGiftData();
+      // API returns the array directly; still safely handle axios-shape just in case
+      const list = Array.isArray(res)
+        ? res
+        : (res && typeof res === "object" && Array.isArray(res.data))
+          ? res.data
+          : [];
+      const normalized = list.map((it) => ({
+        ...it,
+        usedAt: Array.isArray(it.usedAt) ? it.usedAt : [],
+        menuList: Array.isArray(it.menuList)
+          ? it.menuList
+          : Array.isArray(it.menuNameList)
+          ? it.menuNameList
+          : [],
+      }));
+      setReceivedGiftList(normalized);
+    })();
+  }, [filter]);
+
+  useEffect(() => {
+    setOpenIndex(null);
+  }, [filter]);
+
+  // 보낸 선물 상세 fetch (purchaseId 기준)
+  const fetchSendDetail = async (purchaseId) => {
+    if (!purchaseId) return null;
+    // 캐시가 있으면 반환
+    if (sendDetailById[purchaseId]) return sendDetailById[purchaseId];
+    try {
+      setLoadingSendDetailId(purchaseId);
+      const res = await getSendGift(purchaseId);
+      // API가 객체를 직접 반환한다고 가정. axios 형태도 방어
+      const data = res && typeof res === 'object' && !Array.isArray(res) ? (res.data ?? res) : {};
+      const normalized = {
+        ...data,
+        maxDailyUsage: data.maxDailyUsage ?? data.dailyRemainCount ?? 0,
+        menuList: Array.isArray(data.menuList)
+          ? data.menuList
+          : (Array.isArray(data.menuNameList) ? data.menuNameList : []),
+      };
+      setSendDetailById((prev) => ({ ...prev, [purchaseId]: normalized }));
+      return normalized;
+    } finally {
+      setLoadingSendDetailId(null);
+    }
+  };
+
+  // 받은 선물 상세 fetch (memberSubscriptionId 기준)
+  const fetchReceiveDetail = async (memberSubscriptionId) => {
+    if (!memberSubscriptionId) return null;
+    if (receiveDetailById[memberSubscriptionId]) return receiveDetailById[memberSubscriptionId];
+    try {
+      setLoadingReceiveDetailId(memberSubscriptionId);
+      const res = await getReceiveGift(memberSubscriptionId);
+      // 기대 응답(단일 객체):
+      // axios 일 경우: res.data = { success, data: { ... }, message }
+      // fetch/직접 객체 일 경우: res = { success, data: { ... }, message }
+      const root = res && typeof res === 'object' ? (res.data ?? res) : {};
+      const obj = root && typeof root === 'object'
+        ? (root.data && typeof root.data === 'object' ? root.data : root)
+        : null;
+      if (!obj || Array.isArray(obj)) {
+        setReceiveDetailById((prev) => ({ ...prev, [memberSubscriptionId]: null }));
+        return null;
+      }
+      const normalized = {
+        ...obj,
+        usedAt: Array.isArray(obj.usedAt) ? obj.usedAt : [],
+        menuList: Array.isArray(obj.menuList)
+          ? obj.menuList
+          : (Array.isArray(obj.menuNameList) ? obj.menuNameList : []),
+        dailyRemainCount:
+          typeof obj.dailyRemainCount === 'number'
+            ? obj.dailyRemainCount
+            : (obj.maxDailyUsage ?? 0),
+      };
+      setReceiveDetailById((prev) => ({ ...prev, [memberSubscriptionId]: normalized }));
+      return normalized;
+    } finally {
+      setLoadingReceiveDetailId(null);
+    }
+  };
+
+  // ✅ 내 선물함: 나와 관련된 것만 (요청: 전체 탭 기준)
+  const baseList = useMemo(() => {
+    const list = Array.isArray(giftList) ? giftList : [];
+    return list.filter(
+      (it) => it.sender === MY_USER_NAME || it.receiver === MY_USER_NAME
+    );
+  }, [giftList]);
+
   const countAll = baseList.length;
   const countReceived = baseList.filter((it) => it.receiver === MY_USER_NAME).length;
   const countSent = baseList.filter((it) => it.sender === MY_USER_NAME).length;
 
+  // ✅ 탭 필터링
   const filteredGiftList = useMemo(() => {
-    if (filter === 'RECEIVED') return baseList.filter((it) => it.receiver === MY_USER_NAME);
-    if (filter === 'SENT') return baseList.filter((it) => it.sender === MY_USER_NAME);
+    if (filter === "RECEIVED") return receivedGiftList; // RECEIVED 탭은 getReceievGiftData 결과만 사용
+    if (filter === "SENT") return sentGiftList; // SENT 탭은 getSendGiftData 결과만 사용
     return baseList; // ALL
-  }, [filter, baseList]);
- const formatMessage = (item) => {
-    let messageComponent = null;
-    let isSent = false;
-    
-    // 볼드 처리 및 검은색 스타일
-    const boldBlackStyle = { fontWeight: 'bold', color: 'black' };
+  }, [filter, baseList, sentGiftList, receivedGiftList]);
 
-    // 1. 내가 보낸 선물 (sender가 '커피콩빵'과 같다면)
-    if (item.sender === MY_USER_NAME) {
-      isSent = true;
-      // {receiver}님에게 {productName}을 선물하셨습니다.
-      messageComponent = (
-        <>
-          
-          <Typography component="span" sx={boldBlackStyle}>
-            {item.receiver}
-          </Typography>
-          님에게 &nbsp;
-           <Typography component="span" sx={boldBlackStyle}>
-            {item.productName}
-          </Typography>
-          을 선물하셨어요.
-        </>
-      );
-    } 
-    // 2. 내가 받은 선물 (receiver가 '커피콩빵'과 같다면)
-    else if (item.receiver === MY_USER_NAME) {
-      isSent = false;
-      // {sender}님에게 {productName}을 선물받았습니다.
-      messageComponent = (
-        <>
-          <Typography component="span" sx={boldBlackStyle}>
-            {item.sender}
-          </Typography>
-          님에게 &nbsp;
-           <Typography component="span" sx={boldBlackStyle}>
-            {item.productName}
-           </Typography>
-           을 선물받았습니다.
-        </>
-      );
-    } 
-    // 3. 기타 (예외 처리)
-    else {
-        return { messageComponent: <Typography component="span">내역 오류</Typography>, isSent: false };
+  // ✅ 문구 생성 (ALL 탭)
+  // - 내가 받은 경우(receiver === MY_USER_NAME): "sender님에게 subscriptionName을 선물받았습니다!"
+  // - 내가 보낸 경우(sender === MY_USER_NAME): "receiver님에게 subscriptionName을 선물했습니다!"
+  const formatMessage = (item) => {
+    const bold = { fontWeight: "bold", color: "black" };
+    const isReceivedByMe = item.receiver === MY_USER_NAME;
+    if (isReceivedByMe) {
+      return {
+        isSent: false,
+        node: (
+          <>
+            <Typography component="span" sx={bold}>{item.sender}</Typography>
+            님께
+            <Typography component="span" sx={bold}> {item.subscriptionName}</Typography>
+            을 선물받았습니다!
+          </>
+        ),
+      };
     }
+    // 내가 보낸 경우
+    return {
+      isSent: true,
+      node: (
+        <>
+          <Typography component="span" sx={bold}>{item.receiver}</Typography>
+          님께
+          <Typography component="span" sx={bold}> {item.subscriptionName}</Typography>
+          을 선물했습니다!
+        </>
+      ),
+    };
+  };
 
-    return { messageComponent, isSent };
+  // (기존 보조 드롭다운 로직 유지)
+  const pickSendGiftForRow = (row) => {
+    if (row && row.purchaseId) {
+      const found = sentGiftList.find((s) => s.purchaseId === row.purchaseId);
+      return found ? [found] : [];
+    }
+    const candidates = sentGiftList.filter(
+      (s) => s.sender === MY_USER_NAME && s.receiver === row?.receiver && s.productName === row?.subscriptionName
+    );
+    return candidates.length > 0 ? [candidates[0]] : [];
+  };
+
+  const findReceivedForAllRow = (row) => {
+    if (!row) return null;
+    return receivedGiftList.find(
+      (r) =>
+        r.subscriptionName === row.subscriptionName &&
+        r.sender === row.sender &&
+        r.receiver === MY_USER_NAME
+    ) || null;
+  };
+
+  const SentDetailPanel = ({ row }) => {
+    const labelSx = { color: 'text.secondary', fontSize: 12 };
+    const valueSx = { fontSize: 14, fontWeight: 500 };
+    const sectionTitleSx = { fontSize: 12, color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' };
+    const currency = (n) => (typeof n === 'number' ? n.toLocaleString() + '원' : n);
+
+    return (
+      <Card variant="outlined" sx={{ overflow: 'hidden' }}>
+        <CardHeader
+          titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+          subheaderTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
+          title={`${row.subscriptionName}`}
+          subheader={`${row.storeName}`}
+          avatar={
+            <Avatar variant="rounded" sx={{ width: 56, height: 56, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider' }}>
+              <Typography variant="caption">이미지</Typography>
+            </Avatar>
+          }
+          sx={{ pb: 0.5 }}
+        />
+        <CardContent sx={{ pt: 1.5 }}>
+          <Stack spacing={2}>
+            {/* 송수신 정보 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>보낸/받는 정보</Typography>
+              <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                {/* <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>보낸 사람</Typography>
+                  <Typography sx={valueSx}>{row.sender}</Typography>
+                </Grid> */}
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>받는 사람</Typography>
+                  <Typography sx={valueSx}>{row.receiver}</Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
+            {/* 메시지 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>선물 메시지</Typography>
+              <Paper variant="outlined" sx={{ p: 1.2, mt: 0.5, bgcolor: 'grey.50' }}>
+                <Typography variant="body2">{row.giftMessage ?? '—'}</Typography>
+              </Paper>
+            </Box>
+
+            {/* 결제 정보 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>결제 정보</Typography>
+              <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>결제 수단</Typography>
+                  <Chip size="small" label={row.purchaseType} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>결제 일시</Typography>
+                  <Typography sx={valueSx}>{formatKST(row.paidAt)}</Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Divider />
+
+            {/* 구독권 기본정보 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>구독권 정보</Typography>
+              <List dense disablePadding sx={{ mt: 0.5 }}>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="구독권" secondaryTypographyProps={{ sx: valueSx }} secondary={row.subscriptionName} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="가격" secondaryTypographyProps={{ sx: valueSx }} secondary={currency(row.price)} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="구독 기간" secondaryTypographyProps={{ sx: valueSx }} secondary={`${row.subscriptionPeriod}일`} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText
+                    primaryTypographyProps={{ sx: labelSx }}
+                    primary="일일 사용가능 횟수"
+                    secondaryTypographyProps={{ sx: valueSx }}
+                    secondary={String(row.dailyRemainCount)}
+                  />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="매장" secondaryTypographyProps={{ sx: valueSx }} secondary={row.storeName} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText
+                    primaryTypographyProps={{ sx: labelSx }}
+                    primary="타입"
+                    secondaryTypographyProps={{ sx: valueSx }}
+                    secondary={<Chip size="small" color={row.subscriptionType === 'BASIC' ? 'success' : 'default'} label={row.subscriptionType} />}
+                  />
+                </ListItem>
+              </List>
+            </Box>
+          </Stack>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const ReceivedDetailPanel = ({ row }) => {
+    const labelSx = { color: 'text.secondary', fontSize: 12 };
+    const valueSx = { fontSize: 14, fontWeight: 500 };
+    const sectionTitleSx = { fontSize: 12, color: 'text.disabled', letterSpacing: 1, textTransform: 'uppercase' };
+    const currency = (n) => (typeof n === 'number' ? n.toLocaleString() + '원' : n);
+    const chipColor = row.usageStatus === 'ACTIVE' ? 'success' : (row.usageStatus === 'NOT_ACTIVATED' ? 'default' : 'warning');
+  
+    return (
+      <Card variant="outlined" sx={{ overflow: 'hidden' }}>
+        <CardHeader
+          titleTypographyProps={{ variant: 'subtitle1', fontWeight: 700 }}
+          subheaderTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
+          title={`${row.subscriptionName}`}
+          subheader={`${row.storeName}`}
+          avatar={
+            <Avatar variant="rounded" sx={{ width: 56, height: 56, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider' }}>
+              <Typography variant="caption">이미지</Typography>
+            </Avatar>
+          }
+          sx={{ pb: 0.5 }}
+        />
+        <CardContent sx={{ pt: 1.5 }}>
+          <Stack spacing={2}>
+            {/* 송수신 정보 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>보낸/받는 정보</Typography>
+              <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>받는 사람</Typography>
+                  <Typography sx={valueSx}>{row.receiver}</Typography>
+                </Grid>
+              </Grid>
+            </Box>
+  
+            {/* 메시지 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>선물 메시지</Typography>
+              <Paper variant="outlined" sx={{ p: 1.2, mt: 0.5, bgcolor: 'grey.50' }}>
+                <Typography variant="body2">{row.giftMessage ?? '—'}</Typography>
+              </Paper>
+            </Box>
+  
+            {/* 구독 기간/상태 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>구독 사용 정보</Typography>
+              <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>시작일</Typography>
+                  <Typography sx={valueSx}>{formatKST(row.subscriptionStart)}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>종료일</Typography>
+                  <Typography sx={valueSx}>{formatKST(row.subscriptionEnd)}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography sx={labelSx}>상태</Typography>
+                  <Chip size="small" color={chipColor} label={row.usageStatus} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  {/* <Typography sx={labelSx}>일일 잔여</Typography> */}
+                  <Typography sx={valueSx}>{row.dailyRemainCount}</Typography>
+                </Grid>
+              </Grid>
+            </Box>
+  
+            <Divider />
+  
+            {/* 구독권 기본정보 */}
+            <Box>
+              <Typography sx={sectionTitleSx}>구독권 정보</Typography>
+              <List dense disablePadding sx={{ mt: 0.5 }}>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="구독권" secondaryTypographyProps={{ sx: valueSx }} secondary={row.subscriptionName} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="가격" secondaryTypographyProps={{ sx: valueSx }} secondary={currency(row.price)} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="구독 기간" secondaryTypographyProps={{ sx: valueSx }} secondary={`${row.subscriptionPeriod}일`} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText
+                    primaryTypographyProps={{ sx: labelSx }}
+                    // primary="일일 잔여"
+                    secondaryTypographyProps={{ sx: valueSx }}
+                    secondary={String(row.dailyRemainCount)}
+                  />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText primaryTypographyProps={{ sx: labelSx }} primary="매장" secondaryTypographyProps={{ sx: valueSx }} secondary={row.storeName} />
+                </ListItem>
+                <ListItem disableGutters sx={{ py: 0.5 }}>
+                  <ListItemText
+                    primaryTypographyProps={{ sx: labelSx }}
+                    primary="타입"
+                    secondaryTypographyProps={{ sx: valueSx }}
+                    secondary={<Chip size="small" color={row.subscriptionType === 'BASIC' ? 'success' : 'default'} label={row.subscriptionType} />}
+                  />
+                </ListItem>
+              </List>
+            </Box>
+          </Stack>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: 'white' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>내 선물함</Typography>
+    <Box sx={{ maxWidth: 600, margin: "auto", padding: 2, backgroundColor: "white" }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>내 선물함</Typography>
       </Box>
-      <Tabs
-        value={filter}
-        onChange={(_, v) => setFilter(v)}
-        sx={{ borderBottom: 1, borderColor: 'divider', mt: 0.5, mb: 1 }}
-      >
-        <Tab value="ALL" label={`전체 (${countAll})`} />
-        <Tab value="RECEIVED" label={`받은선물 (${countReceived})`} />
-        <Tab value="SENT" label={`보낸선물 (${countSent})`} />
+
+      <Tabs value={filter} onChange={(_, v) => setFilter(v)} sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 1 }}>
+        <Tab value="ALL" label="전체" />
+        <Tab value="RECEIVED" label="받은선물" />
+        <Tab value="SENT" label="보낸선물" />
       </Tabs>
-      {filteredGiftList.map((item, index) => {
-        const { messageComponent, isSent } = formatMessage(item);
-        const isMineSent = item.sender === MY_USER_NAME;
-        const isMineReceived = item.receiver === MY_USER_NAME;
-        const canToggle = isMineSent || isMineReceived;
-        const handleClick = () => {
-          if (canToggle) {
-            setOpenIndex(openIndex === index ? null : index);
-          }
-        };
+
+      {/* SENT 탭: getSendGiftData 기반 렌더링 */}
+      {filter === "SENT" && filteredGiftList.map((item, index) => {
+        const bold = { fontWeight: "bold", color: "black" };
+        const messageNode = (
+          <>
+            <Typography component="span" sx={bold}>{item.receiver}</Typography>
+            &nbsp;님께&nbsp;
+            <Typography component="span" sx={bold}>{item.subscriptionName}</Typography>
+            을 선물했습니다!
+          </>
+        );
+        const handleClick = () => setOpenIndex(openIndex === index ? null : index);
+
         return (
-          <Box key={index} sx={{ mb: 1 }}>
-            <Button
-              fullWidth
-              variant="text"
-              onClick={handleClick}
-              sx={{
-                p: 0,
-                justifyContent: 'flex-start',
-                textTransform: 'none',
-              }}
-            >
+          <Box key={item.purchaseId ?? index} sx={{ mb: 1 }}>
+            <Button fullWidth variant="text" onClick={handleClick} sx={{ p: 0, justifyContent: "flex-start", textTransform: "none" }}>
               <GiftListItem
-                messageComponent={messageComponent}
-                date={HARDCODED_DATE}
-                isSent={isSent}
+                messageComponent={messageNode}
+                date={formatKST(item.paidAt)}
+                isSent={true}
               />
             </Button>
 
-            {/* 내가 보낸 선물: SendGift 드롭다운 */}
+            <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+              <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                <SubscriptionDetailCard
+                  subscriptionData={{
+                    storeName: item.storeName,
+                    subscriptionType: item.subscriptionType,
+                    price: item.price,
+                    subscriptionDesc: item.subscriptionName,
+                    subscriptionPeriod: item.subscriptionPeriod,
+                    subscriptionStart: item.subscriptionStart || item.paidAt,
+                    subscriptionEnd: item.subscriptionEnd,
+                    menuNameList: item.menuList || [],
+                    dailyRemainCount: item.maxDailyUsage,
+                    receiver: item.receiver,
+                  }}
+                  subscriptionType={item.subscriptionType}
+                  maxDailyUsage={item.maxDailyUsage}
+                  giftType="SENT"
+                  isGifted={true}
+                  isExpired={item.isExpired}
+                />
+              </Box>
+            </Collapse>
+          </Box>
+        );
+      })}
+
+      {/* RECEIVED 탭: getReceievGiftData 기반 렌더링 */}
+      {filter === "RECEIVED" && filteredGiftList.map((item, index) => {
+        const bold = { fontWeight: "bold", color: "black" };
+        const messageNode = (
+          <>
+            <Typography component="span" sx={bold}>{item.sender}</Typography>
+            님께&nbsp;
+            <Typography component="span" sx={bold}>{item.subscriptionName}</Typography>
+            을 선물받았습니다!
+          </>
+        );
+        const handleClick = () => setOpenIndex(openIndex === index ? null : index);
+
+        return (
+          <Box key={item.memberSubscriptionId ?? index} sx={{ mb: 1 }}>
+            <Button fullWidth variant="text" onClick={handleClick} sx={{ p: 0, justifyContent: "flex-start", textTransform: "none" }}>
+              <GiftListItem
+                messageComponent={messageNode}
+                date={formatKST(item.subscriptionStart)}
+                isSent={false}
+              />
+            </Button>
+
+            <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+              <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                <SubscriptionDetailCard
+                  subscriptionData={{
+                    storeName: item.storeName,
+                    subscriptionType: item.subscriptionType,
+                    price: item.price,
+                    subscriptionDesc: item.subscriptionName,
+                    subscriptionPeriod: item.subscriptionPeriod,
+                    subscriptionStart: item.subscriptionStart,
+                    subscriptionEnd: item.subscriptionEnd,
+                    menuNameList: item.menuList || [],
+                    giverName: item.sender,
+                    receiver: item.receiver,
+                    dailyRemainCount: item.dailyRemainCount,
+                    usedAt: item.usedAt,
+                    usageStatus: item.usageStatus,
+                  }}
+                  subscriptionType={item.subscriptionType}
+                  maxDailyUsage={item.dailyRemainCount}
+                  giftType="RECEIVED"
+                  isGifted={true}
+                  isExpired={item.usageStatus === 'EXPIRED'}
+                  usedAt={item.usedAt}
+                  hideCancel={item.usageStatus === 'ACTIVE'}
+                  headerExtra={
+                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+                      {(() => {
+                        const color =
+                          item.usageStatus === 'ACTIVE' ? 'success' :
+                          (item.usageStatus === 'NOT_ACTIVATED' ? 'default' : 'warning');
+                        return <Chip size="small" color={color} label={item.usageStatus} />;
+                      })()}
+                    </Stack>
+                  }
+                />
+              </Box>
+            </Collapse>
+          </Box>
+        );
+      })}
+
+      {/* ALL 탭: 기존 렌더링 유지 (getGiftData 기반) */}
+      {filter === "ALL" && filteredGiftList.map((item, index) => {
+        const { node, isSent } = formatMessage(item);
+        const isMineSent = item.sender === MY_USER_NAME;
+        const isMineReceived = item.receiver === MY_USER_NAME;
+        const canToggle = isMineSent || isMineReceived;
+        const handleClick = async () => {
+          if (!canToggle) return;
+          const next = openIndex === index ? null : index;
+          setOpenIndex(next);
+          if (next !== null) {
+            if (isMineSent && item.purchaseId) {
+              await fetchSendDetail(item.purchaseId);
+            }
+            if (isMineReceived && item.memberSubscriptionId) {
+              await fetchReceiveDetail(item.memberSubscriptionId);
+            }
+          }
+        };
+      
+        return (
+          <Box key={item.purchaseId ?? index} sx={{ mb: 1 }}>
+            <Button fullWidth variant="text" onClick={handleClick} sx={{ p: 0, justifyContent: "flex-start", textTransform: "none" }}>
+              <GiftListItem
+                messageComponent={node}
+                date={formatKST(item.createdAt)}
+                isSent={isSent}
+              />
+            </Button>
+      
             {isMineSent && (
               <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
                 <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
-                  <SendGift sendGiftList={sendGiftList} />
+                  {(() => {
+                    const pid = item.purchaseId;
+                    const detail = pid ? sendDetailById[pid] : null;
+
+                    if (pid && !detail) {
+                      return (
+                        <Typography variant="body2" sx={{ color: 'text.secondary', p: 1 }}>
+                          {loadingSendDetailId === pid ? '불러오는 중…' : '상세 정보를 불러올 수 없습니다.'}
+                        </Typography>
+                      );
+                    }
+
+                    // detail이 있으면 SENT 탭 카드와 동일한 구성으로 표시
+                    return detail ? (
+                      <SubscriptionDetailCard
+                        subscriptionData={{
+                          storeName: detail.storeName,
+                          subscriptionType: detail.subscriptionType,
+                          price: detail.price,
+                          subscriptionDesc: detail.subscriptionName,
+                          subscriptionPeriod: detail.subscriptionPeriod,
+                          subscriptionStart: detail.subscriptionStart || detail.paidAt,
+                          subscriptionEnd: detail.subscriptionEnd,
+                          menuNameList: detail.menuList || [],
+                          dailyRemainCount: detail.maxDailyUsage,
+                          receiver: detail.receiver,
+                        }}
+                        subscriptionType={detail.subscriptionType}
+                        maxDailyUsage={detail.maxDailyUsage}
+                        giftType="SENT"
+                        isGifted={true}
+                        isExpired={detail.isExpired}
+                      />
+                    ) : null;
+                  })()}
                 </Box>
               </Collapse>
             )}
-
-            {/* 내가 받은 선물: ReceiveGift 드롭다운 */}
+      
             {isMineReceived && (
               <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
                 <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
-                  <ReceiveGift receiveGiftList={receiveGiftList} />
+                  {(() => {
+                    const msid = item.memberSubscriptionId;
+                    const detail = msid ? receiveDetailById[msid] : null;
+
+                    if (msid && !detail) {
+                      return (
+                        <Typography variant="body2" sx={{ color: 'text.secondary', p: 1 }}>
+                          {loadingReceiveDetailId === msid ? '불러오는 중…' : '상세 정보를 불러올 수 없습니다.'}
+                        </Typography>
+                      );
+                    }
+
+                    return detail ? (
+                      <SubscriptionDetailCard
+                        subscriptionData={{
+                          storeName: detail.storeName,
+                          subscriptionType: detail.subscriptionType,
+                          price: detail.price,
+                          subscriptionDesc: detail.subscriptionName,
+                          subscriptionPeriod: detail.subscriptionPeriod,
+                          subscriptionStart: detail.subscriptionStart,
+                          subscriptionEnd: detail.subscriptionEnd,
+                          menuNameList: detail.menuList || [],
+                          giverName: detail.sender,
+                          receiver: detail.receiver,
+                          dailyRemainCount: detail.dailyRemainCount,
+                          usedAt: detail.usedAt,
+                          usageStatus: detail.usageStatus,
+                        }}
+                        subscriptionType={detail.subscriptionType}
+                        maxDailyUsage={detail.dailyRemainCount}
+                        giftType="RECEIVED"
+                        isGifted={true}
+                        isExpired={detail.usageStatus === 'EXPIRED'}
+                        usedAt={detail.usedAt}
+                        hideCancel={detail.usageStatus === 'ACTIVE'}
+                        headerExtra={
+                          <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+                            {(() => {
+                              const color =
+                                detail.usageStatus === 'ACTIVE' ? 'success' :
+                                (detail.usageStatus === 'NOT_ACTIVATED' ? 'default' : 'warning');
+                              return <Chip size="small" color={color} label={detail.usageStatus} />;
+                            })()}
+                          </Stack>
+                        }
+                      />
+                    ) : null;
+                  })()}
                 </Box>
               </Collapse>
             )}
