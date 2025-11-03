@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
 import { Box, Typography, Button, Tabs, Tab, Collapse, Grid, Divider, Chip, Paper, Card, CardContent, CardHeader, Avatar, Stack, List, ListItem, ListItemText } from '@mui/material';
-import { getGiftData, getSendGiftData, getReceievGiftData, getSendGift, getReceiveGift } from "../../api/gift";
+import { getGiftData, getSendGiftData, getReceievGiftData, getSendGift, getReceiveGift } from "../../utils/gift";
 import { SubscriptionDetailCard } from "./Subscription";
 
 function MyGift() {
-  const MY_USER_NAME = "커피콩빵";
+  // const MY_USER_NAME = "커피콩빵";
   const [filter, setFilter] = useState("ALL");
   const [openIndex, setOpenIndex] = useState(null);
   const [giftList, setGiftList] = useState([]);

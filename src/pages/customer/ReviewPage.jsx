@@ -18,7 +18,7 @@ import {
   Button,
 } from "@mui/material";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
-import { getReview, deleteReview } from "../../api/review";
+import { getReview, deleteReview } from "../../utils/review";
 /**
  * ReviewPage
  * - 내가 작성한 리뷰 내역을 간단히 확인하는 페이지

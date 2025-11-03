@@ -1,5 +1,5 @@
-let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
-
+// let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
+let BASE_URL = "http://localhost:8080"
 import axios from "axios";
 
 export async function getReview(){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.

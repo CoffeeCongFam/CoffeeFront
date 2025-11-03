@@ -19,7 +19,7 @@ import {
   Button,
 } from "@mui/material";
 
-import { postRefund, getPayments } from "../../api/payments";
+import { postRefund, getPayments } from "../../utils/payments";
 
 // 현재 API에서는 환불 완료 여부를 별도 필드로 제공하지 않음.
 // 환불 사유(refundReasons)는 "환불 불가 사유"를 의미하므로, 실제 환불 완료 여부 판단에는 사용하지 않는다.
@@ -268,7 +268,7 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     } else if (hasOver) {
       refundMessage = "구매후 7일 경과하여 환불이 불가능합니다.";
     } else if (hasUsed) {
-      refundMessage = "이미 사용한 구독권을 사용하여 환불이 불가능합니다.";
+      refundMessage = "사용내역이 있는 구독권으로 환불이 불가능합니다.";
     } else {
       refundMessage = "환불이 불가능합니다.";
     }
