@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Box, Tabs, Tab, Typography, Divider, Chip } from "@mui/material";
 import { useParams } from "react-router-dom";
-import storeDetail from "../../../data/customer/storeDetail.js";
 import CafeInfo from "../../../components/customer/cafe/CafeInfo.jsx";
 import CafeMenuList from "../../../components/customer/cafe/CafeMenuList.jsx";
 import CafeSubscriptionList from "../../../components/customer/cafe/CafeSubscriptionList.jsx";
 import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx";
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
+import { fetchStoreDetail } from "../../../apis/customerApi.js";
+import defaultCafeThumbnail from '../../../assets/defaultCafeThumbnail.jpg';
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -50,8 +51,7 @@ function StoreDetailPage() {
   useEffect(() => {
     // 카페 정보 초기화
     try {
-      const res = fetchStoreDetail(storeId);
-      setStore(res);
+      loadStoreDetail(storeId);
       // 카페 상태 계산
       setStoreStatus(getStoreStatusByDate(store.storeHours));
       setIsLoading(false);
@@ -60,10 +60,18 @@ function StoreDetailPage() {
       alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
-      // 더미 테스트
-      setStore(storeDetail);
     }
   }, [storeId]);
+
+  const loadStoreDetail = async (storeId) => {
+    try{
+      const data = await fetchStoreDetail(storeId);
+      setStore(data);
+
+    }catch(e){
+      console.error(e);
+    }
+  }
 
   return (
     <Box
@@ -79,15 +87,14 @@ function StoreDetailPage() {
         sx={{
           width: "100%",
           height: { xs: 240, sm: 240, md: 300 },
-          // borderRadius: 2,
           overflow: "hidden",
           mb: 2,
         }}
       >
         <img
-          src={store.storeImg || "https://picsum.photos/400/400"}
+          src={store.storeImg || defaultCafeThumbnail}
           alt={store.storeName}
-          style={{
+          sx={{
             width: "100%",
             height: "100%",
             objectFit: "cover",
@@ -101,10 +108,11 @@ function StoreDetailPage() {
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: { xs: "flex-start", sm: "center" },
+            flexDirection: "column",
+            alignItems: "flex-start",
             gap: 1,
             mb: 1.5,
+            mt: 3
           }}
         >
           {storeStatus && (

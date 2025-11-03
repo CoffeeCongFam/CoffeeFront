@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import SubscriptionItem from "../../../components/customer/home/SubscriptionItem";
-import subList from "../../../data/customer/subList";
-import cafeList from "../../../data/customer/cafeList";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
 import {
   fetchCustomerSubscriptions,
   fetchNearbyCafes,
@@ -26,7 +26,7 @@ function CustomerHome() {
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
-    // loadSubscriptions(); // 보유 구독권 조회
+    loadSubscriptions(); // 보유 구독권 조회
 
     // 위치 가져와서 근처 카페 요청
     if ("geolocation" in navigate) {
@@ -54,10 +54,10 @@ function CustomerHome() {
   const loadSubscriptions = async () => {
     try {
       const data = await fetchCustomerSubscriptions();
-      setSubscriptions(data);
+      setSubscriptions(data || []);
+      console.log(data);
     } catch (e) {
       console.log(e);
-      // setSubscriptions(subList); // 실패 시 더미 데이터
     }
   };
 
@@ -142,42 +142,58 @@ function CustomerHome() {
         </Box>
       </Box>
 
+      {
+        subscriptions.length <= 0 &&
+        <Box sx={{ backgroundColor:"#f0f0f0c9", px: "1rem", py: "1.5rem", borderRadius:"8px", mb: 5, display:"flex",  gap: isAppLike ? "0.8rem" : "2rem", flexDirection: isAppLike ? "column" : "row",  alignItems: "center"}}>
+          <Typography>
+          보유 구독권이 없습니다. 구독권을 구매해주세요!  
+          </Typography>
+          <Button endIcon={<OpenInNewIcon />} onClick={() => navigate("/me/search")}>구독권 구매하러 가기</Button>
+        </Box>
+      }
+
       {/* 구독권 캐러셀 */}
-      <Box
-        ref={scrollRef}
-        sx={{
-          display: "flex",
-          gap: 2,
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          mb: 5,
-          py: 1,
-          "&::-webkit-scrollbar": {
-            height: isAppLike ? 0 : 6,
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#ccc",
-            borderRadius: 8,
-          },
-        }}
-      >
-        {subscriptions.map((item) => (
-          <Box
-            key={item.subId}
-            sx={{
-              scrollSnapAlign: "start",
-              px: isAppLike ? "8%" : 0,
-              flex: isAppLike ? "0 0 100%" : "0 0 auto",
-            }}
-          >
-            <SubscriptionItem
-              today={today}
-              item={item}
-              handleOrderClick={handleOrderClick}
-            />
-          </Box>
-        ))}
-      </Box>
+      {
+        subscriptions.length > 0 &&
+        <Box
+          ref={scrollRef}
+          sx={{
+            display: "flex",
+            gap: 2,
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            mb: 5,
+            py: 1,
+            "&::-webkit-scrollbar": {
+              height: isAppLike ? 0 : 6,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#ccc",
+              borderRadius: 8,
+            },
+          }}
+        >
+          {subscriptions.map((item) => (
+            <Box
+              key={item.subId}
+              sx={{
+                scrollSnapAlign: "start",
+                px: isAppLike ? "8%" : 0,
+                flex: isAppLike ? "0 0 100%" : "0 0 auto",
+              }}
+            >
+              <SubscriptionItem
+                today={today}
+                item={item}
+                handleOrderClick={handleOrderClick}
+              />
+            </Box>
+          ))
+          }
+        </Box>
+      }
+
+      
 
       {/* 내 근처 카페 */}
       <Box>

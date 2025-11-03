@@ -19,7 +19,7 @@ export async function fetchNearbyCafes(xPoint, yPoint, radius = 500) {
     params: { xPoint, yPoint, radius },
   });
   console.log("xPoint>> ", xPoint, "yPoint>> ", yPoint);
-  return res.data ?? [];
+  return res.data?.data ?? [];
 }
 
 /*  주문  */
@@ -50,19 +50,28 @@ export async function requestCancelOrder(orderId) {
 }
 
 // 카페 상세 정보 조회
-export async function fetchStoreDetail(partnerStoreId) {
-  const res = await api.get(`/customers/stores/${partnerStoreId}`);
+export async function fetchStoreDetail(storeId) {
+  const res = await api.get(`/customers/stores/${storeId}`);
   console.log(res.data?.message);
+  console.log("카페 상세 정보 조회>> ", res.data?.data);
   return res.data?.data;
 }
 
+// 보유 구독권 목록 조회
+export async function fetchUserSubscriptions(){
+  console.log("보유 구독권 목록 조회");
+
+  const res = await api.get(`/customers/subscriptions`);
+  console.log("보유 구독권 목록 : ", res.data?.data);
+  return res.data?.data;
+}
 // 구독권 구매
 // export
 
 /*  매장 탐색 탭 */
 // 카페 목록 조회
 export async function fetchStoreList() {
-  const res = await api.get(`//`);
+  // const res = await api.get(`//`);
 }
 
 // /api/customers/stores/nearby?xPoint=37.4979&yPoint=127.0276&radius=2

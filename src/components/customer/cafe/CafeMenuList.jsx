@@ -104,7 +104,7 @@ function CafeMenuList({ menus = [] }) {
                           minWidth: 0, 
                         }}
                       >
-                      {menu.menuImage && (
+                      {menu.menuImg && (
                         <Box
                           component="img"
                           src={menu.menuImage}
@@ -127,7 +127,7 @@ function CafeMenuList({ menus = [] }) {
                         <Typography variant="subtitle1" sx={{ fontWeight: 500, wordBreak: "keep-all" }}>
                           {menu.menuName || menu.name}
                         </Typography>
-                        {menu.description && (
+                        {menu.menuDesc && (
                           <Typography 
                             variant="body2"
                             color="text.secondary"
@@ -137,7 +137,7 @@ function CafeMenuList({ menus = [] }) {
                               whiteSpace: "normal",
                             }}
                           >
-                            {menu.description}
+                            {menu.menuDesc}
                           </Typography>
                         )}
                       </Box>
@@ -157,7 +157,7 @@ function CafeMenuList({ menus = [] }) {
                       }}
                     >
                       {/* 비활성 메뉴 표시 */}
-                      {menu.isActive === false && (
+                      {menu.menuStatus === "Y" && (
                         <Typography variant="caption" color="error">
                           판매중단
                         </Typography>

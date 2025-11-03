@@ -109,7 +109,7 @@ export default function CustomerLayout() {
   }
 
   // ------------------------------------------
-  // 2) 데스크탑 모드 (네가 원래 쓰던 버전)
+  // 2) 데스크탑 모드
   // ------------------------------------------
   const DrawerContent = (
     <Box role="navigation" sx={{ width: drawerWidth }}>
@@ -207,11 +207,10 @@ export default function CustomerLayout() {
             width: "100%", // main 영역 전체
             background: "transparent",
             boxShadow: "none",
-            pointerEvents: "none", // 밑에 요소 클릭 가능하도록
           }}
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <IconButton color="inherit">
+            <IconButton color="black">
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>

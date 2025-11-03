@@ -59,7 +59,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const subscriptionTypes = useMemo(() => {
     const set = new Set();
     subscriptions.forEach((s) => {
-      if (s.subType) set.add(s.subType);
+      if (s.subscriptionType) set.add(s.subscriptionType);
     });
     return Array.from(set);
   }, [subscriptions]);
@@ -68,7 +68,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const filteredList =
     filter === "ALL"
       ? subscriptions
-      : subscriptions.filter((sub) => sub.subType === filter);
+      : subscriptions.filter((sub) => sub.subscriptionType === filter);
 
   const handleFilterChange = (_, newValue) => {
     if (newValue !== null) {
@@ -184,7 +184,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
         )}
 
         {filteredList.map((sub) => (
-          <Box
+          <Box 
             key={sub.subId || sub.id || sub.subName}
             sx={{
               scrollSnapAlign: "start",
@@ -195,6 +195,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           >
             {/* 카드 */}
             <Box
+              key={sub.subId}
               sx={{
                 border: "1px solid #e0e0e0",
                 borderRadius: 2,
@@ -210,7 +211,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
               {/* 타입 / 이름 / 가격 */}
               <Box sx={{ textAlign: "center" }}>
                 <Chip
-                  label={getTypeLabel(sub.subType)}
+                  label={getTypeLabel(sub.subscriptionType)}
                   size="small"
                   sx={{
                     mb: 1,
@@ -221,7 +222,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   }}
                 />
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {sub.subName || sub.name}
+                  {sub.subscriptionName}
                 </Typography>
                 <Typography sx={{ fontWeight: 800, fontSize: 28 }}>
                   ₩{sub.price?.toLocaleString()}
@@ -332,7 +333,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     <Typography
                       sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#202124" }}
                     >
-                      {sub.remain || 0} 개
+                      {sub.remainSalesQuantity || 0} 개
                     </Typography>
                     <ConfirmationNumber
                       sx={{ fontSize: 20, color: "#4d4d4d" }}
@@ -370,7 +371,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       variant="body2"
                       sx={{ color: "text.secondary", whiteSpace: "pre-line" }}
                     >
-                      {sub.description || "설명 정보가 없습니다."}
+                      {sub.subscriptionDesc || "설명 정보가 없습니다."}
                     </Typography>
                   </Box>
                 </Collapse>

@@ -20,8 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import subList from "../../../data/customer/subList";
 import subMenuListData from "../../../data/common/subMenuListData";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-import api from "../../../utils/api";
-import { requestNewOrder } from "../../../apis/customerApi";
+import { fetchUserSubscriptions, requestNewOrder } from "../../../apis/customerApi";
 
 function CreateOrderPage() {
   const { isAppLike } = useAppShellMode();
@@ -51,15 +50,14 @@ function CreateOrderPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get("/customers/subscriptions");
-        const list = res.data?.data ?? [];
-        setInventoryList(list);
+        const res = await fetchUserSubscriptions();
+        setInventoryList(res);
 
-        if (subscription?.subId) {
-          setSelectedInventory(Number(subscription.subId));
-        } else if (list.length > 0) {
-          setSelectedInventory(Number(list[0].subId));
-        }
+        // if (subscription?.subId) {
+        //   setSelectedInventory(Number(subscription.subId));
+        // } else if (list.length > 0) {
+        //   setSelectedInventory(Number(list[0].subId));
+        // }
       } catch (err) {
         console.error("구독권 목록 조회 실패: ", err);
         setInventoryList(subList);
@@ -184,9 +182,6 @@ function CreateOrderPage() {
       return;
     }
 
-    // TODO. memberId 가져오기
-    const memberId = 23; // test
-
     // storeId, memberSubscriptionId 매핑
     const storeId =
       selectedSub.store?.partnerStoreId ||
@@ -229,16 +224,7 @@ function CreateOrderPage() {
       orderType: orderType,
       menu,
     };
-    // const orderPayload = {
-    //   memberId: 42,
-    //   storeId: 2,
-    //   memberSubscriptionId: 2,
-    //   orderType: orderType,
-    //   menu: [
-    //     { menuId: 1, count: 1 },
-    //     { menuId: 2, count: 2 },
-    //   ],
-    // };
+    
 
     try {
       setIsLoading(true);
