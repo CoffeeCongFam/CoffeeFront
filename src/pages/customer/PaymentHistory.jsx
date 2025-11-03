@@ -16,28 +16,28 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  Button,
 } from "@mui/material";
 
-// 샘플/로컬 더미 데이터 (있으면 사용)
-import sendGiftList from "../../data/customer/sendGiftList";
-import refundGiftList from "../../data/customer/refundGiftList";
+import { postRefund, getPayments } from "../../api/payments";
 
-const isRefunded = (it) => Boolean(it?.refundAt || it?.status === "REFUNDED" || it?.refunded === true);
+// 현재 API에서는 환불 완료 여부를 별도 필드로 제공하지 않음.
+// 환불 사유(refundReasons)는 "환불 불가 사유"를 의미하므로, 실제 환불 완료 여부 판단에는 사용하지 않는다.
+const isRefunded = (_it) => false;
 
 /**
  * PaymentHistory
  * - 결제 내역 확인 페이지 (MUI 전용 UI)
  * - 최신순/오래된순 정렬 가능
- * - 우선 props.paymentList, 없으면 sendGiftList, 그것도 없으면 /api/payments/me 호출
+ * - 우선 props.paymentList, 없으면 /api/payments 호출
  */
 export default function PaymentHistory({ paymentList }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState("desc"); // desc: 최신순, asc: 오래된순
-  const [tab, setTab] = useState("refunded"); // all | refunded | paid
+  const [tab, setTab] = useState("all");
 
   const hasPropData = Array.isArray(paymentList);
-  const hasLocalSeed = Array.isArray(sendGiftList) || Array.isArray(refundGiftList);
 
   // 날짜 유틸
   const toDate = (v) => (v ? new Date(v) : new Date(0));
@@ -61,21 +61,31 @@ export default function PaymentHistory({ paymentList }) {
       return order === "asc" ? da - db : db - da;
     });
 
-  // 표준화: 서로 다른 키를 결제 아이템 공통 형태로 정규화
+  // 표준화: getPayments 반환 형태를 결제 아이템 공통 형태로 정규화
   const normalize = (raw = []) =>
-    raw.map((v, i) => ({
-      id: v.id ?? i,
-      storeName: v.storeName ?? v.merchantName ?? "알 수 없는 매장",
-      productName: v.productName ?? v.itemName ?? "상품",
-      price: typeof v.price === "number" ? v.price : Number(v.price) || 0,
-      subscriptionPeriod: v.subscriptionPeriod ?? v.period ?? null,
-      paidAt: v.paidAt ?? v.createdAt ?? null,
-      purchaseType: v.purchaseType ?? v.method ?? "결제",
-      sender: v.sender ?? v.buyer ?? undefined,
-      receiver: v.receiver ?? undefined,
-      refundAt: v.refundAt ?? v.refundedAt ?? v.refundDate ?? null,
-      status: v.status ?? (v.refundAt || v.refundedAt || v.refundDate ? "REFUNDED" : undefined),
-    }));
+    raw.map((v, i) => {
+      const rawPaidAt = v.paidAt ?? v.createdAt ?? null;
+      const rowKey = `${String(v.purchaseId ?? "noPid")}|${String(rawPaidAt ?? "noDate")}|${i}`;
+      return {
+        id: i,
+        purchaseId: v.purchaseId ?? null,
+        storeName: v.storeName ?? "개인 카페", // API에 매장명이 없으므로 필요시 백엔드 확장
+        productName: v.subscriptionName ?? "구독권",
+        price: typeof v.paymentAmount === "number" ? v.paymentAmount : Number(v.paymentAmount) || 0,
+        subscriptionPeriod: v.subscriptionPeriod ?? null, // 제공되지 않음
+        paidAt: rawPaidAt,
+        purchaseType: v.purchaseType ?? "결제",
+        sender: v.sender,
+        receiver: v.receiver,
+        isGift: v.isGift, // 'Y' | 'N'
+        refundReasons: v.refundReasons ?? null, // null | string[]
+        paymentStatus: v.paymentStatus,
+        memberSubscriptionId: v.memberSubscriptionId,
+        subscriptionId: v.subscriptionId,
+        refunded: false, // 로컬 상태로 환불 완료 여부 트래킹
+        rowKey,
+      };
+    });
 
   // 데이터 로드
   useEffect(() => {
@@ -87,25 +97,12 @@ export default function PaymentHistory({ paymentList }) {
         setItems(sortByPaidAt(n, sortOrder));
         return;
       }
-      // 2) 로컬 더미 (sendGiftList + refundGiftList 병합)
-      if (hasLocalSeed) {
-        const merged = [
-          ...(Array.isArray(sendGiftList) ? sendGiftList : []),
-          ...(Array.isArray(refundGiftList) ? refundGiftList : []),
-        ];
-        if (merged.length > 0) {
-          const n = normalize(merged);
-          setItems(sortByPaidAt(n, sortOrder));
-          return;
-        }
-      }
-      // 3) API 호출
+      // 2) API 호출 (getPayments)
       setLoading(true);
       try {
-        const res = await fetch(`/api/payments/me?sort=${sortOrder}`);
-        if (!res.ok) throw new Error("결제내역을 불러오지 못했습니다.");
-        const data = await res.json();
-        if (!ignore) setItems(sortByPaidAt(normalize(data || []), sortOrder));
+        const data = await getPayments(); // 기대 형태: 배열
+        const n = normalize(Array.isArray(data) ? data : []);
+        if (!ignore) setItems(sortByPaidAt(n, sortOrder));
       } catch (e) {
         if (!ignore) setItems([]);
         console.error(e);
@@ -124,14 +121,51 @@ export default function PaymentHistory({ paymentList }) {
   useEffect(() => {
     if (hasPropData) {
       setItems((prev) => sortByPaidAt(prev, sortOrder));
-    } else if (hasLocalSeed) {
+    } else {
       setItems((prev) => sortByPaidAt(prev, sortOrder));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortOrder]);
 
-  const visibleItems = tab === "refunded" ? items.filter(isRefunded) : items;
+  const refundedCount = useMemo(
+    () => items.filter(it => it.refunded === true || it.paymentStatus === 'REFUNDED').length,
+    [items]
+  );
+
+  const visibleItems = useMemo(
+    () => items.filter(it => tab === 'all' ? true : (it.refunded === true || it.paymentStatus === 'REFUNDED')),
+    [items, tab]
+  );
+
   const empty = !loading && visibleItems.length === 0;
+
+  const handleRefund = async (purchaseId, rowKey) => {
+    if (!purchaseId) {
+      window.alert("구매번호(purchaseId)를 찾을 수 없어 환불을 진행할 수 없습니다. 백엔드 응답을 확인해주세요.");
+      return;
+    }
+    try {
+      const res = await postRefund(purchaseId); // expects: { success: boolean, data: any, message: string }
+      const success = res && res.success === true;
+      if (success) {
+        setItems((prev) =>
+          prev.map((it) =>
+            it.rowKey === rowKey
+              ? { ...it, refunded: true }
+              : it
+          )
+        );
+      } else {
+        const msg =
+          (res && typeof res.message === "string" && res.message.trim()) ||
+          "환불 과정에 문제가 발생했습니다. 다시 시도해주세요";
+        window.alert(msg);
+      }
+    } catch (e) {
+      console.error(e);
+      window.alert("환불 과정에 문제가 발생했습니다. 다시 시도해주세요");
+    }
+  };
 
   return (
     <Box sx={{ p: 2, mt: 4 }}>
@@ -139,11 +173,11 @@ export default function PaymentHistory({ paymentList }) {
 
       <Tabs
         value={tab}
-        onChange={(_, v) => setTab(v)}
+        onChange={(_e, v) => setTab(v)}
         sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5 }}
       >
         <Tab value="all" label={`전체조회 (${items.length})`} />
-        <Tab value="refunded" label={`환불된 내역 (${items.filter(isRefunded).length})`} />
+        <Tab value="refunded" label={`환불내역 (${refundedCount})`} />
       </Tabs>
 
       {loading && (
@@ -156,13 +190,13 @@ export default function PaymentHistory({ paymentList }) {
 
       {!loading && !empty && (
         <Stack spacing={1.5} sx={{ mt: 2 }}>
-          {visibleItems.map((it) => (
+          {visibleItems.map((it, idx) => (
             <PaymentItemCard
-              key={it.id ?? `${it.storeName}-${it.paidAt}`}
+              key={it.rowKey}
               item={it}
               fmtDate={fmtDate}
               fmtPrice={fmtPrice}
-              refunded={isRefunded(it)}
+              onRefund={handleRefund}
             />
           ))}
         </Stack>
@@ -202,8 +236,10 @@ function Header({ sortOrder, onChangeOrder }) {
   );
 }
 
-function PaymentItemCard({ item, fmtDate, fmtPrice, refunded }) {
+function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
   const {
+    id,
+    purchaseId,
     storeName,
     productName,
     price,
@@ -212,56 +248,82 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, refunded }) {
     purchaseType,
     sender,
     receiver,
-    refundAt,
-    refundReason,
+    refundReasons,
+    isGift,
+    refunded,
+    paymentStatus,
   } = item || {};
+
+  const isRefundedDisplay = refunded === true || paymentStatus === 'REFUNDED';
+
+  const reasons = Array.isArray(refundReasons) ? refundReasons.map(r => (r || '').toString().toUpperCase()) : null;
+  const refundable = refundReasons === null && !isRefundedDisplay;
+  const canRefund = Boolean(purchaseId) && refundable;
+  let refundMessage = null;
+  if (!refundable && Array.isArray(reasons)) {
+    const hasOver = reasons.includes("OVER_PERIOD");
+    const hasUsed = reasons.includes("USED_ALREADY");
+    if (hasOver && hasUsed) {
+      refundMessage = "환불 기간 및 사용내역이 존재하여 환불이 불가능합니다.";
+    } else if (hasOver) {
+      refundMessage = "구매후 7일 경과하여 환불이 불가능합니다.";
+    } else if (hasUsed) {
+      refundMessage = "이미 사용한 구독권을 사용하여 환불이 불가능합니다.";
+    } else {
+      refundMessage = "환불이 불가능합니다.";
+    }
+  }
 
   const initial = useMemo(() => (storeName ? storeName.charAt(0) : "?"), [storeName]);
 
   return (
     <Card
       variant="outlined"
-      sx={
-        refunded
-          ? { borderColor: "error.main", bgcolor: "#fff5f5" }
-          : undefined
-      }
+      sx={undefined}
     >
       <CardContent>
         <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* <Avatar>{initial}</Avatar> */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             {/* 상단 메타 */}
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {storeName}
-              </Typography>
-              <Chip size="small" label={productName} />
-              {purchaseType && (
-                <Tooltip title="결제 수단">
-                  <Chip size="small" color="default" label={purchaseType} />
-                </Tooltip>
+            <Stack direction="row" alignItems="center" sx={{ width: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0, flexGrow: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {storeName}
+                </Typography>
+                <Chip size="small" label={productName} />
+                {purchaseType && (
+                  <Tooltip title="결제 수단">
+                    <Chip size="small" color="default" label={purchaseType} />
+                  </Tooltip>
+                )}
+                {isRefundedDisplay && (
+                  <Chip size="small" color="error" label="환불완료" />
+                )}
+                {paidAt && (
+                  <Typography variant="caption" color="text.secondary">
+                    결제일시: {fmtDate(new Date(paidAt))}
+                  </Typography>
+                )}
+              </Box>
+              {canRefund && (
+                <Box sx={{ ml: 'auto', display: 'flex' }}>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    size="small"
+                    onClick={() => onRefund(purchaseId, item.rowKey)}
+                  >
+                    결제 취소
+                  </Button>
+                </Box>
               )}
-              {refunded && (
-                <Chip size="small" color="error" label="환불완료" />
-              )}
-              {refunded && refundReason && (
-                <Chip size="small" variant="outlined" color="error" label={`사유: ${refundReason}`} />
-              )}
-              <Typography variant="caption" sx={{ color: "text.secondary", ml: "auto" }}>
-                {paidAt ? fmtDate(new Date(paidAt)) : "-"}
-              </Typography>
             </Stack>
 
             <Divider sx={{ my: 1 }} />
 
             {/* 본문 정보 */}
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-              {refundAt && (
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  환불 일시: {fmtDate(new Date(refundAt))}
-                </Typography>
-              )}
               <Typography variant="body2">
                 결제 금액: <b>{fmtPrice(price)}</b>원
               </Typography>
@@ -276,6 +338,16 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, refunded }) {
                 </Typography>
               )}
             </Stack>
+
+            {/* 환불 가/부 표시 및 액션 */}
+            {!refundable && refundMessage && (
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  <b>환불 불가 사유 :</b> {refundMessage}
+                </Typography>
+              </Box>
+            )}
+            
           </Box>
         </Stack>
       </CardContent>

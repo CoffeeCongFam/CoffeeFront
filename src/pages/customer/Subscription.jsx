@@ -24,6 +24,7 @@ import {
   Divider as MuiDivider,
 } from '@mui/material';
 import {getSubscription} from '../../api/subscription';
+import { postRefund } from '../../api/payments';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -36,7 +37,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 // 구독권 상세 정보 컴포넌트
-export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isExpired = false, headerExtra = null, actionsSlot = null, maxDailyUsage: maxDailyUsageProp, giftType, usedAt: usedAtProp }) => {
+export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isExpired = false, headerExtra = null, actionsSlot = null, maxDailyUsage: maxDailyUsageProp, giftType, usedAt: usedAtProp, refundReasons: refundReasonsProp, onRefundSuccess = null }) => {
   const [selectedMenu, setSelectedMenu] = useState('');
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -57,6 +58,27 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
   const dailyLabel = giftType === 'RECEIVED' ? '일일 잔여' : '일일 사용가능 횟수';
 
   const formattedPrice = price.toLocaleString();
+
+  // ---- Refund Reasons & Button visibility ----
+  const refundReasons = refundReasonsProp ?? subscriptionData.refundReasons ?? null;
+  const isRefundable = refundReasons === null;
+  const normalizedReasons = Array.isArray(refundReasons) ? refundReasons.map(r => (r || '').toString().toUpperCase()) : [];
+
+  let refundMessage = null;
+  if (!isRefundable) {
+    const hasOver = normalizedReasons.includes('OVER_PERIOD');
+    const hasUsed = normalizedReasons.includes('USED_ALREADY');
+    if (hasOver && hasUsed) {
+      refundMessage = '환불 기간 및 사용내역이 존재하여 환불이 불가능합니다.';
+    } else if (hasOver) {
+      refundMessage = '구매후 7일 경과하여 환불이 불가능합니다.';
+    } else if (hasUsed) {
+      refundMessage = '이미 사용한 구독권을 사용하여 환불이 불가능합니다.';
+    } else {
+      // 알 수 없는 코드가 포함된 경우: 일반 불가 문구
+      refundMessage = '환불이 불가능합니다.';
+    }
+  }
 
   // 금액 정보를 보여주는 박스 서브 컴포넌트
   const InfoBox = ({ title, content, subContent = null, isPrice = false }) => (
@@ -114,18 +136,20 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
   const usageByMonth = groupByMonth(usageDates);
 
   // ---- Cancel / Deny button visibility rules ----
-  const usedCount = usageDates.length;
-  const parseDateSafe = (iso) => {
-    const d = new Date(iso);
-    return isNaN(d) ? null : d;
-  };
-  const startDate = parseDateSafe(subscriptionData?.subStart);
-  const now = new Date();
-  const daysSinceStart = startDate ? Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
-  // 숨김 조건: 1) 사용내역 존재(usedAt.length > 0)  2) subStart로부터 8일째(>= 8일)부터
-  const shouldHideCancel = usedCount > 0 || daysSinceStart >= 8;
+  // 요구사항: refundReasons === null 이면 환불 가능 → 버튼 보임, 그 외에는 버튼 숨김
+  const shouldShowRefundButton = isRefundable;
 
   const isUsageStatusExpired = subscriptionData?.usageStatus === 'NOT_ACTIVATED';
+
+  // 환불/거절 처리 핸들러 (purchaseId를 성공 콜백에 전달)
+  const handleRefundOrDeny = async (purchaseId) => {
+    try {
+      await postRefund(purchaseId);
+      if (typeof onRefundSuccess === 'function') onRefundSuccess(purchaseId);
+    } catch (e) {
+      window.alert(e?.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요");
+    }
+  };
 
   return (
     <Paper
@@ -262,6 +286,17 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
                 {subscriptionDesc}
               </Typography>
             </Box>
+            {/* Refund reasons message area (simple, gray, only when not refundable) */}
+            {!isRefundable && (
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                  환불 불가 사유
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {refundMessage}
+                </Typography>
+              </Box>
+            )}
 
             <FormControl fullWidth variant="outlined">
               <Select
@@ -283,9 +318,13 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
                 actionsSlot
               ) : (
                 <>
-                  {!shouldHideCancel && (
-                    <Button variant="outlined" sx={{ flex: 1, borderColor: '#E0E0E0', color: '#757575', fontWeight: 'bold' }}>
-                      {giftType === 'RECEIVED' ? '선물 거절' : '결제 취소'}
+                  {shouldShowRefundButton && (
+                    <Button
+                      variant="outlined"
+                      sx={{ flex: 1, borderColor: '#E0E0E0', color: '#757575', fontWeight: 'bold' }}
+                      onClick={() => handleRefundOrDeny(subscriptionData.purchaseId)}
+                    >
+                      {giftType === 'RECEIVED' ? '선물 거절' : '구독권 환불'}
                     </Button>
                   )}
                   {giftType !== 'SENT' && (
@@ -412,7 +451,9 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
           }}
         >
           <Typography variant="h6" fontWeight="bold" sx={{ color: '#fff', textAlign: 'center' }}>
-            기한이 만료되었습니다
+            {subscriptionData?.paymentStatus === 'REFUNDED'
+              ? '환불 처리된 구독권입니다.'
+              : '기한이 만료되었습니다'}
           </Typography>
         </Box>
       )}
@@ -432,6 +473,9 @@ const adaptToCardData = (s) => ({
   receiver: s?.receiver,
   subStart: s?.subStart,
   usageStatus: s?.usageStatus,
+  purchaseId: s?.purchaseId,
+  paymentStatus: s?.paymentStatus,
+  refundReasons: s?.refundReasons ?? null,
 });
 
 // 커스텀 다음 화살표 컴포넌트
@@ -529,6 +573,30 @@ const SubscriptionPage = () => {
     ]
   };
 
+  // 환불 성공시: 사용가능 목록에서 제거하고 만료 목록에 추가
+  const handleRefundSuccess = (pid) => {
+    const pidStr = String(pid);
+    // 1) 사용 가능한 목록에서 대상 찾기
+    let removed = null;
+    setAvailableList(prev => {
+      const idx = prev.findIndex(s => String(s?.purchaseId) === pidStr);
+      if (idx === -1) return prev; // 못 찾으면 그대로
+      removed = prev[idx];
+      // 대상 제거한 새 목록 반환
+      return prev.filter((_, i) => i !== idx);
+    });
+    if (removed) {
+      // 2) 만료 목록으로 이동 (상태 갱신해서 push)
+      const moved = {
+        ...removed,
+        isExpired: 'CANCELLED',         // 만료/취소 상태로 분류되도록 설정
+        paymentStatus: 'REFUNDED',      // UI에서 환불 표시용
+        refundReasons: removed.refundReasons ?? null,
+      };
+      setExpiredList(prev => [...prev, moved]);
+    }
+  };
+
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
@@ -569,6 +637,8 @@ const SubscriptionPage = () => {
                     giftType={giftType}
                     usedAt={Array.isArray(s?.usedAt) ? s.usedAt : []}
                     maxDailyUsage={s?.remainingCount}
+                    refundReasons={s?.refundReasons ?? null}
+                    onRefundSuccess={handleRefundSuccess}
                   />
                 </Box>
               );

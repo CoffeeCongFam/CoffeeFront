@@ -15,8 +15,10 @@ import {
   MenuItem,
   LinearProgress,
   Tooltip,
+  Button,
 } from "@mui/material";
-import { getReview } from "../../api/review";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import { getReview, deleteReview } from "../../api/review";
 /**
  * ReviewPage
  * - 내가 작성한 리뷰 내역을 간단히 확인하는 페이지
@@ -27,6 +29,7 @@ export default function ReviewPage({ reviewList: propReviews }) {
   const [localReviews, setLocalReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState("desc"); // 'desc' 최신순, 'asc' 오래된순
+  const [deletingId, setDeletingId] = useState(null);
   const hasPropData = Array.isArray(propReviews) && propReviews.length > 0;
 
   // 간단한 날짜 파서/포맷터 (ISO 또는 yyyy-MM-dd HH:mm:ss 형태 가정)
@@ -73,6 +76,30 @@ export default function ReviewPage({ reviewList: propReviews }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasPropData, sortOrder, propReviews]);
 
+  const handleDelete = async (reviewId) => {
+    console.log(reviewId)
+    if (!reviewId) {
+      alert("리뷰 ID를 찾을 수 없습니다.");
+      return;
+    }
+    try {
+      setDeletingId(reviewId);
+      const res = await deleteReview({ reviewId });
+      if (res) {
+        setLocalReviews((prev) =>
+          prev.filter((rv) => (rv.reviewId ?? rv.review_id) !== reviewId)
+        );
+      } else {
+        alert("삭제 실패하였습니다 다시 시도해주세요");
+      }
+    } catch (e) {
+      console.error("[ReviewPage] deleteReview error:", e);
+      alert("삭제 실패하였습니다 다시 시도해주세요");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const empty = !loading && localReviews.length === 0;
 
   return (
@@ -91,7 +118,13 @@ export default function ReviewPage({ reviewList: propReviews }) {
       {!loading && !empty && (
         <Stack spacing={1.5} sx={{ mt: 2 }}>
           {localReviews.map((rv) => (
-            <ReviewItemCard key={rv.reviewId ?? rv.review_id ?? `${rv.partnerStoreId ?? rv.partner_store_id}-${rv.createdAt ?? rv.created_at}`} review={rv} fmt={fmt} />
+            <ReviewItemCard
+              key={rv.reviewId ?? rv.review_id ?? `${rv.partnerStoreId ?? rv.partner_store_id}-${rv.createdAt ?? rv.created_at}`}
+              review={rv}
+              fmt={fmt}
+              onDelete={handleDelete}
+              deleting={deletingId === (rv.reviewId ?? rv.review_id)}
+            />
           ))}
         </Stack>
       )}
@@ -130,7 +163,7 @@ function Header({ sortOrder, onChangeOrder }) {
   );
 }
 
-function ReviewItemCard({ review, fmt }) {
+function ReviewItemCard({ review, fmt, onDelete, deleting }) {
   const {
     partnerStoreId,
     partner_store_id,
@@ -142,7 +175,10 @@ function ReviewItemCard({ review, fmt }) {
     createdAt,
     created_at,
     reviewImg,
+    reviewId,
+    review_id,
   } = review || {};
+  const id = reviewId ?? review_id;
   const storeId = partnerStoreId ?? partner_store_id;
   const storeLabel = partnerStoreName ? partnerStoreName : (storeId ? `매장 #${storeId}` : "알 수 없는 매장");
   const contentText = reviewContent ?? review_content ?? "";
@@ -183,6 +219,18 @@ function ReviewItemCard({ review, fmt }) {
               <Typography variant="caption" sx={{ color: "text.secondary", ml: "auto" }}>
                 {createdVal ? fmt(new Date(createdVal)) : "-"}
               </Typography>
+              <Box sx={{ ml: 1, display: "flex", justifyContent: "flex-end", flexGrow: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="error"
+                  startIcon={<DeleteOutline />}
+                  onClick={() => onDelete(id)}
+                  disabled={deleting}
+                >
+                  삭제
+                </Button>
+              </Box>
             </Stack>
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
