@@ -229,6 +229,16 @@ function CreateOrderPage() {
       orderType: orderType,
       menu,
     };
+    // const orderPayload = {
+    //   memberId: 42,
+    //   storeId: 2,
+    //   memberSubscriptionId: 2,
+    //   orderType: orderType,
+    //   menu: [
+    //     { menuId: 1, count: 1 },
+    //     { menuId: 2, count: 2 },
+    //   ],
+    // };
 
     try {
       setIsLoading(true);
@@ -259,7 +269,7 @@ function CreateOrderPage() {
   const payload = buildOrderPayload();
 
   return (
-    <Box sx={{ px: isAppLike ? 3 : 30, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 3 : 5, py: 3, pb: 10 }}>
       {/* 뒤로가기 */}
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton onClick={handleBack} sx={{ mr: 1 }}>

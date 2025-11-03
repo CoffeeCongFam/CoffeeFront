@@ -27,6 +27,7 @@ import MarkerManager from "../../../utils/MarkerManager.js";
 import loadNaverMaps from "../../../utils/naverMapLoader.js";
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import { useNavigate } from "react-router-dom";
+import { fetchNearbyCafes } from "../../../apis/customerApi.js";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -107,7 +108,7 @@ export default function SearchPage() {
       const res = fetchNearbyCafes();
       if (res) {
         setCafes(res);
-      } 
+      }
     } catch (err) {
       console.log(err);
     } finally {

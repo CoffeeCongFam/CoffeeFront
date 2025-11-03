@@ -1,33 +1,42 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
+
+import ErrorPage from "../common/error/ErrorPage";
 import LandingPage from "../pages/home/Landing";
 import SignUp from "../pages/home/SignUp";
-import CustomerLayout from "../layout/CustomerLayout"; // PWA 레이아웃
-// import CustomerLayout from "../common/CustomerLayout";   // 데스크탑 전용 레이아웃
-import CustomerHome from "../pages/customer/home/CustomerHome";
+
+import CustomerLayout from "../layout/CustomerLayout";
 import StoreLayout from "../common/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
+
+import CustomerHome from "../pages/customer/home/CustomerHome";
 import OrderPage from "../pages/customer/order/OrderPage";
 import SearchPage from "../pages/customer/search/SearchPage";
-import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/order/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/order/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/home/StoreDetailPage";
 import PurchaseSubscriptionPage from "../pages/customer/home/PurchaseSubscriptionPage";
 import CompletePurchasePage from "../pages/customer/order/CompletePurchasePage";
-import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
+
+import MyPage from "../pages/customer/MyPage";
 import Gift from "../pages/customer/Gift";
+import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
 import PaymentHistory from "../pages/customer/PaymentHistory";
 import MyGift from "../pages/customer/MyGift";
 import Subscription from "../pages/customer/Subscription";
+
 import KakaoRedirect from "../pages/home/KakaoRedirect";
 import CustomerSignUp from "../pages/home/CustomerSignUp";
 import CafeSignUp from "../pages/home/CafeSignUp";
 import MemberSignUp from "../pages/home/MemberSignUp";
-import ErrorPage from "../common/error/ErrorPage";
+
+import PastOrders from "../pages/cafe/PastOrders";
+import ManageMenu from "../pages/cafe/ManageMenu";
+import ManageProduct from "../pages/cafe/ManageProduct";
+import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 
 const router = createBrowserRouter([
   {
@@ -139,10 +148,6 @@ const router = createBrowserRouter([
         path: "mygift",
         element: <MyGift />,
       },
-      {
-        path: "paymentHistory",
-        element: <PaymentHistory />,
-      },
     ],
   },
 
@@ -155,6 +160,22 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <StoreHome />,
+      },
+      {
+        path: "pastOrders",
+        element: <PastOrders />,
+      },
+      {
+        path: "manageMenu",
+        element: <ManageMenu />,
+      },
+      {
+        path: "manageProduct",
+        element: <ManageProduct />,
+      },
+      {
+        path: "manageStoreInfo",
+        element: <ManageStoreInfo />,
       },
     ],
   },

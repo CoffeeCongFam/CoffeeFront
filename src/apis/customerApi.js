@@ -2,6 +2,7 @@ import api from "../utils/api";
 
 /*
     소비자 요청 api 모음
+    받는 쪽에서 await 로 받아야 함.
 */
 
 /*  메인 홈 */
@@ -24,7 +25,8 @@ export async function fetchNearbyCafes({ xPoint, yPoint, radius = 500 }) {
 // 오늘 주문 목록 조회
 export async function fetchTodayOrderList() {
   const res = await api.get(`/me/orders/today`);
-  return res?.data?.data;
+  console.log(res.data?.data);
+  return res.data?.data;
 }
 
 // 주문 요청

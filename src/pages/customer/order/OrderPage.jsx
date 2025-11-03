@@ -14,6 +14,7 @@ import { formatKoreanDateTime } from "../../../utils/dateUtil";
 import todayOrderList from "../../../data/customer/todayOrderList";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import api from "../../../utils/api";
+import { fetchTodayOrderList } from "../../../apis/customerApi";
 
 function OrderPage() {
   const navigate = useNavigate();
@@ -35,13 +36,13 @@ function OrderPage() {
 
     (async () => {
       try {
-        const res = fetchTodayOrderList();
+        const res = await fetchTodayOrderList();
+        console.log("✅오늘 주문 목록 조회 성공:", res);
+
         setTodayOrders(res ?? []);
       } catch (err) {
         console.error("오늘 주문 목록 조회 실패:", err);
       } finally {
-        // demo
-        setTodayOrders(todayOrderList.orderList);
         setIsLoading(false);
       }
     })();
