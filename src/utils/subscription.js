@@ -1,7 +1,7 @@
 // src/api/subscription.js
 import axios from 'axios';
 const BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
-
+// let BASE_URL = "http://localhost:8080"
 export async function getSubscription() {
   try {
     const response = await axios.get(`${BASE_URL}/api/customers/subscriptions`, {

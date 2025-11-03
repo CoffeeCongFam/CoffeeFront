@@ -1,4 +1,5 @@
-let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
+// let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
+let BASE_URL = "http://localhost:8080"
 
 import axios from "axios";
 

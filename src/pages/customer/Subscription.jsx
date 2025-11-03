@@ -22,9 +22,10 @@ import {
   ListItemIcon,
   ListItemText,
   Divider as MuiDivider,
+  Popover,
 } from '@mui/material';
-import {getSubscription} from '../../api/subscription';
-import { postRefund } from '../../api/payments';
+import {getSubscription} from '../../utils/subscription';
+import { postRefund } from '../../utils/payments';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -35,11 +36,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HistoryIcon from '@mui/icons-material/History';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ImageIcon from '@mui/icons-material/Image';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 // 구독권 상세 정보 컴포넌트
 export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isExpired = false, headerExtra = null, actionsSlot = null, maxDailyUsage: maxDailyUsageProp, giftType, usedAt: usedAtProp, refundReasons: refundReasonsProp, onRefundSuccess = null }) => {
   const [selectedMenu, setSelectedMenu] = useState('');
   const [isFlipped, setIsFlipped] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [refundAnchorEl, setRefundAnchorEl] = useState(null);
+  const openRefundPopover = Boolean(refundAnchorEl);
+  const handleOpenRefundPopover = (e) => setRefundAnchorEl(e.currentTarget);
+  const handleCloseRefundPopover = () => setRefundAnchorEl(null);
 
   const {
     storeName,
@@ -48,6 +56,7 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
     subscriptionDesc,
     menuNameList,
     menuList,
+    storeImg,
   } = subscriptionData;
   const menus = Array.isArray(menuNameList)
     ? menuNameList
@@ -63,7 +72,7 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
   const refundReasons = refundReasonsProp ?? subscriptionData.refundReasons ?? null;
   const isRefundable = refundReasons === null;
   const normalizedReasons = Array.isArray(refundReasons) ? refundReasons.map(r => (r || '').toString().toUpperCase()) : [];
-
+  const memberId = 1;
   let refundMessage = null;
   if (!isRefundable) {
     const hasOver = normalizedReasons.includes('OVER_PERIOD');
@@ -73,7 +82,7 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
     } else if (hasOver) {
       refundMessage = '구매후 7일 경과하여 환불이 불가능합니다.';
     } else if (hasUsed) {
-      refundMessage = '이미 사용한 구독권을 사용하여 환불이 불가능합니다.';
+      refundMessage = '이미 사용한 구독권으로 환불이 불가능합니다.';
     } else {
       // 알 수 없는 코드가 포함된 경우: 일반 불가 문구
       refundMessage = '환불이 불가능합니다.';
@@ -88,7 +97,7 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
         padding: 1,
         backgroundColor: '#FFFFFF',
         borderRadius: '8px',
-        minHeight: '70px',
+        minHeight: '64px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -160,7 +169,8 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
         margin: 'auto',
         padding: 2.5,
         borderRadius: '12px',
-        height: '520px', // 정사각형에 가까운 높이 설정
+        height: '540px', // Slightly increased to fit image
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between', // 내부 요소들의 간격을 균등하게 배분
@@ -199,53 +209,85 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
               pointerEvents: isFlipped ? 'none' : 'auto',
             }}
           >
-            {isGifted && giftType !== 'SENT' && (
+            {/* Image area with fallback */}
+            <Box sx={{ position: 'relative', mt: 1, mb: 1 }}>
               <Box
                 sx={{
-                  position: 'absolute',
-                  top: 4,
-                  left: 16,
+                  width: '100%',
+                  height: 140,
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  bgcolor: '#f5f5f5',
+                  border: '1px solid #eee',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 0.5,
-                  backgroundColor: 'rgba(255,255,255,0.95)',
-                  padding: '6px 10px',
-                  borderRadius: '12px',
-                  boxShadow: 2,
-                  zIndex: 3,
+                  justifyContent: 'center',
                 }}
               >
-                <RedeemIcon sx={{ color: '#ff6f00', fontSize: 22 }} />
-                <Typography variant="caption" fontWeight="bold" color="text.primary">
-                  {subscriptionData?.giverName
-                    ? `${subscriptionData.giverName}님이 선물해주셨어요`
-                    : '익명의 천사님이 선물해주셨어요'}
-                </Typography>
+                {storeImg && !imgError ? (
+                  <Box
+                    component="img"
+                    src={storeImg}
+                    alt={storeName || '구독권 이미지'}
+                    onError={() => setImgError(true)}
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <ImageIcon sx={{ fontSize: 72, color: 'grey.400' }} />
+                )}
               </Box>
-            )}
-            {giftType === 'SENT' && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 4,
-                  left: 16,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  backgroundColor: 'rgba(255,255,255,0.95)',
-                  padding: '6px 10px',
-                  borderRadius: '12px',
-                  boxShadow: 2,
-                  zIndex: 3,
-                }}
-              >
-                <RedeemIcon sx={{ color: '#1976d2', fontSize: 22 }} />
-                <Typography variant="caption" fontWeight="bold" color="text.primary">
-                  {`For · ${subscriptionData?.receiver ?? '수신자'}`}
-                </Typography>
-              </Box>
-            )}
-            <Box sx={{ textAlign: 'center', mt: 6 }}>
+
+              {/* Gift Labels overlay on image */}
+              {isGifted && giftType !== 'SENT' && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    left: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    padding: '6px 10px',
+                    borderRadius: '12px',
+                    boxShadow: 2,
+                    zIndex: 3,
+                  }}
+                >
+                  <RedeemIcon sx={{ color: '#ff6f00', fontSize: 22 }} />
+                  <Typography variant="caption" fontWeight="bold" color="text.primary">
+                    {subscriptionData?.giverName
+                      ? `${subscriptionData.giverName}님이 선물해주셨어요`
+                      : '익명의 천사님이 선물해주셨어요'}
+                  </Typography>
+                </Box>
+              )}
+              {giftType === 'SENT' && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    left: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    padding: '6px 10px',
+                    borderRadius: '12px',
+                    boxShadow: 2,
+                    zIndex: 3,
+                  }}
+                >
+                  <RedeemIcon sx={{ color: '#1976d2', fontSize: 22 }} />
+                  <Typography variant="caption" fontWeight="bold" color="text.primary">
+                    {`For · ${subscriptionData?.receiver ?? '수신자'}`}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {/* Title and price row */}
+            <Box sx={{ textAlign: 'center' }}>
               <Box sx={{ display: 'inline-block' }}>
                 <Chip
                   label={subscriptionType}
@@ -267,36 +309,51 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
               <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: '#333' }}>
                 {storeName}
               </Typography>
-              <Typography variant="body1" fontWeight="light" sx={{ mt: 1, color: '#333' }}>
+              <Typography variant="body1" fontWeight="light" sx={{ mt: 0.5, color: '#333' }}>
                 <span style={{ fontWeight: 'bold' }}>₩{formattedPrice}</span>/월
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, mt: 1, mb: 0.5 }}>
               <InfoBox title="금액" content={`${formattedPrice}원`} isPrice />
               <InfoBox title="구독 기간" content={`1일`} />
               <InfoBox title={dailyLabel} content={`매일, 하루 ${resolvedMaxDaily ?? 0}잔`} />
             </Box>
 
             <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{ mb: 1 }}>
-                상세설명
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="primary.main" fontWeight="bold">
+                  상세설명
+                </Typography>
+                {!isRefundable && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" fontWeight="bold" color="error">환불 불가</Typography>
+                    <IconButton aria-label="환불 불가 사유 보기" size="small" onClick={handleOpenRefundPopover} sx={{ color: 'error.main', p: 0 }}>
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                )}
+              </Box>
               <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
                 {subscriptionDesc}
               </Typography>
+              {/* Popover is placed here to keep it close to the trigger */}
+              {!isRefundable && (
+                <Popover
+                  id={openRefundPopover ? 'refund-popover' : undefined}
+                  open={openRefundPopover}
+                  anchorEl={refundAnchorEl}
+                  onClose={handleCloseRefundPopover}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  PaperProps={{ sx: { p: 1, maxWidth: 280 } }}
+                >
+                  <Typography variant="caption" sx={{ color: 'error.main' }}>
+                    {refundMessage}
+                  </Typography>
+                </Popover>
+              )}
             </Box>
-            {/* Refund reasons message area (simple, gray, only when not refundable) */}
-            {!isRefundable && (
-              <Box sx={{ mt: 1 }}>
-                <Typography variant="caption" fontWeight="bold" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                  환불 불가 사유
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {refundMessage}
-                </Typography>
-              </Box>
-            )}
 
             <FormControl fullWidth variant="outlined">
               <Select
@@ -464,6 +521,7 @@ export const SubscriptionDetailCard = ({ subscriptionData, isGifted = false, isE
 // API 데이터를 카드 컴포넌트에서 쓰기 좋게 변환
 const adaptToCardData = (s) => ({
   storeName: s?.store?.storeName ?? '',
+  storeImg: s?.store?.storeImg ?? '',
   subscriptionType: s?.subscriptionType ?? 'STANDARD',
   price: Number(s?.price ?? 0),
   subscriptionDesc: s?.subName ?? '',
@@ -476,6 +534,10 @@ const adaptToCardData = (s) => ({
   purchaseId: s?.purchaseId,
   paymentStatus: s?.paymentStatus,
   refundReasons: s?.refundReasons ?? null,
+  // --- forward receiverId, senderId, memberId if present ---
+  receiverId: s?.receiverId,
+  senderId: s?.senderId,
+  memberId: s?.memberId,
 });
 
 // 커스텀 다음 화살표 컴포넌트
@@ -526,6 +588,8 @@ function PrevArrow(props) {
 
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
+  // TODO: Replace with actual logged-in member id from auth/session
+  const CURRENT_MEMBER_ID = 1;
   const sliderRef = useRef(null);
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'expired'
   const [availableList, setAvailableList] = useState([]); // 사용 가능한 구독권
@@ -626,8 +690,30 @@ const SubscriptionPage = () => {
           <Slider ref={sliderRef} {...settings}>
             {currentList.map((s, index) => {
               const cardData = adaptToCardData(s);
-              const isGifted = (s?.sender && s?.receiver && s.sender !== s.receiver) || s?.isGift === 'Y';
-              const giftType = isGifted ? 'RECEIVED' : undefined;
+              // Gift/ownership classification rules
+              const rid = s?.receiverId;
+              const sid = s?.senderId;
+              const mid = s?.memberId ?? CURRENT_MEMBER_ID;
+
+              let giftType;
+              let isGifted = false;
+              if (mid === rid && mid === sid) {
+                // 본인 구매
+                giftType = undefined; // OWNED
+                isGifted = false;
+              } else if (mid === rid && mid !== sid) {
+                // 받은 선물
+                giftType = 'RECEIVED';
+                isGifted = true;
+              } else if (mid !== rid && mid === sid) {
+                // 보낸 선물
+                giftType = 'SENT';
+                isGifted = true;
+              } else {
+                // 불명확: 기본값
+                giftType = undefined;
+                isGifted = false;
+              }
               return (
                 <Box key={s.subId ?? index} sx={{ padding: '0 8px' }}>
                   <SubscriptionDetailCard
