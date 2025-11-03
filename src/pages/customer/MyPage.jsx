@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
 import PaymentHistory from "./PaymentHistory";
 import ReviewPage from "./ReviewPage";
+import { userState }  from "../../stores/userState";
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
@@ -31,7 +32,10 @@ const PlaceholderComponent = ({ title }) => (
 
 function MyPage() {
   let navigate = useNavigate();
-  const userName = "커피콩빵"; // 하드코딩된 유저 이름
+
+  const authUser = userState((s) => s.user);
+  console.log('AUTH USER>> ', authUser);
+  // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
   const [drawerContent, setDrawerContent] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -44,6 +48,10 @@ function MyPage() {
     "결제 내역",
     "리뷰내역",
   ];
+
+  useEffect(() => {
+    console.log("AUTH USER 변경됨 >>> ", authUser);
+  }, [authUser]);
 
   const handleMenuClick = (menu) => {
     if (menu === "선물하기") {
@@ -108,10 +116,9 @@ function MyPage() {
         mb={3}
       >
         <Box display="flex" alignItems="center">
-          {/* 유저 이름 (하드코딩) */}
           <Box>
             <Typography variant="h5" component="h1" fontWeight="bold">
-              {userName}
+              {authUser?.nickname}
             </Typography>
             {/* 이미지에 있던 추가 정보는 요청에 없으므로 생략 */}
           </Box>

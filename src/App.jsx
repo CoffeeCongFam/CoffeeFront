@@ -9,8 +9,10 @@ function App() {
 
   useEffect(() => {
     const user = TokenService.getUser(); // localStorage에서 유저 꺼내기
+    console.log("user>> ", user);
     if (user) {
       setUser(user);
+      console.log("setUser 완료!!!")
     }
   }, [setUser]);
 

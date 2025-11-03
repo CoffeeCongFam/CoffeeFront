@@ -27,7 +27,7 @@ function CreateOrderPage() {
   const { isAppLike } = useAppShellMode();
 
   // 스토어에서 authUser 상태값 가져오기
-  const authUser = userState((state) => state.user);
+  const authUser = userState((s) => s.user);
 
   // 구독권에서 주문하기로 넘어오는 경우
   const { state } = useLocation();

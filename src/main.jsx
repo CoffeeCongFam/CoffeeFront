@@ -5,8 +5,10 @@ import router from "./router/index.jsx";
 import { CssBaseline } from "@mui/material";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
+  <>
       <CssBaseline />
       <RouterProvider router={router} />
-  </StrictMode>
+      </>
+  // </StrictMode>
 );
