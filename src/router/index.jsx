@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from '../App';
@@ -24,7 +23,7 @@ import Subscription from '../pages/customer/Subscription';
 import KakaoRedirect from '../pages/home/KakaoRedirect';
 import CustomerSignUp from '../pages/home/CustomerSignUp';
 import CafeSignUp from '../pages/home/CafeSignUp';
-import MemberSignUp  from '../pages/home/MemberSignUp';
+import MemberSignUp from '../pages/home/MemberSignUp';
 import PastOrders from '../pages/cafe/PastOrders';
 import ManageMenu from '../pages/cafe/ManageMenu';
 import ManageProduct from '../pages/cafe/ManageProduct';
@@ -48,19 +47,19 @@ const router = createBrowserRouter([
         element: <SignUp />,
       },
       {
-        path: "kakaoRedirect",
+        path: 'kakaoRedirect',
         element: <KakaoRedirect />,
       },
       {
-        path: "customerSignUp",
+        path: 'customerSignUp',
         element: <CustomerSignUp />,
       },
       {
-        path: "cafeSignUp",
+        path: 'cafeSignUp',
         element: <CafeSignUp />,
       },
       {
-        path: "MemberSignUp",
+        path: 'MemberSignUp',
         element: <MemberSignUp />,
       },
     ],
