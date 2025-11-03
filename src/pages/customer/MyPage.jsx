@@ -10,11 +10,11 @@ import {
   IconButton,
   Slide,
 } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
 import PaymentHistory from "./PaymentHistory";
-
+import ReviewPage from "./ReviewPage";
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
@@ -23,7 +23,7 @@ import MyGiftPage from "./MyGift";
 
 // 임시 플레이스홀더 컴포넌트
 const PlaceholderComponent = ({ title }) => (
-  <Box sx={{ p: 3, textAlign: 'center' }}>
+  <Box sx={{ p: 3, textAlign: "center" }}>
     <Typography variant="h5">{title}</Typography>
     <Typography>이곳에 {title} 페이지 내용이 표시됩니다.</Typography>
   </Box>
@@ -37,10 +37,17 @@ function MyPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
-  const finalMenus = ["구독권 관리", "내 선물함", "선물하기", "결제 내역"];
-  
+  const finalMenus = [
+    "구독권 관리",
+    "내 선물함",
+    "선물하기",
+    "결제 내역",
+    "리뷰내역",
+  ];
+
   const handleMenuClick = (menu) => {
-    if (menu === "선물하기") { // "선물하기" 클릭 시 주문 페이지로 이동
+    if (menu === "선물하기") {
+      // "선물하기" 클릭 시 주문 페이지로 이동
       navigate("/me/order/new"); // 절대 경로로 수정 및 오타 수정
       return;
     }
@@ -55,11 +62,18 @@ function MyPage() {
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (drawerContent) {
-      case "구독권 관리": return <SubscriptionPage />;
-      case "내 선물함": return <MyGiftPage />;
-      case "선물하기": return <PlaceholderComponent title="선물하기" />;
-      case "결제 내역": return <PaymentHistory />;
-      default: return null;
+      case "구독권 관리":
+        return <SubscriptionPage />;
+      case "내 선물함":
+        return <MyGiftPage />;
+      case "선물하기":
+        return <PlaceholderComponent title="선물하기" />;
+      case "결제 내역":
+        return <PaymentHistory />;
+      case "리뷰내역":
+        return <ReviewPage />;
+      default:
+        return null;
     }
   };
 
@@ -74,7 +88,7 @@ function MyPage() {
             py: 2,
             fontSize: "1rem",
             fontWeight: "bold",
-            color: 'text.primary' // 텍스트 색상 유지
+            color: "text.primary", // 텍스트 색상 유지
           }}
           onClick={() => handleMenuClick(menu)}
         >
@@ -115,32 +129,37 @@ function MyPage() {
       {/* 하단에서 올라오는 Bottom Sheet (전체 화면 덮지 않음) */}
       <Slide direction="up" in={isDrawerOpen} mountOnEnter unmountOnExit>
         <Box
-          sx={{
-            position: 'fixed',
-            left: '30%',
-            transform: 'translateX(-50%)',
-            bottom: 0,
-            width: '100%',
-            maxWidth: 800, // Container maxWidth="md"(약 900px)에 맞춤
-            height: '80vh', // 화면 일부만 차지
-            bgcolor: 'background.paper',
-            borderTopLeftRadius: 2,
-            borderTopRightRadius: 2,
-            boxShadow: 24,
-            zIndex: (theme) => theme.zIndex.drawer, // AppBar 위로
-          }}
+          sx={{ zIndex: (theme) => theme.zIndex.drawer }}
+          // sx={{ backgroundColor: "yellow" }}
+          // sx={{
+          //   position: "fixed",
+          //   left: "30%",
+          //   transform: "translateX(-50%)",
+          //   bottom: 0,
+          //   width: "100%",
+          //   maxWidth: 800, // Container maxWidth="md"(약 900px)에 맞춤
+          //   height: "80vh", // 화면 일부만 차지
+          //   bgcolor: "background.paper",
+          //   borderTopLeftRadius: 2,
+          //   borderTopRightRadius: 2,
+          //   boxShadow: 24,
+          //   zIndex: (theme) => theme.zIndex.drawer, // AppBar 위로
+          // }}
         >
-          <Box sx={{ position: 'relative', height: '100%' }}>
+          {/* sx={{ position: "relative", height: "100%" }} */}
+          <Box>
             <IconButton
               aria-label="close"
               onClick={handleCloseDrawer}
-              sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+              sx={{}}
+              // sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
             >
               <CloseIcon />
             </IconButton>
-            <Box sx={{ height: '100%', overflowY: 'auto', pt: 2 }}>
+            {renderDrawerContent()}
+            {/* <Box sx={{ height: "100%", overflowY: "auto", pt: 2 }}>
               {renderDrawerContent()}
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </Slide>
