@@ -55,25 +55,27 @@ function Landing() {
           }}
         >
           {sections.map((sec) => (
-            <Box
+            <Link
               key={sec}
-              onClick={() =>
-                scroller.scrollTo(sec, {
-                  smooth: true,
-                  duration: 500,
-                  offset: 0,
-                })
-              }
-              sx={{
-                width: 14,
-                height: 14,
-                borderRadius: "9999px",
-                border: "2px solid #a16246",
-                backgroundColor: active === sec ? "#a16246" : "transparent",
-                cursor: "pointer",
-                transition: "all .2s",
-              }}
-            />
+              to={sec}
+              spy={true}
+              smooth={true}
+              duration={500}
+              offset={0}
+              onSetActive={() => setActive(sec)}
+            >
+              <Box
+                sx={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "9999px",
+                  border: "2px solid #a16246",
+                  backgroundColor: active === sec ? "#a16246" : "transparent",
+                  cursor: "pointer",
+                  transition: "all .2s",
+                }}
+              />
+            </Link>
           ))}
         </Box>
       )}
@@ -114,7 +116,7 @@ function Landing() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              px: isMobile ? 3 : 6,
+              px: isMobile ? 3 : 12,
               gap: 2,
               width: "100%",
             }}
@@ -224,18 +226,21 @@ function Landing() {
             }}
           >
             <Typography sx={{ color: "#cc5f2b", fontWeight: 600 }}>
-              구독이니까 가능한 일
+              매일의 커피, 더 똑똑하게 즐기다
             </Typography>
             <Typography
               sx={{ fontSize: "2rem", fontWeight: 700, color: "#4a3426" }}
             >
-              한 번 결제하고
-              <br />한 달 내내 커피만 고르세요.
+              매일 마시는 커피,
+              <br /> 이제는 구독으로 더 합리적이게
             </Typography>
             <Typography sx={{ color: "#4a3426" }}>
-              소비자는 번거로운 결제를 줄이고,
-              <br />
-              사장님은 예측 가능한 매출을 만들 수 있습니다.
+              CoffeeEns는 당신이 자주 가는 동네 카페를 구독으로 연결해줍니다.
+              <br />한 달 구독으로 매일의 커피를 더 합리적으로, 줄 서지 않고
+              간편하게 즐기세요.
+            </Typography>
+            <Typography sx={{ color: "#4a3426" }}>
+              좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
             <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
               <Link to="cta" smooth duration={500}>

@@ -37,7 +37,12 @@ export default function CustomerLayout() {
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
-    { to: "/me/order", label: "주문하기", icon: <ShoppingCartIcon />, end: true },
+    {
+      to: "/me/order",
+      label: "주문하기",
+      icon: <ShoppingCartIcon />,
+      end: true,
+    },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
 
@@ -159,7 +164,7 @@ export default function CustomerLayout() {
       sx={{
         display: "flex",
         width: "100vw",
-        // height: "100vh",
+        height: "100vh",
         overflow: "hidden",
       }}
     >
@@ -194,13 +199,15 @@ export default function CustomerLayout() {
       >
         {/* 상단 헤더(AppBar) */}
         <AppBar
-          position="fixed"
-          color="inherit"
+          position="absolute"
           elevation={0}
           sx={{
-            width: `calc(100% - ${drawerWidth}px)`,
-            ml: `${drawerWidth}px`,
-            backgroundColor: "transparent",
+            top: 0,
+            left: 0,
+            width: "100%", // main 영역 전체
+            background: "transparent",
+            boxShadow: "none",
+            pointerEvents: "none", // 밑에 요소 클릭 가능하도록
           }}
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -213,7 +220,9 @@ export default function CustomerLayout() {
         </AppBar>
 
         {/* 페이지 콘텐츠 */}
-        <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)", mt: 8 , pb: 10}}>
+        <Box
+          sx={{ width: "100%", minHeight: "calc(100vh - 64px)", mt: 8, pb: 10 }}
+        >
           <Outlet />
         </Box>
       </Box>

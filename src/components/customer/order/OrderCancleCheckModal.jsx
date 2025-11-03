@@ -7,7 +7,7 @@ import Modal from "@mui/material/Modal";
 const style = {
   position: "absolute",
   top: "50%",
-  left: "50%",      
+  left: "50%",
   transform: "translate(-50%, -50%)",
   width: "fit-content",
   minWidth: "360px",
@@ -29,10 +29,10 @@ export default function OrderCancleCheckModal({ open, setOpen, setIsCancel }) {
       open={open}
       onClose={handleClose}
       sx={{
-          display: 'flex',
-          p: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
+        display: "flex",
+        p: 1,
+        alignItems: "center",
+        justifyContent: "center",
       }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -56,7 +56,7 @@ export default function OrderCancleCheckModal({ open, setOpen, setIsCancel }) {
               "&:hover": { backgroundColor: "#333" },
             }}
             onClick={() => {
-              setIsCancel(true);
+              setIsCancel();
               setOpen(false);
             }}
           >

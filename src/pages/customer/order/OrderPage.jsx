@@ -35,8 +35,8 @@ function OrderPage() {
 
     (async () => {
       try {
-        const res = await api.get(`/me/orders/today`);
-        setTodayOrders(res.data?.data ?? []);
+        const res = fetchTodayOrderList();
+        setTodayOrders(res ?? []);
       } catch (err) {
         console.error("오늘 주문 목록 조회 실패:", err);
       } finally {

@@ -2,9 +2,8 @@ import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
 import LandingPage from "../pages/home/Landing";
-import Login from "../pages/home/Login";
 import SignUp from "../pages/home/SignUp";
-import CustomerLayout from "../layout/CustomerLayout" // PWA 레이아웃
+import CustomerLayout from "../layout/CustomerLayout"; // PWA 레이아웃
 // import CustomerLayout from "../common/CustomerLayout";   // 데스크탑 전용 레이아웃
 import CustomerHome from "../pages/customer/home/CustomerHome";
 import StoreLayout from "../common/StoreLayout";
@@ -24,12 +23,11 @@ import Gift from "../pages/customer/Gift";
 import PaymentHistory from "../pages/customer/PaymentHistory";
 import MyGift from "../pages/customer/MyGift";
 import Subscription from "../pages/customer/Subscription";
-import KakaoRedirect from '../pages/home/KakaoRedirect';
-import CustomerSignUp from '../pages/home/CustomerSignUp';
-import CafeSignUp from '../pages/home/CafeSignUp';
-import MemberSignUp  from '../pages/home/MemberSignUp';
+import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CustomerSignUp from "../pages/home/CustomerSignUp";
+import CafeSignUp from "../pages/home/CafeSignUp";
+import MemberSignUp from "../pages/home/MemberSignUp";
 import ErrorPage from "../common/error/ErrorPage";
-
 
 const router = createBrowserRouter([
   {
@@ -40,10 +38,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
-      },
-      {
-        path: "login",
-        element: <Login />,
       },
       {
         path: "signup",

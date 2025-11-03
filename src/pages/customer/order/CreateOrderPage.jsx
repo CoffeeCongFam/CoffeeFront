@@ -15,29 +15,29 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AddIcon from "@mui/icons-material/Add";
 import subList from "../../../data/customer/subList";
 import subMenuListData from "../../../data/common/subMenuListData";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
+import { requestNewOrder } from "../../../apis/customerApi";
 
 function CreateOrderPage() {
-
   const { isAppLike } = useAppShellMode();
-  
+
   // 구독권에서 주문하기로 넘어오는 경우
   const { state } = useLocation();
   const subscription = state?.subscription;
 
   const navigate = useNavigate();
 
-  const [inventoryList, setInventoryList] = useState([]);   // 보유 구독권 목록
+  const [inventoryList, setInventoryList] = useState([]); // 보유 구독권 목록
   const [selectedInventory, setSelectedInventory] = useState(null); // 사용할 구독권
-  const [orderType, setOrderType] = useState("IN");   // 매장 || 포장
-  const [subMenu, setSubMenu] = useState(null);       // 구독권별 메뉴
+  const [orderType, setOrderType] = useState("IN"); // 매장 || 포장
+  const [subMenu, setSubMenu] = useState(null); // 구독권별 메뉴
 
-  const [isLoading, setIsLoading] = useState(false);   // 주문하기 처리 로딩
+  const [isLoading, setIsLoading] = useState(false); // 주문하기 처리 로딩
 
   // 음료 여러 개
   const [beverageOrders, setBeverageOrders] = useState([
@@ -72,10 +72,11 @@ function CreateOrderPage() {
     })();
   }, [subscription]);
 
-
   // 구독권 바뀔 때마다 메뉴 구조 다시 넣기 (지금은 공통 더미)
   useEffect(() => {
-    const inv = inventoryList.find((it) => Number(it.subId) === Number(selectedInventory));
+    const inv = inventoryList.find(
+      (it) => Number(it.subId) === Number(selectedInventory)
+    );
     // 실제로 구독권마다 메뉴가 다르면 inv.menuList 쓰고,
     // 아직 백에서 안 내려오면 공통 더미 사용
     setSubMenu(inv?.menuList || subMenuListData);
@@ -86,10 +87,12 @@ function CreateOrderPage() {
   const requiredTypes = subMenu?.orderRule?.requiredTypes || [];
 
   // 구독권 선택
-  function handleSelectInventory(subId){
+  function handleSelectInventory(subId) {
     const realId = Number(subId);
 
-    const targetInventory = inventoryList.find((it) => Number(it.subId) === realId);
+    const targetInventory = inventoryList.find(
+      (it) => Number(it.subId) === realId
+    );
 
     if (!targetInventory) {
       console.warn("선택한 구독권을 찾을 수 없습니다.");
@@ -98,7 +101,7 @@ function CreateOrderPage() {
     // 잔여 횟수 체크
     if (targetInventory.remainingCount <= 0) {
       alert("해당 구독권은 남은 잔수가 없어 주문할 수 없습니다.");
-      return; 
+      return;
     }
     setSelectedInventory(subId);
   }
@@ -168,10 +171,10 @@ function CreateOrderPage() {
     // 구독권 || 메뉴 선택하지 않았으면 alert
     if (!selectedInventory) {
       alert("구독권을 선택해주세요.");
-      return; 
+      return;
     }
 
-    // 선택된 구독권 객체 찾기 
+    // 선택된 구독권 객체 찾기
     const selectedSub = inventoryList.find(
       (item) => item.subId === selectedInventory
     );
@@ -182,11 +185,13 @@ function CreateOrderPage() {
     }
 
     // TODO. memberId 가져오기
-    const memberId = 23;    // test
+    const memberId = 23; // test
 
     // storeId, memberSubscriptionId 매핑
-    const storeId = selectedSub.store?.partnerStoreId 
-      || selectedSub.store?.storeId || selectedSub.storeId ;
+    const storeId =
+      selectedSub.store?.partnerStoreId ||
+      selectedSub.store?.storeId ||
+      selectedSub.storeId;
     const memberSubscriptionId = selectedSub.subId;
 
     // 메뉴 배열 만들기
@@ -194,13 +199,13 @@ function CreateOrderPage() {
 
     // 음료
     beverageOrders.forEach((bo) => {
-      if(bo.menuId){
+      if (bo.menuId) {
         menu.push({
           menuId: bo.menuId,
           count: bo.qty,
-        })
+        });
       }
-    })
+    });
 
     // 디저트
     if (selectedDessert) {
@@ -223,28 +228,26 @@ function CreateOrderPage() {
       memberSubscriptionId,
       orderType: orderType,
       menu,
-    }
+    };
 
-    try{
+    try {
       setIsLoading(true);
-      console.log("주문 요청>> ",orderPayload)
+      console.log("주문 요청>> ", orderPayload);
 
-      const res = await api.post("/me/orders/new", orderPayload);
-      const orderId = res.data?.data?.orderId;
+      const res = requestNewOrder(orderPayload);
+      const orderId = res.orderId;
+      setIsLoading(false);
 
-      if(orderId){
+      if (orderId) {
         // 주문 상세 페이지로 이동
         navigate(`/me/order/${orderId}`);
-      }else{
+      } else {
         // orderId
         navigate(-1);
       }
-
-    } catch(err){
+    } catch (err) {
       console.error("주문 요청 실패: ", err);
-      alert("주문에 실패했어요. 다시 시도해 주세요.")
-    } finally {
-      setTimeout(() => setIsLoading(false), 500);
+      alert("주문에 실패했어요. 다시 시도해 주세요.");
     }
   }
 
@@ -264,14 +267,21 @@ function CreateOrderPage() {
         </IconButton>
       </Box>
 
-       {/* 제목 */}
+      {/* 제목 */}
       <Box sx={{ textAlign: "center", mb: 2 }}>
-        <Typography variant={isAppLike ? "h6" : "h5"} fontWeight={'bold'}>주문하기</Typography>
+        <Typography variant={isAppLike ? "h6" : "h5"} fontWeight={"bold"}>
+          주문하기
+        </Typography>
       </Box>
 
       <Box
-      style={{display: 'flex' , flexDirection: "column", justifyContent: "space-btween"}} 
-      sx={{ px: isAppLike ? 0 : 20, mt: isAppLike ? 0 : 7  }}>
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-btween",
+        }}
+        sx={{ px: isAppLike ? 0 : 20, mt: isAppLike ? 0 : 7 }}
+      >
         <Box>
           {/* 1. 구독권(매장) 선택 */}
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -296,14 +306,16 @@ function CreateOrderPage() {
                       {inventory.store.storeName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                        {inventory.subName}
-                        {/* 남은 잔수도 같이 보여주고 싶으면 */}
-                        {typeof inventory.remainingCount === "number"
-                          ? ` · 남은잔 ${inventory.remainingCount}잔`
-                          : null}
-                        {/* 미사용 상태면 */}
-                        {inventory.isExpired === "NOT_ACTIVATED" ? " · 미사용" : ""}
-                      </Typography>
+                      {inventory.subName}
+                      {/* 남은 잔수도 같이 보여주고 싶으면 */}
+                      {typeof inventory.remainingCount === "number"
+                        ? ` · 남은잔 ${inventory.remainingCount}잔`
+                        : null}
+                      {/* 미사용 상태면 */}
+                      {inventory.isExpired === "NOT_ACTIVATED"
+                        ? " · 미사용"
+                        : ""}
+                    </Typography>
                   </Box>
                 </Box>
               </MenuItem>
@@ -311,7 +323,7 @@ function CreateOrderPage() {
           </Select>
 
           {/* 2. 이용 타입 */}
-          <Box sx={{ mt: 2, mb: 2 }} >
+          <Box sx={{ mt: 2, mb: 2 }}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <ToggleButtonGroup
                 color="primary"
@@ -359,7 +371,9 @@ function CreateOrderPage() {
                   >
                     {beverageMenus.map((menu) => (
                       <MenuItem key={menu.menuId} value={menu.menuId}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
                           <Avatar src={menu.menuImage} alt={menu.name} />
                           {menu.name} ({menu.price.toLocaleString()}원)
                         </Box>
@@ -403,9 +417,14 @@ function CreateOrderPage() {
 
           {/* 디저트 선택 (단일) */}
           {dessertMenus.length > 0 && (
-            <Box sx={{ mb: 2, display: "flex", gap: 1 , alignItems: "flex-end"}}>
+            <Box
+              sx={{ mb: 2, display: "flex", gap: 1, alignItems: "flex-end" }}
+            >
               <Box sx={{ flex: 3 }}>
-                <Typography variant="caption" sx={{ mb: 0.5, display: "block" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ mb: 0.5, display: "block" }}
+                >
                   디저트 선택{" "}
                   {requiredTypes.includes("DESSERT") ? "(필수)" : "(선택)"}
                 </Typography>
@@ -422,7 +441,9 @@ function CreateOrderPage() {
                   )}
                   {dessertMenus.map((menu) => (
                     <MenuItem key={menu.menuId} value={menu.menuId}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <Avatar src={menu.menuImage} alt={menu.name} />
                         {menu.name} ({menu.price.toLocaleString()}원)
                       </Box>
@@ -432,16 +453,16 @@ function CreateOrderPage() {
               </Box>
 
               {/* 수량 */}
-              <Box sx={{ mt: 0.5}}>
+              <Box sx={{ mt: 0.5 }}>
                 <Select
                   value={dessertQty}
                   onChange={(e) => setDessertQty(Number(e.target.value))}
                   sx={{
                     width: 80,
                     "& .MuiSelect-select": {
-                      height: "100%",              
+                      height: "100%",
                       display: "flex",
-                      alignItems: "center",       
+                      alignItems: "center",
                     },
                   }}
                 >
@@ -467,8 +488,17 @@ function CreateOrderPage() {
             gap: 0.5,
           }}
         >
-          <Box sx={{display:'flex', flexDirection:'row', gap: 1, alignContent: "center", mb: 2}}>
-          <ShoppingCartIcon/><Typography fontWeight={'bold'}>장바구니</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 1,
+              alignContent: "center",
+              mb: 2,
+            }}
+          >
+            <ShoppingCartIcon />
+            <Typography fontWeight={"bold"}>장바구니</Typography>
           </Box>
           {payload.items.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
@@ -509,9 +539,9 @@ function CreateOrderPage() {
         }}
       >
         <CircularProgress color="inherit" />
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            주문이 진행 중입니다 ...
-          </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          주문이 진행 중입니다 ...
+        </Typography>
       </Backdrop>
     </Box>
   );

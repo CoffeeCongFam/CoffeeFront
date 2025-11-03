@@ -7,6 +7,7 @@ import CafeMenuList from "../../../components/customer/cafe/CafeMenuList.jsx";
 import CafeSubscriptionList from "../../../components/customer/cafe/CafeSubscriptionList.jsx";
 import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx";
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
+import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -30,25 +31,15 @@ function a11yProps(index) {
   };
 }
 
-function StoreDetailPage() {
+const DAY_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
 
-  const [store, setStore] = useState({
-    storeId: null,
-    storeName: "",
-    storeStatus: "",
-    summary: "",
-    address: "",
-    phone: "",
-    storeHours: [],
-    menus: [], // 메뉴 탭용
-    subscriptions: [], // 구독권 탭용
-    reviews: [], // 리뷰 탭용
-    storeImage: "https://picsum.photos/400/400",
-    maxDailyUsage: 0,
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [store, setStore] = useState({});
+  const [storeStatus, setStoreStatus] = useState("OPEN"); // OPEN || CLOSED || HOLIDAY
 
   const [tab, setTab] = useState(0);
 
@@ -57,22 +48,33 @@ function StoreDetailPage() {
   };
 
   useEffect(() => {
-    // TODO: storeId로 실제 api 호출한다고 가정
-    // 지금은 더미 데이터 주입
-    setStore(storeDetail);
+    // 카페 정보 초기화
+    try {
+      const res = fetchStoreDetail(storeId);
+      setStore(res);
+      // 카페 상태 계산
+      setStoreStatus(getStoreStatusByDate(store.storeHours));
+      setIsLoading(false);
+    } catch (err) {
+      console.log("카페 상세  정보 요청 실패: ", err);
+      alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+      // 더미 테스트
+      setStore(storeDetail);
+    }
   }, [storeId]);
 
   return (
-    <Box 
+    <Box
       sx={{
         width: "100%",
         maxWidth: isAppLike ? "100%" : "1100px", // 데스크탑에서만 가운데로
         mx: "auto",
-        pb: isAppLike ?  "15%" : 0
+        pb: isAppLike ? "15%" : 0,
       }}
     >
       {/* 상단 대표 이미지 */}
-
       <Box
         sx={{
           width: "100%",
@@ -83,7 +85,7 @@ function StoreDetailPage() {
         }}
       >
         <img
-          src={store.storeImage || "https://picsum.photos/400/400"}
+          src={store.storeImg || "https://picsum.photos/400/400"}
           alt={store.storeName}
           style={{
             width: "100%",
@@ -93,26 +95,32 @@ function StoreDetailPage() {
           }}
         />
       </Box>
-        
+
       <Box sx={{ px: 2 }}>
         {/* 상단 기본 정보 */}
         <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "flex-start", sm: "center" },
-          gap: 1,
-          mb: 1.5,
-        }}
-      >
-        {store.storeStatus && (
-          <Chip
-              label={store.storeStatus}
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "flex-start", sm: "center" },
+            gap: 1,
+            mb: 1.5,
+          }}
+        >
+          {storeStatus && (
+            <Chip
+              label={
+                storeStatus === "OPEN"
+                  ? "영업중"
+                  : storeStatus === "HOLIDAY"
+                  ? "휴무일"
+                  : "영업종료"
+              }
               size="small"
               color={
-                store.storeStatus === "OPEN"
+                storeStatus === "OPEN"
                   ? "success"
-                  : store.storeStatus === "HOLIDAY"
+                  : storeStatus === "HOLIDAY"
                   ? "warning"
                   : "default"
               }
@@ -161,9 +169,7 @@ function StoreDetailPage() {
         <TabPanel value={tab} index={3}>
           <CafeReviewList store={store} />
         </TabPanel>
-
       </Box>
-      
     </Box>
   );
 }

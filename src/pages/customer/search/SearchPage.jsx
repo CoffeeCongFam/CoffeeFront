@@ -76,7 +76,6 @@ const STATUS_MAP = {
 };
 
 export default function SearchPage() {
-
   const { isAppLike } = useAppShellMode();
 
   const navigate = useNavigate();
@@ -87,8 +86,9 @@ export default function SearchPage() {
   const hereMarkerRef = useRef(null);
   const mmRef = useRef(null);
 
-  const [isMapError, setIsMapError] = useState(false);    // 지도 렌더링 에러 여부
+  const [isMapError, setIsMapError] = useState(false); // 지도 렌더링 에러 여부
   const [status, setStatus] = useState("loading");
+  const [isLoading, setIsLoading] = useState(true);
 
   // 검색 관련
   const [keyword, setKeyword] = useState("");
@@ -98,12 +98,23 @@ export default function SearchPage() {
   const [sortOption, setSortOption] = useState("distance");
   const [openCafeList, setOpenCafeList] = useState(false);
 
-  // ✅ 검색창 아래 드롭다운 보여줄지
+  // 검색창 아래 드롭다운 보여줄지
   const [showSearchResult, setShowSearchResult] = useState(false);
 
   useEffect(() => {
-    setCafes(cafeList ?? []);
-  }, []);
+    // 카페 목록 가져오기
+    try {
+      const res = fetchNearbyCafes();
+      if (res) {
+        setCafes(res);
+      } 
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setCafes(cafeList);
+      setIsLoading(false);
+    }
+  }, [cafes]);
 
   // 지도 init
   useEffect(() => {
@@ -114,11 +125,13 @@ export default function SearchPage() {
         const maps = await loadNaverMaps(clientId);
 
         if (!maps) {
-          console.warn("네이버 지도 로딩 실패 → 오프라인이거나 외부 스크립트 불러오기 실패");
+          console.warn(
+            "네이버 지도 로딩 실패 → 오프라인이거나 외부 스크립트 불러오기 실패"
+          );
           setIsMapError(true);
           return;
         }
-    
+
         if (!mounted || !mapContainerRef.current) return;
 
         mapsRef.current = maps;
@@ -214,7 +227,7 @@ export default function SearchPage() {
     return () => clearTimeout(t);
   }, [keyword]);
 
-  // ✅ 리스트에서 선택
+  // 리스트에서 선택
   const handleSelectCafe = (cafe) => {
     const map = mapRef.current;
     const maps = mapsRef.current;
@@ -331,7 +344,7 @@ export default function SearchPage() {
           position: "absolute",
           top: 16,
           left: 16,
-          right: 16,       // 모바일 오른쪽 여백 확보
+          right: 16, // 모바일 오른쪽 여백 확보
           zIndex: 1300,
           display: "flex",
           gap: 8,
@@ -340,7 +353,8 @@ export default function SearchPage() {
         }}
       >
         {/* 왼쪽에 검색창 */}
-        <Box sx={{
+        <Box
+          sx={{
             position: "relative",
             flex: { xs: "1 1 100%", sm: "0 0 auto" }, // 모바일: 가로 꽉, 데스크탑: 원래처럼
             maxWidth: { xs: "100%", sm: 320 },
@@ -412,14 +426,14 @@ export default function SearchPage() {
           onClick={setCurrentLocation}
           aria-label="current-location"
           sx={{
-              backgroundColor: "white",
-              color: "gray",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-              "&:hover": {
-                backgroundColor: "#f5f5f5",            // hover 시 살짝 밝게
-                boxShadow: "0 4px 10px rgba(0,0,0,0.25)", // hover 시 그림자 강화
-              },
-            }}
+            backgroundColor: "white",
+            color: "gray",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            "&:hover": {
+              backgroundColor: "#f5f5f5", // hover 시 살짝 밝게
+              boxShadow: "0 4px 10px rgba(0,0,0,0.25)", // hover 시 그림자 강화
+            },
+          }}
         >
           <LocationSearchingIcon />
         </IconButton>
@@ -489,13 +503,13 @@ export default function SearchPage() {
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
-            <Button size="small" onClick={() => setOpenCafeList(false)} >
+            <Button size="small" onClick={() => setOpenCafeList(false)}>
               닫기
             </Button>
           </Box>
         </Box>
 
-        <Box sx={{ overflowY: "auto", flexGrow: 1, pb: '25%' }}>
+        <Box sx={{ overflowY: "auto", flexGrow: 1, pb: "25%" }}>
           <List>
             <Box
               sx={{
@@ -557,7 +571,6 @@ export default function SearchPage() {
                       }}
                     >
                       {renderStoreStatus(cafe.storeStatus)}
-                     
                     </Box>
 
                     <Typography
@@ -566,44 +579,57 @@ export default function SearchPage() {
                     >
                       {cafe.storeName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap={false}   >
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      noWrap={false}
+                    >
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
 
-                    <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
-                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
+                    <Box
+                      sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", gap: 0.5 }}
+                      >
                         👥 {cafe.subscriberCount ?? 0}명 구독
                       </Typography>
-                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", gap: 0.5 }}
+                      >
                         ⭐ {cafe.reviewCount ?? 0}개 리뷰
                       </Typography>
                     </Box>
                   </Box>
 
                   {/* 오른쪽 버튼 영역 */}
-                  <Box sx={{
+                  <Box
+                    sx={{
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
                       alignItems: "flex-end",
-                      mt: { xs: 1.5, sm: 0 },           // 
-                      width: { xs: "100%", sm: "auto" }, // 
+                      mt: { xs: 1.5, sm: 0 }, //
+                      width: { xs: "100%", sm: "auto" }, //
                     }}
                   >
-                    {!isAppLike && 
-                      <Typography 
+                    {!isAppLike && (
+                      <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ whiteSpace: "nowrap" }} 
+                        sx={{ whiteSpace: "nowrap" }}
                       >
                         {cafe.distance ?? "454m"}
                       </Typography>
-                    }
-                     
+                    )}
+
                     {cafe.isSubscribed ? (
                       <Button
                         variant="outlined"
-                        size= {isAppLike ? "small" : "medium"}
+                        size={isAppLike ? "small" : "medium"}
                         startIcon={<span style={{ fontSize: 14 }}>✓</span>}
                         sx={{
                           borderRadius: 999,
@@ -619,10 +645,10 @@ export default function SearchPage() {
                     ) : (
                       <Button
                         variant="outlined"
-                        size= {isAppLike ? "small" : "medium"}
+                        size={isAppLike ? "small" : "medium"}
                         onClick={(e) => {
                           e.stopPropagation(); // 리스트 전체 클릭과 겹치지 않게
-                          navigate(`/me/store/${cafe.storeId}`)
+                          navigate(`/me/store/${cafe.storeId}`);
                         }}
                         sx={{
                           borderRadius: 999,
