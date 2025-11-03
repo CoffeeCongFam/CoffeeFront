@@ -91,7 +91,7 @@ const router = createBrowserRouter([
         element: <CompleteOrderPage />,
       },
       {
-        path: "mypage",
+        path: 'mypage',
         element: <MyPage />,
       },
       {
@@ -99,19 +99,19 @@ const router = createBrowserRouter([
         element: <StoreDetailPage />,
       },
       {
-        path: "subscription",
+        path: 'subscription',
         element: <Subscription />,
       },
       {
-        path: "gift",
+        path: 'gift',
         element: <Gift />,
       },
       {
-        path: "mygift",
+        path: 'mygift',
         element: <MyGift />,
       },
       {
-        path: "paymentHistory",
+        path: 'paymentHistory',
         element: <PaymentHistory />,
       },
     ],

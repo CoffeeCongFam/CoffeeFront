@@ -661,4 +661,3 @@ export default function PastOrdersList() {
       </Box>
     </ThemeProvider>
   );
-}
