@@ -174,9 +174,10 @@ function Landing() {
                     backgroundColor: "rgba(74,52,38,0.05)",
                   },
                 }}
-                onClick={() =>
-                  scroller.scrollTo("cta", { smooth: true, duration: 500 })
-                }
+                onClick={kakaoLogin}
+                // onClick={() =>
+                //   scroller.scrollTo("cta", { smooth: true, duration: 500 })
+                // }
               >
                 로그인 →
               </Button>
