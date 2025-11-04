@@ -22,7 +22,7 @@ function SignUp() {
     const REDIRECT_URI = `${BASE_URL}/auth/kakao/callback`;
 
     const encodedState = encodeURIComponent(role);
-
+    
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&state=${encodedState}`;
     return URI;
   };

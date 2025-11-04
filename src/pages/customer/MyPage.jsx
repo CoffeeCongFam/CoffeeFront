@@ -16,13 +16,13 @@ import SubscriptionPage from "./Subscription";
 import PaymentHistory from "./PaymentHistory";
 import ReviewPage from "./ReviewPage";
 import { handleLogout } from "../../utils/logout";
-import { useUserState } from "../../stores/userState"; //-------------
+// import useUserStore from "../../stores/useUserStore";
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
 // import GiftPage from "./Gift";
-// import PaymentHistoryPage from "./PaymentHistory";
+// import PaymentHistory from "./PaymentHistory";
 
 // 임시 플레이스홀더 컴포넌트
 const PlaceholderComponent = ({ title }) => (
