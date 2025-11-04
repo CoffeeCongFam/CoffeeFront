@@ -1,7 +1,12 @@
-import { Box, Button, Card, Grid, Typography } from "@mui/material";
-import React, { useState } from "react";
-import axios from "axios";
-import OrderDetailModal from "./OrderDetailModal";
+import { Box, Button, Card, Grid, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import OrderDetailModal from './OrderDetailModal';
+import { ChevronLeft } from '@mui/icons-material';
+
+const BASE_URL = 'http://localhost:8080';
+
+const partnerStoreId = 1;
 
 // export const DUMMY_TODAY_ORDERS_RESPONSE = {
 //   success: true,
@@ -13,16 +18,16 @@ import OrderDetailModal from "./OrderDetailModal";
 //       orderId: 21,
 //       memberSubscriptionId: 1,
 //       dailyRemainCount: 1, // 일 잔여 횟수
-//       orderType: "OUT", // 테이크아웃
-//       orderStatus: "REQUEST",
+//       orderType: 'OUT', // 테이크아웃
+//       orderStatus: 'REQUEST',
 //       rejectedReason: null,
 //       orderNumber: 1009,
-//       createdAt: "2025-10-31T04:25:00.000Z",
-//       tel: "010-1234-5678",
-//       name: "홍길동",
+//       createdAt: '2025-10-31T04:25:00.000Z',
+//       tel: '010-1234-5678',
+//       name: '홍길동',
 //       menuList: [
-//         { menuId: 21, quantity: 2, menuName: "카페라떼", price: 9000 },
-//         { menuId: 32, quantity: 1, menuName: "브라우니", price: 4000 },
+//         { menuId: 21, quantity: 2, menuName: '카페라떼', price: 9000 },
+//         { menuId: 32, quantity: 1, menuName: '브라우니', price: 4000 },
 //       ],
 //     },
 //     // ----------------------------------------
@@ -32,15 +37,15 @@ import OrderDetailModal from "./OrderDetailModal";
 //       orderId: 19,
 //       memberSubscriptionId: 1,
 //       dailyRemainCount: 1, // 일 잔여 횟수
-//       orderType: "IN", // 매장이용
-//       orderStatus: "INPROGRESS",
+//       orderType: 'IN', // 매장이용
+//       orderStatus: 'INPROGRESS',
 //       rejectedReason: null,
 //       orderNumber: 1007,
-//       createdAt: "2025-10-31T04:15:00.000Z",
-//       tel: "010-5555-4444",
-//       name: "김철수",
+//       createdAt: '2025-10-31T04:15:00.000Z',
+//       tel: '010-5555-4444',
+//       name: '김철수',
 //       menuList: [
-//         { menuId: 1, quantity: 1, menuName: "아메리카노", price: 3500 },
+//         { menuId: 1, quantity: 1, menuName: '아메리카노', price: 3500 },
 //       ],
 //     },
 //     // ----------------------------------------
@@ -50,20 +55,20 @@ import OrderDetailModal from "./OrderDetailModal";
 //       orderId: 17,
 //       memberSubscriptionId: 2,
 //       dailyRemainCount: 2, // 일 잔여 횟수
-//       orderType: "OUT",
-//       orderStatus: "COMPLETED",
+//       orderType: 'OUT',
+//       orderStatus: 'COMPLETED',
 //       rejectedReason: null,
 //       orderNumber: 1005,
-//       createdAt: "2025-10-31T04:05:00.000Z",
-//       tel: "010-8888-7777",
-//       name: "박영희",
+//       createdAt: '2025-10-31T04:05:00.000Z',
+//       tel: '010-8888-7777',
+//       name: '박영희',
 //       menuList: [
-//         { menuId: 21, quantity: 1, menuName: "바닐라 라떼", price: 5000 },
-//         { menuId: 41, quantity: 1, menuName: "딸기 케이크", price: 6000 },
+//         { menuId: 21, quantity: 1, menuName: '바닐라 라떼', price: 5000 },
+//         { menuId: 41, quantity: 1, menuName: '딸기 케이크', price: 6000 },
 //       ],
 //     },
 //   ],
-//   message: "요청이 성공적으로 처리되었습니다.",
+//   message: '요청이 성공적으로 처리되었습니다.',
 // };
 
 const getOrderTypeLabel = (typeCode) => {
@@ -91,7 +96,7 @@ const getFormattedMenuList = (menuList) => {
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
-  const [orders, setOrders] = useState(DUMMY_TODAY_ORDERS_RESPONSE.data);
+  const [orders, setOrders] = useState([]);
 
   // 모달 상태 정의
   const [modalState, setModalState] = useState({
@@ -108,6 +113,34 @@ function StoreHome() {
     setModalState({ open: true, selectedOrder: order });
   };
 
+  // 오늘의 주문 목록 조회 GET
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/api/stores/orders/today/${partnerStoreId}`
+          // 하드코딩 partnerStoreId 테스트용**
+        );
+
+        // 백엔드 응답 구조에 맞게 resposne.data.data
+        if (response.data && response.data.data) {
+          setOrders(response.data.data);
+          console.log(
+            '✅ GET 성공, 데이터 로드 완료:',
+            response.data.data.length,
+            '개'
+          );
+        } else {
+          setOrders(response.data || []);
+          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
+        }
+      } catch (error) {
+        console.error('오늘의 주문 목록 로딩 실패:', error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
   // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
   // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.
   const handleModalOrderReject = async (
@@ -120,7 +153,7 @@ function StoreHome() {
 
       // 백엔드 요청
       const response = await axios.patch(
-        `/api/stores/orders/reject/${orderId}`,
+        `${BASE_URL}/api/stores/orders/reject/${orderId}`,
         {
           rejectedReason: rejectedReasonText,
         }
@@ -148,32 +181,31 @@ function StoreHome() {
       console.error(`주문 거부 API 호출 오류:`, error);
       alert(`주문 거부 처리중 오류가 발생했습니다.`);
     }
-    // axios 연결 전 가데이터로 테스트용도 코드
-    handleStatusChange(orderId, nextStatus); // 상태 업데이트
-    handleModalClose();
-    console.log(`거절 처리 요청: ID ${orderId}, 다음 상태: ${nextStatus}`);
   };
 
   // ⭐️버튼 클릭 시 orders 상태를 실제로 업데이트 하는 함수
   const handleStatusChange = async (orderId, nextStatus) => {
     try {
       // 백엔드 요청
-      const response = await axios.patch(`/api/stores/orders/${orderId}`, {
-        orderStatus: nextStatus,
-      });
+      const response = await axios.patch(
+        `${BASE_URL}/api/stores/orders/${orderId}`,
+        {
+          orderStatus: nextStatus,
+        }
+      );
 
       // 성공 시 FE 상태 업데이트
       if (response.status === 200) {
         setOrders((prevOrders) =>
           prevOrders.map((order) => {
-            order.orderId === orderId
-              ? {
-                  ...order,
-                  orderStatus: nextStatus,
-                  // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
-                  dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
-                }
-              : order;
+            if (order.orderId === orderId) {
+              return {
+                ...order,
+                orderStatus: nextStatus,
+                dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
+              };
+            }
+            return order;
           })
         );
         console.log(`주문 ID ${orderId} 상태가 ${nextStatus}로 변경완료`);
@@ -182,69 +214,6 @@ function StoreHome() {
       console.error(`주문 상태 변경 API 호출 오류 :`, error);
       alert(`주문 상태 변경에 실패했습니다.`);
     }
-
-    // axios 연결 전 가데이터로 테스트용도 코드
-    setOrders((prevOrders) => {
-      // 주문 접수 버튼을 누르고 주문 상태가 INPROGRESS로 바뀌었을 때만
-      // memberSubscriptionId의 dailyRemainCount 횟수를 차감시켜줘야해서
-      // 그에 따른 로직으로 수정
-
-      const currentOrder = prevOrders.find(
-        (order) => order.orderId === orderId
-      );
-      if (!currentOrder) return prevOrders;
-
-      const memberSubscriptionIdToUpdate = currentOrder.memberSubscriptionId;
-
-      // 잔여 횟수를 차감해야 하는 경우인지 판단
-      // (REQUEST => INPROGRESS로 접수될 때만 차감)
-      const isInprogress = nextStatus === "INPROGRESS";
-
-      const newOrders = prevOrders.map((order) => {
-        let newDailyRemainCount = order.dailyRemainCount;
-        let newStatus = order.orderStatus;
-
-        if (order.orderId === orderId) {
-          newStatus = nextStatus;
-        }
-
-        if (
-          isInprogress &&
-          order.memberSubscriptionId === memberSubscriptionIdToUpdate
-        ) {
-          newDailyRemainCount = Math.max(0, order.dailyRemainCount - 1);
-        }
-
-        return {
-          ...order,
-          orderStatus: newStatus,
-          dailyRemainCount: newDailyRemainCount,
-        };
-      });
-
-      console.log(
-        `[${memberSubscriptionIdToUpdate} 구독] 상태 변경 및 잔여 횟수 차감 결과:`
-      );
-      newOrders
-        .filter((o) => o.memberSubscriptionId === memberSubscriptionIdToUpdate)
-        .forEach((o) => {
-          console.log(
-            `- 주문 ID: ${o.orderId}, 상태: ${o.orderStatus}, 잔여횟수: ${o.dailyRemainCount}`
-          );
-        });
-      return newOrders;
-      //   prevOrders.map((order) =>
-      //     order.orderId === orderId
-      //       ? {
-      //           ...order,
-      //           orderStatus: nextStatus, // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
-      //           dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
-      //         } // 해당 주문의 상태만 변경
-      //       : order
-      //   )
-      // );
-      // console.log(`주문 ID : ${orderId}를 ${nextStatus}로 변경 요청`);
-    });
   };
 
   // 현재 주문 상태를 기반으로 다음 수행 동작과 다음 상태를 결정하는 함수
