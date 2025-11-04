@@ -38,6 +38,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ImageIcon from "@mui/icons-material/Image";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import useUserStore from "../../stores/useUserStore";
 
 // 구독권 상세 정보 컴포넌트
 export const SubscriptionDetailCard = ({
@@ -69,6 +70,8 @@ export const SubscriptionDetailCard = ({
     menuList,
     storeImg,
   } = subscriptionData;
+  const dailyRemainCount = subscriptionData.dailyRemainCount ?? 0;
+  const isDailyUsedUp = dailyRemainCount <= 0;
   const menus = Array.isArray(menuNameList)
     ? menuNameList
     : Array.isArray(menuList)
@@ -367,7 +370,8 @@ export const SubscriptionDetailCard = ({
               <InfoBox title="구독 기간" content={`1일`} />
               <InfoBox
                 title={dailyLabel}
-                content={`매일, 하루 ${resolvedMaxDaily ?? 0}잔`}
+                content={`${resolvedMaxDaily ?? 0}잔`}
+                subContent={isDailyUsedUp ? "당일 사용횟수 소진" : null}
               />
             </Box>
 
@@ -717,8 +721,8 @@ function PrevArrow(props) {
 
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
-  // TODO: Replace with actual logged-in member id from auth/session
-  const CURRENT_MEMBER_ID = 1;
+  const { authUser } = useUserStore();
+  const CURRENT_MEMBER_ID = authUser?.memberId ?? 1;
   const sliderRef = useRef(null);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'expired'
   const [availableList, setAvailableList] = useState([]); // 사용 가능한 구독권
@@ -735,17 +739,11 @@ const SubscriptionPage = () => {
         // API가 { success, data, message }를 반환하므로 .data를 붙여서 사용
         const arr = Array.isArray(res?.data) ? res.data : [];
         // 조건 정정:
-        // 사용 가능: isExpired ∈ {'ACTIVE', 'Y'}
-        // 만료/비활성: isExpired ∈ {'NOT_ACTIVATED', 'EXPIRED', 'CANCELLED', 'USED_UP', 'N'}
+        // 사용 가능: isExpired 값이 "EXPIRED"가 아닌 모든 구독권
+        // 만료: isExpired 값이 "EXPIRED"인 구독권만
         const norm = (v) => (v ?? "").toString().toUpperCase();
-        const avail = arr.filter((s) =>
-          ["ACTIVE", "Y"].includes(norm(s?.isExpired))
-        );
-        const exp = arr.filter((s) =>
-          ["NOT_ACTIVATED", "EXPIRED", "CANCELLED", "USED_UP", "N"].includes(
-            norm(s?.isExpired)
-          )
-        );
+        const avail = arr.filter((s) => norm(s?.isExpired) !== "EXPIRED");
+        const exp = arr.filter((s) => norm(s?.isExpired) === "EXPIRED");
         console.log(
           "[Subscription] available:",
           avail.length,
@@ -914,7 +912,11 @@ const SubscriptionPage = () => {
           </IconButton>
         </Box>
       ) : (
-        <Typography>보유한 구독권이 없습니다.</Typography>
+        <Typography>
+          {activeTab === "expired"
+            ? "만료된 구독권이 없습니다."
+            : "보유한 구독권이 없습니다."}
+        </Typography>
       )}
     </Container>
   );
