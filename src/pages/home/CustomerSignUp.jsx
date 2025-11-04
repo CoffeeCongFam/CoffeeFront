@@ -9,7 +9,8 @@ import {
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-
+import { useNavigate } from "react-router-dom";
+import useUserStore from "../../stores/useUserStore";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
@@ -19,7 +20,8 @@ function CustomerSignUp() {
   const [tel, setTel] = useState("");
   const [gender, setGender] = useState("남");
   const [initialEmail, setInitialEmail] = useState("");
-
+  // L_01 - 네비게이트 선언
+  let navigate = useNavigate();
   useEffect(() => {
     console.log("MemberSignUp mounted!!!!!");
     const params = new URLSearchParams(search);
@@ -55,6 +57,9 @@ function CustomerSignUp() {
   //   return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
   // };
 
+  // L_05 - zustand에서 setUser 불러오기
+  const { setUser } = useUserStore.getState();
+
   // 폼 제출 핸들러
   const handleSignup = async () => {
     const genderEnum = gender === "남" ? "M" : "F";
@@ -68,18 +73,29 @@ function CustomerSignUp() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/signup/store",
+        "http://localhost:8080/api/signup/member",
         { ...formData },
         { withCredentials: true }
       );
 
       // response 전체 출력
       console.log("응답 전체:", response.data);
+      const memberId = response.data.data.memberId;
       console.log("리다이렉트 URL:", response.data.data.redirectUrl);
-      if (response.data.data.redirectUrl) {
-        window.location.href = response.data.data.redirectUrl;
-      } else {
-        alert("회원가입이 완료되었습니다.");
+      // L_02 - 이거 있으면 강제로 리다이렉트 될수있음 일단 주석처리
+      // if (response.data.data.redirectUrl) {
+      //   window.location.href = response.data.data.redirectUrl;
+      // } else {
+      //   alert("카페 상세정보 입력창으로 넘어갑니다.");
+      // }
+
+      // L_03 - 성공이 success : true 라면 카페 상세정보 입력하는 창으로 이동
+      if (response.data.data.message === '성공') {
+        // L_04 - zustand의 useUserStore를 사용해서 memberId 업데이트해서 cafeSignUp에서 사용가능하게 해주기
+        setUser({memberId});
+        if(window.confirm("회원정보 등록이 완료되었습니다. 카페 상세정보 입력창으로 넘어갑니다.")){
+           navigate("/cafeSignUp");
+        }
       }
     } catch (err) {
       console.error("회원가입 실패:", err);

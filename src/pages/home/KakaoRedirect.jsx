@@ -11,12 +11,12 @@ function KakaoRedirect() {
       // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
       const res = await axios({
         method: "GET",
-        url: `http://localhost:8080/auth/kakao/callback?code=${code}`,
-        withCredentials: true,
-      });
-      if (res.status !== 200) {
-        throw new Error(`Unexpected status: ${res.status}`);
-      }
+                url: `http://localhost:8080/auth/kakao/callback?code=${code}`,
+                withCredentials: true,
+            });
+            if (res.status !== 200) {
+                throw new Error(`Unexpected status: ${res.status}`);
+            }
 
       // 3. 성공 응답 처리
       const ACCESS_TOKEN = res.data.accessToken;
