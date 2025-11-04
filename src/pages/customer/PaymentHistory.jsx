@@ -23,7 +23,7 @@ import { postRefund, getPayments } from "../../utils/payments";
 
 // 현재 API에서는 환불 완료 여부를 별도 필드로 제공하지 않음.
 // 환불 사유(refundReasons)는 "환불 불가 사유"를 의미하므로, 실제 환불 완료 여부 판단에는 사용하지 않는다.
-const isRefunded = (_it) => false;
+// const isRefunded = (_it) => false;
 
 /**
  * PaymentHistory
@@ -50,9 +50,7 @@ export default function PaymentHistory({ paymentList }) {
       minute: "2-digit",
     }).format(d);
   const fmtPrice = (n) =>
-    typeof n === "number"
-      ? new Intl.NumberFormat("ko-KR").format(n)
-      : n ?? "-";
+    typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
 
   const sortByPaidAt = (arr, order) =>
     [...arr].sort((a, b) => {
@@ -65,13 +63,18 @@ export default function PaymentHistory({ paymentList }) {
   const normalize = (raw = []) =>
     raw.map((v, i) => {
       const rawPaidAt = v.paidAt ?? v.createdAt ?? null;
-      const rowKey = `${String(v.purchaseId ?? "noPid")}|${String(rawPaidAt ?? "noDate")}|${i}`;
+      const rowKey = `${String(v.purchaseId ?? "noPid")}|${String(
+        rawPaidAt ?? "noDate"
+      )}|${i}`;
       return {
         id: i,
         purchaseId: v.purchaseId ?? null,
         storeName: v.storeName ?? "개인 카페", // API에 매장명이 없으므로 필요시 백엔드 확장
         productName: v.subscriptionName ?? "구독권",
-        price: typeof v.paymentAmount === "number" ? v.paymentAmount : Number(v.paymentAmount) || 0,
+        price:
+          typeof v.paymentAmount === "number"
+            ? v.paymentAmount
+            : Number(v.paymentAmount) || 0,
         subscriptionPeriod: v.subscriptionPeriod ?? null, // 제공되지 않음
         paidAt: rawPaidAt,
         purchaseType: v.purchaseType ?? "결제",
@@ -83,6 +86,7 @@ export default function PaymentHistory({ paymentList }) {
         memberSubscriptionId: v.memberSubscriptionId,
         subscriptionId: v.subscriptionId,
         refunded: false, // 로컬 상태로 환불 완료 여부 트래킹
+        refundedAt: v.refundedAt ?? null,
         rowKey,
       };
     });
@@ -128,12 +132,20 @@ export default function PaymentHistory({ paymentList }) {
   }, [sortOrder]);
 
   const refundedCount = useMemo(
-    () => items.filter(it => it.refunded === true || it.paymentStatus === 'REFUNDED').length,
+    () =>
+      items.filter(
+        (it) => it.refunded === true || it.paymentStatus === "REFUNDED"
+      ).length,
     [items]
   );
 
   const visibleItems = useMemo(
-    () => items.filter(it => tab === 'all' ? true : (it.refunded === true || it.paymentStatus === 'REFUNDED')),
+    () =>
+      items.filter((it) =>
+        tab === "all"
+          ? true
+          : it.refunded === true || it.paymentStatus === "REFUNDED"
+      ),
     [items, tab]
   );
 
@@ -141,17 +153,27 @@ export default function PaymentHistory({ paymentList }) {
 
   const handleRefund = async (purchaseId, rowKey) => {
     if (!purchaseId) {
-      window.alert("구매번호(purchaseId)를 찾을 수 없어 환불을 진행할 수 없습니다. 백엔드 응답을 확인해주세요.");
+      window.alert(
+        "구매번호(purchaseId)를 찾을 수 없어 환불을 진행할 수 없습니다. 백엔드 응답을 확인해주세요."
+      );
       return;
     }
     try {
       const res = await postRefund(purchaseId); // expects: { success: boolean, data: any, message: string }
       const success = res && res.success === true;
       if (success) {
+        // API에서 전달된 환불 시각 사용 (refunedAt / refundedAt 둘 다 방어적으로 처리)
+        const data = res.data ?? {};
+        const refundedAtFromApi = data.refunedAt || data.refundedAt || null;
         setItems((prev) =>
           prev.map((it) =>
             it.rowKey === rowKey
-              ? { ...it, refunded: true }
+              ? {
+                  ...it,
+                  refunded: true,
+                  paymentStatus: "REFUNDED",
+                  refundedAt: refundedAtFromApi ?? it.refundedAt ?? it.paidAt,
+                }
               : it
           )
         );
@@ -190,7 +212,7 @@ export default function PaymentHistory({ paymentList }) {
 
       {!loading && !empty && (
         <Stack spacing={1.5} sx={{ mt: 2 }}>
-          {visibleItems.map((it, idx) => (
+          {visibleItems.map((it) => (
             <PaymentItemCard
               key={it.rowKey}
               item={it}
@@ -238,25 +260,30 @@ function Header({ sortOrder, onChangeOrder }) {
 
 function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
   const {
-    id,
+    // id,
     purchaseId,
     storeName,
     productName,
     price,
-    subscriptionPeriod,
+    // subscriptionPeriod,
     paidAt,
     purchaseType,
     sender,
     receiver,
     refundReasons,
-    isGift,
+    // isGift,
     refunded,
     paymentStatus,
+    refundedAt,
   } = item || {};
 
-  const isRefundedDisplay = refunded === true || paymentStatus === 'REFUNDED';
+  const isRefundedDisplay = refunded === true || paymentStatus === "REFUNDED";
+  const dateLabel = isRefundedDisplay && refundedAt ? "환불시각" : "결제일시";
+  const dateValue = isRefundedDisplay && refundedAt ? refundedAt : paidAt;
 
-  const reasons = Array.isArray(refundReasons) ? refundReasons.map(r => (r || '').toString().toUpperCase()) : null;
+  const reasons = Array.isArray(refundReasons)
+    ? refundReasons.map((r) => (r || "").toString().toUpperCase())
+    : null;
   const refundable = refundReasons === null && !isRefundedDisplay;
   const canRefund = Boolean(purchaseId) && refundable;
   let refundMessage = null;
@@ -274,20 +301,29 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     }
   }
 
-  const initial = useMemo(() => (storeName ? storeName.charAt(0) : "?"), [storeName]);
+  // const initial = useMemo(
+  //   () => (storeName ? storeName.charAt(0) : "?"),
+  //   [storeName]
+  // );
 
   return (
-    <Card
-      variant="outlined"
-      sx={undefined}
-    >
+    <Card variant="outlined" sx={undefined}>
       <CardContent>
         <Stack direction="row" spacing={2} alignItems="flex-start">
           {/* <Avatar>{initial}</Avatar> */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             {/* 상단 메타 */}
-            <Stack direction="row" alignItems="center" sx={{ width: '100%' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0, flexGrow: 1 }}>
+            <Stack direction="row" alignItems="center" sx={{ width: "100%" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  flexWrap: "wrap",
+                  minWidth: 0,
+                  flexGrow: 1,
+                }}
+              >
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {storeName}
                 </Typography>
@@ -300,14 +336,14 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                 {isRefundedDisplay && (
                   <Chip size="small" color="error" label="환불완료" />
                 )}
-                {paidAt && (
+                {dateValue && (
                   <Typography variant="caption" color="text.secondary">
-                    결제일시: {fmtDate(new Date(paidAt))}
+                    {dateLabel}: {fmtDate(new Date(dateValue))}
                   </Typography>
                 )}
               </Box>
               {canRefund && (
-                <Box sx={{ ml: 'auto', display: 'flex' }}>
+                <Box sx={{ ml: "auto", display: "flex" }}>
                   <Button
                     variant="outlined"
                     color="inherit"
@@ -323,7 +359,12 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
             <Divider sx={{ my: 1 }} />
 
             {/* 본문 정보 */}
-            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              flexWrap="wrap"
+            >
               <Typography variant="body2">
                 결제 금액: <b>{fmtPrice(price)}</b>원
               </Typography>
@@ -347,7 +388,6 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                 </Typography>
               </Box>
             )}
-            
           </Box>
         </Stack>
       </CardContent>
