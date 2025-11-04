@@ -1,5 +1,5 @@
-// let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
-let BASE_URL = "http://localhost:8080"
+let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
+// let BASE_URL = "http://localhost:8080"
 
 import axios from "axios";
 
@@ -25,18 +25,35 @@ export async function getSendGiftData() {
   }
 }
 
-export async function getReceievGiftData() { // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
+export async function getReceievGiftData() { 
   try {
-    const response = await axios.get(`${BASE_URL}/api/me/purchase/gift/receive`);
-    // console.log(response.data.data)
-    return response.data.data;
+    const response = await axios.get(`${BASE_URL}/api/me/purchase/gift/receive`, {
+      transformResponse: [(data) => {
+        try {
+          // Remove any characters before the first {
+          const jsonStart = data.indexOf('{');
+          if (jsonStart > 0) {
+            data = data.substring(jsonStart);
+          }
+          const parsed = JSON.parse(data);
+          return parsed;
+        } catch (e) {
+          console.error("Error parsing response data:", e);
+          return data;
+        }
+      }]
+    });
+    // Safely access nested data
+    const resultData = response.data?.data ?? (response.data?.result?.data ?? null);
+    console.log("[getReceievGiftData] parsed:", response.data.data);
+    return resultData;
   } catch (error) {
     console.error("Error fetching gift data:", error);
     return null;
   }
 }
 
-export async function getSendGift(purchaseId){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
+export async function getSendGift(purchaseId){ 
   try {
     const response = await axios.get(`${BASE_URL}/api/me/purchase/gift/send?purchaseId=${purchaseId}`);
     // console.log(response.data.data)
@@ -47,7 +64,7 @@ export async function getSendGift(purchaseId){ // 함수 이름에 오타가 있
   }
 }
 
-export async function getReceiveGift(memberSubscriptionId){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
+export async function getReceiveGift(memberSubscriptionId){ 
   try {
     console.log(memberSubscriptionId);
     const response = await axios.get(`${BASE_URL}/api/me/purchase/gift/receive?memberSubscriptionId=${memberSubscriptionId}`);
