@@ -127,7 +127,7 @@ const router = createBrowserRouter([
         element: <StoreHome />,
       },
       {
-        path: 'pastOrders',
+        path: 'pastorders',
         element: <PastOrders />,
       },
       {
@@ -135,7 +135,7 @@ const router = createBrowserRouter([
         element: <ManageMenu />,
       },
       {
-        path: 'manageProduct',
+        path: 'manageproduct',
         element: <ManageProduct />,
       },
       {

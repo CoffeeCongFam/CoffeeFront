@@ -402,9 +402,7 @@ function StoreHome() {
                       </Button>
                     </Box>
                   </Box>
-
                   <Typography>{formattedMenuString}</Typography>
-
                   <Typography variant="body2" color="text.secondary">
                     {new Date(order.createdAt).toLocaleString()}
                   </Typography>

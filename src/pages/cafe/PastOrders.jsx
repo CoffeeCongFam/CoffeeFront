@@ -499,7 +499,6 @@ export default function PastOrdersList() {
             <Typography variant="h5" component="h1" fontWeight="bold">
               지난 주문 내역 ({selectedDate.replace(/-/g, '.')})
             </Typography>
-
             <Box display="flex" alignItems="center" gap={1}>
               <Typography variant="body1" color="text.secondary">
                 날짜 선택:
@@ -514,7 +513,6 @@ export default function PastOrdersList() {
               />
             </Box>
           </Box>
-
           {/* 로딩, 에러, 데이터 없음 상태 표시 */}
           <Box
             sx={{
