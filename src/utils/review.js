@@ -1,10 +1,10 @@
 // let BASE_URL = "https://566e8ca2-16d7-45d7-8097-da13ce9bd28d.mock.pstmn.io"
-let BASE_URL = "http://localhost:8080"
-import axios from "axios";
+// let BASE_URL = "http://localhost:8080"
+import api from "./api";
 
 export async function getReview(){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
   try {
-    const response = await axios.get(`${BASE_URL}/api/reviews/me`);
+    const response = await api.get(`/reviews/me`);
     // console.log(response.data.data)
     return response.data.data;
   } catch (error) {
@@ -16,7 +16,7 @@ export async function getReview(){ // 함수 이름에 오타가 있어 getRecei
 
 export async function deleteReview({reviewId}){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
   try {
-    const response = await axios.delete(`${BASE_URL}/api/reviews/${reviewId}`);
+    const response = await api.delete(`/reviews/${reviewId}`);
     console.log(response.data.success)
     return response.data.success == true;
   } catch (error) {

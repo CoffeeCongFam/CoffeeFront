@@ -83,6 +83,7 @@ export default function PaymentHistory({ paymentList }) {
         memberSubscriptionId: v.memberSubscriptionId,
         subscriptionId: v.subscriptionId,
         refunded: false, // 로컬 상태로 환불 완료 여부 트래킹
+        refundedAt: v.refundedAt ?? null,
         rowKey,
       };
     });
@@ -148,10 +149,18 @@ export default function PaymentHistory({ paymentList }) {
       const res = await postRefund(purchaseId); // expects: { success: boolean, data: any, message: string }
       const success = res && res.success === true;
       if (success) {
+        // API에서 전달된 환불 시각 사용 (refunedAt / refundedAt 둘 다 방어적으로 처리)
+        const data = res.data ?? {};
+        const refundedAtFromApi = data.refunedAt || data.refundedAt || null;
         setItems((prev) =>
           prev.map((it) =>
             it.rowKey === rowKey
-              ? { ...it, refunded: true }
+              ? {
+                  ...it,
+                  refunded: true,
+                  paymentStatus: "REFUNDED",
+                  refundedAt: refundedAtFromApi ?? it.refundedAt ?? it.paidAt,
+                }
               : it
           )
         );
@@ -252,9 +261,12 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     isGift,
     refunded,
     paymentStatus,
+    refundedAt,
   } = item || {};
 
   const isRefundedDisplay = refunded === true || paymentStatus === 'REFUNDED';
+  const dateLabel = isRefundedDisplay && refundedAt ? '환불시각' : '결제일시';
+  const dateValue = isRefundedDisplay && refundedAt ? refundedAt : paidAt;
 
   const reasons = Array.isArray(refundReasons) ? refundReasons.map(r => (r || '').toString().toUpperCase()) : null;
   const refundable = refundReasons === null && !isRefundedDisplay;
@@ -300,9 +312,9 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                 {isRefundedDisplay && (
                   <Chip size="small" color="error" label="환불완료" />
                 )}
-                {paidAt && (
+                {dateValue && (
                   <Typography variant="caption" color="text.secondary">
-                    결제일시: {fmtDate(new Date(paidAt))}
+                    {dateLabel}: {fmtDate(new Date(dateValue))}
                   </Typography>
                 )}
               </Box>

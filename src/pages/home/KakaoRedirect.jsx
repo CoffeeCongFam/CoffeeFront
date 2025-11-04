@@ -12,18 +12,9 @@ function KakaoRedirect() {
             const res = await axios({
                 method: 'GET',
 
-                url: `http://localhost:8080/login/oauth2/code/kakao?code=${code}`,
+                url: `http://localhost:8080/auth/kakao/callback?code=${code}`,
                 withCredentials: true,
             });
-            if (res.status !== 200) {
-                throw new Error(`Unexpected status: ${res.status}`);
-            }
-
-
-            if (res.status !== 200) {
-                throw new Error(`Unexpected status: ${res.status}`);
-            }
-
             if (res.status !== 200) {
                 throw new Error(`Unexpected status: ${res.status}`);
             }
@@ -44,7 +35,7 @@ function KakaoRedirect() {
                 navigate('/main');
             }
             // 4. 메인 페이지로 이동
-            navigate('/main');
+            // navigate('/main');
             
         } catch (err) {
             // 5. 에러 처리

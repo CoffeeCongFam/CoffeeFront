@@ -38,10 +38,10 @@ const router = createBrowserRouter([
         index: true,
         element: <LandingPage />,
       },
-      {
-        path: 'login',
-        element: <Login />,
-      },
+      // {
+      //   path: 'login',
+      //   element: <Login />,
+      // },
       {
         path: 'signup',
         element: <SignUp />,
