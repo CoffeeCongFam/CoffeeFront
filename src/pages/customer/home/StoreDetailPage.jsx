@@ -8,7 +8,7 @@ import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
-import dummyImg from "./../../../assets/CoffeiensLogo.png";
+import dummyImg from "./../../../assets/cafeInfoDummy.png";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {

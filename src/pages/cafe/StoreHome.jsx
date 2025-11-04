@@ -96,12 +96,7 @@ const getFormattedMenuList = (menuList) => {
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
-<<<<<<< HEAD
-  const [orders, setOrders] = useState(null);
-  // DUMMY_TODAY_ORDERS_RESPONSE.data
-=======
   const [orders, setOrders] = useState([]);
->>>>>>> fd3f4e4e14fa0f4e768df56a9a62c0945b668f94
 
   // 모달 상태 정의
   const [modalState, setModalState] = useState({

@@ -2,112 +2,83 @@ import * as React from 'react';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
-import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
-import InfoIcon from '@mui/icons-material/Info';
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // ✅ LocationPinIcon 대신 권장
+import { Box } from '@mui/material';
+import menuDummy from "../../../assets/menuDummy.jpg";
+import { useNavigate } from 'react-router-dom';
 
-export default function LocalCafeImgList() {
-  return (
-    <ImageList sx={{ width: "100%", height: 450 }} variant="masonry" cols={5} gap={8}>
-      <ImageListItem key="Subheader" cols={5}>
-        <ListSubheader component="div">December</ListSubheader>
-      </ImageListItem>
-      {itemData.map((item) => (
-        <ImageListItem key={item.img}>
-          <img
-            srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-            src={`${item.img}?w=248&fit=crop&auto=format`}
-            alt={item.title}
-            loading="lazy"
-          />
-          <ImageListItemBar
-            title={item.title}
-            subtitle={item.author}
-            actionIcon={
-              <IconButton
-                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                aria-label={`info about ${item.title}`}
-              >
-                <InfoIcon />
-              </IconButton>
-            }
-          />
-        </ImageListItem>
-      ))}
-    </ImageList>
-  );
+export default function LocalCafeImgList({ list = [] }) {
+
+    const navigate = useNavigate();
+    return (
+        <Box
+        sx={{
+            width: '100%',
+            height: 450,
+            overflowY: 'auto',
+        }}
+        >
+        <ImageList cols={5} gap={8} sx={{ m: 0 }}>
+            {list.map((item, index) => (
+            <ImageListItem
+                onClick={() => navigate(`/me/store/${item.storeId}`)}
+                key={item.storeId || item.partnerStoreId || item.storeName || index}
+                sx={{ cursor: "pointer", position: 'relative' }} 
+            >
+                {/* 썸네일 이미지 */}
+                <img
+                src={menuDummy}
+                alt={item.storeName}
+                loading="lazy"
+                style={{
+                    borderRadius: '8px',
+                    width: '100%',
+                    display: 'block',
+                }}
+                />
+
+                {/* 거리 배지 (우상단 고정) */}
+                {typeof item.distanceKm === 'number' && (
+                <Box
+                    sx={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    backgroundColor: 'rgba(255, 111, 67, 0.82)', // hotpink 반투명
+                    color: 'white',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    px: 1,
+                    py: 0.3,
+                    borderRadius: '8px',
+                    zIndex: 2,
+                    }}
+                >
+                    {item.distanceKm.toFixed(1)} km
+                </Box>
+                )}
+
+                {/* 하단 정보 바 */}
+                <ImageListItemBar
+                title={item.storeName}
+                subtitle={
+                    <span>
+                    {(item.roadAddress || '') + (item.detailAddress || '')}
+                    </span>
+                }
+                actionIcon={
+                    <IconButton
+                    sx={{ color: 'rgba(255, 255, 255, 0.8)' }}
+                    aria-label={`위치 보기: ${item.storeName}`}
+                    >
+                    <LocationOnIcon />
+                    </IconButton>
+                }
+                />
+            </ImageListItem>
+            ))}
+        </ImageList>
+        </Box>
+    );
 }
-
-const itemData = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    title: 'Breakfast',
-    author: '@bkristastucchio',
-    rows: 2,
-    cols: 2,
-    featured: true,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    title: 'Burger',
-    author: '@rollelflex_graphy726',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    title: 'Camera',
-    author: '@helloimnik',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-    title: 'Coffee',
-    author: '@nolanissac',
-    cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-    title: 'Hats',
-    author: '@hjrc33',
-    cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-    title: 'Honey',
-    author: '@arwinneil',
-    rows: 2,
-    cols: 2,
-    featured: true,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-    title: 'Basketball',
-    author: '@tjdragotta',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-    title: 'Fern',
-    author: '@katie_wasserman',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-    title: 'Mushrooms',
-    author: '@silverdalex',
-    rows: 2,
-    cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-    title: 'Tomato basil',
-    author: '@shelleypauls',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-    title: 'Sea star',
-    author: '@peterlaster',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-    title: 'Bike',
-    author: '@southside_customs',
-    cols: 2,
-  },
-];

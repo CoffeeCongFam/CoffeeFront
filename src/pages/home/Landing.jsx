@@ -12,6 +12,9 @@ import useAppShellMode from "../../hooks/useAppShellMode";
 
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/CoffeiensLogo.png";
+import LoginIcon from '@mui/icons-material/Login';
+
+
 
 function Landing() {
   const { isAppLike } = useAppShellMode();
@@ -19,9 +22,21 @@ function Landing() {
   const [active, setActive] = useState("hero");
   const isMobile = useMediaQuery("(max-width:900px)");
 
+  const sections = ["hero", "customer", "store", "cta"];
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const handleScroll = (e) => {
+    const { scrollTop, clientHeight } = e.currentTarget;
+    const index = Math.round(scrollTop / clientHeight);
+    const sec = sections[index] || sections[0];
+    setActive(sec);
+  };
+
+
   // 카카오 소셜로그인 필요한 코드 및 주소
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
-  const REDIRECT_URI = `http://localhost:8080/auth/kakao/callback`;
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  const REDIRECT_URI = `${BASE_URL}/auth/kakao/callback`;
 
   // 카카오 로그인 버튼
   const kakaoLogin = () => {
@@ -30,10 +45,11 @@ function Landing() {
     window.location.href = URI;
   };
 
-  const sections = ["hero", "customer", "store", "cta"];
 
   return (
     <Box
+      ref={containerRef}
+      onScroll={handleScroll}
       sx={{
         height: "100vh",
         width: "100vw",
@@ -138,9 +154,9 @@ function Landing() {
             >
               당신의 하루를 진화시키는
               <br />
-              커피 구독 플랫폼, CoffeeEns
+              커피 구독 플랫폼, COFFEIENS 
             </Typography>
-            <Typography sx={{ color: "#4a3426", fontSize: "0.9rem" }}>
+            <Typography sx={{ color: "#4a3426", fontSize: "0.9rem", mt: 1 }}>
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
               COFFEIENS는 소비자에게는 더 현명한 하루를,
@@ -148,19 +164,19 @@ function Landing() {
               사장님들께는 꾸준히 찾아오는 단골의 기쁨을 선물합니다.
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+            <Box sx={{ display: "flex", gap: 2, mt: 6 }}>
               <Button
                 variant="contained"
                 sx={{
                   backgroundColor: "#c84436",
                   textTransform: "none",
                   borderRadius: "9999px",
-                  px: 4,
+                  px: 6,
                   "&:hover": { backgroundColor: "#b0382b" },
                 }}
                 onClick={() => navigate("/signup")}
               >
-                회원 가입하기
+                회원가입
               </Button>
               <Button
                 variant="outlined"
@@ -169,26 +185,28 @@ function Landing() {
                   color: "#4a3426",
                   textTransform: "none",
                   borderRadius: "9999px",
-                  px: 3,
+                  px: 5,
                   display: "flex",
                   gap: 1,
+                  justifyContent: "space-between",
                   alignItems: "center",
                   "&:hover": {
                     borderColor: "#4a3426",
                     backgroundColor: "rgba(74,52,38,0.05)",
                   },
                 }}
+                endIcon={<LoginIcon />}
                 onClick={kakaoLogin}
                 // onClick={() =>
                 //   scroller.scrollTo("cta", { smooth: true, duration: 500 })
                 // }
               >
-                로그인 →
+                로그인
               </Button>
             </Box>
 
             {/* 다음으로 내려가는 버튼 */}
-            <Link to="feature" smooth duration={500}>
+            {/* <Link to="customer" smooth duration={500}>
               <IconButton
                 sx={{
                   mt: 4,
@@ -201,7 +219,7 @@ function Landing() {
               >
                 •••
               </IconButton>
-            </Link>
+            </Link> */}
           </Box>
         </Box>
       </Element>
@@ -223,7 +241,7 @@ function Landing() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              px: isMobile ? 3 : 6,
+              px: isMobile ? 3 : 14,
               gap: 2,
             }}
           >
@@ -244,7 +262,7 @@ function Landing() {
             <Typography sx={{ color: "#4a3426" }}>
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Box sx={{ display: "flex", gap: 1, mt: 6}}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -278,25 +296,26 @@ function Landing() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              px: isMobile ? 3 : 6,
+              px: isMobile ? 3 : 14,
               gap: 2,
             }}
           >
             <Typography sx={{ color: "#cc5f2b", fontWeight: 600 }}>
-              구독이니까 가능한 일
+              예측 가능한 매출, 사장님의 새로운 루틴
             </Typography>
             <Typography
               sx={{ fontSize: "2rem", fontWeight: 700, color: "#4a3426" }}
             >
-              한 번 결제하고
-              <br />한 달 내내 커피만 고르세요.
+              이제 우리 카페에도 사이렌 오더가 생깁니다.<br />
+              단골은 늘리고, 매출은 안정적으로
             </Typography>
             <Typography sx={{ color: "#4a3426" }}>
-              소비자는 번거로운 결제를 줄이고,
+              CoffeeEns는 구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              사장님은 예측 가능한 매출을 만들 수 있습니다.
+              매일 찾는 단골 고객을 확보하고, 주문과 결제를 간편하게 관리하세요. <br />
+              프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Box sx={{ display: "flex", gap: 1,  mt: 6}}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"

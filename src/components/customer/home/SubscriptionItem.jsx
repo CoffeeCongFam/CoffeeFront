@@ -10,7 +10,7 @@ import {
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
-import dummyImg from "../../../assets/CoffeiensLogo.png";
+import dummyImg from "../../../assets/cafeInfoDummy.png"
 import { useNavigate } from "react-router-dom";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
