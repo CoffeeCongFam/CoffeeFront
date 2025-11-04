@@ -7,8 +7,8 @@ import {
   TextField,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import api from "../../utils/api";
 
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function MemberSignUp() {
@@ -59,8 +59,8 @@ function MemberSignUp() {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/signup/member",
+      const response = await api.post(
+        "/signup/member",
         { ...formData },
         { withCredentials: true }
       );

@@ -11,9 +11,7 @@ import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import { useEffect, useState } from "react";
 import { formatKoreanDateTime } from "../../../utils/dateUtil";
-import todayOrderList from "../../../data/customer/todayOrderList";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import api from "../../../utils/api";
 import { fetchTodayOrderList } from "../../../apis/customerApi";
 
 function OrderPage() {

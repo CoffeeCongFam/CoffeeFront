@@ -16,6 +16,10 @@ import { useCallback, useEffect, useState } from 'react';
 const STORE_API_URL = '/api/owners/stores'; // get, post 기본 경로
 const PARTNER_STORE_ID = 1; // partnerStoreId는 patch 요청 시 필요(로그인 후 저장된 값 사용)
 
+const today = new Date().toLocaleDateString('ko-KR');
+const dateParts = today.split('.').map((part) => part.trim());
+const month = dateParts[1];
+
 // 🚨 [가데이터 초기화]
 const INITIAL_STORE_INFO = {
   success: true,
@@ -28,64 +32,59 @@ const INITIAL_STORE_INFO = {
     detailAddress: '1층 102호',
     businessNumber: '111-22-33333',
     detailInfo: '조용한 카페',
-    businessStart: '09:00', // 영업시간 시작
-    businessEnd: '20:00', // 영업 시간 끝
-    breakTimeStart: null, // 브레이크 타임 시작
-    breakTimeEnd: null, // 브레이크 타임 끝
-    closedDays: ['월', '공휴일'], // 휴무일
-    isClosed: 'N',
-    // storeHours: [
-    //   {
-    //     dayOfWeek: 'MON',
-    //     openTime: '09:00',
-    //     closeTime: '18:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'TUE',
-    //     openTime: '09:00',
-    //     closeTime: '18:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'WED',
-    //     openTime: '09:00',
-    //     closeTime: '18:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'THU',
-    //     openTime: '09:00',
-    //     closeTime: '18:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'FRI',
-    //     openTime: '09:00',
-    //     closeTime: '18:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'SAT',
-    //     openTime: '10:00',
-    //     closeTime: '17:00',
-    //     isClosed: 'N',
-    //   },
-    //   {
-    //     dayOfWeek: 'SUN',
-    //     openTime: null,
-    //     closeTime: null,
-    //     isClosed: 'Y',
-    //   },
-    // ],
+    storeHours: [
+      {
+        dayOfWeek: 'MON',
+        openTime: '09:00',
+        closeTime: '18:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'TUE',
+        openTime: '09:00',
+        closeTime: '18:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'WED',
+        openTime: '09:00',
+        closeTime: '18:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'THU',
+        openTime: '09:00',
+        closeTime: '18:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'FRI',
+        openTime: '09:00',
+        closeTime: '18:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'SAT',
+        openTime: '10:00',
+        closeTime: '17:00',
+        isClosed: 'N',
+      },
+      {
+        dayOfWeek: 'SUN',
+        openTime: null,
+        closeTime: null,
+        isClosed: 'Y',
+      },
+    ],
   },
   message: '요청이 성공적으로 처리되었습니다.',
 };
 
 export default function ManageStoreInfo() {
-  const [storeInfo, setStoreInfo] = useState(INITIAL_STORE_INFO);
-  const [originalStoreInfo, setOriginalStoreInfo] =
-    useState(INITIAL_STORE_INFO);
+  const [storeInfo, setStoreInfo] = useState(INITIAL_STORE_INFO.data);
+  const [originalStoreInfo, setOriginalStoreInfo] = useState(
+    INITIAL_STORE_INFO.data
+  );
 
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -107,7 +106,7 @@ export default function ManageStoreInfo() {
     } catch (err) {
       console.log('매장 정보 조회 실패. 더미 데이터 사용.', err);
       setError('매장 정보를 불러오지 못했습니다. 더미 데이터를 표시.');
-      // API 실패 시, 미리 설정된 INITIAL_STORE_INFO 사용
+      // API 실패 시, 미리 설정된 가데이터 INITIAL_STORE_INFO 사용하게끔
     } finally {
       setIsLoading(false);
     }
@@ -117,11 +116,45 @@ export default function ManageStoreInfo() {
     getStoreInfo();
   }, [getStoreInfo]);
 
-  // 입력 필드 변경 핸들러
+  // 일반 텍스트 입력 필드 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
     setStoreInfo((prev) => ({ ...prev, [name]: value }));
   };
+
+  // 요일별 영업시간 및 휴무일 변경 핸들러
+  const handleHoursChange = useCallback((dayOfWeek, field, value) => {
+    setStoreInfo((prev) => ({
+      ...prev,
+      storeHours: prev.storeHours.map((hour) => {
+        if (hour.dayOfWeek === dayOfWeek) {
+          // isClosed 필드 처리
+          if (field === 'isClosed') {
+            const newIsClosed = value ? 'Y' : 'N';
+            // 휴무일('Y')이면 시간 필드는 null로 비워줍니다.
+            if (newIsClosed === 'Y') {
+              return {
+                ...hour,
+                isClosed: newIsClosed,
+                openTime: null,
+                closeTime: null,
+              };
+            }
+            // 휴무일 해제('N')이면 기본 시간(예: 09:00)을 설정하거나 null을 유지할 수 있습니다.
+            return {
+              ...hour,
+              isClosed: newIsClosed,
+              openTime: hour.openTime || '09:00', // 해제 시 기본값 설정 (필요에 따라 조정)
+              closeTime: hour.closeTime || '18:00',
+            };
+          }
+          // openTime/closeTime 필드 처리
+          return { ...hour, [field]: value };
+        }
+        return hour;
+      }),
+    }));
+  }, []);
 
   // 휴무일 토글 핸들러
   const handleClosedDayToggle = (e, newClosedDays) => {
@@ -239,8 +272,8 @@ export default function ManageStoreInfo() {
             },
             {
               label: '사업자 번호',
-              name: 'businessLicenseId',
-              value: storeInfo.businessLicenseId,
+              name: 'businessNumber',
+              value: storeInfo.businessNumber,
               disabled: true,
             }, // 번호는 보통 수정 불가
           ].map((field) => (
@@ -267,9 +300,10 @@ export default function ManageStoreInfo() {
           mb={2}
           sx={{ borderBottom: 1, borderColor: 'divider', pb: 1 }}
         >
-          영업시간 및 휴무일
+          {month}월 영업시간 및 휴무일
         </Typography>
         <Grid container spacing={3}>
+          {}월
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth

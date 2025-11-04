@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import React from "react";
+import { NavLink, Outlet } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -14,12 +14,15 @@ import {
   ListItemText,
   Divider,
   Typography,
-} from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PersonIcon from '@mui/icons-material/Person';
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import HomeIcon from "@mui/icons-material/Home";
+import {
+  History,
+  LocalCafe,
+  CardGiftcard,
+  LocationOn,
+} from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -28,30 +31,27 @@ const today = new Date();
 export default function StoreLayout() {
   const links = [
     {
-      to: '/store',
-      label: '홈화면',
+      to: "/store",
+      label: "홈화면",
       icon: <HomeIcon />,
       end: true,
     },
     {
-      to: '/store/pastorders',
-      label: '지난 주문 내역',
-      icon: <SearchIcon />,
+      to: "/store/pastorders",
+      label: "지난 주문 내역",
+      icon: <History />,
     },
-    { to: '/store/manageMenu', label: '메뉴 관리', icon: <ShoppingCartIcon /> },
+    { to: "/store/manageMenu", label: "메뉴 관리", icon: <LocalCafe /> },
     {
-      to: '/store/manageproduct',
-      label: '상품 관리',
-      icon: <ShoppingCartIcon />,
+      to: "/store/manageproduct",
+      label: "상품 관리",
+      icon: <CardGiftcard />,
     },
     {
-      to: '/store/manageStoreInfo',
-      label: '매장 정보',
-      icon: <ShoppingCartIcon />,
+      to: "/store/manageStoreInfo",
+      label: "매장 정보",
+      icon: <LocationOn />,
     },
-
-    { to: '/store/manageMenu', label: '메뉴 관리', icon: <ShoppingCartIcon /> },
-
   ];
 
   const DrawerContent = (
@@ -68,7 +68,7 @@ export default function StoreLayout() {
             key={item.to}
             to={item.to}
             end={item.end}
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
             {({ isActive }) => (
               <ListItemButton
@@ -77,10 +77,10 @@ export default function StoreLayout() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
-                  '&.Mui-selected': {
-                    backgroundColor: 'primary.light',
-                    color: 'white',
-                    '& .MuiListItemIcon-root': { color: 'white' },
+                  "&.Mui-selected": {
+                    backgroundColor: "primary.light",
+                    color: "white",
+                    "& .MuiListItemIcon-root": { color: "white" },
                   },
                 }}
               >
@@ -95,7 +95,7 @@ export default function StoreLayout() {
   );
 
   return (
-    <Box sx={{ display: 'flex', width: '100vw', height: '100vh' }}>
+    <Box sx={{ display: "flex", width: "100vw", height: "100vh" }}>
       <CssBaseline />
 
       {/* 왼쪽 사이드바 */}
@@ -106,8 +106,8 @@ export default function StoreLayout() {
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
+            boxSizing: "border-box",
+            backgroundImage: "none",
           },
         }}
         open
@@ -121,8 +121,8 @@ export default function StoreLayout() {
         sx={{
           flexGrow: 1,
           // ml: `${drawerWidth}px`,
-          backgroundColor: '#f9f9f9',
-          overflow: 'auto',
+          backgroundColor: "#f9f9f9",
+          overflow: "auto",
         }}
       >
         {/* 상단 헤더(AppBar) */}
@@ -133,10 +133,10 @@ export default function StoreLayout() {
           sx={{
             width: `calc(100% - ${drawerWidth}px)`,
             ml: `${drawerWidth}px`,
-            borderBottom: '1px solid #e0e0e0',
+            borderBottom: "1px solid #e0e0e0",
           }}
         >
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6" noWrap>
               {today.toLocaleDateString()}
             </Typography>

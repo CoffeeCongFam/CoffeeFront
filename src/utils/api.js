@@ -20,28 +20,27 @@ const api = axios.create({
   },
 });
 
-
 // Access Token을 관리 헬퍼 함수 (localStorage 사용)
 export const TokenService = {
   getLocalAccessToken: () => {
-    return localStorage.getItem('accessToken');
+    return localStorage.getItem("accessToken");
   },
   updateLocalAccessToken: (token) => {
-    localStorage.setItem('accessToken', token);
+    localStorage.setItem("accessToken", token);
   },
   removeLocalAccessToken: () => {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem("accessToken");
   },
   // user 정보 관련 함수
   getUser: () => {
-    return JSON.parse(localStorage.getItem('user'));
+    return JSON.parse(localStorage.getItem("user"));
   },
   setUser: (user) => {
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(user));
   },
   removeUser: () => {
-    localStorage.removeItem('user');
-  }
+    localStorage.removeItem("user");
+  },
 };
 
 // 요청 인터셉터: 모든 요청 헤더에 Access Token 추가
@@ -49,7 +48,7 @@ api.interceptors.request.use(
   (config) => {
     const token = TokenService.getLocalAccessToken();
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
@@ -59,7 +58,8 @@ api.interceptors.request.use(
 );
 
 // 공통 에러 로깅 / 응답 인터셉터: Access Token 만료 시 재발급 처리
-api.interceptors.response.use((response) => {
+api.interceptors.response.use(
+  (response) => {
     return response;
   },
   async (error) => {
@@ -71,15 +71,19 @@ api.interceptors.response.use((response) => {
       try {
         // Refresh Token을 사용하여 새 Access Token 발급 요청
         // Refresh Token은 `withCredentials: true` 설정으로 인해 쿠키에 담겨 자동으로 전송됩니다.
-        const rs = await axios.post('YOUR_API_BASE_URL/auth/refresh-token', null, {
-            withCredentials: true
-        });
-        
+        const rs = await axios.post(
+          "YOUR_API_BASE_URL/auth/refresh-token",
+          null,
+          {
+            withCredentials: true,
+          }
+        );
+
         const { accessToken } = rs.data; // 서버 응답에 새 Access Token 필드명 확인 필요
-        
+
         // 새 Access Token 저장 및 헤더 업데이트
         TokenService.updateLocalAccessToken(accessToken);
-        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
         // 이전 요청을 새 Access Token으로 재시도
         return api(originalRequest);

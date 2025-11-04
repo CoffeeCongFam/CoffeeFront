@@ -185,59 +185,67 @@ function StoreHome() {
 
     // axios 연결 전 가데이터로 테스트용도 코드
     setOrders((prevOrders) => {
-
       // 주문 접수 버튼을 누르고 주문 상태가 INPROGRESS로 바뀌었을 때만
       // memberSubscriptionId의 dailyRemainCount 횟수를 차감시켜줘야해서
       // 그에 따른 로직으로 수정
-      
-      const currentOrder = prevOrders.find(order => order.orderId === orderId);
+
+      const currentOrder = prevOrders.find(
+        (order) => order.orderId === orderId
+      );
       if (!currentOrder) return prevOrders;
 
       const memberSubscriptionIdToUpdate = currentOrder.memberSubscriptionId;
-      
+
       // 잔여 횟수를 차감해야 하는 경우인지 판단
       // (REQUEST => INPROGRESS로 접수될 때만 차감)
       const isInprogress = nextStatus === 'INPROGRESS';
-      
+
       const newOrders = prevOrders.map((order) => {
         let newDailyRemainCount = order.dailyRemainCount;
         let newStatus = order.orderStatus;
 
-        if (order.orderId === orderId){
+        if (order.orderId === orderId) {
           newStatus = nextStatus;
         }
 
-        if (isInprogress && order.memberSubscriptionId === memberSubscriptionIdToUpdate) {
+        if (
+          isInprogress &&
+          order.memberSubscriptionId === memberSubscriptionIdToUpdate
+        ) {
           newDailyRemainCount = Math.max(0, order.dailyRemainCount - 1);
         }
 
         return {
           ...order,
-          orderStatus : newStatus,
-          dailyRemainCount : newDailyRemainCount,
+          orderStatus: newStatus,
+          dailyRemainCount: newDailyRemainCount,
         };
       });
 
-      console.log(`[${memberSubscriptionIdToUpdate} 구독] 상태 변경 및 잔여 횟수 차감 결과:`);
-        newOrders
-            .filter(o => o.memberSubscriptionId === memberSubscriptionIdToUpdate)
-            .forEach(o => {
-                console.log(`- 주문 ID: ${o.orderId}, 상태: ${o.orderStatus}, 잔여횟수: ${o.dailyRemainCount}`);
-            });
+      console.log(
+        `[${memberSubscriptionIdToUpdate} 구독] 상태 변경 및 잔여 횟수 차감 결과:`
+      );
+      newOrders
+        .filter((o) => o.memberSubscriptionId === memberSubscriptionIdToUpdate)
+        .forEach((o) => {
+          console.log(
+            `- 주문 ID: ${o.orderId}, 상태: ${o.orderStatus}, 잔여횟수: ${o.dailyRemainCount}`
+          );
+        });
       return newOrders;
-    //   prevOrders.map((order) =>
-    //     order.orderId === orderId
-    //       ? {
-    //           ...order,
-    //           orderStatus: nextStatus, // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
-    //           dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
-    //         } // 해당 주문의 상태만 변경
-    //       : order
-    //   )
-    // );
-    // console.log(`주문 ID : ${orderId}를 ${nextStatus}로 변경 요청`);
-  });
-}
+      //   prevOrders.map((order) =>
+      //     order.orderId === orderId
+      //       ? {
+      //           ...order,
+      //           orderStatus: nextStatus, // 일 잔여 횟수가 0미만으로 내려가지 않도록 할 수 있는 Math.max 사용
+      //           dailyRemainCount: Math.max(0, order.dailyRemainCount - 1),
+      //         } // 해당 주문의 상태만 변경
+      //       : order
+      //   )
+      // );
+      // console.log(`주문 ID : ${orderId}를 ${nextStatus}로 변경 요청`);
+    });
+  };
 
   // 현재 주문 상태를 기반으로 다음 수행 동작과 다음 상태를 결정하는 함수
   const getNextActionAndState = (currentStatus) => {
@@ -352,7 +360,7 @@ function StoreHome() {
           // 현재 상태에 따른 액션 정보 가져오기
           const actionDetails = getNextActionAndState(order.orderStatus);
 
-          // 포맷된 메뉴 목록 문자열 
+          // 포맷된 메뉴 목록 문자열
           const formattedMenuString = getFormattedMenuList(order.menuList);
 
           return (

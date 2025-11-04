@@ -52,13 +52,13 @@ export async function requestCancelOrder(orderId) {
 // 카페 상세 정보 조회
 export async function fetchStoreDetail(storeId) {
   const res = await api.get(`/customers/stores/${storeId}`);
-  console.log(res.data?.message);
-  console.log("카페 상세 정보 조회>> ", res.data?.data);
+  // console.log(res.data?.message);
+  console.log("카페 상세 정보 조회>> ", res.data);
   return res.data?.data;
 }
 
 // 보유 구독권 목록 조회
-export async function fetchUserSubscriptions(){
+export async function fetchUserSubscriptions() {
   console.log("보유 구독권 목록 조회");
 
   const res = await api.get(`/customers/subscriptions`);
@@ -66,7 +66,7 @@ export async function fetchUserSubscriptions(){
   return res.data?.data;
 }
 // 구독권 구매
-// export
+export async function requestPurchaseSubscription() {}
 
 /*  매장 탐색 탭 */
 // 카페 목록 조회

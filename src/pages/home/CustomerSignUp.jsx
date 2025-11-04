@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -6,15 +6,13 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
-
-  const navigate = useNavigate();
 
   // 상태 관리
   const [name, setName] = useState("");

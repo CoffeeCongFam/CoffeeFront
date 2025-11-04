@@ -6,15 +6,21 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import {
   fetchCustomerSubscriptions,
   fetchNearbyCafes,
 } from "../../../apis/customerApi";
+import useUserStore from "../../../stores/useUserStore";
+import api, { TokenService } from "../../../utils/api";
+// import api from "../../../utils/api";
 
 function CustomerHome() {
   const navigate = useNavigate();
+
+  const { authUser, setUser } = useUserStore();
+
   const { isAppLike } = useAppShellMode();
   // const [isLoading, setIsLoading] = useState(true);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -23,6 +29,38 @@ function CustomerHome() {
   const [locError, setLocError] = useState("");
 
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    //
+    const initUser = async () => {
+      if (!authUser && TokenService.getLocalAccessToken) {
+        // token 은 있는데, 로그인한 사용자 정보가 없는 상태
+        console.log("TOKEN OK, BUT USER INFO IS EMPTY-----------------");
+
+        try {
+          const res = await api.post("/login");
+          const userData = res.data?.data;
+          console.log("user data from '/login", userData);
+
+          if (userData) {
+            setUser(userData);
+            TokenService.setUser(userData);
+            console.log("userData 저장 완료-------------------");
+          } else {
+            console.warn("응답에 user data 없음");
+            //
+            window.href;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+
+    initUser();
+
+    console.log(authUser);
+  }, []);
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
@@ -68,7 +106,7 @@ function CustomerHome() {
       const data = await fetchNearbyCafes(
         coords.latitude,
         coords.longitude,
-        500,
+        500
       );
       console.log("LOCAL CAFES>> ", data);
 
@@ -125,7 +163,8 @@ function CustomerHome() {
           <Typography
             sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
           >
-            유저 님, {isAppLike && <br />} 오늘도 한 잔의 여유를 즐겨보세요.
+            {authUser.name} 님, {isAppLike && <br />} 오늘도 한 잔의 여유를
+            즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
@@ -142,19 +181,34 @@ function CustomerHome() {
         </Box>
       </Box>
 
-      {
-        subscriptions.length <= 0 &&
-        <Box sx={{ backgroundColor:"#f0f0f0c9", px: "1rem", py: "1.5rem", borderRadius:"8px", mb: 5, display:"flex",  gap: isAppLike ? "0.8rem" : "2rem", flexDirection: isAppLike ? "column" : "row",  alignItems: "center"}}>
+      {subscriptions.length <= 0 && (
+        <Box
+          sx={{
+            backgroundColor: "#f0f0f0c9",
+            px: "1rem",
+            py: "1.5rem",
+            borderRadius: "8px",
+            mb: 5,
+            display: "flex",
+            gap: isAppLike ? "0.8rem" : "2rem",
+            flexDirection: isAppLike ? "column" : "row",
+            alignItems: "center",
+          }}
+        >
           <Typography>
-          보유 구독권이 없습니다. 구독권을 구매해주세요!  
+            보유 구독권이 없습니다. 구독권을 구매해주세요!
           </Typography>
-          <Button endIcon={<OpenInNewIcon />} onClick={() => navigate("/me/search")}>구독권 구매하러 가기</Button>
+          <Button
+            endIcon={<OpenInNewIcon />}
+            onClick={() => navigate("/me/search")}
+          >
+            구독권 구매하러 가기
+          </Button>
         </Box>
-      }
+      )}
 
       {/* 구독권 캐러셀 */}
-      {
-        subscriptions.length > 0 &&
+      {subscriptions.length > 0 && (
         <Box
           ref={scrollRef}
           sx={{
@@ -188,12 +242,9 @@ function CustomerHome() {
                 handleOrderClick={handleOrderClick}
               />
             </Box>
-          ))
-          }
+          ))}
         </Box>
-      }
-
-      
+      )}
 
       {/* 내 근처 카페 */}
       <Box>

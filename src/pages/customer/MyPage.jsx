@@ -15,10 +15,11 @@ import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
 import PaymentHistory from "./PaymentHistory";
 import ReviewPage from "./ReviewPage";
-import { userState }  from "../../stores/userState";
+import { handleLogout } from "../../utils/logout";
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
+import useUserStore from "../../stores/useUserStore";
 // import GiftPage from "./Gift";
 // import PaymentHistoryPage from "./PaymentHistory";
 
@@ -33,8 +34,8 @@ const PlaceholderComponent = ({ title }) => (
 function MyPage() {
   let navigate = useNavigate();
 
-  const authUser = userState((s) => s.user);
-  console.log('AUTH USER>> ', authUser);
+  const { authUser, setUser, clearUser } = useUserStore();
+  console.log("AUTH USER>> ", authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
   const [drawerContent, setDrawerContent] = useState(null);
@@ -52,6 +53,14 @@ function MyPage() {
   useEffect(() => {
     console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
+
+  const logout = () => {
+    // userStore 초기화
+    clearUser();
+
+    // 로그아웃 처리
+    handleLogout();
+  };
 
   const handleMenuClick = (menu) => {
     if (menu === "선물하기") {
@@ -118,9 +127,10 @@ function MyPage() {
         <Box display="flex" alignItems="center">
           <Box>
             <Typography variant="h5" component="h1" fontWeight="bold">
-              {authUser?.nickname}
+              {authUser?.name}
             </Typography>
             {/* 이미지에 있던 추가 정보는 요청에 없으므로 생략 */}
+            <Button onClick={logout}>로그아웃</Button>
           </Box>
         </Box>
       </Box>

@@ -8,6 +8,7 @@ import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
+import dummyImg from "./../../../assets/CoffeiensLogo.png";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -63,14 +64,13 @@ function StoreDetailPage() {
   }, [storeId]);
 
   const loadStoreDetail = async (storeId) => {
-    try{
+    try {
       const data = await fetchStoreDetail(storeId);
       setStore(data);
-
-    }catch(e){
+    } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   return (
     <Box
@@ -91,7 +91,7 @@ function StoreDetailPage() {
         }}
       >
         <img
-          src={store.storeImg || ''}
+          src={dummyImg || store.storeImg}
           alt={store.storeName}
           sx={{
             width: "100%",
@@ -111,7 +111,7 @@ function StoreDetailPage() {
             alignItems: "flex-start",
             gap: 1,
             mb: 1.5,
-            mt: 3
+            mt: 3,
           }}
         >
           {storeStatus && (

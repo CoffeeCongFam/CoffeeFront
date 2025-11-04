@@ -18,7 +18,8 @@ function SignUp() {
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
 
   const buildKakaoUrl = (role) => {
-    const REDIRECT_URI = `http://localhost:8080/auth/kakao/callback`;
+    const BASE_URL = import.meta.env.VITE_API_URL;
+    const REDIRECT_URI = `${BASE_URL}/auth/kakao/callback`;
 
     const encodedState = encodeURIComponent(role);
 
