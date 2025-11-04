@@ -75,10 +75,30 @@ export async function fetchSubscriptionInfo(subscriptionId) {
   return res.data?.data;
 }
 // 구독권 구매
-export async function requestPurchaseSubscription(payload) {
-  console.log("구독권 구매 요청");
+export async function requestPurchase(payload) {
+  console.log("구독권 구매 요청>> ", payload);
 
   const res = await api.post(`/me/purchase/new`, payload);
+
+  console.log("result: ", res.data?.data);
+  return res.data?.data;
+}
+
+// 구독권 구매 내역 조회
+export async function fetchPurchaseInfo(purchaseId) {
+  console.log("구독권 구매 내역 조회>> ", purchaseId);
+
+  const res = await api.get(`/me/purchase/${purchaseId}`);
+  console.log(res.data?.data);
+  return res.data?.data;
+}
+
+// TODO. 선물하기 대상 멤버 찾기
+export async function findReceiver(payload) {
+  console.log("선물 전달할 멤버 조회>> ", payload);
+
+  const res = await api.post(`/me/purchase/gift/tel`, payload);
+  console.log(res.data?.data);
   return res.data?.data;
 }
 

@@ -34,7 +34,8 @@ function SubscriptionItem({ subscription }) {
       {/* 왼쪽 정보 */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {subscription?.store?.storeName || "카페"}
+          {subscription?.store?.storeName || "카페 이름"}{" "}
+          {subscription?.subscriptionName}
         </Typography>
 
         {/* 간단한 혜택 설명 */}
@@ -49,11 +50,11 @@ function SubscriptionItem({ subscription }) {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <CalendarMonthIcon fontSize="small" />
-            <span>결제일 기준 30일 이용</span>
+            <span>결제일 기준 {subscription?.subscriptionPeriod}일 이용</span>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <CoffeeIcon fontSize="small" />
-            <span>매일 1잔 제공</span>
+            <span>매일 {subscription?.maxDailyUsage}잔 이용</span>
           </Box>
         </Box>
 

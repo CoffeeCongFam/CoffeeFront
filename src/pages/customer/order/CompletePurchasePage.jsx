@@ -3,7 +3,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import { fetchPurchaseInfo } from "../../../apis/customerApi";
 
 function CompletePurchasePage() {
   const { purchaseId } = useParams();
@@ -11,22 +12,33 @@ function CompletePurchasePage() {
 
   const [purchase, setPurchase] = useState(null);
 
+  async function getPurchaseInfo() {
+    const data = await fetchPurchaseInfo(purchaseId);
+    setPurchase(data);
+  }
+
   useEffect(() => {
     // TODO: purchaseId 로 실제 결제 완료 내역 조회
-    // 예시 더미 데이터
-    setPurchase({
-      purchaseId,
-      storeName: "카페 모나카",
-      subName: "스탠다드",
-      amount: 19900,
-      cycle: "1개월",
-      nextBillingDate: "2025.10.26",
-      paidAt: "2025.10.26 13:28",
-      approvalNo: "2342389819",
-      payMethod: "[신한] 카드",
-      isGift: "Y", // "N"
-    });
+    getPurchaseInfo();
   }, [purchaseId]);
+
+  // "data": {
+  //       "sender": "정민선",
+  //       "receiver": "정민선",
+  //       "subscriptionId": 1,
+  //       "subscriptionName": "아메리카노 구독",
+  //       "paidAt": "2025-11-04T14:59:50.553549",
+  //       "purchaseId": 61,
+  //       "memberSubscriptionId": 61,
+  //       "paymentStatus": "PAID",
+  //       "isGift": "N",
+  //       "giftMessage": null,
+  //       "paymentAmount": 19000,
+  //       "usageStatus": "NOT_ACTIVATED",
+  //       "refundedAt": null,
+  //       "storeName": "달빛다방",
+  //       "refundReasons": []
+  //   },
 
   function handleBack() {
     // 결제 완료 후에는 그냥 내 구독 목록 /me/subscriptions 로 보내도 됨
@@ -66,14 +78,24 @@ function CompletePurchasePage() {
         }}
       >
         {/* 상단 매장명 */}
-        {/* <Typography variant="h5" sx={{ fontWeight: 700, color: "#555", mb: 4 }}>
-          {purchase.storeName}
-        </Typography> */}
-        {purchase.isGift === "Y" && 
-          <Box sx={{display: "flex", flex: 1, justifyContent: "space-around", mb: 3, }}>
-            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+        {purchase.isGift === "Y" && (
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              justifyContent: "space-around",
+              mb: 3,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
               <Typography fontWeight={"bold"}>보내는 사람</Typography>
-              <Typography>아무개</Typography>
+              <Typography>{purchase?.sender}</Typography>
             </Box>
             <Box
               sx={{
@@ -85,12 +107,18 @@ function CompletePurchasePage() {
             >
               <ForwardIcon />
             </Box>
-            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
               <Typography fontWeight={"bold"}>받는 사람</Typography>
-              <Typography>아무개</Typography>
+              <Typography>{purchase?.receiver}</Typography>
             </Box>
           </Box>
-        }
+        )}
         <Divider sx={{ my: 3 }} />
 
         {/* 구독 정보 */}
@@ -99,8 +127,11 @@ function CompletePurchasePage() {
         </Typography>
 
         <Row label="카페명" value={purchase.storeName} />
-        <Row label="구독권명" value={purchase.subName} />
-        <Row label="금액" value={`${purchase.amount.toLocaleString()} 원`} />
+        <Row label="구독권명" value={purchase.subscriptionName} />
+        {/* <Row
+          label="금액"
+          value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
+        /> */}
         <Row label="결제 주기" value={purchase.cycle} />
         <Row label="다음 결제 예정일" value={purchase.nextBillingDate} />
 
@@ -111,13 +142,13 @@ function CompletePurchasePage() {
           결제 정보
         </Typography>
 
-        <Row
+        {/* <Row
           label="결제 금액"
-          value={`${purchase.amount.toLocaleString()} 원`}
-        />
+          value={`${purchase.paymentAmount.toLocaleString()} 원`}
+        /> */}
         <Row label="승인 일시" value={purchase.paidAt} />
-        <Row label="승인 번호" value={purchase.approvalNo} />
-        <Row label="결제 수단" value={purchase.payMethod} />
+        <Row label="승인 번호" value={purchase.purchaseId} />
+        <Row label="결제 수단" value={purchase.paymentStatus} />
       </Box>
 
       {/* 하단 확인 버튼 영역 */}

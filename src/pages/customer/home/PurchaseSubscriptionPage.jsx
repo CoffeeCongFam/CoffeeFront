@@ -13,7 +13,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
-import { fetchSubscriptionInfo } from "../../../apis/customerApi";
+import {
+  fetchSubscriptionInfo,
+  requestPurchase,
+} from "../../../apis/customerApi";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
@@ -26,17 +29,13 @@ function PurchaseSubscriptionPage() {
   async function fetchSubData() {
     const subData = await fetchSubscriptionInfo(subId);
     console.log(subData);
-    return subData;
+    setSubscription(subData);
   }
 
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
-    // TODO: 실제 API 호출
-
     // 구독권 정보 가져오기
-    const data = fetchSubData();
-    console.log(data);
-    setSubscription(data);
+    fetchSubData();
   }, [subId]);
 
   function handleBack() {
@@ -48,20 +47,15 @@ function PurchaseSubscriptionPage() {
     setIsLoading(true);
     setPayOpen(false);
 
-    // {
-    //     "subscriptionId" : 2,
-    //     "purchaseType" : "CREDIT_CARD",
-    //     "receiverMemberId" : 2,
-    //     "giftMessage" : "선물 줄게"
-    // }
-
-    // //구매일 경우 receiverMemberId, giftMessage는 Null로 처리
+    console.log("결제 진행 ----------------------------");
 
     try {
-      // TODO: 실제 결제 처리 API 호출 (예: await api.purchase(subscription.subId))
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 대기 (로딩 효과)
+      const payload = {
+        subscriptionId: subscription.subscriptionId,
+        purchaseType: "CREDIT_CARD",
+      };
+      const purchaseId = await requestPurchase(payload);
 
-      const purchaseId = 1; // 실제 purchaseId 받아오기
       navigate(`/me/purchase/${purchaseId}/complete`);
     } catch (error) {
       console.error("결제 실패:", error);

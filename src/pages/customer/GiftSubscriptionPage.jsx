@@ -6,6 +6,7 @@ import {
   Backdrop,
   Button,
   CircularProgress,
+  TextField, // ✅ 추가
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -18,9 +19,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../components/customer/purchase/SubscriptionItem";
 import SearchGiftReceiver from "../../components/customer/purchase/SearchGiftReceiver";
 import useAppShellMode from "../../hooks/useAppShellMode";
+import {
+  fetchSubscriptionInfo,
+  findReceiver,
+  requestPurchase,
+} from "../../apis/customerApi";
+import useUserStore from "../../stores/useUserStore";
 
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
+
+  const { authUser } = useUserStore();
+  console.log("authUser>> ", authUser);
+
   const { subId } = useParams();
   const navigate = useNavigate();
 
@@ -33,29 +44,19 @@ function GiftSubscriptionPage() {
   const [searchOpen, setSearchOpen] = useState(true);
   const [searchResults, setSearchResults] = useState([]); // 검색 결과
 
+  // 선물 메시지 상태
+  const [giftMessage, setGiftMessage] = useState("");
+
+  async function fetchSubData() {
+    const subData = await fetchSubscriptionInfo(subId);
+    console.log(subData);
+    setSubscription(subData);
+  }
+
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
-    // TODO: 실제 API 호출
-    setSubscription({
-      subId: 3,
-      store: {
-        storeId: 1,
-        storeName: "카페 모나카",
-        storeImage: "https://picsum.photos/400/400",
-      },
-      price: 19900,
-      subImage:
-        "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
-      subName: "프리미엄 구독권",
-      subType: "PREMIUM",
-      isExpired: "N",
-      limitEntity: 10,
-      stock: 10,
-      description: "구독권에 대한 간단한 설명",
-      isGift: "Y",
-      maxDailyUsage: 2, // 일일 사용 가능 횟수
-      isSubscribed: "Y",
-    });
+    // 구독권 정보 가져오기
+    fetchSubData();
   }, [subId]);
 
   function handleBack() {
@@ -63,17 +64,33 @@ function GiftSubscriptionPage() {
     navigate(-1);
   }
 
+  //결제 진행 함수 (로딩 + 완료 페이지 이동)
   async function confirmPayment() {
-    // 결제 진행
+    if (!receiver) {
+      alert("받는 사람을 먼저 선택해 주세요.");
+      return;
+    }
+
     setIsLoading(true);
     setPayOpen(false);
 
-    try {
-      // TODO: 실제 결제 처리 API 호출 (예: await api.purchase(subscription.subId))
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 대기 (로딩 효과)
+    console.log("결제 진행 ----------------------------");
 
-      const purchaseId = 1; // 실제 purchaseId 받아오기
-      navigate(`/me/purchase/${purchaseId}/complete`);
+    try {
+      const payload = {
+        subscriptionId: subscription.subscriptionId,
+        purchaseType: "CREDIT_CARD",
+        receiverMemberId: receiver.memberId, // 선택된 유저 id 사용
+        giftMessage: giftMessage?.trim() || "선물 드려요 ☕", // 입력한 메시지 사용
+      };
+
+      console.log("payload >>> ", payload);
+
+      const data = await requestPurchase(payload);
+
+      console.log("구매 완료!", data.purchaseId);
+
+      navigate(`/me/purchase/${data.purchaseId}/complete`);
     } catch (error) {
       console.error("결제 실패:", error);
       alert("결제 처리 중 오류가 발생했습니다.");
@@ -82,37 +99,28 @@ function GiftSubscriptionPage() {
     }
   }
 
-  function handleSearch(phone) {
+  async function handleSearch(phone) {
     console.log("검색할 전화번호", phone);
+    const payload = {
+      tel: phone,
+    };
 
-    // TODO: 실제 API 호출로 교체
-    // 여기선 더미로 필터된 목록처럼 만들게요
-    const dummyMembers = [
-      { id: 1, name: "김민지", phone: "010-1111-2222" },
-      { id: 2, name: "박지현", phone: "010-1111-3333" },
-      { id: 3, name: "정민선", phone: "010-9999-0000" },
-    ];
+    const findMember = await findReceiver(payload);
 
-    const filtered = dummyMembers.filter(
-      (m) =>
-        m.phone.includes(phone.replaceAll("-", "")) || m.phone.includes(phone)
-    );
-
-    setSearchResults(filtered);
+    setReceiver(findMember);
   }
 
   function handleSelectReceiver(member) {
     setReceiver(member);
-    searchOpen(false);
-    // 선택 후 리스트 닫고 싶으면 비워도 됨
-    // setSearchResults([]);
+    setSearchOpen(false);
   }
+
   return (
     <>
       <Box
         sx={{
           p: 3,
-          pb:  isAppLike ? "100px" : 10,
+          pb: isAppLike ? "100px" : 10,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -181,13 +189,12 @@ function GiftSubscriptionPage() {
                   gap: 10,
                   backgroundColor: "#f6f6f6ff",
                   borderRadius: "10px",
-                  // height: "100%",
                   height: "fit-content",
                   padding: "15px 25px",
                 }}
               >
                 <AccountCircleIcon />
-                {"보내는 유저 이름"}
+                {authUser?.name}
               </Box>
             </Box>
 
@@ -225,14 +232,13 @@ function GiftSubscriptionPage() {
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: 2,
-                    // height: "100%",
                     height: "fit-content",
                     padding: "15px 25px",
                   }}
                 >
-                  <Box sx={{ display: 'flex', gap: "10px"}}>
-                  <AccountCircleIcon />
-                  <Typography>{receiver.name}</Typography>
+                  <Box sx={{ display: "flex", gap: "10px" }}>
+                    <AccountCircleIcon />
+                    <Typography>{receiver.name}</Typography>
                   </Box>
                   <IconButton
                     onClick={() => {
@@ -299,6 +305,24 @@ function GiftSubscriptionPage() {
               )}
             </Box>
           </Box>
+
+          {/* ✅ 선물 메시지 입력 영역 */}
+          <Box sx={{ mt: 1, width: "100%", maxWidth: 900 }}>
+            <Typography sx={{ fontWeight: "bold", mb: 1 }}>
+              메시지 카드
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              maxRows={4}
+              placeholder="선물과 함께 보낼 메시지를 입력하세요. (최대 100자)"
+              value={giftMessage}
+              onChange={
+                (e) => setGiftMessage(e.target.value.slice(0, 100)) // 최대 100자 제한
+              }
+            />
+          </Box>
         </Box>
 
         {/* 유의사항 */}
@@ -312,7 +336,7 @@ function GiftSubscriptionPage() {
             borderRadius: 2,
             py: 2,
             px: 5,
-            textAlign: "left", // ✅ 내용은 왼쪽 정렬 유지 (가독성)
+            textAlign: "left",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -413,7 +437,13 @@ function GiftSubscriptionPage() {
             </Box>
 
             {/* 밑에 실제 결제 버튼 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end", pb: isAppLike ? 11 : 0 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                pb: isAppLike ? 11 : 0,
+              }}
+            >
               <Box
                 sx={{
                   bgcolor: "white",
