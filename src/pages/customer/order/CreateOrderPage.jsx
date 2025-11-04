@@ -18,7 +18,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AddIcon from "@mui/icons-material/Add";
 import subList from "../../../data/customer/subList";
-import subMenuListData from "../../../data/common/subMenuListData";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import {
   fetchUserSubscriptions,
@@ -77,14 +76,21 @@ function CreateOrderPage() {
     })();
   }, [subscription]);
 
-  // 구독권 바뀔 때마다 메뉴 구조 다시 넣기 (지금은 공통 더미)
+  // 구독권 바뀔 때마다 메뉴 구조 다시 넣기
   useEffect(() => {
+    console.log("구독권 선택 변경 ------------------------");
     const inv = inventoryList.find(
       (it) => Number(it.subId) === Number(selectedInventory)
     );
-    // 실제로 구독권마다 메뉴가 다르면 inv.menuList 쓰고,
-    // 아직 백에서 안 내려오면 공통 더미 사용
-    setSubMenu(inv?.menuList || subMenuListData);
+    console.log(inv);
+
+    // (async () => {
+    //   try {
+    //     const menuList = await fetchMenuListBySubId(inv.subId);
+
+    //   }
+    // })
+    setSubMenu(inv?.menu);
   }, [selectedInventory, inventoryList]);
 
   const beverageMenus = subMenu?.menusByType?.BEVERAGE || [];
@@ -108,7 +114,9 @@ function CreateOrderPage() {
       alert("해당 구독권은 남은 잔수가 없어 주문할 수 없습니다.");
       return;
     }
-    setSelectedInventory(subId);
+    setSelectedInventory(subId); // 구독권 선택
+
+    // 메뉴 업데이트
   }
 
   // 음료 행 하나 업데이트
@@ -261,7 +269,7 @@ function CreateOrderPage() {
   const payload = buildOrderPayload();
 
   return (
-    <Box sx={{ px: isAppLike ? 3 : 5, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 3 : "3rem", py: 3, pb: 10 }}>
       {/* 뒤로가기 */}
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton onClick={handleBack} sx={{ mr: 1 }}>
@@ -350,6 +358,13 @@ function CreateOrderPage() {
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
             메뉴 선택
           </Typography>
+          {/* <Box>
+            <Select>
+              {subMenu?.map((menu, idx) => {
+                <MenuItem key={idx}>{menu}</MenuItem>;
+              })}
+            </Select>
+          </Box> */}
 
           {/* 음료 여러 개 선택 */}
           {beverageMenus.length > 0 && (

@@ -134,7 +134,7 @@ function StoreDetailPage() {
             variant={isAppLike ? "h5" : "h4"}
             sx={{ fontWeight: 700 }}
           >
-            {store.storeName || "카페 이름"}
+            {store?.storeName || "카페 이름"}
           </Typography>
         </Box>
 

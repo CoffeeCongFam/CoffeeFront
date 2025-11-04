@@ -41,7 +41,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         cursor: "pointer",
         position: "relative",
       }}
-      onClick={() => navigate(`/me/store/${item.store.storeId}`)}
+      onClick={() => navigate(`/me/store/${item.store.partnerStoreId}`)}
     >
       {/* 도장 오버레이 */}
       {isUsedToday && (
