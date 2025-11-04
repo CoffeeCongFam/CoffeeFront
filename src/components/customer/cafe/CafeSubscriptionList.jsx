@@ -423,13 +423,13 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   unmountOnExit
                 >
                   <List component="div" disablePadding>
-                    {(sub.menuList || []).map((menu) => (
-                      <ListItemButton key={menu} sx={{ pl: 4 }}>
-                        <ListItemIcon sx={{ minWidth: 32 }}>
+                    {(sub.menus || []).map((menu) => (
+                      <ListItemButton key={menu.menuId} sx={{ pl: 4 }}>
+                        <ListItemIcon key={menu.menuId} sx={{ minWidth: 32 }}>
                           <CoffeeIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
-                          primary={menu}
+                          primary={menu.menuName}
                           primaryTypographyProps={{
                             fontSize: "0.8rem",
                             color: "#333",

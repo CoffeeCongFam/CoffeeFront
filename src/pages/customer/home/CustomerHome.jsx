@@ -14,6 +14,7 @@ import {
 } from "../../../apis/customerApi";
 import useUserStore from "../../../stores/useUserStore";
 import api, { TokenService } from "../../../utils/api";
+import LocalCafeImgList from "./LocalCafeImgList";
 // import api from "../../../utils/api";
 
 function CustomerHome() {
@@ -148,6 +149,7 @@ function CustomerHome() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
+        
       }}
     >
       {/* 헤더 */}
@@ -262,6 +264,8 @@ function CustomerHome() {
         <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>
+
+        <LocalCafeImgList />
 
         {locError && (
           <Typography color="error" sx={{ mb: 1 }}>
