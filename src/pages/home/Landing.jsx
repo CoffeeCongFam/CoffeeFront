@@ -6,11 +6,11 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { Element, Link, } from "react-scroll";
+import { Element, Link } from "react-scroll";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../hooks/useAppShellMode";
 
-import kakaoBtn from "../../assets/kakaoLoginIcon.png"
+import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/CoffeiensLogo.png";
 
 function Landing() {
@@ -25,6 +25,7 @@ function Landing() {
 
   // 카카오 로그인 버튼
   const kakaoLogin = () => {
+    console.log("KAKAO LOGIN-----------------------");
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = URI;
   };
@@ -182,7 +183,7 @@ function Landing() {
                 //   scroller.scrollTo("cta", { smooth: true, duration: 500 })
                 // }
               >
-                 로그인
+                로그인 →
               </Button>
             </Box>
 

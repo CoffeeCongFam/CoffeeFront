@@ -14,7 +14,8 @@ function formatPrice(n) {
   if (n === null || n === undefined) return "-";
   try {
     return n.toLocaleString("ko-KR");
-  } catch (_) {
+  } catch (e) {
+    console.log(e);
     const num = Number(n);
     return Number.isFinite(num) ? num.toLocaleString("ko-KR") : String(n);
   }
@@ -31,7 +32,8 @@ function formatPaidAt(iso) {
     const hh = String(d.getHours()).padStart(2, "0");
     const mi = String(d.getMinutes()).padStart(2, "0");
     return `${y}.${mm}.${dd}  ${hh}:${mi}`;
-  } catch (_) {
+  } catch (e) {
+    console.log(e);
     return String(iso);
   }
 }

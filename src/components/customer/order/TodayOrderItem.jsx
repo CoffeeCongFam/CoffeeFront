@@ -6,8 +6,12 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
+import { useNavigate } from "react-router-dom";
+
 
 function TodayOrderItem({ order }) {
+  const navigate = useNavigate();
+
   return (
     <div>
       <Card
@@ -19,6 +23,11 @@ function TodayOrderItem({ order }) {
           alignItems: "center", // 🔹 세로 중앙 정렬
           padding: "16px",
           borderRadius: "12px",
+          cursor: "pointer",
+          backgroundColor: order.orderStatus==="COMPLETED" ? "#e5e5e5a5" : "white"
+        }}
+        onClick={() => {
+          navigate(`/me/order/${order.orderId}`);
         }}
       >
         <div
@@ -33,8 +42,8 @@ function TodayOrderItem({ order }) {
             component="img"
             style={{ borderRadius: "8px" }}
             sx={{ width: 100, height: 70, objectFit: "cover" }}
-            image={order.store.storeImage}
-            alt={order.store.storeName}
+            image={order.storeImg}
+            alt={order.storeName}
           />
           <div
             style={{
@@ -43,7 +52,9 @@ function TodayOrderItem({ order }) {
               justifyContent: "center",
             }}
           >
-            <Typography variant="subtitle1" fontWeight="bold">{order.store.storeName}</Typography>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {order.storeName}
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               {order.orderMenu[0].menuName} × {order.orderMenu[0].quantity}
             </Typography>

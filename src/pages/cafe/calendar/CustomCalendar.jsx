@@ -1,23 +1,23 @@
 // https://zindex.tistory.com/313 블로그 참조
 
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState } from "react";
 
-import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import ko from 'date-fns/locale/ko';
-import { getMonth, getYear, getDate } from 'date-fns'; // date-fns 모듈 사용은 유지
-import dayjs from 'dayjs'; // dayjs 모듈 사용은 유지
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ko from "date-fns/locale/ko";
+import { getMonth, getYear } from "date-fns"; // date-fns 모듈 사용은 유지
+// import dayjs from "dayjs"; // dayjs 모듈 사용은 유지
 
 // MUI 아이콘
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 // CSS 파일 경로 가정
-import './calendarCustomThree.scss';
+import "./calendarCustomThree.scss";
 
 // 날짜 한국어로 표시 등록 (date-fns 사용)
-registerLocale('ko', ko);
+registerLocale("ko", ko);
 
 // CustomInput 컴포넌트 (Ref 전달을 위해 forwardRef 사용)
 const CustomInput = forwardRef((props, ref) => {
@@ -31,7 +31,7 @@ const CustomInput = forwardRef((props, ref) => {
 });
 
 // displayName 설정 (선택 사항)
-CustomInput.displayName = 'CustomInput';
+CustomInput.displayName = "CustomInput";
 
 export default function CalendarCustomThree() {
   // ⭐️ useState 타입 제거 및 초기화 수정 (순수 JS 문법)
@@ -50,22 +50,22 @@ export default function CalendarCustomThree() {
 
   // 월 선택 select box에 보여질 데이터 (문자열로 유지)
   const months = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10',
-    '11',
-    '12',
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
   ];
 
   // 선택된 날짜 포맷팅
-  const date = startDate ? dayjs(startDate).format('YYYY-MM-DD') : '';
+  // const date = startDate ? dayjs(startDate).format("YYYY-MM-DD") : "";
 
   // 캘린더의 최소/최대 날짜 설정
   // minDate: years 배열의 첫 번째 해 (10년 전)의 1월 1일로 설정
@@ -91,9 +91,9 @@ export default function CalendarCustomThree() {
           <div
             style={{
               margin: 10,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
             {/* 이전 달 버튼 */}
@@ -148,7 +148,7 @@ export default function CalendarCustomThree() {
         )}
         selected={startDate}
         onChange={(date) => setStartDate(date)}
-        dayClassName={(d) => 'custom-day'}
+        // dayClassName={(d) => "custom-day"}
         dateFormat="yyyy.MM.dd"
         disabledKeyboardNavigation
         locale="ko" // 한국어로 설정

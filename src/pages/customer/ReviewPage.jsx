@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -185,7 +185,7 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
   const createdVal = createdAt ?? created_at;
 
   // 이니셜 아바타 (매장명 첫 글자)
-  const initial = useMemo(() => (storeId ? String(storeId).charAt(0) : "R"), [storeId]);
+  // const initial = useMemo(() => (storeId ? String(storeId).charAt(0) : "R"), [storeId]);
 
   return (
     <Card variant="outlined">

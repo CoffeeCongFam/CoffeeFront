@@ -2,6 +2,7 @@ const subMenuListData = {
   subId: 1,
   subscriptionName: "스탠다드 구독권",
   // 오늘 남은 주문 가능 횟수
+
   orderRule: {
     requiredTypes: ["BEVERAGE"],
     optionalTypes: ["DESSERT"],
