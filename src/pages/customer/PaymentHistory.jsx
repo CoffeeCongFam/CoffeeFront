@@ -80,7 +80,10 @@ export default function PaymentHistory({ paymentList }) {
         purchaseType: v.purchaseType ?? "결제",
         sender: v.sender,
         receiver: v.receiver,
-        isGift: v.isGift, // 'Y' | 'N'
+        isGift:
+          v.isGift !== undefined && v.isGift !== null
+            ? String(v.isGift).toUpperCase()
+            : "N", // 'Y' | 'N'
         refundReasons: v.refundReasons ?? null, // null | string[]
         paymentStatus: v.paymentStatus,
         memberSubscriptionId: v.memberSubscriptionId,
@@ -271,11 +274,13 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     sender,
     receiver,
     refundReasons,
-    // isGift,
+    isGift,
     refunded,
     paymentStatus,
     refundedAt,
   } = item || {};
+
+  const isGiftPayment = (isGift || "").toString().toUpperCase() === "Y";
 
   const isRefundedDisplay = refunded === true || paymentStatus === "REFUNDED";
   const dateLabel = isRefundedDisplay && refundedAt ? "환불시각" : "결제일시";
@@ -368,12 +373,7 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
               <Typography variant="body2">
                 결제 금액: <b>{fmtPrice(price)}</b>원
               </Typography>
-              {sender && (
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  보낸 사람: {sender}
-                </Typography>
-              )}
-              {receiver && (
+              {isGiftPayment && receiver && (
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   받는 사람: {receiver}
                 </Typography>

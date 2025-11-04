@@ -1,4 +1,5 @@
 // src/api/subscription.js
+import axios from "axios";
 import api from "./api";
 export async function getSubscription() {
   try {

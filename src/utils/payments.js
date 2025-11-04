@@ -1,5 +1,4 @@
 import api from "./api";
-
 export async function getPaymentsHistory(){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
   try {
     console.log();
@@ -11,7 +10,7 @@ export async function getPaymentsHistory(){ // 함수 이름에 오타가 있어
   }
 }
 
-export async function postRefund(purchaseId){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
+export async function postRefund(purchaseId){ 
   try {
     const response = await api.patch(`/me/purchase/refund/${purchaseId}`);
     console.log(response.data)
@@ -22,7 +21,7 @@ export async function postRefund(purchaseId){ // 함수 이름에 오타가 있�
   }
 }
 
-export async function getPayments(){ // 함수 이름에 오타가 있어 getReceiveGiftData로 수정하는 것을 권장합니다.
+export async function getPayments(){ 
   try {
     const response = await api.get(`/me/purchase`);
         console.log(response.data.data);
@@ -32,3 +31,5 @@ export async function getPayments(){ // 함수 이름에 오타가 있어 getRec
     return null;
   }
 }
+
+
