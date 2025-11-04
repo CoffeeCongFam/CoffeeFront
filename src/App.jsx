@@ -10,6 +10,8 @@ function App() {
     console.log("APP ---------------------------");
 
     console.log("APP AUTHUSER-----------------------", authUser);
+
+    // if(authUser)
   }, []);
   return (
     <div>

@@ -258,7 +258,7 @@ function CustomerHome() {
       )}
 
       {/* 내 근처 카페 */}
-      <Box>
+      <Box style={{ px: "1rem" }}>
         <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>

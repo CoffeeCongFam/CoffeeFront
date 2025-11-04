@@ -9,7 +9,8 @@ function LocalCafeCard({ store }) {
   return (
     <Card
       sx={{
-        width: 230,
+        width: "100%",
+        // width: 230,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",

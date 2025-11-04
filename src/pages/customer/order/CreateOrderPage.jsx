@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   MenuItem,
   Select,
@@ -37,10 +37,12 @@ function CreateOrderPage() {
 
   const navigate = useNavigate();
 
+  const [selectedMenu, setSelectedMenu] = useState(null);
+
   const [inventoryList, setInventoryList] = useState([]); // 보유 구독권 목록
-  const [selectedInventory, setSelectedInventory] = useState(null); // 사용할 구독권
+  const [selectedInventory, setSelectedInventory] = useState(null); // 사용할 구독권(객체)
   const [orderType, setOrderType] = useState("IN"); // 매장 || 포장
-  const [subMenu, setSubMenu] = useState(null); // 구독권별 메뉴
+  const [subMenu, setSubMenu] = useState(null); // 구독권별 메뉴(객체: { menusByType, orderRule })
 
   const [isLoading, setIsLoading] = useState(false); // 주문하기 처리 로딩
 
@@ -53,56 +55,84 @@ function CreateOrderPage() {
   const [selectedDessert, setSelectedDessert] = useState("");
   const [dessertQty, setDessertQty] = useState(1);
 
+  function handleSelectedMenu(menuId) {
+    console.log(menuId);
+    setSelectedMenu(menuId);
+  }
+
+  // 1. 구독권 목록 조회 + 기본 선택
   useEffect(() => {
     (async () => {
       try {
         const res = await fetchUserSubscriptions();
-        setInventoryList(res);
+        setInventoryList(res || []);
 
-        // if (subscription?.subId) {
-        //   setSelectedInventory(Number(subscription.subId));
-        // } else if (list.length > 0) {
-        //   setSelectedInventory(Number(list[0].subId));
-        // }
+        // 기본 선택 로직
+        let defaultInventory = null;
+        if (subscription?.memberSubscriptionId) {
+          defaultInventory = res.find(
+            (it) =>
+              Number(it.memberSubscriptionId) ===
+              Number(subscription.memberSubscriptionId)
+          );
+        } else if (res.length > 0) {
+          defaultInventory = res[0];
+        }
+
+        if (defaultInventory) {
+          setSelectedInventory(defaultInventory);
+          setSubMenu(defaultInventory.menu || null);
+        }
       } catch (err) {
         console.error("구독권 목록 조회 실패: ", err);
+
+        // 실패 시 더미 데이터 사용
         setInventoryList(subList);
-        if (subscription?.subId) {
-          setSelectedInventory(Number(subscription.subId));
+
+        let defaultInventory = null;
+
+        if (subscription?.memberSubscriptionId) {
+          defaultInventory = subList.find(
+            (it) =>
+              Number(it.memberSubscriptionId) ===
+              Number(subscription.memberSubscriptionId)
+          );
         } else if (subList.length > 0) {
-          setSelectedInventory(Number(subList[0].subId));
+          defaultInventory = subList[0];
+        }
+
+        if (defaultInventory) {
+          setSelectedInventory(defaultInventory);
+          setSubMenu(defaultInventory.menu || null);
         }
       }
     })();
   }, [subscription]);
 
-  // 구독권 바뀔 때마다 메뉴 구조 다시 넣기
+  // 2. 구독권 바뀔 때마다 메뉴 구조/선택 초기화
   useEffect(() => {
     console.log("구독권 선택 변경 ------------------------");
-    const inv = inventoryList.find(
-      (it) => Number(it.subId) === Number(selectedInventory)
-    );
-    console.log(inv);
+    console.log("구독권>>>>>>>>>>>>>>>>..", selectedInventory);
 
-    // (async () => {
-    //   try {
-    //     const menuList = await fetchMenuListBySubId(inv.subId);
+    setSubMenu(selectedInventory?.menu || null);
 
-    //   }
-    // })
-    setSubMenu(inv?.menu);
-  }, [selectedInventory, inventoryList]);
+    // 구독권이 바뀌면 메뉴 선택 상태 초기화
+    setBeverageOrders([{ menuId: "", qty: 1 }]);
+    setSelectedDessert("");
+    setDessertQty(1);
+  }, [selectedInventory]);
 
   const beverageMenus = subMenu?.menusByType?.BEVERAGE || [];
   const dessertMenus = subMenu?.menusByType?.DESSERT || [];
   const requiredTypes = subMenu?.orderRule?.requiredTypes || [];
 
   // 구독권 선택
-  function handleSelectInventory(subId) {
-    const realId = Number(subId);
+  function handleSelectInventory(memberSubscriptionId) {
+    console.log("선택된 구독권 ---------------->> ", memberSubscriptionId);
+    const realId = Number(memberSubscriptionId);
 
     const targetInventory = inventoryList.find(
-      (it) => Number(it.subId) === realId
+      (it) => Number(it.memberSubscriptionId) === realId
     );
 
     if (!targetInventory) {
@@ -114,9 +144,9 @@ function CreateOrderPage() {
       alert("해당 구독권은 남은 잔수가 없어 주문할 수 없습니다.");
       return;
     }
-    setSelectedInventory(subId); // 구독권 선택
-
-    // 메뉴 업데이트
+    setSelectedInventory(targetInventory); // 구독권 객체 선택
+    setSubMenu(targetInventory.menu || null);
+    console.log("선택한 구독권의 메뉴>>", targetInventory.menu);
   }
 
   // 음료 행 하나 업데이트
@@ -138,10 +168,15 @@ function CreateOrderPage() {
 
   // 음료 행 삭제
   function handleRemoveBeverage(index) {
+    // 마지막 남은 한 개는 지우지 않고 menuId만 초기화 (빈값)
+    if (beverageOrders.length === 1) {
+      setBeverageOrders([{ menuId: "", qty: 1 }]);
+      return;
+    }
     setBeverageOrders((prev) => prev.filter((_, i) => i !== index));
   }
 
-  // 최종 주문
+  // 주문 미리보기용 payload
   function buildOrderPayload() {
     const items = [];
 
@@ -153,7 +188,7 @@ function CreateOrderPage() {
 
         items.push({
           menuId: bo.menuId,
-          menuName: menuInfo ? menuInfo.name : "", // ← 여기!
+          menuName: menuInfo ? menuInfo.menuName || menuInfo.name || "" : "",
           qty: bo.qty,
         });
       }
@@ -167,13 +202,15 @@ function CreateOrderPage() {
 
       items.push({
         menuId: selectedDessert,
-        menuName: dessertInfo ? dessertInfo.name : "",
+        menuName: dessertInfo
+          ? dessertInfo.menuName || dessertInfo.name || ""
+          : "",
         qty: dessertQty,
       });
     }
 
     return {
-      subId: selectedInventory,
+      memberSubscriptionId: selectedInventory?.memberSubscriptionId ?? null,
       orderType,
       items,
     };
@@ -187,10 +224,7 @@ function CreateOrderPage() {
       return;
     }
 
-    // 선택된 구독권 객체 찾기
-    const selectedSub = inventoryList.find(
-      (item) => item.subId === selectedInventory
-    );
+    const selectedSub = selectedInventory; // 이미 객체 상태
 
     if (!selectedSub) {
       alert("주문할 구독권을 찾을 수 없어요.");
@@ -202,7 +236,7 @@ function CreateOrderPage() {
       selectedSub.store?.partnerStoreId ||
       selectedSub.store?.storeId ||
       selectedSub.storeId;
-    const memberSubscriptionId = selectedSub.subId;
+    const memberSubscriptionId = selectedSub.memberSubscriptionId;
 
     // 메뉴 배열 만들기
     const menu = [];
@@ -226,25 +260,52 @@ function CreateOrderPage() {
     }
 
     // 메뉴 선택하지 않았다면 주문 막기
-    if (menu.length === 0) {
-      alert("주문할 메뉴를 선택해 주세요.");
-      return;
-    }
+    // if (menu.length === 0) {
+    //   alert("주문할 메뉴를 선택해 주세요.");
+    //   return;
+    // }
+
+    // 필수 메뉴 타입 체크
+    // const hasBeverage = menu.some((item) =>
+    //   beverageMenus.some((b) => b.menuId === item.menuId)
+    // );
+    // const hasDessert = menu.some((item) =>
+    //   dessertMenus.some((d) => d.menuId === item.menuId)
+    // );
+
+    // if (requiredTypes.includes("BEVERAGE") && !hasBeverage) {
+    //   alert("음료는 필수 선택 항목입니다.");
+    //   return;
+    // }
+
+    // if (requiredTypes.includes("DESSERT") && !hasDessert) {
+    //   alert("디저트는 필수 선택 항목입니다.");
+    //   return;
+    // }
 
     // 최종 payload
+    // const orderPayload = {
+    //   memberId: authUser?.memberId,
+    //   storeId,
+    //   memberSubscriptionId,
+    //   orderType: orderType,
+    //   menu,
+    // };
+
+    console.log(selectedMenu);
     const orderPayload = {
       memberId: authUser?.memberId,
       storeId,
       memberSubscriptionId,
       orderType: orderType,
-      menu,
+      menu: [{ menuId: selectedMenu.menuId, count: 1 }],
     };
 
     try {
       setIsLoading(true);
       console.log("주문 요청>> ", orderPayload);
 
-      const res = requestNewOrder(orderPayload);
+      const res = await requestNewOrder(orderPayload);
       const orderId = res.orderId;
       setIsLoading(false);
 
@@ -252,11 +313,12 @@ function CreateOrderPage() {
         // 주문 상세 페이지로 이동
         navigate(`/me/order/${orderId}`);
       } else {
-        // orderId
+        // orderId가 없으면 이전 페이지로
         navigate(-1);
       }
     } catch (err) {
       console.error("주문 요청 실패: ", err);
+      setIsLoading(false);
       alert("주문에 실패했어요. 다시 시도해 주세요.");
     }
   }
@@ -285,12 +347,13 @@ function CreateOrderPage() {
       </Box>
 
       <Box
-        style={{
+        sx={{
+          px: isAppLike ? 0 : 20,
+          mt: isAppLike ? 0 : 7,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-btween",
+          justifyContent: "space-between",
         }}
-        sx={{ px: isAppLike ? 0 : 20, mt: isAppLike ? 0 : 7 }}
       >
         <Box>
           {/* 1. 구독권(매장) 선택 */}
@@ -300,28 +363,29 @@ function CreateOrderPage() {
 
           <Select
             id="order-target-store"
-            value={selectedInventory}
+            value={selectedInventory?.memberSubscriptionId || ""}
             onChange={(e) => handleSelectInventory(Number(e.target.value))}
             fullWidth
           >
             {inventoryList.map((inventory) => (
-              <MenuItem key={inventory.subId} value={inventory.subId}>
+              <MenuItem
+                key={inventory.memberSubscriptionId}
+                value={inventory.memberSubscriptionId}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Avatar
-                    src={inventory.store.storeImg}
-                    alt={inventory.store.storeName}
+                    src={inventory.store?.storeImg}
+                    alt={inventory.store?.storeName}
                   />
                   <Box>
                     <Typography variant="body2">
-                      {inventory.store.storeName}
+                      {inventory.store?.storeName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {inventory.subName}
-                      {/* 남은 잔수도 같이 보여주고 싶으면 */}
                       {typeof inventory.remainingCount === "number"
                         ? ` · 남은잔 ${inventory.remainingCount}잔`
                         : null}
-                      {/* 미사용 상태면 */}
                       {inventory.isExpired === "NOT_ACTIVATED"
                         ? " · 미사용"
                         : ""}
@@ -354,29 +418,29 @@ function CreateOrderPage() {
             </Box>
           </Box>
 
-          {/* 3. 메뉴 선택 */}
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-            메뉴 선택
-          </Typography>
-          {/* <Box>
-            <Select>
-              {subMenu?.map((menu, idx) => {
-                <MenuItem key={idx}>{menu}</MenuItem>;
-              })}
-            </Select>
-          </Box> */}
-
-          {/* 음료 여러 개 선택 */}
+          {/* 3. 음료 여러 개 선택 */}
           {beverageMenus.length > 0 && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" sx={{ mb: 1, display: "block" }}>
-                음료 선택 {requiredTypes.includes("BEVERAGE") ? "(필수)" : ""}
+            <Box sx={{ mb: 2, mt: 3 }}>
+              <Typography
+                variant="caption"
+                sx={{ mb: 1, display: "block" }}
+                fontWeight={
+                  requiredTypes.includes("BEVERAGE") ? "bold" : "normal"
+                }
+              >
+                음료 선택{" "}
+                {requiredTypes.includes("BEVERAGE") ? "(필수)" : "(선택)"}
               </Typography>
 
               {beverageOrders.map((bo, index) => (
                 <Box
                   key={index}
-                  sx={{ display: "flex", gap: 1, mb: 1, alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    mb: 1,
+                    alignItems: "center",
+                  }}
                 >
                   {/* 음료 선택 */}
                   <Select
@@ -386,10 +450,17 @@ function CreateOrderPage() {
                     }
                     fullWidth
                   >
+                    <MenuItem value="" disabled>
+                      음료를 선택하세요
+                    </MenuItem>
                     {beverageMenus.map((menu) => (
                       <MenuItem key={menu.menuId} value={menu.menuId}>
                         <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
                         >
                           <Avatar src={menu.menuImage} alt={menu.name} />
                           {menu.name} ({menu.price.toLocaleString()}원)
@@ -405,17 +476,20 @@ function CreateOrderPage() {
                       handleChangeBeverage(index, "qty", Number(e.target.value))
                     }
                     sx={{ width: 80 }}
+                    disabled={!bo.menuId}
                   >
                     <MenuItem value={1}>1</MenuItem>
                     <MenuItem value={2}>2</MenuItem>
                     <MenuItem value={3}>3</MenuItem>
                   </Select>
 
-                  {/* 삭제 버튼 (첫 행은 안 지워도 되게 조건 걸어도 됨) */}
-                  {beverageOrders.length > 1 && (
+                  {/* 삭제 버튼 (첫 행은 안 지우고 메뉴를 초기화) */}
+                  {index > 0 || beverageOrders.length > 1 ? (
                     <IconButton onClick={() => handleRemoveBeverage(index)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
+                  ) : (
+                    <Box sx={{ width: 40 }} />
                   )}
                 </Box>
               ))}
@@ -426,6 +500,7 @@ function CreateOrderPage() {
                 size="small"
                 startIcon={<AddIcon />}
                 onClick={handleAddBeverage}
+                sx={{ mt: 1 }}
               >
                 음료 추가
               </Button>
@@ -435,12 +510,21 @@ function CreateOrderPage() {
           {/* 디저트 선택 (단일) */}
           {dessertMenus.length > 0 && (
             <Box
-              sx={{ mb: 2, display: "flex", gap: 1, alignItems: "flex-end" }}
+              sx={{
+                mb: 2,
+                display: "flex",
+                gap: 1,
+                alignItems: "flex-end",
+                mt: 3,
+              }}
             >
               <Box sx={{ flex: 3 }}>
                 <Typography
                   variant="caption"
                   sx={{ mb: 0.5, display: "block" }}
+                  fontWeight={
+                    requiredTypes.includes("DESSERT") ? "bold" : "normal"
+                  }
                 >
                   디저트 선택{" "}
                   {requiredTypes.includes("DESSERT") ? "(필수)" : "(선택)"}
@@ -459,7 +543,11 @@ function CreateOrderPage() {
                   {dessertMenus.map((menu) => (
                     <MenuItem key={menu.menuId} value={menu.menuId}>
                       <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
                       >
                         <Avatar src={menu.menuImage} alt={menu.name} />
                         {menu.name} ({menu.price.toLocaleString()}원)
@@ -482,6 +570,7 @@ function CreateOrderPage() {
                       alignItems: "center",
                     },
                   }}
+                  disabled={!selectedDessert}
                 >
                   <MenuItem value={1}>1</MenuItem>
                   <MenuItem value={2}>2</MenuItem>
@@ -490,6 +579,15 @@ function CreateOrderPage() {
             </Box>
           )}
         </Box>
+        메뉴 선택
+        <Select
+          value={selectedMenu}
+          onChange={(e) => handleSelectedMenu(e.target.value)}
+        >
+          {subMenu?.map((menu) => (
+            <MenuItem value={menu}>{menu.menuName}</MenuItem>
+          ))}
+        </Select>
         {/* 주문 내역 미리보기 */}
         <Box
           sx={{
@@ -534,15 +632,14 @@ function CreateOrderPage() {
             ))
           )}
         </Box>
-
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            sx={{ backgroundColor: "black", color: "white", width: 100 }}
-            onClick={requestOrder}
-          >
-            주문하기
-          </Button>
-        </Box>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}></Box>
+        <Button
+          sx={{ backgroundColor: "black", color: "white", width: 100 }}
+          onClick={requestOrder}
+          // disabled={isLoading || payload.items.length === 0}
+        >
+          주문하기
+        </Button>
       </Box>
 
       <Backdrop
