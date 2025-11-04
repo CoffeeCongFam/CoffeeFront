@@ -1,21 +1,10 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { atom, useSetRecoilState } from 'recoil';
-
-// R_1. Recoil 전역상태 생성
-export const memberState = atom({
-    key: 'memberState',
-    default: null
-})
 
 // 컴포넌트 이름을 역할에 맞게 변경하는 것을 권장합니다. (예: KakaoRedirect)
 function KakaoRedirect() { 
     const navigate = useNavigate();
-    // R_2. 전역상태 set함수 선언
-    const setMember = useSetRecoilState(memberState);
-    // R-check 잘 저장되었는지 확인용
-    const member = useRecoilValue(memberState);
     // 2. 인가 코드를 백엔드 서버로 전송하는 비동기 함수 정의
     const kakaoLoginHandler = async (code, role) => {
         try {
@@ -30,13 +19,15 @@ function KakaoRedirect() {
                 throw new Error(`Unexpected status: ${res.status}`);
             }
 
-            // R_3. response의 member 데이터를 전역상태에 저장
-            const member = res.data.data;
-            setMember(member);
-            // R-check console 확인
-              useEffect(() => {
-                console.log('현재 저장된 member 상태:', member);
-            }, [member]); // 상태가 바뀔 때마다 콘솔에 출력
+
+            if (res.status !== 200) {
+                throw new Error(`Unexpected status: ${res.status}`);
+            }
+
+            if (res.status !== 200) {
+                throw new Error(`Unexpected status: ${res.status}`);
+            }
+
             // 3. 성공 응답 처리
             const ACCESS_TOKEN = res.data.accessToken;
             
@@ -53,7 +44,7 @@ function KakaoRedirect() {
                 navigate('/main');
             }
             // 4. 메인 페이지로 이동
-            // navigate('/main');
+            navigate('/main');
             
         } catch (err) {
             // 5. 에러 처리
