@@ -19,7 +19,6 @@ import axios from 'axios';
 // 실제 애플리케이션에서는 로그인 정보에서 가져와야 함
 // ==========================================================
 const PARTNER_STORE_ID = 1; // 예시로 사용할 점주 매장 ID
-const API_BASE_URL = '/api/stores/orders/past'; // 기본 API 경로
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
@@ -79,245 +78,245 @@ const getKstBusinessDateStringFromUtc = (utcDateString) => {
   return `${year}-${month}-${day}`;
 };
 
-export const DUMMY_PAST_ORDERS_RESPONSE = {
-  success: true,
-  data: [
-    // ==========================================================
-    // 1. 오늘 주문 (2025-11-02 KST) - 3개
-    // ==========================================================
-    {
-      orderId: 101,
-      orderNumber: 7123,
-      // KST 15:30:00 -> UTC 06:30:00Z
-      createdAt: '2025-11-02T06:30:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 1,
-      subscriptionName: '카페 모니카 BASIC 구독권',
-      orderType: 'IN', // 매장 이용
-      tel: '010-1111-2222',
-      name: '홍길동',
-      menuList: [{ menuId: 1, quantity: 2, menuName: '아메리카노' }],
-    },
-    {
-      orderId: 102,
-      orderNumber: 7124,
-      // KST 12:05:00 -> UTC 03:05:00Z
-      createdAt: '2025-11-02T03:05:00.000Z',
-      orderStatus: 'CANCELED',
-      memberSubscriptionId: 2,
-      subscriptionName: '카페 모니카 PREMIUM 구독권',
-      orderType: 'OUT', // 테이크아웃
-      tel: '010-5555-4444',
-      name: '김철수',
-      menuList: [
-        { menuId: 21, quantity: 1, menuName: '카페라떼' },
-        { menuId: 32, quantity: 1, menuName: '브라우니' },
-      ],
-    },
-    {
-      orderId: 103,
-      orderNumber: 7125,
-      // KST 09:15:00 -> UTC 00:15:00Z
-      createdAt: '2025-11-02T00:15:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 3,
-      subscriptionName: '카페 모니카 DESSERT 구독권',
-      orderType: 'IN',
-      tel: '010-8888-7777',
-      name: '박영희',
-      menuList: [{ menuId: 10, quantity: 3, menuName: '에스프레소' }],
-    },
+// export const DUMMY_PAST_ORDERS_RESPONSE = {
+//   success: true,
+//   data: [
+//     // ==========================================================
+//     // 1. 오늘 주문 (2025-11-02 KST) - 3개
+//     // ==========================================================
+//     {
+//       orderId: 101,
+//       orderNumber: 7123,
+//       // KST 15:30:00 -> UTC 06:30:00Z
+//       createdAt: '2025-11-02T06:30:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 1,
+//       subscriptionName: '카페 모니카 BASIC 구독권',
+//       orderType: 'IN', // 매장 이용
+//       tel: '010-1111-2222',
+//       name: '홍길동',
+//       menuList: [{ menuId: 1, quantity: 2, menuName: '아메리카노' }],
+//     },
+//     {
+//       orderId: 102,
+//       orderNumber: 7124,
+//       // KST 12:05:00 -> UTC 03:05:00Z
+//       createdAt: '2025-11-02T03:05:00.000Z',
+//       orderStatus: 'CANCELED',
+//       memberSubscriptionId: 2,
+//       subscriptionName: '카페 모니카 PREMIUM 구독권',
+//       orderType: 'OUT', // 테이크아웃
+//       tel: '010-5555-4444',
+//       name: '김철수',
+//       menuList: [
+//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
+//         { menuId: 32, quantity: 1, menuName: '브라우니' },
+//       ],
+//     },
+//     {
+//       orderId: 103,
+//       orderNumber: 7125,
+//       // KST 09:15:00 -> UTC 00:15:00Z
+//       createdAt: '2025-11-02T00:15:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 3,
+//       subscriptionName: '카페 모니카 DESSERT 구독권',
+//       orderType: 'IN',
+//       tel: '010-8888-7777',
+//       name: '박영희',
+//       menuList: [{ menuId: 10, quantity: 3, menuName: '에스프레소' }],
+//     },
 
-    // ==========================================================
-    // 2. 어제 주문 (2025-11-01 KST) - 3개
-    // ==========================================================
-    {
-      orderId: 201,
-      orderNumber: 6511,
-      // KST 17:55:00 -> UTC 08:55:00Z
-      createdAt: '2025-11-01T08:55:00.000Z',
-      orderStatus: 'REJECTED',
-      memberSubscriptionId: 1,
-      subscriptionName: '카페 모니카 BASIC 구독권',
-      orderType: 'OUT',
-      tel: '010-9999-1111',
-      name: '최민수',
-      menuList: [{ menuId: 5, quantity: 1, menuName: '샌드위치' }],
-      rejectedReason: '매장 마감 임박으로 주문 거부',
-    },
-    {
-      orderId: 202,
-      orderNumber: 6512,
-      // KST 14:30:00 -> UTC 05:30:00Z
-      createdAt: '2025-11-01T05:30:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 2,
-      subscriptionName: '카페 모니카 PREMIUM 구독권',
-      orderType: 'IN',
-      tel: '010-2222-3333',
-      name: '이수진',
-      menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
-    },
-    {
-      orderId: 203,
-      orderNumber: 6513,
-      // KST 11:20:00 -> UTC 02:20:00Z
-      createdAt: '2025-11-01T02:20:00.000Z',
-      orderStatus: 'CANCELED',
-      memberSubscriptionId: 3,
-      subscriptionName: '카페 모니카 DESSERT 구독권',
-      orderType: 'OUT',
-      tel: '010-1111-2222',
-      name: '홍길동',
-      menuList: [
-        { menuId: 32, quantity: 1, menuName: '브라우니' },
-        { menuId: 12, quantity: 1, menuName: '마카롱' },
-      ],
-    },
+//     // ==========================================================
+//     // 2. 어제 주문 (2025-11-01 KST) - 3개
+//     // ==========================================================
+//     {
+//       orderId: 201,
+//       orderNumber: 6511,
+//       // KST 17:55:00 -> UTC 08:55:00Z
+//       createdAt: '2025-11-01T08:55:00.000Z',
+//       orderStatus: 'REJECTED',
+//       memberSubscriptionId: 1,
+//       subscriptionName: '카페 모니카 BASIC 구독권',
+//       orderType: 'OUT',
+//       tel: '010-9999-1111',
+//       name: '최민수',
+//       menuList: [{ menuId: 5, quantity: 1, menuName: '샌드위치' }],
+//       rejectedReason: '매장 마감 임박으로 주문 거부',
+//     },
+//     {
+//       orderId: 202,
+//       orderNumber: 6512,
+//       // KST 14:30:00 -> UTC 05:30:00Z
+//       createdAt: '2025-11-01T05:30:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 2,
+//       subscriptionName: '카페 모니카 PREMIUM 구독권',
+//       orderType: 'IN',
+//       tel: '010-2222-3333',
+//       name: '이수진',
+//       menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
+//     },
+//     {
+//       orderId: 203,
+//       orderNumber: 6513,
+//       // KST 11:20:00 -> UTC 02:20:00Z
+//       createdAt: '2025-11-01T02:20:00.000Z',
+//       orderStatus: 'CANCELED',
+//       memberSubscriptionId: 3,
+//       subscriptionName: '카페 모니카 DESSERT 구독권',
+//       orderType: 'OUT',
+//       tel: '010-1111-2222',
+//       name: '홍길동',
+//       menuList: [
+//         { menuId: 32, quantity: 1, menuName: '브라우니' },
+//         { menuId: 12, quantity: 1, menuName: '마카롱' },
+//       ],
+//     },
 
-    // ==========================================================
-    // 3. 그제 주문 (2025-10-31 KST) - 3개
-    // ==========================================================
-    {
-      orderId: 301,
-      orderNumber: 5888,
-      // KST 16:00:00 -> UTC 07:00:00Z
-      createdAt: '2025-10-31T07:00:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 2,
-      subscriptionName: '카페 모니카 PREMIUM 구독권',
-      orderType: 'IN',
-      tel: '010-5555-4444',
-      name: '김철수',
-      menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
-    },
-    {
-      orderId: 302,
-      orderNumber: 5889,
-      // KST 13:30:00 -> UTC 04:30:00Z
-      createdAt: '2025-10-31T04:30:00.000Z',
-      orderStatus: 'REJECTED',
-      memberSubscriptionId: 3,
-      subscriptionName: '카페 모니카 DESSERT 구독권',
-      orderType: 'OUT',
-      tel: '010-8888-7777',
-      name: '박영희',
-      menuList: [{ menuId: 12, quantity: 1, menuName: '마카롱' }],
-      rejectedReason: '재료 소진으로 주문 거부',
-    },
-    {
-      orderId: 303,
-      orderNumber: 5890,
-      // KST 10:00:00 -> UTC 01:00:00Z
-      createdAt: '2025-10-31T01:00:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 1,
-      subscriptionName: '카페 모니카 BASIC 구독권',
-      orderType: 'IN',
-      tel: '010-9999-1111',
-      name: '최민수',
-      menuList: [
-        { menuId: 21, quantity: 1, menuName: '카페라떼' },
-        { menuId: 32, quantity: 1, menuName: '브라우니' },
-      ],
-    },
+//     // ==========================================================
+//     // 3. 그제 주문 (2025-10-31 KST) - 3개
+//     // ==========================================================
+//     {
+//       orderId: 301,
+//       orderNumber: 5888,
+//       // KST 16:00:00 -> UTC 07:00:00Z
+//       createdAt: '2025-10-31T07:00:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 2,
+//       subscriptionName: '카페 모니카 PREMIUM 구독권',
+//       orderType: 'IN',
+//       tel: '010-5555-4444',
+//       name: '김철수',
+//       menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
+//     },
+//     {
+//       orderId: 302,
+//       orderNumber: 5889,
+//       // KST 13:30:00 -> UTC 04:30:00Z
+//       createdAt: '2025-10-31T04:30:00.000Z',
+//       orderStatus: 'REJECTED',
+//       memberSubscriptionId: 3,
+//       subscriptionName: '카페 모니카 DESSERT 구독권',
+//       orderType: 'OUT',
+//       tel: '010-8888-7777',
+//       name: '박영희',
+//       menuList: [{ menuId: 12, quantity: 1, menuName: '마카롱' }],
+//       rejectedReason: '재료 소진으로 주문 거부',
+//     },
+//     {
+//       orderId: 303,
+//       orderNumber: 5890,
+//       // KST 10:00:00 -> UTC 01:00:00Z
+//       createdAt: '2025-10-31T01:00:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 1,
+//       subscriptionName: '카페 모니카 BASIC 구독권',
+//       orderType: 'IN',
+//       tel: '010-9999-1111',
+//       name: '최민수',
+//       menuList: [
+//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
+//         { menuId: 32, quantity: 1, menuName: '브라우니' },
+//       ],
+//     },
 
-    // ==========================================================
-    // 4. 한 달 전 주문 (2025-10-02 KST) - 3개
-    // ==========================================================
-    {
-      orderId: 401,
-      orderNumber: 4321,
-      // KST 18:00:00 -> UTC 09:00:00Z
-      createdAt: '2025-10-02T09:00:00.000Z',
-      orderStatus: 'CANCELED',
-      memberSubscriptionId: 3,
-      subscriptionName: '카페 모니카 DESSERT 구독권',
-      orderType: 'OUT',
-      tel: '010-2222-3333',
-      name: '이수진',
-      menuList: [{ menuId: 10, quantity: 1, menuName: '에스프레소' }],
-    },
-    {
-      orderId: 402,
-      orderNumber: 4322,
-      // KST 14:30:00 -> UTC 05:30:00Z
-      createdAt: '2025-10-02T05:30:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 1,
-      subscriptionName: '카페 모니카 BASIC 구독권',
-      orderType: 'IN',
-      tel: '010-1111-2222',
-      name: '홍길동',
-      menuList: [
-        { menuId: 1, quantity: 1, menuName: '아메리카노' },
-        { menuId: 5, quantity: 1, menuName: '샌드위치' },
-      ],
-    },
-    {
-      orderId: 403,
-      orderNumber: 4323,
-      // KST 08:45:00 -> UTC 23:45:00Z (전날 UTC)
-      createdAt: '2025-10-01T23:45:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 2,
-      subscriptionName: '카페 모니카 PREMIUM 구독권',
-      orderType: 'OUT',
-      tel: '010-5555-4444',
-      name: '김철수',
-      menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
-    },
+//     // ==========================================================
+//     // 4. 한 달 전 주문 (2025-10-02 KST) - 3개
+//     // ==========================================================
+//     {
+//       orderId: 401,
+//       orderNumber: 4321,
+//       // KST 18:00:00 -> UTC 09:00:00Z
+//       createdAt: '2025-10-02T09:00:00.000Z',
+//       orderStatus: 'CANCELED',
+//       memberSubscriptionId: 3,
+//       subscriptionName: '카페 모니카 DESSERT 구독권',
+//       orderType: 'OUT',
+//       tel: '010-2222-3333',
+//       name: '이수진',
+//       menuList: [{ menuId: 10, quantity: 1, menuName: '에스프레소' }],
+//     },
+//     {
+//       orderId: 402,
+//       orderNumber: 4322,
+//       // KST 14:30:00 -> UTC 05:30:00Z
+//       createdAt: '2025-10-02T05:30:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 1,
+//       subscriptionName: '카페 모니카 BASIC 구독권',
+//       orderType: 'IN',
+//       tel: '010-1111-2222',
+//       name: '홍길동',
+//       menuList: [
+//         { menuId: 1, quantity: 1, menuName: '아메리카노' },
+//         { menuId: 5, quantity: 1, menuName: '샌드위치' },
+//       ],
+//     },
+//     {
+//       orderId: 403,
+//       orderNumber: 4323,
+//       // KST 08:45:00 -> UTC 23:45:00Z (전날 UTC)
+//       createdAt: '2025-10-01T23:45:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 2,
+//       subscriptionName: '카페 모니카 PREMIUM 구독권',
+//       orderType: 'OUT',
+//       tel: '010-5555-4444',
+//       name: '김철수',
+//       menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
+//     },
 
-    // ==========================================================
-    // 5. 두 달 전 주문 (2025-09-02 KST) - 3개
-    // ==========================================================
-    {
-      orderId: 501,
-      orderNumber: 3101,
-      // KST 15:00:00 -> UTC 06:00:00Z
-      createdAt: '2025-09-02T06:00:00.000Z',
-      orderStatus: 'COMPLETED',
-      memberSubscriptionId: 3,
-      subscriptionName: '카페 모니카 DESSERT 구독권',
-      orderType: 'IN',
-      tel: '010-8888-7777',
-      name: '박영희',
-      menuList: [{ menuId: 32, quantity: 1, menuName: '브라우니' }],
-    },
-    {
-      orderId: 502,
-      orderNumber: 3102,
-      // KST 11:45:00 -> UTC 02:45:00Z
-      createdAt: '2025-09-02T02:45:00.000Z',
-      orderStatus: 'REJECTED',
-      memberSubscriptionId: 1,
-      subscriptionName: '카페 모니카 BASIC 구독권',
-      orderType: 'OUT',
-      tel: '010-9999-1111',
-      name: '최민수',
-      menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
-      rejectedReason: '직원 부재로 주문 거부',
-    },
-    {
-      orderId: 503,
-      orderNumber: 3103,
-      // KST 07:30:00 -> UTC 22:30:00Z (전날 UTC)
-      createdAt: '2025-09-01T22:30:00.000Z',
-      orderStatus: 'CANCELED',
-      memberSubscriptionId: 2,
-      subscriptionName: '카페 모니카 PREMIUM 구독권',
-      orderType: 'IN',
-      tel: '010-2222-3333',
-      name: '이수진',
-      menuList: [
-        { menuId: 21, quantity: 1, menuName: '카페라떼' },
-        { menuId: 12, quantity: 1, menuName: '마카롱' },
-      ],
-    },
-  ],
-  message: '과거 주문 내역 정적 데이터가 성공적으로 생성되었습니다.',
-};
-// 위에는 전부 가데이터 테스트 로직;
+//     // ==========================================================
+//     // 5. 두 달 전 주문 (2025-09-02 KST) - 3개
+//     // ==========================================================
+//     {
+//       orderId: 501,
+//       orderNumber: 3101,
+//       // KST 15:00:00 -> UTC 06:00:00Z
+//       createdAt: '2025-09-02T06:00:00.000Z',
+//       orderStatus: 'COMPLETED',
+//       memberSubscriptionId: 3,
+//       subscriptionName: '카페 모니카 DESSERT 구독권',
+//       orderType: 'IN',
+//       tel: '010-8888-7777',
+//       name: '박영희',
+//       menuList: [{ menuId: 32, quantity: 1, menuName: '브라우니' }],
+//     },
+//     {
+//       orderId: 502,
+//       orderNumber: 3102,
+//       // KST 11:45:00 -> UTC 02:45:00Z
+//       createdAt: '2025-09-02T02:45:00.000Z',
+//       orderStatus: 'REJECTED',
+//       memberSubscriptionId: 1,
+//       subscriptionName: '카페 모니카 BASIC 구독권',
+//       orderType: 'OUT',
+//       tel: '010-9999-1111',
+//       name: '최민수',
+//       menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
+//       rejectedReason: '직원 부재로 주문 거부',
+//     },
+//     {
+//       orderId: 503,
+//       orderNumber: 3103,
+//       // KST 07:30:00 -> UTC 22:30:00Z (전날 UTC)
+//       createdAt: '2025-09-01T22:30:00.000Z',
+//       orderStatus: 'CANCELED',
+//       memberSubscriptionId: 2,
+//       subscriptionName: '카페 모니카 PREMIUM 구독권',
+//       orderType: 'IN',
+//       tel: '010-2222-3333',
+//       name: '이수진',
+//       menuList: [
+//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
+//         { menuId: 12, quantity: 1, menuName: '마카롱' },
+//       ],
+//     },
+//   ],
+//   message: '과거 주문 내역 정적 데이터가 성공적으로 생성되었습니다.',
+// };
+// // 위에는 전부 가데이터 테스트 로직;
 
 // menuList에서 menuName과 quantity를 조합해서 보여주는 식
 const getFormattedMenuList = (menuList) => {
@@ -385,10 +384,6 @@ export default function PastOrdersList() {
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
   };
-
-  // ⬅️ 폴백 모드 상태 추가: 가데이터 사용 여부를 표시 -- axios 연결안해뒀으니까 일단 가데이터로
-  const [isFallbackMode, setIsFallbackMode] = useState(false);
-
   // ----------------------------------------------------------
   // 2. API 호출 함수 구현 (useCallback 사용)
   // ----------------------------------------------------------
@@ -401,7 +396,8 @@ export default function PastOrdersList() {
 
     try {
       // 🚨 요청 URL 구성: /api/stores/orders/past/{partnerStoreId}?searchDate={YYYY-MM-DD}
-      const url = `${API_BASE_URL}/${PARTNER_STORE_ID}?searchDate=${date}`;
+      const url = `http://localhost:8080/api/stores/orders/past/${PARTNER_STORE_ID}?searchDate=${date}`;
+      // PARTNER_STORE_ID는 하드코딩된 테스트용 점주 매장 코드
 
       const response = await axios.get(url);
 
@@ -414,16 +410,11 @@ export default function PastOrdersList() {
         );
       }
     } catch (err) {
-      // 🚨 axios 연결되기 전이니까 가데이터로 테스트중
-
-      // console.error('주문 내역 조회 오류:', err);
-      // // 사용자에게 보여줄 에러 메시지 설정
-      // setError(
-      //   '데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
-      // );
-
-      setOrders(DUMMY_PAST_ORDERS_RESPONSE.data);
-      setIsFallbackMode(true); // 폴백 모드 활성화
+      console.error('주문 내역 조회 오류:', err);
+      // 사용자에게 보여줄 에러 메시지 설정
+      setError(
+        '데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+      );
     } finally {
       setIsLoading(false);
     }
