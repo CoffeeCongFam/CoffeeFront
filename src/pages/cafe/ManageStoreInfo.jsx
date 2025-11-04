@@ -9,15 +9,15 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from '@mui/material';
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+} from "@mui/material";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 
-const STORE_API_URL = '/api/owners/stores'; // get, post 기본 경로
+const STORE_API_URL = "/api/owners/stores"; // get, post 기본 경로
 const PARTNER_STORE_ID = 1; // partnerStoreId는 patch 요청 시 필요(로그인 후 저장된 값 사용)
 
-const today = new Date().toLocaleDateString('ko-KR');
-const dateParts = today.split('.').map((part) => part.trim());
+const today = new Date().toLocaleDateString("ko-KR");
+const dateParts = today.split(".").map((part) => part.trim());
 const month = dateParts[1];
 
 // 🚨 [가데이터 초기화]
@@ -25,59 +25,59 @@ const INITIAL_STORE_INFO = {
   success: true,
   data: {
     partnerStoreId: 1,
-    storeName: '카페 모니카',
-    storeTel: '010-1111-1111',
-    tel: '010-1234-5678',
-    roadAddress: '서울시 강남구 테헤란로 123',
-    detailAddress: '1층 102호',
-    businessNumber: '111-22-33333',
-    detailInfo: '조용한 카페',
+    storeName: "카페 모니카",
+    storeTel: "010-1111-1111",
+    tel: "010-1234-5678",
+    roadAddress: "서울시 강남구 테헤란로 123",
+    detailAddress: "1층 102호",
+    businessNumber: "111-22-33333",
+    detailInfo: "조용한 카페",
     storeHours: [
       {
-        dayOfWeek: 'MON',
-        openTime: '09:00',
-        closeTime: '18:00',
-        isClosed: 'N',
+        dayOfWeek: "MON",
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'TUE',
-        openTime: '09:00',
-        closeTime: '18:00',
-        isClosed: 'N',
+        dayOfWeek: "TUE",
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'WED',
-        openTime: '09:00',
-        closeTime: '18:00',
-        isClosed: 'N',
+        dayOfWeek: "WED",
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'THU',
-        openTime: '09:00',
-        closeTime: '18:00',
-        isClosed: 'N',
+        dayOfWeek: "THU",
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'FRI',
-        openTime: '09:00',
-        closeTime: '18:00',
-        isClosed: 'N',
+        dayOfWeek: "FRI",
+        openTime: "09:00",
+        closeTime: "18:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'SAT',
-        openTime: '10:00',
-        closeTime: '17:00',
-        isClosed: 'N',
+        dayOfWeek: "SAT",
+        openTime: "10:00",
+        closeTime: "17:00",
+        isClosed: "N",
       },
       {
-        dayOfWeek: 'SUN',
+        dayOfWeek: "SUN",
         openTime: null,
         closeTime: null,
-        isClosed: 'Y',
+        isClosed: "Y",
       },
     ],
   },
-  message: '요청이 성공적으로 처리되었습니다.',
+  message: "요청이 성공적으로 처리되었습니다.",
 };
 
 export default function ManageStoreInfo() {
@@ -104,8 +104,8 @@ export default function ManageStoreInfo() {
       setStoreInfo(data);
       setOriginalStoreInfo(data); // 원본 데이터 저장 (취소 시 복구용)
     } catch (err) {
-      console.log('매장 정보 조회 실패. 더미 데이터 사용.', err);
-      setError('매장 정보를 불러오지 못했습니다. 더미 데이터를 표시.');
+      console.log("매장 정보 조회 실패. 더미 데이터 사용.", err);
+      setError("매장 정보를 불러오지 못했습니다. 더미 데이터를 표시.");
       // API 실패 시, 미리 설정된 가데이터 INITIAL_STORE_INFO 사용하게끔
     } finally {
       setIsLoading(false);
@@ -123,16 +123,16 @@ export default function ManageStoreInfo() {
   };
 
   // 요일별 영업시간 및 휴무일 변경 핸들러
-  const handleHoursChange = useCallback((dayOfWeek, field, value) => {
+  const _handleHoursChange = useCallback((dayOfWeek, field, value) => {
     setStoreInfo((prev) => ({
       ...prev,
       storeHours: prev.storeHours.map((hour) => {
         if (hour.dayOfWeek === dayOfWeek) {
           // isClosed 필드 처리
-          if (field === 'isClosed') {
-            const newIsClosed = value ? 'Y' : 'N';
+          if (field === "isClosed") {
+            const newIsClosed = value ? "Y" : "N";
             // 휴무일('Y')이면 시간 필드는 null로 비워줍니다.
-            if (newIsClosed === 'Y') {
+            if (newIsClosed === "Y") {
               return {
                 ...hour,
                 isClosed: newIsClosed,
@@ -144,8 +144,8 @@ export default function ManageStoreInfo() {
             return {
               ...hour,
               isClosed: newIsClosed,
-              openTime: hour.openTime || '09:00', // 해제 시 기본값 설정 (필요에 따라 조정)
-              closeTime: hour.closeTime || '18:00',
+              openTime: hour.openTime || "09:00", // 해제 시 기본값 설정 (필요에 따라 조정)
+              closeTime: hour.closeTime || "18:00",
             };
           }
           // openTime/closeTime 필드 처리
@@ -176,12 +176,12 @@ export default function ManageStoreInfo() {
 
       await axios.patch(url, dataToSend);
 
-      setSuccessMessage('매장 정보가 성공적으로 수정되었습니다.');
+      setSuccessMessage("매장 정보가 성공적으로 수정되었습니다.");
       setIsEditing(false); // 수정 모드 종료
       setOriginalStoreInfo(storeInfo); // 원본 데이터 업데이트
     } catch (err) {
-      console.error('매장 정보 수정 실패 :', err);
-      setError('정보 수정에 실패. 다시 시도해주세요');
+      console.error("매장 정보 수정 실패 :", err);
+      setError("정보 수정에 실패. 다시 시도해주세요");
     } finally {
       setIsLoading(false);
     }
@@ -196,7 +196,7 @@ export default function ManageStoreInfo() {
   // 렌더링
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
         <CircularProgress />
         <Typography sx={{ ml: 2 }}>정보를 불러오는 중입니다...</Typography>
       </Box>
@@ -218,11 +218,11 @@ export default function ManageStoreInfo() {
           </Typography>
           <Button
             variant="contained"
-            color={isEditing ? 'error' : 'primary'}
+            color={isEditing ? "error" : "primary"}
             onClick={() => (isEditing ? handleCancel() : setIsEditing(true))}
             size="small"
           >
-            {isEditing ? '수정 취소' : '정보 수정'}
+            {isEditing ? "수정 취소" : "정보 수정"}
           </Button>
         </Box>
 
@@ -242,37 +242,37 @@ export default function ManageStoreInfo() {
         <Typography
           variant="h6"
           mb={2}
-          sx={{ borderBottom: 1, borderColor: 'divider', pb: 1 }}
+          sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}
         >
           기본 정보
         </Typography>
         <Grid container spacing={3}>
           {[
             {
-              label: '가게 이름',
-              name: 'storeName',
+              label: "가게 이름",
+              name: "storeName",
               value: storeInfo.storeName,
               disabled: true,
             }, // 이름은 보통 수정 불가
-            { label: '가게 전화번호', name: 'tel', value: storeInfo.tel },
+            { label: "가게 전화번호", name: "tel", value: storeInfo.tel },
             {
-              label: '점주 전화번호',
-              name: 'businessNumber',
+              label: "점주 전화번호",
+              name: "businessNumber",
               value: storeInfo.businessNumber,
             },
             {
-              label: '도로명 주소',
-              name: 'roadAddress',
+              label: "도로명 주소",
+              name: "roadAddress",
               value: storeInfo.roadAddress,
             },
             {
-              label: '상세 주소',
-              name: 'detailAddress',
+              label: "상세 주소",
+              name: "detailAddress",
               value: storeInfo.detailAddress,
             },
             {
-              label: '사업자 번호',
-              name: 'businessNumber',
+              label: "사업자 번호",
+              name: "businessNumber",
               value: storeInfo.businessNumber,
               disabled: true,
             }, // 번호는 보통 수정 불가
@@ -282,12 +282,12 @@ export default function ManageStoreInfo() {
                 fullWidth
                 label={field.label}
                 name={field.name}
-                value={field.value || ''}
+                value={field.value || ""}
                 onChange={handleChange}
                 InputProps={{
                   readOnly: !isEditing || field.disabled,
                 }}
-                variant={isEditing ? 'outlined' : 'standard'}
+                variant={isEditing ? "outlined" : "standard"}
               />
             </Grid>
           ))}
@@ -298,7 +298,7 @@ export default function ManageStoreInfo() {
           variant="h6"
           mt={4}
           mb={2}
-          sx={{ borderBottom: 1, borderColor: 'divider', pb: 1 }}
+          sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}
         >
           {month}월 영업시간 및 휴무일
         </Typography>
@@ -310,11 +310,11 @@ export default function ManageStoreInfo() {
               label="영업 시작 시간"
               name="businessStart"
               type="time"
-              value={storeInfo.businessStart || ''}
+              value={storeInfo.businessStart || ""}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
               InputProps={{ readOnly: !isEditing }}
-              variant={isEditing ? 'outlined' : 'standard'}
+              variant={isEditing ? "outlined" : "standard"}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -323,11 +323,11 @@ export default function ManageStoreInfo() {
               label="영업 종료 시간"
               name="businessEnd"
               type="time"
-              value={storeInfo.businessEnd || ''}
+              value={storeInfo.businessEnd || ""}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
               InputProps={{ readOnly: !isEditing }}
-              variant={isEditing ? 'outlined' : 'standard'}
+              variant={isEditing ? "outlined" : "standard"}
             />
           </Grid>
           {/* 휴무일 토글 버튼 (피그마 디자인 반영) */}
@@ -341,17 +341,17 @@ export default function ManageStoreInfo() {
               aria-label="휴무일"
               disabled={!isEditing}
             >
-              {['월', '화', '수', '목', '금', '토', '일', '공휴일'].map(
+              {["월", "화", "수", "목", "금", "토", "일", "공휴일"].map(
                 (day) => (
                   <ToggleButton
                     key={day}
                     value={day}
                     size="small"
                     sx={{
-                      fontWeight: 'bold',
-                      '&.Mui-selected': {
-                        backgroundColor: 'primary.main',
-                        color: 'white',
+                      fontWeight: "bold",
+                      "&.Mui-selected": {
+                        backgroundColor: "primary.main",
+                        color: "white",
                       },
                     }}
                   >

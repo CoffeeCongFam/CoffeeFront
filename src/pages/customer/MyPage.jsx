@@ -34,7 +34,7 @@ const PlaceholderComponent = ({ title }) => (
 function MyPage() {
   let navigate = useNavigate();
 
-  const { authUser, setUser, clearUser } = useUserStore();
+  const { authUser, clearUser } = useUserStore();
   console.log("AUTH USER>> ", authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 

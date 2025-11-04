@@ -12,7 +12,6 @@ import OrderStepper from "../../../components/customer/order/OrderStepper";
 import OrderCheckModal from "../../../components/customer/order/OrderCancleCheckModal";
 import { useNavigate, useParams } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-import api from "../../../utils/api";
 
 import {
   fetchOrderDetail,
@@ -57,7 +56,6 @@ function CompleteOrderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState(null);
   const [openCancel, setOpenCancel] = React.useState(false); // 주문 취소 확인 모달
-  const [isCancel, setIsCancel] = useState(false);
 
   // 주문 정보 초기화
   useEffect(() => {

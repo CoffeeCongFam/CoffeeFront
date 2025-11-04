@@ -45,7 +45,7 @@ export default function ManageMenu() {
   }, []);
 
   // 2. 신규 메뉴 등록 (CREATE)
-  const handleRegisterMenu = async (formData, selectedFile, imagePreview) => {
+  const handleRegisterMenu = async (formData, selectedFile) => {
     // menuService.js의 registerMenu가 FormData를 처리합니다.
     try {
       // API 호출: 메뉴 등록

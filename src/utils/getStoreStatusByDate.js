@@ -6,7 +6,7 @@ export default function getStoreStatusByDate(
     return "CLOSED";
   }
 
-  const dayCode = DAY_CODE[now.getDay()]; // 오늘 요일 코드 ex) "MON"
+  // const dayCode = DAY_CODE[now.getDay()]; // 오늘 요일 코드 ex) "MON"
   const todayRule = storeHours.find((h) => h.dayOfWeek === dayCode);
 
   // 오늘 요일 정보가 아예 없으면 닫힘으로 본다

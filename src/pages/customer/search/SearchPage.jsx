@@ -65,7 +65,7 @@ export default function SearchPage() {
   const [mapsReady, setMapsReady] = useState(false);
   const [isMapError, setIsMapError] = useState(false);
   const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // (lng, lat)
 
   const [keyword, setKeyword] = useState("");
@@ -130,7 +130,6 @@ export default function SearchPage() {
         }));
         setCafes(normalized);
         console.log(normalized);
-        
       } catch (err) {
         console.error("현재 위치 또는 카페 API 실패:", err);
         // 실패 시 샘플 데이터 사용
@@ -141,9 +140,10 @@ export default function SearchPage() {
           _mmId: c.storeId ?? c.id ?? `idx-${i}`,
         }));
         setCafes(normalized);
-      } finally {
-        setIsLoading(false);
       }
+      // finally {
+      //   setIsLoading(false);
+      // }
     })();
     return () => {
       mounted = false;
@@ -559,15 +559,27 @@ export default function SearchPage() {
                     >
                       {cafe.storeName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" noWrap={false}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      noWrap={false}
+                    >
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
 
-                    <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
-                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
+                    <Box
+                      sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", gap: 0.5 }}
+                      >
                         👥 {cafe.subscriberCount ?? 0}명 구독
                       </Typography>
-                      <Typography variant="body2" sx={{ display: "flex", gap: 0.5 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ display: "flex", gap: 0.5 }}
+                      >
                         ⭐ {cafe.reviewCount ?? 0}개 리뷰
                       </Typography>
                     </Box>
@@ -585,7 +597,11 @@ export default function SearchPage() {
                     }}
                   >
                     {!isAppLike && (
-                      <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
                         {cafe.distance ?? "454m"}
                       </Typography>
                     )}

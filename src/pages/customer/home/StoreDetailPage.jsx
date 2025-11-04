@@ -38,7 +38,7 @@ function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
 
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [store, setStore] = useState({});
   const [storeStatus, setStoreStatus] = useState("OPEN"); // OPEN || CLOSED || HOLIDAY
 
@@ -54,12 +54,9 @@ function StoreDetailPage() {
       loadStoreDetail(storeId);
       // 카페 상태 계산
       setStoreStatus(getStoreStatusByDate(store.storeHours));
-      setIsLoading(false);
     } catch (err) {
       console.log("카페 상세  정보 요청 실패: ", err);
       alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
-    } finally {
-      setIsLoading(false);
     }
   }, [storeId]);
 
