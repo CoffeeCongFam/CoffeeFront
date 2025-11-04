@@ -20,3 +20,16 @@ export async function postRefund(purchaseId){
     return null;
   }
 }
+
+export async function getPayments(){ 
+  try {
+    const response = await api.get(`/me/purchase`);
+        console.log(response.data.data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching gift data:", error);
+    return null;
+  }
+}
+
+
