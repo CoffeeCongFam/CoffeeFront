@@ -1,5 +1,5 @@
 import { Card, CardContent, Typography, Box } from "@mui/material";
-import RoomIcon from "@mui/icons-material/Room"; // ✅ LocationPinIcon 대신 일반적으로 많이 쓰는 RoomIcon
+import RoomIcon from "@mui/icons-material/Room";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 

@@ -104,7 +104,7 @@ function Landing() {
             >
               <img
                 src={monkeyLogo}
-                alt="CoffeeEns Logo"
+                alt="COFFEIENS Logo"
                 style={{ maxWidth: "380px", height: "auto" }}
               />
             </Box>
@@ -143,7 +143,7 @@ function Landing() {
             <Typography sx={{ color: "#4a3426", fontSize: "0.9rem" }}>
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
-              CoffeeEns는 소비자에게는 더 현명한 하루를,
+              COFFEIENS는 소비자에게는 더 현명한 하루를,
               <br />
               사장님들께는 꾸준히 찾아오는 단골의 기쁨을 선물합니다.
             </Typography>
@@ -336,7 +336,7 @@ function Landing() {
               mb: 2,
             }}
           >
-            지금 CoffeeEns에 합류하세요.
+            지금 COFFEIENS에 합류하세요.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
             <Button
@@ -348,9 +348,9 @@ function Landing() {
                 px: 4,
                 "&:hover": { backgroundColor: "#3a2a1f" },
               }}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/signup")}
             >
-              이메일로 로그인
+              회원가입 하러 가기
             </Button>
 
             {/* 카카오 버튼 */}

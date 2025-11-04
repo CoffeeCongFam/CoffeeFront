@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 function SearchCafeInput({ keyword, setKeyword }) {
   return (
     <TextField
-      style={{
+      sx={{
         borderRadius: "10px",
         // boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
       }}

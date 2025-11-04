@@ -25,6 +25,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
+import SubTypeChip from "../../common/SubTypeChip";
 
 const subDescBoxStyle = {
   backgroundColor: "#F2F2F2",
@@ -36,19 +37,6 @@ const subDescBoxStyle = {
   gap: "0.8rem",
   justifyContent: "space-around",
 };
-
-function getChipStyle(type) {
-  switch (type) {
-    case "BASIC":
-      return { bgcolor: "#E0E0E0", color: "#333" };
-    case "STANDARD":
-      return { bgcolor: "#E6F4EA", color: "#2e7d32" };
-    case "PREMIUM":
-      return { bgcolor: "#FFF3CD", color: "#B28704" };
-    default:
-      return { bgcolor: "#F1F3F4", color: "#5F6368" };
-  }
-}
 
 function CafeSubscriptionList({ subscriptions = [] }) {
   const navigate = useNavigate();
@@ -214,18 +202,11 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             >
               {/* 타입 / 이름 / 가격 */}
               <Box sx={{ textAlign: "center" }}>
-                <Chip
-                  label={getTypeLabel(sub.subscriptionType)}
-                  size="small"
-                  sx={{
-                    mb: 1,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    borderRadius: "999px",
-                    ...getChipStyle(sub.subType),
-                  }}
-                />
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                <SubTypeChip type={sub.subscriptionType} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, mt: "0.5rem" }}
+                >
                   {sub.subscriptionName}
                 </Typography>
                 <Typography sx={{ fontWeight: 800, fontSize: 28 }}>

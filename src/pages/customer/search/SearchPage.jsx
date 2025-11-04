@@ -27,14 +27,15 @@ import MarkerManager from "../../../utils/MarkerManager.js";
 import loadNaverMaps from "../../../utils/naverMapLoader.js";
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import { useNavigate } from "react-router-dom";
-import { fetchNearbyCafes } from "../../../apis/customerApi.js";
+import { fetchAllCafes } from "../../../apis/customerApi.js";
 import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
   left: "50%",
   bottom: 0,
-  transform: "translate(-50%, 100%)", // 기본: 숨김
+  // 100% 아래로 내려서 '숨김' 상태를 명확히 함
+  transform: "translate(-50%, 100%)",
   width: "100%",
   maxHeight: "80vh",
   borderTopLeftRadius: 16,
@@ -48,6 +49,9 @@ const Panel = styled(Paper)(({ theme }) => ({
   zIndex: 1300,
   padding: "10px",
 }));
+
+// 패널 렌더링 부분은 이미 잘 되어 있습니다.
+// transform: openCafeList ? "translate(-50%, 0)" : "translate(-50%, 100%)",
 
 export default function SearchPage() {
   const { isAppLike } = useAppShellMode();
@@ -120,7 +124,8 @@ export default function SearchPage() {
         if (!mounted) return;
         setCurrentLoc(loc);
 
-        const res = await fetchNearbyCafes(x, y); // API 응답 배열
+        const res = await fetchAllCafes();
+        console.log("fetchAllCafes>> ", res);
         const normalized = (Array.isArray(res) ? res : []).map((c, i) => ({
           ...c,
           // 서버 응답 키가 xpoint/ypoint일 수도 있으므로 정규화
@@ -210,6 +215,10 @@ export default function SearchPage() {
 
   // 현재 위치로 이동 버튼
   const setCurrentLocation = useCallback(() => {
+    console.log("현재 위치로 이동!");
+    if (openCafeList) {
+      setOpenCafeList(false);
+    }
     const map = mapRef.current;
     const maps = mapsRef.current;
     if (!map || !maps) return;
@@ -329,7 +338,7 @@ export default function SearchPage() {
 
       {/* 상단 컨트롤 + 검색 드롭다운 */}
       <Box
-        style={{
+        sx={{
           position: "absolute",
           top: 16,
           left: 16,
@@ -338,15 +347,16 @@ export default function SearchPage() {
           display: "flex",
           gap: 8,
           alignItems: "center",
-          flexWrap: { xs: "wrap", sm: "nowrap" },
+          // flexWrap: { xs: "wrap", sm: "nowrap" },
         }}
       >
         {/* 검색창 */}
         <Box
           sx={{
             position: "relative",
+            zIndex: 1400,
             flex: { xs: "1 1 100%", sm: "0 0 auto" },
-            maxWidth: { xs: "100%", sm: 320 },
+            maxWidth: { xs: "100%", sm: 500 },
           }}
         >
           <SearchCafeInput
@@ -454,6 +464,10 @@ export default function SearchPage() {
       {/* 하단 리스트 패널 */}
       <Panel
         sx={{
+          // 마운트 시 트랜지션 방지: openCafeList가 false일 때는 transition을 0으로 설정
+          transition: openCafeList
+            ? "transform 0.3s ease-in-out"
+            : "transform 0s",
           transform: openCafeList
             ? "translate(-50%, 0)"
             : "translate(-50%, 100%)",

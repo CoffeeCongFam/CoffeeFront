@@ -29,8 +29,10 @@ function CustomerHome() {
   const [locError, setLocError] = useState("");
 
   const scrollRef = useRef(null);
+  const localScrollRef = useRef(null);
 
   useEffect(() => {
+    console.log("CUSTOMER HOME--------------------------------", authUser);
     //
     const initUser = async () => {
       // token 은 있는데, 로그인한 사용자 정보가 없는 상태
@@ -54,6 +56,7 @@ function CustomerHome() {
           }
         } catch (err) {
           console.error(err);
+          navigate("/");
         }
       }
     };
@@ -105,8 +108,8 @@ function CustomerHome() {
     try {
       console.log("LOAD NEAR BY CAFES");
       const data = await fetchNearbyCafes(
-        coords.latitude,
-        coords.longitude,
+        coords.longitude, // 경도
+        coords.latitude, // 위도
         500
       );
       console.log("LOCAL CAFES>> ", data);
@@ -131,6 +134,11 @@ function CustomerHome() {
       left: offset,
       behavior: "smooth",
     });
+  };
+
+  const localScrollBy = (offset) => {
+    if (!localScrollRef.current) return;
+    localScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
   };
 
   return (
@@ -218,7 +226,7 @@ function CustomerHome() {
             overflowX: "auto",
             scrollSnapType: "x mandatory",
             mb: 5,
-            py: 1,
+            py: 2,
             "&::-webkit-scrollbar": {
               height: isAppLike ? 0 : 6,
             },
@@ -226,11 +234,13 @@ function CustomerHome() {
               backgroundColor: "#ccc",
               borderRadius: 8,
             },
+            // backgroundColor: "#ccccccaf",
+            // borderRadius: "8px",
           }}
         >
           {subscriptions.map((item) => (
             <Box
-              key={item.subId}
+              key={item.purchaseId}
               sx={{
                 scrollSnapAlign: "start",
                 px: isAppLike ? "8%" : 0,
@@ -260,6 +270,51 @@ function CustomerHome() {
         )}
 
         <Box
+          style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
+        >
+          <IconButton onClick={() => localScrollBy(-260)} size="small">
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+          <IconButton onClick={() => localScrollBy(260)} size="small">
+            <ArrowForwardIosIcon fontSize="small" />
+          </IconButton>
+        </Box>
+
+        <Box
+          ref={localScrollRef}
+          sx={{
+            display: "flex",
+            gap: 2,
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            mb: 5,
+            py: 2,
+            "&::-webkit-scrollbar": {
+              height: isAppLike ? 0 : 6,
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#ccc",
+              borderRadius: 8,
+            },
+            // backgroundColor: "#ccccccaf",
+            // borderRadius: "8px",
+          }}
+        >
+          {nearbyCafes.map((store) => (
+            <Box
+              key={store.id || store.storeId}
+              sx={{
+                scrollSnapAlign: "start",
+                px: isAppLike ? "8%" : 0,
+                flex: isAppLike ? "0 0 100%" : "0 0 auto",
+              }}
+            >
+              <LocalCafeCard store={store} key={store.id || store.storeId} />
+            </Box>
+          ))}
+        </Box>
+
+        {/* <Box
           sx={{
             display: "grid",
             gridTemplateColumns: isAppLike
@@ -277,7 +332,7 @@ function CustomerHome() {
               500m 안에 등록된 카페가 아직 없어요 ☕
             </Typography>
           )}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );
