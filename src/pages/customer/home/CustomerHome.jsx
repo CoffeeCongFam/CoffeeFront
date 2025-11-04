@@ -33,8 +33,9 @@ function CustomerHome() {
   useEffect(() => {
     //
     const initUser = async () => {
-      if (!authUser && TokenService.getLocalAccessToken) {
-        // token 은 있는데, 로그인한 사용자 정보가 없는 상태
+      // token 은 있는데, 로그인한 사용자 정보가 없는 상태
+
+      if (!authUser) {
         console.log("TOKEN OK, BUT USER INFO IS EMPTY-----------------");
 
         try {
@@ -163,7 +164,7 @@ function CustomerHome() {
           <Typography
             sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
           >
-            {authUser.name} 님, {isAppLike && <br />} 오늘도 한 잔의 여유를
+            {authUser?.name} 님, {isAppLike && <br />} 오늘도 한 잔의 여유를
             즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>

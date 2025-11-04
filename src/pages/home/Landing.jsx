@@ -25,6 +25,7 @@ function Landing() {
 
   // 카카오 로그인 버튼
   const kakaoLogin = () => {
+    console.log("KAKAO LOGIN-----------------------");
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = URI;
   };

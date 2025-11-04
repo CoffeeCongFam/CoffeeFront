@@ -65,8 +65,22 @@ export async function fetchUserSubscriptions() {
   console.log("보유 구독권 목록 : ", res.data?.data);
   return res.data?.data;
 }
+
+// 특정 구독권 정보 조회
+export async function fetchSubscriptionInfo(subscriptionId) {
+  console.log("특정 구독권 정보 조회 요청");
+
+  const res = await api.get(`/owners/subscriptions/${subscriptionId}`);
+  console.log(res.data?.data);
+  return res.data?.data;
+}
 // 구독권 구매
-export async function requestPurchaseSubscription() {}
+export async function requestPurchaseSubscription(payload) {
+  console.log("구독권 구매 요청");
+
+  const res = await api.post(`/me/purchase/new`, payload);
+  return res.data?.data;
+}
 
 /*  매장 탐색 탭 */
 // 카페 목록 조회

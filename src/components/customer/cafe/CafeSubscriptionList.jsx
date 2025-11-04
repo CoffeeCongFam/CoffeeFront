@@ -18,7 +18,11 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { ExpandLess, ExpandMore, ConfirmationNumber } from "@mui/icons-material";
+import {
+  ExpandLess,
+  ExpandMore,
+  ConfirmationNumber,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 
@@ -27,10 +31,10 @@ const subDescBoxStyle = {
   padding: "12px 14px",
   borderRadius: "8px",
   width: "100%",
-  display: "flex", 
+  display: "flex",
   flexDirection: "column",
   gap: "0.8rem",
-  justifyContent: "space-around"
+  justifyContent: "space-around",
 };
 
 function getChipStyle(type) {
@@ -90,16 +94,16 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   };
 
   // 페이지 이동 함수들
-  const goToPurchaseSub = (subId) => {
-    navigate(`/me/subscriptions/${subId}/purchase`);
+  const goToPurchaseSub = (subscriptionId) => {
+    navigate(`/me/subscriptions/${subscriptionId}/purchase`);
   };
   const goToOrder = (sub) => {
     navigate("/me/order/new", {
       state: { subscription: sub },
     });
   };
-  const goToSendGift = (subId) => {
-    navigate(`/me/subscriptions/${subId}/gift`);
+  const goToSendGift = (subscriptionId) => {
+    navigate(`/me/subscriptions/${subscriptionId}/gift`);
   };
 
   const getTypeLabel = (type) => {
@@ -184,8 +188,8 @@ function CafeSubscriptionList({ subscriptions = [] }) {
         )}
 
         {filteredList.map((sub) => (
-          <Box 
-            key={sub.subId || sub.id || sub.subName}
+          <Box
+            key={sub.subscriptionId || sub.subscriptionId || sub.subName}
             sx={{
               scrollSnapAlign: "start",
               px: isAppLike ? 0 : "10%",
@@ -195,7 +199,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           >
             {/* 카드 */}
             <Box
-              key={sub.subId}
+              key={sub.subscriptionId}
               sx={{
                 border: "1px solid #e0e0e0",
                 borderRadius: 2,
@@ -252,15 +256,20 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     금액
                   </Typography>
                   <Box>
-                    <Typography 
-                      sx={{ textAlign: "right", 
-                      fontSize: { xs: "0.8rem" , sm : "1rem"} 
+                    <Typography
+                      sx={{
+                        textAlign: "right",
+                        fontSize: { xs: "0.8rem", sm: "1rem" },
                       }}
                     >
                       월 {sub.price?.toLocaleString()}원
                     </Typography>
                     <Typography
-                      sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                      sx={{
+                        fontSize: 10,
+                        color: "#ff39caff",
+                        textAlign: "right",
+                      }}
                     >
                       한 잔당 약 ₩
                       {sub.price
@@ -268,15 +277,19 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         : 0}
                     </Typography>
                   </Box>
-                  
                 </Box>
 
                 <Box sx={subDescBoxStyle}>
                   <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
                     구독 주기
                   </Typography>
-                      
-                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"}   }}>
+
+                  <Typography
+                    sx={{
+                      textAlign: "right",
+                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                    }}
+                  >
                     1개월
                   </Typography>
                 </Box>
@@ -285,11 +298,20 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
                     사용 가능
                   </Typography>
-                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"} }}>
+                  <Typography
+                    sx={{
+                      textAlign: "right",
+                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                    }}
+                  >
                     매일, 하루 {sub.maxDailyUsage}잔
                   </Typography>
                   <Typography
-                    sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                    sx={{
+                      fontSize: 10,
+                      color: "#ff39caff",
+                      textAlign: "right",
+                    }}
                   >
                     결제일로부터 시작
                   </Typography>
@@ -305,8 +327,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   }}
                 >
                   {/* 왼쪽: 아이콘 + 라벨 */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
-                    
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      flex: 1,
+                    }}
+                  >
                     <ListItemText
                       primary="잔여 구독권 수량"
                       primaryTypographyProps={{
@@ -327,11 +355,15 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       textAlign: "center",
                       display: "flex",
                       flexDirection: "row",
-                      gap: "0.3rem"
+                      gap: "0.3rem",
                     }}
                   >
                     <Typography
-                      sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#202124" }}
+                      sx={{
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        color: "#202124",
+                      }}
                     >
                       {sub.remainSalesQuantity || 0} 개
                     </Typography>
@@ -347,7 +379,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <ListItemButton
                   onClick={() =>
                     setOpenDescId((prev) =>
-                      prev === sub.subId ? null : sub.subId
+                      prev === sub.subscriptionId ? null : sub.subscriptionId
                     )
                   }
                   sx={{ borderRadius: 1 }}
@@ -359,10 +391,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       color: "#4d4d4d",
                     }}
                   />
-                  {openDescId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                  {openDescId === sub.subscriptionId ? (
+                    <ExpandLess />
+                  ) : (
+                    <ExpandMore />
+                  )}
                 </ListItemButton>
                 <Collapse
-                  in={openDescId === sub.subId}
+                  in={openDescId === sub.subscriptionId}
                   timeout="auto"
                   unmountOnExit
                 >
@@ -382,7 +418,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <ListItemButton
                   onClick={() =>
                     setOpenMenuId((prev) =>
-                      prev === sub.subId ? null : sub.subId
+                      prev === sub.subscriptionId ? null : sub.subscriptionId
                     )
                   }
                   sx={{ borderRadius: 1 }}
@@ -394,10 +430,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       color: "#4d4d4d",
                     }}
                   />
-                  {openMenuId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                  {openMenuId === sub.subscriptionId ? (
+                    <ExpandLess />
+                  ) : (
+                    <ExpandMore />
+                  )}
                 </ListItemButton>
                 <Collapse
-                  in={openMenuId === sub.subId}
+                  in={openMenuId === sub.subscriptionId}
                   timeout="auto"
                   unmountOnExit
                 >
@@ -432,7 +472,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <Button
                   fullWidth
                   size="small"
-                  onClick={() => goToSendGift(sub.subId)}
+                  onClick={() => goToSendGift(sub.subscriptionId)}
                   startIcon={<CardGiftcardIcon />}
                   sx={{
                     backgroundColor: "black",
@@ -447,7 +487,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   <Button
                     fullWidth
                     size="small"
-                    onClick={() => goToPurchaseSub(sub.subId)}
+                    onClick={() => goToPurchaseSub(sub.subscriptionId)}
                     startIcon={<CreditCardIcon />}
                     sx={{
                       backgroundColor: "black",
@@ -471,7 +511,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   >
                     주문하기
                   </Button>
-
                 )}
               </Box>
             </Box>

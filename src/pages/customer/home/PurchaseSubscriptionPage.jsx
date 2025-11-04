@@ -13,47 +13,49 @@ import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
+import { fetchSubscriptionInfo } from "../../../apis/customerApi";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // ✅ 결제 처리 로딩 상태
-  const [payOpen, setPayOpen] = useState(false); // ✅ 결제 패널 열림/닫힘
+  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
+  const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
+
+  async function fetchSubData() {
+    const subData = await fetchSubscriptionInfo(subId);
+    console.log(subData);
+    return subData;
+  }
 
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
     // TODO: 실제 API 호출
-    setSubscription({
-      subId: 3,
-      store: {
-        storeId: 1,
-        storeName: "카페 모나카",
-        storeImage: "https://picsum.photos/400/400",
-      },
-      price: 19900,
-      subImage:
-        "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
-      subName: "프리미엄 구독권",
-      subType: "PREMIUM",
-      isExpired: "N",
-      limitEntity: 10,
-      stock: 10,
-      description: "구독권에 대한 간단한 설명",
-      isGift: "Y",
-      isSubscribed: "Y",
-    });
+
+    // 구독권 정보 가져오기
+    const data = fetchSubData();
+    console.log(data);
+    setSubscription(data);
   }, [subId]);
 
   function handleBack() {
     navigate(-1);
   }
 
-  // ✅ 결제 진행 함수 (로딩 + 완료 페이지 이동)
+  //결제 진행 함수 (로딩 + 완료 페이지 이동)
   async function confirmPayment() {
     setIsLoading(true);
     setPayOpen(false);
+
+    // {
+    //     "subscriptionId" : 2,
+    //     "purchaseType" : "CREDIT_CARD",
+    //     "receiverMemberId" : 2,
+    //     "giftMessage" : "선물 줄게"
+    // }
+
+    // //구매일 경우 receiverMemberId, giftMessage는 Null로 처리
 
     try {
       // TODO: 실제 결제 처리 API 호출 (예: await api.purchase(subscription.subId))
@@ -161,7 +163,7 @@ function PurchaseSubscriptionPage() {
         </Box>
       </Box>
 
-      {/* ✅ 결제 선택 패널 */}
+      {/* 결제 선택 패널 */}
       <Backdrop
         open={payOpen}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
