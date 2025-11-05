@@ -113,7 +113,7 @@ function CustomerHome() {
       console.log("LOAD NEAR BY CAFES");
       const data = await fetchNearbyCafes(
         coords.longitude, // 경도 (xpoint)
-        coords.latitude,  // 위도 (ypoint)
+        coords.latitude, // 위도 (ypoint)
         500
       );
       console.log("LOCAL CAFES>> ", data);
@@ -154,9 +154,6 @@ function CustomerHome() {
     }
   };
 
-      
-      
-
   function handleOrderClick(sub) {
     navigate("/me/order/new", {
       state: { subscription: sub },
@@ -183,7 +180,6 @@ function CustomerHome() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
-        
       }}
     >
       {/* 헤더 */}
@@ -208,8 +204,8 @@ function CustomerHome() {
           <Typography
             sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
           >
-            안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한 잔의 여유를
-            즐겨보세요.
+            안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
+            잔의 여유를 즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
@@ -283,12 +279,12 @@ function CustomerHome() {
                 flex: isAppLike ? "0 0 100%" : "0 0 auto",
               }}
             >
-              <SubscriptionCard subscription={item} />
-              {/* <SubscriptionItem
+              {/* <SubscriptionCard subscription={item} /> */}
+              <SubscriptionItem
                 today={today}
                 item={item}
                 handleOrderClick={handleOrderClick}
-              /> */}
+              />
             </Box>
           ))}
         </Box>
@@ -300,7 +296,7 @@ function CustomerHome() {
           내 근처 동네 카페
         </Typography>
 
-        <LocalCafeImgList list = {nearbyCafes}/>
+        <LocalCafeImgList list={nearbyCafes} />
 
         {locError && (
           <Typography color="error" sx={{ mb: 1 }}>
