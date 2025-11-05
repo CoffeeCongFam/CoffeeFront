@@ -30,7 +30,8 @@ import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import { useNavigate } from "react-router-dom";
 import { fetchAllCafes } from "../../../apis/customerApi.js";
 import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
-import cafeMarkerIcon from "../../../assets/cafeMarker.png"; // 카페용 마커 아이콘
+// import cafeMarkerIcon from "../../../assets/cafeMarker.png"; // 카페용 마커 아이콘
+import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
