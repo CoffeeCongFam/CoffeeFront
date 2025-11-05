@@ -6,7 +6,7 @@ import {
   Grid,
   Divider,
   Stack,
-  Chip
+  Chip,
 } from "@mui/material";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 
@@ -45,15 +45,25 @@ function SendGift({ sendGiftList = [] }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {sendGiftList.map((g) => (
-        <Paper key={g.id ?? `${g.sender}-${g.receiver}-${g.paidAt}`} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }} elevation={0}>
+        <Paper
+          key={g.id ?? `${g.sender}-${g.receiver}-${g.paidAt}`}
+          sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}
+          elevation={0}
+        >
           {/* 보내는/받는 사람 */}
           <Grid container alignItems="center" spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={5}>
               <Stack spacing={0.5}>
-                <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  fontWeight={700}
+                >
                   보내는 사람
                 </Typography>
-                <Typography variant="h6" fontWeight={500}>{g.sender}</Typography>
+                <Typography variant="h6" fontWeight={500}>
+                  {g.sender}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: "center" }}>
@@ -61,10 +71,16 @@ function SendGift({ sendGiftList = [] }) {
             </Grid>
             <Grid item xs={5}>
               <Stack spacing={0.5} alignItems="flex-end">
-                <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  fontWeight={700}
+                >
                   받는 사람
                 </Typography>
-                <Typography variant="h6" fontWeight={500}>{g.receiver}</Typography>
+                <Typography variant="h6" fontWeight={500}>
+                  {g.receiver}
+                </Typography>
               </Stack>
             </Grid>
           </Grid>
@@ -88,31 +104,41 @@ function SendGift({ sendGiftList = [] }) {
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>카페명</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  카페명
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{g.storeName}</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>구독권명</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  구독권명
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{g.productName}</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>금액</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  금액
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{formatPrice(g.price)} 원</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>구독 기간</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  구독 기간
+                </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography align="right">{g.subscriptionPeriod}개월</Typography>
+                <Typography align="right">
+                  {g.subscriptionPeriod}개월
+                </Typography>
               </Grid>
             </Grid>
           </Box>
@@ -124,28 +150,36 @@ function SendGift({ sendGiftList = [] }) {
             </Typography>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>결제 금액</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  결제 금액
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{formatPrice(g.price)} 원</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>승인 일시</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  승인 일시
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{formatPaidAt(g.paidAt)}</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>승인 번호</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  승인 번호
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{g.purchaseId}</Typography>
               </Grid>
 
               <Grid item xs={6}>
-                <Typography color="text.secondary" fontWeight={700}>결제 수단</Typography>
+                <Typography color="text.secondary" fontWeight={700}>
+                  결제 수단
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography align="right">{g.purchaseType}</Typography>
@@ -156,7 +190,9 @@ function SendGift({ sendGiftList = [] }) {
       ))}
 
       {sendGiftList.length === 0 && (
-        <Typography color="text.secondary">보낸 선물 내역이 없습니다.</Typography>
+        <Typography color="text.secondary">
+          보낸 선물 내역이 없습니다.
+        </Typography>
       )}
     </Box>
   );

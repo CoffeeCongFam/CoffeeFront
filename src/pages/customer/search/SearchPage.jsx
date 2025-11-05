@@ -17,6 +17,7 @@ import {
   Avatar,
   Select,
   MenuItem,
+  Popover,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
@@ -29,7 +30,7 @@ import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import { useNavigate } from "react-router-dom";
 import { fetchAllCafes } from "../../../apis/customerApi.js";
 import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
-import cafeMarkerIcon from "../../../assets/cafeMarker.png";
+import cafeMarkerIcon from "../../../assets/cafeMarker.png"; // 카페용 마커 아이콘
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -72,6 +73,7 @@ export default function SearchPage() {
   const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
   // const [isLoading, setIsLoading] = useState(true);
   const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // (lng, lat)
+  const [currentLocRef, setCurrentLocRef] = useState(null);
 
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
@@ -79,6 +81,14 @@ export default function SearchPage() {
   const [sortOption, setSortOption] = useState("distance");
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
+
+  const handleCurrentLocPopoverOpen = (event) => {
+    setCurrentLocRef(event.currentTarget);
+  };
+
+  const handleCurrentLocPopoverClose = () => {
+    setCurrentLocRef(null);
+  };
 
   // --- utils ---
   function getCurrentPositionAsync(options) {
@@ -182,6 +192,7 @@ export default function SearchPage() {
     // 현재 위치 마커
     hereMarkerRef.current = new maps.Marker({
       position: center,
+      zIndex: 9999,
       map,
       title: "현재 위치",
     });
@@ -313,6 +324,8 @@ export default function SearchPage() {
     }
   }, [cafes, sortOption]);
 
+  const open = Boolean(currentLocRef); // 현재 위치
+
   return (
     <Box
       sx={{
@@ -362,7 +375,7 @@ export default function SearchPage() {
           right: 16,
           zIndex: 1300,
           display: "flex",
-          gap: 8,
+          gap: 1,
           alignItems: "center",
           // flexWrap: { xs: "wrap", sm: "nowrap" },
         }}
@@ -436,6 +449,8 @@ export default function SearchPage() {
         <IconButton
           onClick={setCurrentLocation}
           aria-label="current-location"
+          onMouseEnter={handleCurrentLocPopoverOpen}
+          onMouseLeave={handleCurrentLocPopoverClose}
           sx={{
             backgroundColor: "white",
             color: "gray",
@@ -448,6 +463,26 @@ export default function SearchPage() {
         >
           <LocationSearchingIcon />
         </IconButton>
+        <Popover
+          id="mouse-over-popover"
+          sx={{ pointerEvents: "none" }}
+          open={open}
+          anchorEl={currentLocRef}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+          onClose={handleCurrentLocPopoverClose}
+          disableRestoreFocus
+        >
+          <Typography sx={{ p: 1, backgroundColor: "rgba(255, 255, 255, 0)" }}>
+            현재 위치로 이동
+          </Typography>
+        </Popover>
 
         {/* 리스트 토글 */}
         {isAppLike ? (

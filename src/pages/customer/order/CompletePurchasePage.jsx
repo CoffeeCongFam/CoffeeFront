@@ -137,10 +137,6 @@ function CompletePurchasePage() {
           결제 정보
         </Typography>
 
-        {/* <Row
-          label="결제 금액"
-          value={`${purchase.paymentAmount.toLocaleString()} 원`}
-        /> */}
         <Row label="승인 일시" value={purchase.paidAt} />
         <Row label="승인 번호" value={purchase.purchaseId} />
         <Row label="결제 수단" value={purchase.paymentStatus} />

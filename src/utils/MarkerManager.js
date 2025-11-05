@@ -1,5 +1,7 @@
 // MarkerManager.js
-// 지도 위 카페 마커들을 "차분 업데이트(diff)" 방식으로 관리하는 유틸 클래스.
+// 지도 위 카페 마커들을 관리하는 유틸 클래스.
+
+import cafeDummy from "../assets/cafeInfoDummy.png";
 
 export default class MarkerManager {
   /**
@@ -27,7 +29,7 @@ export default class MarkerManager {
     return cafe._mmId ?? cafe.id ?? cafe.storeId ?? `idx-${idx ?? 0}`;
   }
 
-  // ✅ 마커 클릭/포커스에서 공통으로 쓸 상세 말풍선 HTML
+  // 마커 클릭/포커스에서 공통으로 쓸 상세 말풍선 HTML
   _buildInfoHtml(cafe) {
     const stockInfo =
       cafe.subscriptionStock != null
@@ -53,6 +55,11 @@ export default class MarkerManager {
         : cafe.storeStatus === "HOLIDAY"
         ? "휴무일"
         : "정보없음";
+
+    // 카페 더미 데이터
+    const thumbnailSrc =
+      cafe.storeImage && cafe.storeImage.trim() ? cafe.storeImage : cafeDummy;
+    // "../assets/cafeInfoDummy.png"
 
     // const actionButton = cafe.isSubscribed
     //   ? `<button style="
@@ -119,7 +126,7 @@ export default class MarkerManager {
         box-shadow:0 2px 8px rgba(0,0,0,0.15);
         font-family:'Pretendard', sans-serif;
       ">
-        <img src="${cafe.storeImage ?? ""}" 
+        <img src="${thumbnailSrc}" 
             style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;"
             alt="thumbnail" />
         <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
