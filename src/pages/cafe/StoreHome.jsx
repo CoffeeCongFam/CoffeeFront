@@ -2,74 +2,10 @@ import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
-import { ChevronLeft } from '@mui/icons-material';
+import useUserStore from '../../stores/useUserStore';
+import api, { TokenService } from '../../utils/api';
 
 const BASE_URL = 'http://localhost:8080';
-
-const partnerStoreId = 1;
-
-// export const DUMMY_TODAY_ORDERS_RESPONSE = {
-//   success: true,
-//   data: [
-//     // ----------------------------------------
-//     // 1. 요청 (REQUEST) - 접수 대기 중 (가장 최근 주문)
-//     // ----------------------------------------
-//     {
-//       orderId: 21,
-//       memberSubscriptionId: 1,
-//       dailyRemainCount: 1, // 일 잔여 횟수
-//       orderType: 'OUT', // 테이크아웃
-//       orderStatus: 'REQUEST',
-//       rejectedReason: null,
-//       orderNumber: 1009,
-//       createdAt: '2025-10-31T04:25:00.000Z',
-//       tel: '010-1234-5678',
-//       name: '홍길동',
-//       menuList: [
-//         { menuId: 21, quantity: 2, menuName: '카페라떼', price: 9000 },
-//         { menuId: 32, quantity: 1, menuName: '브라우니', price: 4000 },
-//       ],
-//     },
-//     // ----------------------------------------
-//     // 2. 제조 중 (INPROGRESS)
-//     // ----------------------------------------
-//     {
-//       orderId: 19,
-//       memberSubscriptionId: 1,
-//       dailyRemainCount: 1, // 일 잔여 횟수
-//       orderType: 'IN', // 매장이용
-//       orderStatus: 'INPROGRESS',
-//       rejectedReason: null,
-//       orderNumber: 1007,
-//       createdAt: '2025-10-31T04:15:00.000Z',
-//       tel: '010-5555-4444',
-//       name: '김철수',
-//       menuList: [
-//         { menuId: 1, quantity: 1, menuName: '아메리카노', price: 3500 },
-//       ],
-//     },
-//     // ----------------------------------------
-//     // 3. 완료 (COMPLETED) - 픽업 대기 중
-//     // ----------------------------------------
-//     {
-//       orderId: 17,
-//       memberSubscriptionId: 2,
-//       dailyRemainCount: 2, // 일 잔여 횟수
-//       orderType: 'OUT',
-//       orderStatus: 'COMPLETED',
-//       rejectedReason: null,
-//       orderNumber: 1005,
-//       createdAt: '2025-10-31T04:05:00.000Z',
-//       tel: '010-8888-7777',
-//       name: '박영희',
-//       menuList: [
-//         { menuId: 21, quantity: 1, menuName: '바닐라 라떼', price: 5000 },
-//         { menuId: 41, quantity: 1, menuName: '딸기 케이크', price: 6000 },
-//       ],
-//     },
-//   ],
-//   message: '요청이 성공적으로 처리되었습니다.',
-// };
 
 const getOrderTypeLabel = (typeCode) => {
   switch (typeCode) {
@@ -96,6 +32,9 @@ const getFormattedMenuList = (menuList) => {
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
+  const { authUser, setUser, partnerStoreId, setPartnerStoreId } =
+    useUserStore();
+
   const [orders, setOrders] = useState([]);
 
   // 모달 상태 정의
@@ -113,13 +52,63 @@ function StoreHome() {
     setModalState({ open: true, selectedOrder: order });
   };
 
+  // 로그인 했을 때 userId랑 partnerStoreId를 JUSTAND로 쓰기 위한 몸부림(App.js에 넣어야 함 - 테스트용임 이거는)
+  useEffect(() => {
+    console.log('CUSTOMER HOME--------------------------------', authUser);
+    //
+    const initUser = async () => {
+      // token 은 있는데, 로그인한 사용자 정보가 없는 상태
+
+      if (!authUser) {
+        console.log('TOKEN OK, BUT USER INFO IS EMPTY-----------------');
+
+        try {
+          const res = await api.post('/login');
+          const userData = res.data?.data;
+          console.log("user data from '/login", userData);
+
+          if (userData) {
+            setUser(userData);
+            TokenService.setUser(userData);
+            console.log('userData 저장 완료-------------------');
+
+            if (userData.partnerStoreId) {
+              setPartnerStoreId(userData.partnerStoreId);
+              console.log(
+                `✅ Partner Store ID ${userData.partnerStoreId} 저장 완료.`
+              );
+            }
+          } else {
+            console.warn('응답에 user data 없음');
+            //
+            window.href;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+
+    initUser();
+
+    console.log(authUser);
+  }, []);
+
   // 오늘의 주문 목록 조회 GET
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
+        if (!partnerStoreId || partnerStoreId <= 0) {
+          console.log(
+            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
+            partnerStoreId
+          );
+          return;
+        }
+
         const response = await axios.get(
           `${BASE_URL}/api/stores/orders/today/${partnerStoreId}`
-          // 하드코딩 partnerStoreId 테스트용**
         );
 
         // 백엔드 응답 구조에 맞게 resposne.data.data
@@ -139,7 +128,7 @@ function StoreHome() {
       }
     };
     fetchOrders();
-  }, []);
+  }, [partnerStoreId]);
 
   // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
   // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.

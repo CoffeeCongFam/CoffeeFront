@@ -16,6 +16,7 @@ import {
   Avatar,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import useUserStore from '../../../stores/useUserStore';
 
 const MENU_TYPES = [
   { value: 'BEVERAGE', label: '음료' },
@@ -28,13 +29,15 @@ const defaultImageUrl = 'https://placehold.co/40x40/CCCCCC/333333?text=New';
  * 신규 메뉴 등록 모달 컴포넌트
  */
 export default function MenuRegistModal({ open, onClose, onRegister }) {
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
+
   const [formData, setFormData] = useState({
     menuName: '',
     price: '',
     menuDesc: '',
     menuType: 'BEVERAGE',
     menuStatus: 'Y',
-    partnerStoreId: 1, // 고정 값
+    partnerStoreId: partnerStoreId, // 고정 값
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -119,15 +122,22 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
   const handleSubmit = async () => {
     if (validate()) {
       try {
+        // 🚩 [수정] 가격(price)을 문자열에서 숫자로 변환
+        const dataToRegister = {
+          ...formData,
+          price: parseInt(formData.price), // 문자열인 가격을 숫자로 변환
+        };
+
         // 부모 컴포넌트의 onRegister 함수 호출 (API 연결 책임은 부모에게 있음)
         await onRegister(
-          formData,
+          dataToRegister,
           selectedFile,
           imagePreview || defaultImageUrl // 현재 미리보기 URL 전송
         );
 
         // 성공 시 폼 초기화 및 닫기
         resetFormAndClose();
+        alert(`메뉴 [${formData.menuName}] 등록 완료!`);
       } catch (error) {
         // onRegister에서 발생한 API 에러 처리
         console.error('메뉴 등록 중 에러 발생:', error);

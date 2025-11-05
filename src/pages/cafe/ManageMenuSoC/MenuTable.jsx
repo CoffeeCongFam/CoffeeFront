@@ -28,8 +28,16 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { CloudUpload } from '@mui/icons-material';
 
-const formatPrice = (price) => price.toLocaleString('ko-KR') + '원';
-
+const formatPrice = (price) => {
+  // price가 유효한 숫자(0 포함)인지 확인합니다.
+  if (typeof price === 'number' && !isNaN(price)) {
+    // 0 미만의 값(DB/API 오류 가능성)도 포함하여 toLocaleString 처리
+    return price.toLocaleString('ko-KR') + '원';
+  }
+  // 유효하지 않은 경우, 오류 대신 대체 텍스트를 반환합니다.
+  return '가격 정보 없음';
+  // 또는 '0원' 등으로 설정할 수도 있습니다.
+};
 const getMenuTypeLabel = (type) => {
   switch (type) {
     case 'BEVERAGE':

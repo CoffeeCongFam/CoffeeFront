@@ -9,7 +9,7 @@ import axios from 'axios';
 // 🚨 백엔드 연결 시: 실제 API 기본 경로 사용 (예: '/api/owners/subscriptions')
 const API_BASE_URL = 'http://localhost:8080/api/owners/subscriptions';
 
-const SUBSCRIPTION_ID = 1;
+// const SUBSCRIPTION_ID = 1;
 
 // 1. 구독권 리스트 조회 (GET)
 // Endpoint: /api/owners/subscriptions
@@ -60,7 +60,7 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
 
 export const updateSubscription = async (subscriptionId, updateData) => {
   // 🚩 [실제 axios 코드]
-  const url = `${API_BASE_URL}/${SUBSCRIPTION_ID}`;
+  const url = `${API_BASE_URL}/${subscriptionId}`;
   // SUBSCRIPTION_ID 테스트용 가데이터
 
   try {
