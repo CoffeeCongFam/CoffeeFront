@@ -43,9 +43,9 @@ const getMenuTypeLabel = (type) => {
 
 const getMenuStatusChipProps = (status) => {
   switch (status) {
-    case 'ACTIVE':
+    case 'Y':
       return { label: '판매 중', color: 'success' };
-    case 'INACTIVE':
+    case 'N':
       return { label: '판매 중지', color: 'error' };
     default:
       return { label: '상태 확인 필요', color: 'warning' };
