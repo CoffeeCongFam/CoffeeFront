@@ -74,7 +74,7 @@ const ProductList = ({ subscriptions, onCardClick }) => {
       {subscriptions.map((subscription) => {
         // 단일 구독권 객체에 대한 카드 렌더링 로직 (기존 코드를 그대로 사용)
         const statusProps = getStatusProps(subscription.subscriptionStatus);
-
+        console.log(subscription);
         return (
           <Paper
             key={subscription.subscriptionId} // key는 배열 반복 시 필수

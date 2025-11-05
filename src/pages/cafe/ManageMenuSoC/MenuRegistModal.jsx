@@ -33,8 +33,8 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
     price: '',
     menuDesc: '',
     menuType: 'BEVERAGE',
-    menuStatus: 'ACTIVE',
-    partnerStoreId: 'S001', // 고정 값
+    menuStatus: 'Y',
+    partnerStoreId: 1, // 고정 값
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -103,8 +103,8 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
       price: '',
       menuDesc: '',
       menuType: 'BEVERAGE',
-      menuStatus: 'ACTIVE',
-      partnerStoreId: 'S001',
+      menuStatus: 'Y',
+      partnerStoreId: 1,
     });
     setErrors({});
     handleClearImage();
@@ -158,8 +158,8 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
                 label="메뉴 활성 상태"
                 onChange={handleChange}
               >
-                <MenuItem value="ACTIVE">ACTIVE (판매 중)</MenuItem>
-                <MenuItem value="INACTIVE">INACTIVE (판매 중지)</MenuItem>
+                <MenuItem value="Y">ACTIVE (판매 중)</MenuItem>
+                <MenuItem value="N">INACTIVE (판매 중지)</MenuItem>
               </Select>
             </FormControl>
           </Grid>

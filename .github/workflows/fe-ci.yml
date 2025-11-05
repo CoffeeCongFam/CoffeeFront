@@ -14,12 +14,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js LTS
+      # Node.js 설정
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
 
+      # 의존성 설치 및 빌드
       - name: Install dependencies
         run: npm ci
 
@@ -40,3 +42,25 @@ jobs:
           name: fe-dist
           path: dist
           retention-days: 7
+      # Docker 빌드 및 배포
+      - name: Copy and deploy to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/home/ubuntu/CoffeeFront"
+
+      # Docker 빌드 및 배포
+      - name: Deploy Docker Compose on server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/app/CoffeeFront
+            docker compose down || true
+            docker compose up -d --build
+            docker image prune -f

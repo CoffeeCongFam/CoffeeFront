@@ -41,8 +41,8 @@ export default function MenuEditModal({
       price: '',
       menuDesc: '',
       menuType: 'BEVERAGE',
-      menuStatus: 'ACTIVE',
-      partnerStoreId: 'S001',
+      menuStatus: 'Y',
+      partnerStoreId: 1,
       menuImg: defaultImageUrl,
     }
   );
@@ -62,8 +62,8 @@ export default function MenuEditModal({
         price: editingMenu.price.toString(), // 가격을 문자열로 변환하여 폼에 표시
         menuDesc: editingMenu.menuDesc || '',
         menuType: editingMenu.menuType || 'BEVERAGE',
-        menuStatus: editingMenu.menuStatus || 'ACTIVE',
-        partnerStoreId: editingMenu.partnerStoreId || 'S001',
+        menuStatus: editingMenu.menuStatus || 'Y',
+        partnerStoreId: editingMenu.partnerStoreId || 1,
         menuImg: editingMenu.menuImg || defaultImageUrl, // 기존 DB URL 저장
       });
       setImagePreview(editingMenu.menuImg || defaultImageUrl);
@@ -180,8 +180,8 @@ export default function MenuEditModal({
                 label="메뉴 활성 상태"
                 onChange={handleChange}
               >
-                <MenuItem value="ACTIVE">ACTIVE (판매 중)</MenuItem>
-                <MenuItem value="INACTIVE">INACTIVE (판매 중지)</MenuItem>
+                <MenuItem value="Y">ACTIVE (판매 중)</MenuItem>
+                <MenuItem value="N">INACTIVE (판매 중지)</MenuItem>
               </Select>
             </FormControl>
           </Grid>

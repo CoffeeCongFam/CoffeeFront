@@ -1,9 +1,5 @@
 import axios from 'axios';
 const API_BASE_URL = 'http://localhost:8080/api/stores/menus';
-const PARTNER_STORE_ID = 1;
-// partnerStoreId 테스트용 하드코드 점주 매장 코드
-const MENU_ID = 2;
-// MENU_ID 테스트용 하드 코드 메뉴 아이디
 
 // /api/stores/menus 매장 메뉴 등록
 // /api/stores/menus/{menuId} 매장 메뉴 상세 정보 수정
@@ -82,7 +78,7 @@ const MENU_ID = 2;
 export const fetchStoreMenus = async (partnerStoreId) => {
   // [실제 axios 코드]
   try {
-    const url = `${API_BASE_URL}/store/${PARTNER_STORE_ID}`;
+    const url = `${API_BASE_URL}/store/${partnerStoreId}`;
     // 테스트용 PARTNER_STORE_ID
     const response = await axios.get(url);
     console.log(
@@ -102,7 +98,7 @@ export const fetchStoreMenus = async (partnerStoreId) => {
 //  * @param {Object} menuData - 메뉴 정보를 담은 JSON 객체 (menuName, price, menuDesc 등)
 //  * @param {File | null} imageFile - 첨부할 이미지 파일 (File 객체)
 //  * @returns {Promise<Object>} 등록된 메뉴 정보 객체
-export const registerMenu = async (menuData, imageFile) => {
+export const registerMenu = async (data, imageFile) => {
   // 🚩 [실제 axios 코드]
   const url = `${API_BASE_URL}`;
 
@@ -111,19 +107,19 @@ export const registerMenu = async (menuData, imageFile) => {
 
   // 이미지 파일 추가 - ** 이건 경로인가?
   if (imageFile) {
-    formData.append('image', imageFile);
+    formData.append('file', imageFile);
   }
 
   // 메뉴 json 데이터 추가
-  const menuJson = new Blob([JSON.stringify(menuData)], {
+  const menuJson = new Blob([JSON.stringify(data)], {
     type: 'application/json',
   });
-  formData.append('menu', menuJson);
+  formData.append('data', menuJson);
 
   try {
     const response = await axios.post(url, formData, {
       headers: {
-        // 'Content-Type': 'multipart/form-data',
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data.data;
@@ -139,27 +135,27 @@ export const registerMenu = async (menuData, imageFile) => {
 
 export const updateMenu = async (menuId, updateData, imageFIle) => {
   // 🚩 [실제 axios 코드 - 주석 처리]
-  const url = `${API_BASE_URL}/${MENU_ID}`;
+  const url = `${API_BASE_URL}/${menuId}`;
   // 테스트용 MENU_ID
 
   const formData = new FormData();
 
   // 이미지 파일 추가
   if (imageFIle) {
-    formData.append('image', imageFIle);
+    formData.append('file', imageFIle);
   }
 
   // 메뉴 json 데이터 추가
   const menuJson = new Blob([JSON.stringify(updateData)], {
     type: 'application/json',
   });
-  formData.append('menu', menuJson);
+  formData.append('data', menuJson);
 
   try {
     // put 요청
     const response = await axios.patch(url, formData, {
       headers: {
-        // 'Content-Type': 'multipart/form-data',
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data.data;
@@ -169,18 +165,18 @@ export const updateMenu = async (menuId, updateData, imageFIle) => {
   }
 };
 
-// 메뉴 정보 소프트 삭제 (DELETE)
+// 메뉴 정보 소프트 삭제 (DELETE) - 프론트에서 볼 수 없으나, 활성화 상태를 비활성화로 바꾼
 // Endpoint: DELETE /api/stores/menus/{menuId}
 //  * @param {string} menuId - 삭제할 메뉴 ID
 export const deleteMenu = async (menuId) => {
   // 🚩 [실제 axios 코드 - 주석 처리]
   try {
-    const url = `${API_BASE_URL}/${MENU_ID}`;
+    const url = `${API_BASE_URL}/${menuId}`;
     // 테스트용 MENU_ID
     const response = await axios.delete(url);
     return response.data.data;
   } catch (error) {
-    console.error(`메뉴 삭제 실패 (ID: ${MENU_ID}):`, error);
+    console.error(`메뉴 삭제 실패 (ID: ${menuId}):`, error);
     throw error;
   }
 };
