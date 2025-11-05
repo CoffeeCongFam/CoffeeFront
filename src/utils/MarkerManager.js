@@ -49,27 +49,43 @@ export default class MarkerManager {
         ? "휴무일"
         : "정보없음";
 
-    const actionButton = cafe.isSubscribed
-      ? `<button style="
-            background:#fff;
-            border:1px solid #aaa;
-            color:#333;
-            border-radius:20px;
-            font-size:12px;
-            padding:3px 10px;
-            margin-top:6px;
-            cursor:default;
-          ">✓ 구독중</button>`
-      : `<button style="
-            background:#000;
-            color:#fff;
-            border:none;
-            border-radius:20px;
-            font-size:12px;
-            padding:4px 12px;
-            margin-top:6px;
-            cursor:pointer;
-          ">+ 구독하기</button>`;
+    // const actionButton = cafe.isSubscribed
+    //   ? `<button style="
+    //         background:#fff;
+    //         border:1px solid #aaa;
+    //         color:#333;
+    //         border-radius:20px;
+    //         font-size:12px;
+    //         padding:3px 10px;
+    //         margin-top:6px;
+    //         cursor:default;
+    //       ">✓ 구독중</button>`
+    //   : `<button style="
+    //         background:#000;
+    //         color:#fff;
+    //         border:none;
+    //         border-radius:20px;
+    //         font-size:12px;
+    //         padding:4px 12px;
+    //         margin-top:6px;
+    //         cursor:pointer;
+    //       ">+ 구독하기</button>`;
+
+    // const subscribeButton = `
+    //   <a href="/me/store/${cafe.storeId}"
+    //     style="
+    //       display:inline-block;
+    //       margin-top:6px;
+    //       text-decoration:none;
+    //       color:#fff;
+    //       background:#1976d2;
+    //       border-radius:20px;
+    //       padding:4px 10px;
+    //       font-size:12px;
+    //     ">
+    //     자세히 보기 →
+    //   </a>
+    // `;
 
     const detailButton = `
       <a href="/me/store/${cafe.storeId}" 
@@ -130,8 +146,8 @@ export default class MarkerManager {
           <div style="font-size:12px; color:#444; margin-top:3px;">
             👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${cafe.reviewCount ?? 0}개
           </div>
-          <div style="margin-top:6px; display:flex; gap:6px; align-items:center;">
-            ${actionButton}
+          <div style="margin-top:6px; display:flex; gap:6px; align-items:center; justify-content: right;">
+
             ${detailButton}
           </div>
         </div>

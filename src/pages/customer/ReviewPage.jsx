@@ -63,21 +63,23 @@ export default function ReviewPage({ reviewList: propReviews }) {
         }
         const res = await getReview();
         const arr = Array.isArray(res) ? res : res?.data ?? [];
-        console.log('[ReviewPage] resolved reviews:', arr.length, arr);
+        console.log("[ReviewPage] resolved reviews:", arr.length, arr);
         if (!ignore) setLocalReviews(sortReviews(arr, sortOrder));
       } catch (e) {
-        console.error('[ReviewPage] getReview error:', e);
+        console.error("[ReviewPage] getReview error:", e);
       } finally {
         if (!ignore) setLoading(false);
       }
     }
     load();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasPropData, sortOrder, propReviews]);
 
   const handleDelete = async (reviewId) => {
-    console.log(reviewId)
+    console.log(reviewId);
     if (!reviewId) {
       alert("리뷰 ID를 찾을 수 없습니다.");
       return;
@@ -111,15 +113,19 @@ export default function ReviewPage({ reviewList: propReviews }) {
         </Box>
       )}
 
-      {empty && (
-        <EmptyState />
-      )}
+      {empty && <EmptyState />}
 
       {!loading && !empty && (
         <Stack spacing={1.5} sx={{ mt: 2 }}>
           {localReviews.map((rv) => (
             <ReviewItemCard
-              key={rv.reviewId ?? rv.review_id ?? `${rv.partnerStoreId ?? rv.partner_store_id}-${rv.createdAt ?? rv.created_at}`}
+              key={
+                rv.reviewId ??
+                rv.review_id ??
+                `${rv.partnerStoreId ?? rv.partner_store_id}-${
+                  rv.createdAt ?? rv.created_at
+                }`
+              }
               review={rv}
               fmt={fmt}
               onDelete={handleDelete}
@@ -180,7 +186,11 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
   } = review || {};
   const id = reviewId ?? review_id;
   const storeId = partnerStoreId ?? partner_store_id;
-  const storeLabel = partnerStoreName ? partnerStoreName : (storeId ? `매장 #${storeId}` : "알 수 없는 매장");
+  const storeLabel = partnerStoreName
+    ? partnerStoreName
+    : storeId
+    ? `매장 #${storeId}`
+    : "알 수 없는 매장";
   const contentText = reviewContent ?? review_content ?? "";
   const createdVal = createdAt ?? created_at;
 
@@ -200,13 +210,18 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
                 width: 84,
                 height: 84,
                 borderRadius: 1,
-                objectFit: 'cover',
-                flexShrink: 0
+                objectFit: "cover",
+                flexShrink: 0,
               }}
             />
           )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              flexWrap="wrap"
+            >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                 {storeLabel}
               </Typography>
@@ -216,10 +231,20 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
               <Tooltip title={`${rating}점`}>
                 <Rating value={Number(rating) || 0} precision={0.5} readOnly />
               </Tooltip>
-              <Typography variant="caption" sx={{ color: "text.secondary", ml: "auto" }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "text.secondary", ml: "auto" }}
+              >
                 {createdVal ? fmt(new Date(createdVal)) : "-"}
               </Typography>
-              <Box sx={{ ml: 1, display: "flex", justifyContent: "flex-end", flexGrow: 1 }}>
+              <Box
+                sx={{
+                  ml: 1,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  flexGrow: 1,
+                }}
+              >
                 <Button
                   variant="outlined"
                   size="small"

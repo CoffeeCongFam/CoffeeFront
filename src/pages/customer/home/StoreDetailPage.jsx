@@ -8,7 +8,7 @@ import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
-import dummyImg from "./../../../assets/CoffeiensLogo.png";
+import dummyImg from "./../../../assets/cafeInfoDummy.png";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -38,7 +38,7 @@ function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
 
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [store, setStore] = useState({});
   const [storeStatus, setStoreStatus] = useState("OPEN"); // OPEN || CLOSED || HOLIDAY
 
@@ -54,6 +54,7 @@ function StoreDetailPage() {
       loadStoreDetail(storeId);
       // 카페 상태 계산
       setStoreStatus(getStoreStatusByDate(store.storeHours));
+      setIsLoading(false);
     } catch (err) {
       console.log("카페 상세  정보 요청 실패: ", err);
       alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
@@ -69,11 +70,13 @@ function StoreDetailPage() {
     }
   };
 
-  return (
+  return isLoading ? (
+    <Box>로딩 중...</Box>
+  ) : (
     <Box
       sx={{
         width: "100%",
-        maxWidth: isAppLike ? "100%" : "1100px", // 데스크탑에서만 가운데로
+        maxWidth: isAppLike ? "100%" : "50%", // 데스크탑에서만 가운데로
         mx: "auto",
         pb: isAppLike ? "15%" : 0,
       }}
@@ -82,6 +85,8 @@ function StoreDetailPage() {
       <Box
         sx={{
           width: "100%",
+          justifyContent: "center",
+          alignContent: "center",
           height: { xs: 240, sm: 240, md: 300 },
           overflow: "hidden",
           mb: 2,
@@ -134,7 +139,7 @@ function StoreDetailPage() {
             variant={isAppLike ? "h5" : "h4"}
             sx={{ fontWeight: 700 }}
           >
-            {store.storeName || "카페 이름"}
+            {store?.storeName || "카페 이름"}
           </Typography>
         </Box>
 
@@ -171,7 +176,7 @@ function StoreDetailPage() {
 
         {/* 3. 리뷰 탭 */}
         <TabPanel value={tab} index={3}>
-          <CafeReviewList store={store} />
+          <CafeReviewList storeId={storeId} />
         </TabPanel>
       </Box>
     </Box>

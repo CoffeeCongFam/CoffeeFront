@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import menuDummy from "../../../assets/menuDummy.jpg";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 function CafeMenuList({ menus = [] }) {
@@ -48,7 +49,12 @@ function CafeMenuList({ menus = [] }) {
         Object.keys(grouped).map((type) => (
           <Box
             key={type}
-            sx={{ mb: 2, border: "1px solid #eee", borderRadius: 1, overflow: "hidden" }}
+            sx={{
+              mb: 2,
+              border: "1px solid #eee",
+              borderRadius: 1,
+              overflow: "hidden",
+            }}
           >
             {/* 섹션 헤더 */}
             <Box
@@ -87,28 +93,28 @@ function CafeMenuList({ menus = [] }) {
                       borderBottom: "1px solid #cacacaff",
                       "&:last-of-type": { borderBottom: "none" },
                       cursor: "pointer",
-                      transition: "background-color 0.2s ease", 
+                      transition: "background-color 0.2s ease",
                       "&:hover": {
-                        backgroundColor: "#f9f9f9", 
+                        backgroundColor: "#f9f9f9",
                       },
                     }}
                   >
                     {/* 왼쪽: 이미지 + 이름/설명 */}
                     <Box
                       sx={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: { xs: "flex-start", sm: "center" },
-                          gap: 2,
-                          flex: 1, 
-                          minWidth: 0, 
-                        }}
-                      >
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: { xs: "flex-start", sm: "center" },
+                        gap: 2,
+                        flex: 1,
+                        minWidth: 0,
+                      }}
+                    >
                       {menu.menuImg && (
                         <Box
                           component="img"
-                          src={menu.menuImage}
-                          alt={menu.menuName}
+                          src={menu?.menuImage || menuDummy}
+                          alt={menu?.menuName}
                           sx={{
                             width: { xs: 80, sm: 100 },
                             height: { xs: 64, sm: 70 },
@@ -119,16 +125,20 @@ function CafeMenuList({ menus = [] }) {
                         />
                       )}
 
-                      <Box sx={{
+                      <Box
+                        sx={{
                           flex: 1,
-                          minWidth: 0, 
+                          minWidth: 0,
                         }}
                       >
-                        <Typography variant="subtitle1" sx={{ fontWeight: 500, wordBreak: "keep-all" }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 500, wordBreak: "keep-all" }}
+                        >
                           {menu.menuName || menu.name}
                         </Typography>
                         {menu.menuDesc && (
-                          <Typography 
+                          <Typography
                             variant="body2"
                             color="text.secondary"
                             sx={{
@@ -146,14 +156,14 @@ function CafeMenuList({ menus = [] }) {
                     {/* 오른쪽: 가격 / 상태 */}
                     <Box
                       sx={{
-                        width: { xs: "100%", sm: "auto" },   
-                        flexShrink: 0,                        
+                        width: { xs: "100%", sm: "auto" },
+                        flexShrink: 0,
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: { xs: "flex-end", sm: "flex-start" },
                         gap: 1,
-                        ml: { sm: 2 },                        
+                        ml: { sm: 2 },
                       }}
                     >
                       {/* 비활성 메뉴 표시 */}
@@ -164,7 +174,11 @@ function CafeMenuList({ menus = [] }) {
                       )}
                       <Typography
                         variant="subtitle1"
-                        sx={{ color:"#4d4d4dff" , fontWeight: 600, whiteSpace: "nowrap" }}
+                        sx={{
+                          color: "#4d4d4dff",
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}
                       >
                         {menu.price ? menu.price.toLocaleString() : "-"}원
                       </Typography>

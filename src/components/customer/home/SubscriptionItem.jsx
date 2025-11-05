@@ -10,6 +10,7 @@ import {
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
+import dummyImg from "../../../assets/cafeInfoDummy.png"
 import { useNavigate } from "react-router-dom";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
@@ -41,7 +42,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         cursor: "pointer",
         position: "relative",
       }}
-      onClick={() => navigate(`/me/store/${item.store.storeId}`)}
+      onClick={() => navigate(`/me/store/${item.store.partnerStoreId}`)}
     >
       {/* 도장 오버레이 */}
       {isUsedToday && (
@@ -78,7 +79,8 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             objectFit: "cover",
             backgroundColor: "#ddd",
           }}
-          image={item.store.storeImg}
+          image={dummyImg}
+          // image={item.store.storeImg || dummayImg}
           alt={item.store.storeName}
         />
       </Box>
@@ -92,6 +94,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             justifyContent: "space-between",
             alignItems: "center",
             mb: 1,
+            gap: "1.5rem",
           }}
         >
           <Typography variant="subtitle1" fontWeight="700">
@@ -100,7 +103,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
 
           <Chip
             icon={<StarBorderIcon sx={{ color: "white" }} />}
-            label={item.subName}
+            label={item.subscriptionType}
             size="small"
             style={{ fontSize: "10px", width: "fit-content" }}
             sx={{
@@ -117,7 +120,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
           variant="body2"
           sx={{ fontSize: "12px", textAlign: "right", color: "grey.600" }}
         >
-          {item.subStart} ~ {item.subEnd}
+          {item.subStart.split("T")[0]} ~ {item.subEnd.split("T")[0]}
         </Typography>
 
         {/* 남은 이용일 (가운데, 핑크) */}

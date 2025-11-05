@@ -4,6 +4,7 @@ import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import WalletIcon from "@mui/icons-material/Wallet";
 import { fetchPurchaseInfo } from "../../../apis/customerApi";
 
 function CompletePurchasePage() {
@@ -22,26 +23,7 @@ function CompletePurchasePage() {
     getPurchaseInfo();
   }, [purchaseId]);
 
-  // "data": {
-  //       "sender": "정민선",
-  //       "receiver": "정민선",
-  //       "subscriptionId": 1,
-  //       "subscriptionName": "아메리카노 구독",
-  //       "paidAt": "2025-11-04T14:59:50.553549",
-  //       "purchaseId": 61,
-  //       "memberSubscriptionId": 61,
-  //       "paymentStatus": "PAID",
-  //       "isGift": "N",
-  //       "giftMessage": null,
-  //       "paymentAmount": 19000,
-  //       "usageStatus": "NOT_ACTIVATED",
-  //       "refundedAt": null,
-  //       "storeName": "달빛다방",
-  //       "refundReasons": []
-  //   },
-
   function handleBack() {
-    // 결제 완료 후에는 그냥 내 구독 목록 /me/subscriptions 로 보내도 됨
     navigate("/me/subscriptions");
   }
 
@@ -62,7 +44,7 @@ function CompletePurchasePage() {
             ? "선물이 전달되었습니다."
             : "결제가 완료되었습니다."}
         </Typography>
-        <CardGiftcardIcon />
+        {purchase.isGift === "Y" ? <CardGiftcardIcon /> : <WalletIcon />}
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -117,6 +99,19 @@ function CompletePurchasePage() {
               <Typography fontWeight={"bold"}>받는 사람</Typography>
               <Typography>{purchase?.receiver}</Typography>
             </Box>
+          </Box>
+        )}
+        {purchase?.isGift === "Y" && (
+          <Box
+            sx={{
+              textAlign: "center",
+              backgroundColor: "#fff48dd7",
+              px: "1rem",
+              py: "1rem",
+              borderRadius: "1rem",
+            }}
+          >
+            <Typography>{purchase.giftMessage}</Typography>
           </Box>
         )}
         <Divider sx={{ my: 3 }} />
