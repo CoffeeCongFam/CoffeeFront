@@ -123,13 +123,14 @@ export default function CustomerLayout() {
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
         <Box
-          style={{
+          sx={{
             height: 120,
             margin: "0 auto",
             cursor: "pointer",
             marginTop: "10px",
             marginBottom: "10px",
           }}
+          onClick={() => navigate("/me")}
         >
           <img src={logo} alt="CoffeeEns 로고" style={{ height: "100%" }} />
         </Box>
