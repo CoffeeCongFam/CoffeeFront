@@ -8,7 +8,7 @@ const useUserStore = create((set, get) => ({
   //    유저 정보 업데이트 함수
   setUser: (newUser) => set({ authUser: newUser }),
 
-  setPartnerStoreId: (id) => set({ partnerStoreId: id }),
+  setPartnerStoreId: (id) => set({ partnerStoreId: id }), // partnerStoreId 사용
 
   // 유저 정보 초기화
   clearUser: () => set({ authUser: null }),
