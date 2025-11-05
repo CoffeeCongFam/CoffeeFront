@@ -41,8 +41,11 @@ import {
   getReceiveGift,
 } from "../../utils/gift";
 import { SubscriptionDetailCard } from "./Subscription";
+import useUserStore from "../../stores/useUserStore";
 
 function MyGift() {
+  const { authUser } = useUserStore();
+  const memberId = authUser?.memberId ?? 105;
   const [filter, setFilter] = useState("ALL");
   const [openIndex, setOpenIndex] = useState(null);
   const [giftList, setGiftList] = useState([]);
@@ -218,34 +221,83 @@ function MyGift() {
     return baseList; // ALL
   }, [filter, baseList, sentGiftList, receivedGiftList]);
 
-  // ✅ 문구 생성 (ALL 탭) - isGift 기반
-  const formatMessage = (item) => {
+  // ✅ 문구 생성 (ALL 탭) - memberId / senderId / receiverId 기반
+  const formatMessage = (item, memberId) => {
     const bold = { fontWeight: "bold", color: "black" };
-    const isReceived = item.isGift === "Y";
 
-    if (isReceived) {
-      // 받은 선물: sender -> 나
+    const normalizeId = (v) => {
+      if (v === undefined || v === null || v === "") return null;
+      const n = Number(v);
+      return Number.isNaN(n) ? null : n;
+    };
+
+    const mId = normalizeId(memberId);
+    const sId = normalizeId(item.senderId);
+    const rId = normalizeId(item.receiverId);
+
+    const isMineSent = mId !== null && sId !== null && mId === sId;
+    const isMineReceived = mId !== null && rId !== null && mId === rId;
+
+    // 내가 받은 선물: sender -> 나 (receiverId === memberId)
+    if (isMineReceived) {
       return {
         isSent: false,
+        isMineSent,
+        isMineReceived,
         node: (
           <>
-            <Typography component="span" sx={bold}>{item.sender}</Typography>
+            <Typography component="span" sx={bold}>
+              {item.sender}
+            </Typography>
             님께&nbsp;
-            <Typography component="span" sx={bold}>{item.subscriptionName}</Typography>
+            <Typography component="span" sx={bold}>
+              {item.subscriptionName}
+            </Typography>
             을 선물받았습니다!
           </>
         ),
       };
     }
 
-    // 보낸 선물: 나 -> receiver
+    // 내가 보낸 선물: 나(senderId) -> 상대(receiverId)
+    if (isMineSent) {
+      return {
+        isSent: true,
+        isMineSent,
+        isMineReceived,
+        node: (
+          <>
+            <Typography component="span" sx={bold}>
+              {item.receiver}
+            </Typography>
+            님께&nbsp;
+            <Typography component="span" sx={bold}>
+              {item.subscriptionName}
+            </Typography>
+            을 선물했습니다!
+          </>
+        ),
+      };
+    }
+
+    // 기타: 나와 직접적인 매칭이 없는 선물 기록 (안전망)
     return {
-      isSent: true,
+      isSent: false,
+      isMineSent,
+      isMineReceived,
       node: (
         <>
-          <Typography component="span" sx={bold}>{item.receiver}</Typography>
+          <Typography component="span" sx={bold}>
+            {item.sender}
+          </Typography>
+          님이&nbsp;
+          <Typography component="span" sx={bold}>
+            {item.receiver}
+          </Typography>
           님께&nbsp;
-          <Typography component="span" sx={bold}>{item.subscriptionName}</Typography>
+          <Typography component="span" sx={bold}>
+            {item.subscriptionName}
+          </Typography>
           을 선물했습니다!
         </>
       ),
@@ -767,11 +819,9 @@ function MyGift() {
         );
       })}
 
-      {/* ALL 탭: 기존 렌더링 유지 (getGiftData 기반) */}
+      {/* ALL 탭: getGiftData 기반, memberId / senderId / receiverId로 분기 */}
       {filter === "ALL" && filteredGiftList.map((item, index) => {
-        const { node, isSent } = formatMessage(item);
-        const isMineSent = item.isGift === "N";      // 보낸 선물
-        const isMineReceived = item.isGift === "Y";  // 받은 선물
+        const { node, isSent, isMineSent, isMineReceived } = formatMessage(item, memberId);
         const canToggle = isMineSent || isMineReceived;
 
         const handleClick = async () => {

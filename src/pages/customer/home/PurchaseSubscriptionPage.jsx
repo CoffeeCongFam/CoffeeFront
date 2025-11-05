@@ -54,9 +54,11 @@ function PurchaseSubscriptionPage() {
         subscriptionId: subscription.subscriptionId,
         purchaseType: "CREDIT_CARD",
       };
-      const purchaseId = await requestPurchase(payload);
+      const data = await requestPurchase(payload);
 
-      navigate(`/me/purchase/${purchaseId}/complete`);
+      console.log("구매 완료!", data.purchaseId);
+
+      navigate(`/me/purchase/${data.purchaseId}/complete`);
     } catch (error) {
       console.error("결제 실패:", error);
       alert("결제 처리 중 오류가 발생했습니다.");

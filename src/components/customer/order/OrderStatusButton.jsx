@@ -27,6 +27,11 @@ const STATUS_STYLES = {
     color: "#d32f2f", // 빨강
     bg: "#ffebee",
   },
+  CANCELED: {
+    label: "주문 취소",
+    color: "#ff9b29ff", // 회색
+    bg: "#fffab9ff",
+  },
 };
 
 

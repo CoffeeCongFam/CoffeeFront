@@ -49,7 +49,7 @@ export default function CustomerLayout() {
             cursor: "pointer",
           }}
         >
-          <img src={logo} alt="CoffeeEns 로고" style={{ height: "100%" }} />
+          <img src={logo} alt="COFFEIENS 로고" style={{ height: "100%" }} />
         </Box>
       </Toolbar>
       <Divider />

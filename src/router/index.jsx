@@ -37,6 +37,7 @@ import PastOrders from "../pages/cafe/PastOrders";
 import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
+import RequireMemberType from "../common/RequireMemberType";
 
 const router = createBrowserRouter([
   {
@@ -75,7 +76,11 @@ const router = createBrowserRouter([
   // TODO!!! me 뒤에 :memberId 추가 필요
   {
     path: "/me",
-    element: <CustomerLayout />,
+    element: (
+      // <RequireMemberType allow={["GENERAL"]}>
+      <CustomerLayout />
+      // </RequireMemberType>
+    ),
     children: [
       {
         index: true,

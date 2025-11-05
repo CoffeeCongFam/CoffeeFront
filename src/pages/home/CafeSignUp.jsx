@@ -1,8 +1,12 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, TextField, Chip } from "@mui/material";
 import axios from "axios";
-
+// L_03 - 카페 정보 등록만 담당하는 등록 api 호출
+import { postCafe } from "../../utils/login";
 function CafeSignUp() {
+  const navigate = useNavigate();
+
   const JAVASCRIPT_API_KEY = "bfc6a794411e9c59db71d143bcc3d704";
   // 상태 관리
   const [formState, setFormState] = useState({
@@ -47,20 +51,9 @@ function CafeSignUp() {
     )}-${digitsOnly.slice(7)}`;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const _formData = {
-      businessNumber: formState.businessNumber.replace(/\D/g, ""), // 숫자만 추출
-      storeName: formState.storeName,
-      roadAddress: formState.roadAddress,
-      detailAddress: formState.detailAddress,
-      extraInfo: formState.extraInfo,
-      storePhone: formState.storePhone.replace(/\D/g, ""), // 숫자만 추출
-      hasImage: Boolean(formState.storeImage),
-      xPoint: formState.xPoint,
-      yPoint: formState.yPoint,
-    };
-    // submit 처리 로직 연동 예정
+    await handleSignup();
   };
 
   // 사업자번호 인증 함수
@@ -276,7 +269,41 @@ function CafeSignUp() {
     formState.roadAddress.trim() !== "" &&
     formState.detailAddress.trim() !== "" &&
     formState.storePhone.trim() !== "";
+//----------------회원가입 버튼 --------------------
+  const handleSignup = async () => {
+    try {
+      const newCafeData = {
+        storeName: formState.storeName,
+        roadAddress: formState.roadAddress,
+        detailAddress: formState.detailAddress,
+        businessNumber: formState.businessNumber, // 화면에 입력된 그대로(하이픈 포함)
+        // L_04 - 일단 이미지는 나중으로 미루기 나중에 수정해줘야함
+        storeImg: null,
+        detailInfo: formState.extraInfo,
+        storeTel: formState.storePhone, // 하이픈 제거된 숫자 문자열
+        xPoint: formState.xPoint,
+        yPoint: formState.yPoint,
+      };
 
+      const result = await postCafe(newCafeData);
+      // postCafe는 response.data.data를 반환하는 유틸이라고 가정
+      const success = result;
+
+      if (success) {
+        if (window.confirm("회원가입이 완료되었습니다. 회원 홈으로 이동합니다.")) {
+          navigate("/store");
+        }
+      } else {
+        if (window.confirm("회원가입에 실패하였습니다. 메인으로 이동합니다.")) {
+          navigate("/");
+        }
+      }
+    } catch (err) {
+      console.error("회원가입 실패:", err);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
+  };
+//------------------------------------
   return (
     <div
       style={{
@@ -332,9 +359,10 @@ function CafeSignUp() {
               disabled={formState.isBusinessVerified} // 인증 후 비활성화
               value={formState.businessNumber}
               onChange={(e) => {
+                const formatted = formatBusinessNumber(e.target.value);
                 setFormState((prev) => ({
                   ...prev,
-                  businessNumber: formatBusinessNumber(e.target.value),
+                  businessNumber: formatted,
                   isBusinessVerified: false, // 번호 변경 시 인증 상태 초기화
                 }));
               }}
@@ -496,13 +524,14 @@ function CafeSignUp() {
           <div style={inputRowStyle}>
             <span style={labelTextStyle}>매장 전화번호:</span>
             <TextField
-              value={formState.storePhone}
-              onChange={(e) =>
+              value={formatPhoneNumber(formState.storePhone)}
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, ""); // 숫자만 추출
                 setFormState((prev) => ({
                   ...prev,
-                  storePhone: formatPhoneNumber(e.target.value),
-                }))
-              }
+                  storePhone: digitsOnly, // 하이픈 없는 문자열로 저장
+                }));
+              }}
               placeholder="000-0000-0000"
               size="small"
               variant="outlined"

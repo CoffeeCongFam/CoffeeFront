@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -29,6 +29,7 @@ import useAppShellMode from "../hooks/useAppShellMode";
 const drawerWidth = 240;
 
 export default function CustomerLayout() {
+  const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
   const { isAppLike } = useAppShellMode(); // ← 여기서 모바일/PWA 여부
@@ -56,7 +57,14 @@ export default function CustomerLayout() {
         {/* 상단 바 - 아주 얇게 */}
         <AppBar position="static" elevation={0} color="inherit">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Typography variant="h6">CoffeeEns</Typography>
+            <Typography
+              variant="h6"
+              fontWeight={"bold"}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/me")}
+            >
+              COFFEIENS
+            </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />

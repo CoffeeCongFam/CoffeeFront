@@ -7,13 +7,15 @@ import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
+import menuDummy from '../../../assets/menuDummy.jpg';
+import { Box } from "@mui/material";
 
 
 function TodayOrderItem({ order }) {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <Box>
       <Card
         key={order.orderId}
         style={{
@@ -30,7 +32,7 @@ function TodayOrderItem({ order }) {
           navigate(`/me/order/${order.orderId}`);
         }}
       >
-        <div
+        <Box
           style={{
             display: "flex",
             flexDirection: "row",
@@ -42,10 +44,10 @@ function TodayOrderItem({ order }) {
             component="img"
             style={{ borderRadius: "8px" }}
             sx={{ width: 100, height: 70, objectFit: "cover" }}
-            image={order.storeImg}
+            image={order.storeImg || menuDummy}
             alt={order.storeName}
           />
-          <div
+          <Box
             style={{
               display: "flex",
               flexDirection: "column",
@@ -56,15 +58,15 @@ function TodayOrderItem({ order }) {
               {order.storeName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {order.orderMenu[0].menuName} × {order.orderMenu[0].quantity}
+              {order.menuList[0].menuName} × {order.menuList[0].quantity}
             </Typography>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* 오른쪽: 상태 버튼 */}
         <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
       </Card>
-    </div>
+    </Box>
   );
 }
 

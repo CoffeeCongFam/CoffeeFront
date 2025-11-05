@@ -22,6 +22,13 @@ export async function fetchNearbyCafes(xPoint, yPoint, radius = 500) {
   return res.data?.data ?? [];
 }
 
+// 카페 목록 전체 조회
+export async function fetchAllCafes() {
+  const res = await api.get(`/customers/stores`);
+  console.log(res.data?.data);
+  return res.data?.data;
+}
+
 /*  주문  */
 // 오늘 주문 목록 조회
 export async function fetchTodayOrderList() {

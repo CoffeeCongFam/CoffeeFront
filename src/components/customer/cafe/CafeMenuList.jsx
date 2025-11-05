@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import menuDummy from '../../../assets/menuDummy.jpg';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 function CafeMenuList({ menus = [] }) {
@@ -112,8 +113,8 @@ function CafeMenuList({ menus = [] }) {
                       {menu.menuImg && (
                         <Box
                           component="img"
-                          src={menu.menuImage}
-                          alt={menu.menuName}
+                          src={menu?.menuImage || menuDummy}
+                          alt={menu?.menuName}
                           sx={{
                             width: { xs: 80, sm: 100 },
                             height: { xs: 64, sm: 70 },

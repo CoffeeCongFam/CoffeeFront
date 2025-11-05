@@ -11,7 +11,6 @@ function KakaoRedirect() {
       // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
       const res = await axios({
         method: "GET",
-
                 url: `http://localhost:8080/auth/kakao/callback?code=${code}`,
                 withCredentials: true,
             });
@@ -19,31 +18,30 @@ function KakaoRedirect() {
                 throw new Error(`Unexpected status: ${res.status}`);
             }
 
-            // 3. 성공 응답 처리
-            const ACCESS_TOKEN = res.data.accessToken;
-            
-            // 받아온 토큰을 로컬 스토리지에 저장하여 로그인 상태 유지
-            localStorage.setItem('token', ACCESS_TOKEN);
-            console.log('로그인 성공! Local Storage에 토큰 저장됨.');
-            
-            // 4. 역할별 회원가입 페이지로 이동
-            if (role === 'member') {
-                navigate('/memberSignUp');
-            } else if (role === 'customer') {
-                navigate('/customerSignUp');
-            } else {
-                navigate('/main');
-            }
-            // 4. 메인 페이지로 이동
-            // navigate('/main');
-            
-        } catch (err) {
-            // 5. 에러 처리
-            console.error('카카오 소셜 로그인 에러:', err);
-            window.alert('로그인에 실패하셨습니다.');
-            navigate('/'); // 초기 페이지로 이동
-        }
-    };
+      // 3. 성공 응답 처리
+      const ACCESS_TOKEN = res.data.accessToken;
+
+      // 받아온 토큰을 로컬 스토리지에 저장하여 로그인 상태 유지
+      localStorage.setItem("token", ACCESS_TOKEN);
+      console.log("로그인 성공! Local Storage에 토큰 저장됨.");
+
+      // 4. 역할별 회원가입 페이지로 이동
+      if (role === "member") {
+        navigate("/memberSignUp");
+      } else if (role === "customer") {
+        navigate("/customerSignUp");
+      } else {
+        navigate("/main");
+      }
+      // 4. 메인 페이지로 이동
+      // navigate('/main');
+    } catch (err) {
+      // 5. 에러 처리
+      console.error("카카오 소셜 로그인 에러:", err);
+      window.alert("로그인에 실패하셨습니다.");
+      navigate("/"); // 초기 페이지로 이동
+    }
+  };
 
   // 1. 컴포넌트가 마운트될 때 인가 코드 파싱 및 로그인 함수 실행
   useEffect(() => {
