@@ -69,130 +69,129 @@ const router = createBrowserRouter([
         path: "MemberSignUp",
         element: <MemberSignUp />,
       },
-    ],
-  },
+      // 일반 회원
+      // TODO!!! me 뒤에 :memberId 추가 필요
+      {
+        path: "/me",
+        element: (
+          // <RequireMemberType allow={["GENERAL"]}>
+          <CustomerLayout />
+          // </RequireMemberType>
+        ),
+        children: [
+          {
+            index: true,
+            element: <CustomerHome />,
+          },
+          {
+            path: "search",
+            element: <SearchPage />,
+          },
+          {
+            path: "order",
+            element: <OrderPage />,
+          },
+          {
+            path: "order/new",
+            element: <CreateOrderPage />,
+          },
+          {
+            path: "order/:orderId",
+            element: <CompleteOrderPage />,
+          },
+          {
+            path: "mypage",
+            element: <MyPage />,
+          },
+          {
+            path: "store/:storeId",
+            element: <StoreDetailPage />,
+          },
 
-  // 일반 회원
-  // TODO!!! me 뒤에 :memberId 추가 필요
-  {
-    path: "/me",
-    element: (
-      // <RequireMemberType allow={["GENERAL"]}>
-      <CustomerLayout />
-      // </RequireMemberType>
-    ),
-    children: [
-      {
-        index: true,
-        element: <CustomerHome />,
-      },
-      {
-        path: "search",
-        element: <SearchPage />,
-      },
-      {
-        path: "order",
-        element: <OrderPage />,
-      },
-      {
-        path: "order/new",
-        element: <CreateOrderPage />,
-      },
-      {
-        path: "order/:orderId",
-        element: <CompleteOrderPage />,
-      },
-      {
-        path: "mypage",
-        element: <MyPage />,
-      },
-      {
-        path: "store/:storeId",
-        element: <StoreDetailPage />,
+          // 구독권 구매
+          {
+            path: "subscriptions/:subId/purchase",
+            element: <PurchaseSubscriptionPage />,
+          },
+          //
+          {
+            path: "purchase/:purchaseId/complete",
+            element: <CompletePurchasePage />,
+          },
+          {
+            path: "subscriptions/:subId/gift",
+            element: <GiftSubscriptionPage />,
+          },
+          {
+            path: "subscription",
+            element: <Subscription />,
+          },
+          {
+            path: "gift",
+            element: <Gift />,
+          },
+          {
+            path: "mygift",
+            element: <MyGift />,
+          },
+          {
+            path: "paymentHistory",
+            element: <PaymentHistory />,
+          },
+          {
+            path: "subscription",
+            element: <Subscription />,
+          },
+          {
+            path: "gift",
+            element: <Gift />,
+          },
+          {
+            path: "mygift",
+            element: <MyGift />,
+          },
+        ],
       },
 
-      // 구독권 구매
+      // 점주
+      // 점주
+      // :storeId 붙여야 함.
       {
-        path: "subscriptions/:subId/purchase",
-        element: <PurchaseSubscriptionPage />,
+        path: "/store",
+        element: <StoreLayout />,
+        children: [
+          {
+            index: true,
+            element: <StoreHome />,
+          },
+          {
+            path: "pastOrders",
+            element: <PastOrders />,
+          },
+          {
+            path: "manageMenu",
+            element: <ManageMenu />,
+          },
+          {
+            path: "manageProduct",
+            element: <ManageProduct />,
+          },
+          {
+            path: "manageStoreInfo",
+            element: <ManageStoreInfo />,
+          },
+        ],
       },
-      //
+      // 관리자
       {
-        path: "purchase/:purchaseId/complete",
-        element: <CompletePurchasePage />,
-      },
-      {
-        path: "subscriptions/:subId/gift",
-        element: <GiftSubscriptionPage />,
-      },
-      {
-        path: "subscription",
-        element: <Subscription />,
-      },
-      {
-        path: "gift",
-        element: <Gift />,
-      },
-      {
-        path: "mygift",
-        element: <MyGift />,
-      },
-      {
-        path: "paymentHistory",
-        element: <PaymentHistory />,
-      },
-      {
-        path: "subscription",
-        element: <Subscription />,
-      },
-      {
-        path: "gift",
-        element: <Gift />,
-      },
-      {
-        path: "mygift",
-        element: <MyGift />,
-      },
-    ],
-  },
-
-  // 점주
-  // :storeId 붙여야 함.
-  {
-    path: "/store",
-    element: <StoreLayout />,
-    children: [
-      {
-        index: true,
-        element: <StoreHome />,
-      },
-      {
-        path: "pastOrders",
-        element: <PastOrders />,
-      },
-      {
-        path: "manageMenu",
-        element: <ManageMenu />,
-      },
-      {
-        path: "manageProduct",
-        element: <ManageProduct />,
-      },
-      {
-        path: "manageStoreInfo",
-        element: <ManageStoreInfo />,
-      },
-    ],
-  },
-
-  // 관리자
-  {
-    path: "/admin",
-    element: <AdminLayout />,
-    children: [
-      {
-        index: true,
-        element: <AdminHome />,
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminHome />,
+          },
+        ],
       },
     ],
   },

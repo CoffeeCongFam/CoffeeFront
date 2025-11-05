@@ -147,7 +147,7 @@ function Header({ sortOrder, onChangeOrder }) {
       sx={{ mb: 2, px: 1 }}
     >
       <Box sx={{ ml: 2 }}>
-        <Typography variant="h6" component="h2">
+        <Typography variant="h6" component="h2" fontWeight="bold">
           내가 작성한 리뷰
         </Typography>
       </Box>

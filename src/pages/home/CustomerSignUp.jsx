@@ -90,11 +90,15 @@ function CustomerSignUp() {
       // }
 
       // L_03 - 성공이 success : true 라면 카페 상세정보 입력하는 창으로 이동
-      if (response.data.data.message === '성공') {
+      if (response.data.data.message === "성공") {
         // L_04 - zustand의 useUserStore를 사용해서 memberId 업데이트해서 cafeSignUp에서 사용가능하게 해주기
-        setUser({memberId});
-        if(window.confirm("회원정보 등록이 완료되었습니다. 카페 상세정보 입력창으로 넘어갑니다.")){
-           navigate("/cafeSignUp");
+        setUser({ memberId });
+        if (
+          window.confirm(
+            "회원정보 등록이 완료되었습니다. 카페 상세정보 입력창으로 넘어갑니다."
+          )
+        ) {
+          navigate("/cafeSignUp");
         }
       }
     } catch (err) {

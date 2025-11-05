@@ -1,6 +1,7 @@
 import { DeleteOutline } from "@mui/icons-material";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
@@ -11,7 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { Button } from "react-scroll";
+
+import useUserStore from "../../../stores/useUserStore";
 
 const fmt = (d) =>
   new Intl.DateTimeFormat("ko-KR", {
@@ -22,8 +24,9 @@ const fmt = (d) =>
     minute: "2-digit",
   }).format(d);
 
-function ReviewItemCard({ review }) {
+function ReviewItemCard({ review, handleDelete }) {
   const {
+    memberId,
     partnerStoreId,
     partner_store_id,
     partnerStoreName,
@@ -43,6 +46,8 @@ function ReviewItemCard({ review }) {
     : "알 수 없는 매장";
   const contentText = reviewContent ?? review_content ?? "";
   const createdVal = createdAt ?? created_at;
+
+  const { authUser } = useUserStore();
 
   // 이니셜 아바타 (매장명 첫 글자)
   // const initial = useMemo(() => (storeId ? String(storeId).charAt(0) : "R"), [storeId]);
@@ -87,6 +92,7 @@ function ReviewItemCard({ review }) {
               >
                 {createdVal ? fmt(new Date(createdVal)) : "-"}
               </Typography>
+
               <Box
                 sx={{
                   ml: 1,
@@ -94,7 +100,13 @@ function ReviewItemCard({ review }) {
                   justifyContent: "flex-end",
                   flexGrow: 1,
                 }}
-              ></Box>
+              >
+                {memberId === authUser.memberId && (
+                  <Button onClick={() => handleDelete(review.reviewId)}>
+                    삭제
+                  </Button>
+                )}
+              </Box>
             </Stack>
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>

@@ -269,7 +269,7 @@ function CafeSignUp() {
     formState.roadAddress.trim() !== "" &&
     formState.detailAddress.trim() !== "" &&
     formState.storePhone.trim() !== "";
-//----------------회원가입 버튼 --------------------
+  //----------------회원가입 버튼 --------------------
   const handleSignup = async () => {
     try {
       const newCafeData = {
@@ -290,7 +290,9 @@ function CafeSignUp() {
       const success = result;
 
       if (success) {
-        if (window.confirm("회원가입이 완료되었습니다. 회원 홈으로 이동합니다.")) {
+        if (
+          window.confirm("회원가입이 완료되었습니다. 회원 홈으로 이동합니다.")
+        ) {
           navigate("/store");
         }
       } else {
@@ -303,7 +305,7 @@ function CafeSignUp() {
       alert("회원가입 중 오류가 발생했습니다.");
     }
   };
-//------------------------------------
+  //------------------------------------
   return (
     <div
       style={{

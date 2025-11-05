@@ -1,12 +1,16 @@
 // MarkerManager.js
-// 지도 위 카페 마커들을 "차분 업데이트(diff)" 방식으로 관리하는 유틸 클래스.
+// 지도 위 카페 마커들을 관리하는 유틸 클래스.
+
+import cafeDummy from "../assets/cafeInfoDummy.png";
 
 export default class MarkerManager {
   /**
    * @param {naver.maps.Map} map   - Naver 지도 인스턴스
    * @param {typeof naver.maps} maps - naver.maps 네임스페이스 (생성자/유틸 접근용)
+   * @param {objects} options
+   *  - options.cafeIcon: 카페 마커 아이콘 URL
    */
-  constructor(map, maps) {
+  constructor(map, maps, options = {}) {
     this.map = map;
     this.maps = maps;
 
@@ -15,6 +19,9 @@ export default class MarkerManager {
 
     // InfoWindow(말풍선)는 1개만 만들어서 재사용
     this.infoWindow = new maps.InfoWindow({ content: "" });
+
+    // 마커 아이콘 경로 저장
+    this.cafeIcon = options.cafeIcon || null;
   }
 
   // ✅ 마커/포커스에서 공통으로 쓸 ID 규칙
@@ -22,7 +29,7 @@ export default class MarkerManager {
     return cafe._mmId ?? cafe.id ?? cafe.storeId ?? `idx-${idx ?? 0}`;
   }
 
-  // ✅ 마커 클릭/포커스에서 공통으로 쓸 상세 말풍선 HTML
+  // 마커 클릭/포커스에서 공통으로 쓸 상세 말풍선 HTML
   _buildInfoHtml(cafe) {
     const stockInfo =
       cafe.subscriptionStock != null
@@ -48,6 +55,11 @@ export default class MarkerManager {
         : cafe.storeStatus === "HOLIDAY"
         ? "휴무일"
         : "정보없음";
+
+    // 카페 더미 데이터
+    const thumbnailSrc =
+      cafe.storeImage && cafe.storeImage.trim() ? cafe.storeImage : cafeDummy;
+    // "../assets/cafeInfoDummy.png"
 
     // const actionButton = cafe.isSubscribed
     //   ? `<button style="
@@ -114,7 +126,7 @@ export default class MarkerManager {
         box-shadow:0 2px 8px rgba(0,0,0,0.15);
         font-family:'Pretendard', sans-serif;
       ">
-        <img src="${cafe.storeImage ?? ""}" 
+        <img src="${thumbnailSrc}" 
             style="width:70px; height:70px; border-radius:8px; object-fit:cover; flex-shrink:0;"
             alt="thumbnail" />
         <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
@@ -186,13 +198,30 @@ export default class MarkerManager {
         }
       } else {
         // 새 마커 생성
-        const marker = new this.maps.Marker({
+        // const marker = new this.maps.Marker({
+        //   position: pos,
+        //   map: this.map,
+        //   title: cafe.storeName,
+        // });
+        const markerOptions = {
           position: pos,
           map: this.map,
           title: cafe.storeName,
-        });
+        };
 
-        // 마커 클릭 시 상세 말풍선 (자세히 보기 포함)
+        // 아이콘을 파라미터로 받아왔다면 아이콘을 세팅
+        if (this.cafeIcon) {
+          markerOptions.icon = {
+            url: this.cafeIcon,
+            size: new this.maps.Size(36, 36), // 원본 크기
+            scaledSize: new this.maps.Size(36, 36), // 스케일된 크기
+            origin: new this.maps.Point(0, 0),
+            anchor: new this.maps.Point(18, 36), // 아래쪽 중앙 기준
+          };
+        }
+        const marker = new this.maps.Marker(markerOptions);
+
+        // 마커 클릭 시 상세 말풍선 나오는 이벤트 추가 (자세히 보기 포함)
         this.maps.Event.addListener(marker, "click", () => {
           const html = this._buildInfoHtml(cafe);
           this.infoWindow.setContent(html);

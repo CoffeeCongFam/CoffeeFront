@@ -116,3 +116,26 @@ export async function fetchStoreList() {
 }
 
 // /api/customers/stores/nearby?xPoint=37.4979&yPoint=127.0276&radius=2
+
+// 리뷰 작성
+export async function createReview(payload) {
+  console.log("리뷰 작성 요청>> ", payload);
+
+  await api.post(`/reviews`, payload);
+}
+
+// 리뷰 삭제
+export async function deleteReview(reviewId) {
+  console.log("리뷰 삭제 요청>> ", reviewId);
+  // /api/reviews/{review}
+
+  const res = await api.delete(`/reviews/${reviewId}`);
+  return res.data?.success; // true || false
+}
+
+// 소비자별 리뷰 조회
+export async function fetchUserReview() {
+  console.log("");
+  const res = await api.get(`/reviews/me`);
+  return res.data?.data;
+}

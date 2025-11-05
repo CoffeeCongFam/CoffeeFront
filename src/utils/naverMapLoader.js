@@ -24,7 +24,7 @@ function loadNaverMaps(clientId) {
       s.onerror = () => {
         // 오프라인 등으로 실패한 경우에도 에러 던지지 않고 null 반환
         console.warn("[naverMapLoader] 지도 스크립트 로드 실패");
-        resolve(null); 
+        resolve(null);
       };
 
       document.head.appendChild(s);

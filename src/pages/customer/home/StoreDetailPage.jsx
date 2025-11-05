@@ -176,7 +176,7 @@ function StoreDetailPage() {
 
         {/* 3. 리뷰 탭 */}
         <TabPanel value={tab} index={3}>
-          <CafeReviewList storeId={storeId} />
+          <CafeReviewList storeName={store.storeName} storeId={storeId} />
         </TabPanel>
       </Box>
     </Box>
