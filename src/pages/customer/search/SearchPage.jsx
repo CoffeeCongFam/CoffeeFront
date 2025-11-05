@@ -29,6 +29,7 @@ import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import { useNavigate } from "react-router-dom";
 import { fetchAllCafes } from "../../../apis/customerApi.js";
 import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
+import cafeMarkerIcon from "../../../assets/cafeMarker.png";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -193,7 +194,7 @@ export default function SearchPage() {
     });
 
     // 마커 매니저 준비
-    mmRef.current = new MarkerManager(map, maps);
+    mmRef.current = new MarkerManager(map, maps, { cafeIcon: cafeMarkerIcon });
 
     setStatus("ready");
     initedRef.current = true;
@@ -236,6 +237,14 @@ export default function SearchPage() {
             position: here,
             map,
             title: "현재 위치",
+            // 현재 위치 아이콘은 기본 파란색 아이콘으로 하도록
+            // icon: {
+            //   url: hereMarkerIcon,
+            //   size: new maps.Size(32, 32),
+            //   scaledSize: new maps.Size(32, 32),
+            //   origin: new maps.Point(0, 0),
+            //   anchor: new maps.Point(16, 32),
+            // },
           });
         }
       },
@@ -305,7 +314,15 @@ export default function SearchPage() {
   }, [cafes, sortOption]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100vh" }}>
+    <Box
+      sx={{
+        position: "absolute", // 부모(Box) 기준으로 꽉 채우도록
+        inset: 0, // top:0, right:0, bottom:0, left:0
+        width: "100%",
+        height: "100%",
+        overflow: "hidden", // SearchPage 내부에서만 스크롤 컨트롤
+      }}
+    >
       {isMapError ? (
         <Box
           sx={{
@@ -661,6 +678,6 @@ export default function SearchPage() {
           </List>
         </Box>
       </Panel>
-    </div>
+    </Box>
   );
 }
