@@ -110,20 +110,18 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-                      {menu.menuImg && (
-                        <Box
-                          component="img"
-                          src={menu?.menuImage || menuDummy}
-                          alt={menu?.menuName}
-                          sx={{
-                            width: { xs: 80, sm: 100 },
-                            height: { xs: 64, sm: 70 },
-                            objectFit: "cover",
-                            borderRadius: 1.2,
-                            flexShrink: 0,
-                          }}
-                        />
-                      )}
+                      <Box
+                        component="img"
+                        src={menuDummy || menu?.menuImage || menuDummy}
+                        alt={menu?.menuName}
+                        sx={{
+                          width: { xs: 80, sm: 100 },
+                          height: { xs: 64, sm: 70 },
+                          objectFit: "cover",
+                          borderRadius: 1.2,
+                          flexShrink: 0,
+                        }}
+                      />
 
                       <Box
                         sx={{
@@ -167,7 +165,7 @@ function CafeMenuList({ menus = [] }) {
                       }}
                     >
                       {/* 비활성 메뉴 표시 */}
-                      {menu.menuStatus === "Y" && (
+                      {menu.menuStatus === "N" && (
                         <Typography variant="caption" color="error">
                           판매중단
                         </Typography>
