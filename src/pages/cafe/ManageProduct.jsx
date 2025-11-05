@@ -4,7 +4,7 @@
 // `ProductService.js`: 가상의 백엔드 API 호출 및 데이터 처리 로직을 담당합니다.
 
 // 상태 관리와 비즈니스 로직(API 호출, 모달 제어)를 담당하는 컨테이너 역할
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -12,17 +12,20 @@ import {
   CircularProgress,
   Alert,
   Container,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 // 🚩 모든 서브 컴포넌트와 서비스가 같은 디렉토리에 있다고 가정합니다.
-import ProductList from "./ManageProductSoC/ProductList";
-import ProductDetailEditModal from "./ManageProductSoC/ProductDetailEditModal";
-import ProductRegistModal from "./ManageProductSoC/ProductRegistModal";
+import ProductList from './ManageProductSoC/ProductList';
+import ProductDetailEditModal from './ManageProductSoC/ProductDetailEditModal';
+import ProductRegistModal from './ManageProductSoC/ProductRegistModal';
 import {
   fetchSubscriptions,
   registerSubscription,
   updateSubscription,
-} from "./ManageProductSoC/ProductService";
+  fetchAllMenus, // 👈  ProductService에서 메뉴 로드 함수 import
+} from './ManageProductSoC/ProductService';
+
+const PartnerStoreId = 13; // 하드코딩
 
 /**
  * 구독권 관리 페이지 (컨테이너 컴포넌트)
@@ -35,6 +38,7 @@ export default function ManageProduct() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [allMenus, setAllMenus] = useState([]); // 매장의 전체 메뉴 리스트
 
   // 모달 관리 상태
   const [isRegistModalOpen, setIsRegistModalOpen] = useState(false);
@@ -43,26 +47,54 @@ export default function ManageProduct() {
   // 현재 상세/수정 모달에 보여줄 선택된 구독권 데이터
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
-  // 2. 데이터 불러오기 로직
+  // 🚩 loadSubscriptions 함수 (로그 추가)
   const loadSubscriptions = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    console.log('--- 구독권 로드 시작 ---');
     try {
-      // Service 계층을 통해 데이터 로드
       const data = await fetchSubscriptions();
+      console.log('로드된 데이터 (배열):', data); // ⚠️ 여기에 유효한 배열이 찍히는지 확인
       setSubscriptions(data);
+      console.log('setSubscriptions 호출 완료');
     } catch (err) {
-      console.error("구독권 목록 로드 실패:", err);
-      setError("구독권 목록을 불러오는 데 실패했습니다.");
+      console.error('구독권 목록 로드 실패:', err);
+      setError('구독권 목록을 불러오는 데 실패했습니다.');
     } finally {
+      console.log('--- 로드 종료, isLoading: false ---');
       setIsLoading(false);
     }
   }, []);
 
-  // 3. 컴포넌트 마운트 시 데이터 로드
+  // 🚩 메뉴 로드 함수
+  const loadAllMenus = useCallback(async () => {
+    console.log('--- 전체 메뉴 로드 시작 ---');
+    try {
+      const menuData = await fetchAllMenus(PartnerStoreId);
+      setAllMenus(menuData);
+    } catch (err) {
+      console.error('전체 메뉴 목록 로드 실패:', err); // 메뉴 로드 실패는 별도 에러 처리 또는 무시
+    }
+  }, []);
+
+  // 3. 컴포넌트 마운트 시 데이터 로드 로직 통합
   useEffect(() => {
-    loadSubscriptions();
-  }, [loadSubscriptions]);
+    const loadInitialData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // 🚩 메뉴 로딩과 구독권 로딩을 병렬로 처리 (두 함수를 모두 호출)
+        await Promise.all([
+          loadSubscriptions(), // 기존 구독권 로드
+          loadAllMenus(), // **새로 추가된 메뉴 로드**
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, [loadSubscriptions, loadAllMenus]);
 
   // 4. 모달 제어 핸들러
   const handleOpenRegistModal = () => setIsRegistModalOpen(true);
@@ -79,40 +111,47 @@ export default function ManageProduct() {
   };
 
   // 5. 등록 로직
-  const handleRegisterSubscription = async (data, imageFile) => {
+  const handleRegisterSubscription = async (data, imageFile, menuIds) => {
     setIsLoading(true);
+
+    const dataToSend = {
+      ...data,
+      menuIds: menuIds, // 백엔드로 보낼 menuIds 추가됨
+    };
+
     try {
-      const newSubscription = await registerSubscription(data, imageFile);
+      const success = await registerSubscription(dataToSend, imageFile);
       // 새로운 구독권을 리스트 상태에 추가(중복 방어 로직 추가)
-      setSubscriptions((prev) => {
-        const filtered = prev.filter(
-          (sub) => sub.subscriptionId !== newSubscription.subscriptionId
-        );
-        return [...filtered, newSubscription];
-      });
-      handleCloseRegistModal(); // 성공 시 모달 닫기
+
+      if (success) {
+        // null 객체를 추가하는 대신,
+        await loadSubscriptions(); // 구독권 리스트 전체를 다시 불러오는 함수
+        handleCloseRegistModal(); // 성공 시 모달 닫기
+      }
     } catch (err) {
-      console.error("구독권 등록 실패:", err);
-      setError("구독권 등록 중 오류가 발생했습니다.");
+      console.error('구독권 등록 실패:', err);
+      setError('구독권 등록 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
   // 6. 수정 로직
-  const handleUpdateSubscription = async (id, updatedData, imageFile) => {
+  const handleUpdateSubscription = async (id, updatedData) => {
     setIsLoading(true);
     try {
-      const result = await updateSubscription(id, updatedData, imageFile);
+      await updateSubscription(id, updatedData);
 
       // 리스트 상태에서 수정된 항목 업데이트
       setSubscriptions((prev) =>
-        prev.map((sub) => (sub.subscriptionId === id ? result : sub))
+        prev.map((sub) =>
+          sub.subscriptionId === id ? { ...sub, ...updatedData } : sub
+        )
       );
       handleCloseDetailEditModal(); // 성공 시 모달 닫기
     } catch (err) {
       console.error(`구독권 수정 실패 (ID: ${id}):`, err);
-      setError("구독권 수정 중 오류가 발생했습니다.");
+      setError('구독권 수정 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +166,7 @@ export default function ManageProduct() {
         alignItems="center"
       >
         <Typography variant="h4" component="h1" fontWeight="bold">
-          [구독권] 상품 관리
+          [구독권] 관리
         </Typography>
         <Button
           variant="contained"
@@ -150,7 +189,7 @@ export default function ManageProduct() {
 
       {/* 로딩 상태 표시 */}
       {isLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
         </Box>
       )}
@@ -169,6 +208,7 @@ export default function ManageProduct() {
         <ProductRegistModal
           open={isRegistModalOpen}
           onClose={handleCloseRegistModal}
+          allMenus={allMenus}
           onRegister={handleRegisterSubscription}
         />
       )}
@@ -179,6 +219,7 @@ export default function ManageProduct() {
           open={isDetailEditModalOpen}
           subscription={selectedSubscription}
           onClose={handleCloseDetailEditModal}
+          allMenus={allMenus}
           onSave={handleUpdateSubscription} // 수정 완료 버튼 클릭 시 호출
         />
       )}

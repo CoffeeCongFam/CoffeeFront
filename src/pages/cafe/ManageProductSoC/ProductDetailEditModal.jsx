@@ -14,6 +14,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
+import MenuSelect from './MenuSelect';
 
 // 모달 스타일 설정
 const modalStyle = {
@@ -31,12 +32,31 @@ const modalStyle = {
  * @param {function} onClose 모달 닫기 핸들러
  * @param {function} onSave 수정 완료 버튼 클릭 시 호출될 함수 (컨테이너의 handleUpdateSubscription과 연결)
  */
-const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
+const ProductDetailEditModal = ({
+  open,
+  subscription,
+  onClose,
+  onSave,
+  allMenus,
+}) => {
   // 폼 상태를 subscription prop으로 초기화
   const [formData, setFormData] = useState(subscription);
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(subscription.subscriptionImg);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 기존 구독권의 menus에서 id만 추출, subscription.menus가 유효한 배열일 때만 실행
+  const getInitialMenuIds = (sub) => {
+    if (sub && Array.isArray(sub.menus)) {
+      return sub.menus.map((m) => m.menuId);
+    }
+    return [];
+  };
+
+  // selectedMenuIds 상태를 subscription.menus로 초기화
+  const [selectedMenuIds, setSelectedMenuIds] = useState(
+    getInitialMenuIds(subscription)
+  );
 
   // subscription prop이 변경될 때마다 폼 상태를 업데이트
   useEffect(() => {
@@ -44,6 +64,7 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
       setFormData(subscription);
       setPreviewUrl(subscription.subscriptionImg);
       setImageFile(null); // 새 모달 열리면 파일 초기화
+      setSelectedMenuIds(getInitialMenuIds(subscription));
     }
   }, [subscription]);
 
@@ -91,8 +112,14 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
     }
 
     setIsSubmitting(true);
+
+    const dataToSend = {
+      ...formData,
+      menuIds: selectedMenuIds, // 👈 백엔드 DTO와 일치
+    };
+
     // 컨테이너로 ID, 수정된 데이터, 이미지 파일을 전달하여 수정 로직 실행
-    await onSave(subscription.subscriptionId, formData, imageFile);
+    await onSave(subscription.subscriptionId, dataToSend, imageFile);
     setIsSubmitting(false);
   };
 
@@ -210,6 +237,11 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
             multiline
             rows={3}
             fullWidth
+          />
+          <MenuSelect
+            allMenus={allMenus}
+            selectedMenuIds={selectedMenuIds}
+            setSelectedMenuIds={setSelectedMenuIds}
           />
 
           {/* 판매 상태 및 수량 */}

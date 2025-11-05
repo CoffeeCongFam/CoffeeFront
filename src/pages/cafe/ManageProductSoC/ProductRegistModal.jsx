@@ -12,7 +12,9 @@ import {
   Select,
   MenuItem,
   Typography,
+  Divider,
 } from '@mui/material';
+import MenuSelect from './MenuSelect';
 
 // 모달 스타일 설정
 const modalStyle = {
@@ -24,7 +26,10 @@ const modalStyle = {
 };
 
 // 신규 구독권 등록 모달 컴포넌트
-const ProductRegistModal = ({ open, onClose, onRegister }) => {
+const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
+  // 선택된 메뉴 ID 상태: 등록은 빈 배열에서 시작
+  const [selectedMenuIds, setSelectedMenuIds] = useState([]);
+
   // 폼 상태 관리(초기값 설정)
   const [formData, setFormData] = useState({
     subscriptionName: '',
@@ -76,10 +81,15 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
     }
 
     setIsSubmitting(true);
-    // 컨테이너로 데이터와 이미지 파일을 전달하여 등록 로직 실행
-    await onRegister(formData, imageFile);
-    // onRegister에서 성공적으로 모달을 닫아주기 때문에 여기서는 isSubmitting만 해제
-    setIsSubmitting(false);
+    try {
+      // 🚩 [수정] onRegister 호출 시 selectedMenuIds를 세 번째 인자로 전달
+      await onRegister(formData, imageFile, selectedMenuIds);
+    } catch (err) {
+      console.error(err);
+      // 에러 처리
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -136,6 +146,14 @@ const ProductRegistModal = ({ open, onClose, onRegister }) => {
             fullWidth
             required
           />
+          {/* 🚩 메뉴 선택 컴포넌트 삽입 */}
+          <Divider />
+          <MenuSelect
+            allMenus={allMenus}
+            selectedMenuIds={selectedMenuIds}
+            setSelectedMenuIds={setSelectedMenuIds}
+          />
+          <Divider />
           <TextField
             label="가격 (원)"
             name="price"

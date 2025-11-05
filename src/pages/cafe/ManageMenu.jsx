@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Container, Box, Typography, Button } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, Button } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 // 분리된 컴포넌트와 서비스 임포트
-import MenuTable from "./ManageMenuSoC/MenuTable";
-import MenuRegistModal from "./ManageMenuSoC/MenuRegistModal";
-import MenuEditModal from "./ManageMenuSoC/MenuEditModal";
+import MenuTable from './ManageMenuSoC/MenuTable';
+import MenuRegistModal from './ManageMenuSoC/MenuRegistModal';
+import MenuEditModal from './ManageMenuSoC/MenuEditModal';
 
 // axios 전까지만 갖다 쓰는 용 ***
-const CURRENT_STORE_ID = "S001";
+const CURRENT_STORE_ID = 1;
 
 // axios 로직을 담고 있는 서비스 함수 임포트
 import {
@@ -16,7 +16,7 @@ import {
   registerMenu,
   deleteMenu,
   updateMenu,
-} from "./ManageMenuSoC/MenuService";
+} from './ManageMenuSoC/MenuService';
 
 // 🚩 ManageMenu.jsx는 컨테이너로 모든 CRUD 관련 API 호출(axios 사용) 밑 상태 관리
 
@@ -35,7 +35,7 @@ export default function ManageMenu() {
       const data = await fetchStoreMenus(CURRENT_STORE_ID);
       setMenuList(data);
     } catch (error) {
-      console.error("메뉴 리스트 로딩 실패:", error);
+      console.error('메뉴 리스트 로딩 실패:', error);
       // alert("메뉴 목록을 불러오지 못했습니다.");
     }
   };
@@ -56,7 +56,7 @@ export default function ManageMenu() {
       setMenuList((prev) => [newMenuData, ...prev]);
       alert(`메뉴 [${newMenuData.menuName}] 등록 성공!`);
     } catch (error) {
-      console.error("메뉴 등록 실패:", error);
+      console.error('메뉴 등록 실패:', error);
       throw error; // 모달에서 catch하여 실패 알림
     }
   };
@@ -69,7 +69,7 @@ export default function ManageMenu() {
 
   // 4. 메뉴 삭제 (DELETE)
   const handleDeleteClick = async (menuId) => {
-    if (!window.confirm("정말로 이 메뉴를 삭제하시겠습니까? (소프트 삭제)")) {
+    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까? (소프트 삭제)')) {
       return;
     }
 
@@ -79,10 +79,10 @@ export default function ManageMenu() {
 
       // 성공 시 리스트에서 해당 메뉴 제거 (또는 상태 업데이트)
       setMenuList((prev) => prev.filter((menu) => menu.menuId !== menuId));
-      alert("메뉴 삭제 성공!");
+      alert('메뉴 삭제 성공!');
     } catch (error) {
       console.error(`메뉴 삭제 실패 (ID: ${menuId}):`, error);
-      alert("메뉴 삭제에 실패했습니다.");
+      alert('메뉴 삭제에 실패했습니다.');
     }
   };
 
@@ -101,15 +101,15 @@ export default function ManageMenu() {
       setIsEditModalOpen(false);
       alert(`메뉴 [${updateMenu.menuName}] 수정 완료!`);
     } catch (error) {
-      console.error("메뉴 수정 실패:", error);
-      alert("메뉴 수정에 실패했습니다.");
+      console.error('메뉴 수정 실패:', error);
+      alert('메뉴 수정에 실패했습니다.');
     }
   };
 
   return (
     <Container
       maxWidth="xl"
-      sx={{ py: 4, minHeight: "100vh", bgcolor: "background.default" }}
+      sx={{ py: 4, minHeight: '100vh', bgcolor: 'background.default' }}
     >
       {/* 상단 헤더 및 버튼 */}
       <Box
@@ -126,7 +126,7 @@ export default function ManageMenu() {
           color="primary"
           startIcon={<AddCircleOutlineIcon />}
           onClick={() => setIsRegModalOpen(true)} // ⬅️ 모달 상태 관리
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: 'bold' }}
         >
           메뉴 등록
         </Button>
