@@ -243,7 +243,6 @@ function CompleteOrderPage() {
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
-              <Typography color="text.secondary">결제 금액</Typography>
               <Typography>
                 {orderInfo.payAmount?.toLocaleString()} 원
               </Typography>

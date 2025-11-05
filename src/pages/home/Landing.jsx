@@ -12,9 +12,7 @@ import useAppShellMode from "../../hooks/useAppShellMode";
 
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/CoffeiensLogo.png";
-import LoginIcon from '@mui/icons-material/Login';
-
-
+import LoginIcon from "@mui/icons-material/Login";
 
 function Landing() {
   const { isAppLike } = useAppShellMode();
@@ -23,7 +21,7 @@ function Landing() {
   const isMobile = useMediaQuery("(max-width:900px)");
 
   const sections = ["hero", "customer", "store", "cta"];
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const containerRef = (React.useRef < HTMLDivElement) | (null > null);
 
   const handleScroll = (e) => {
     const { scrollTop, clientHeight } = e.currentTarget;
@@ -31,7 +29,6 @@ function Landing() {
     const sec = sections[index] || sections[0];
     setActive(sec);
   };
-
 
   // 카카오 소셜로그인 필요한 코드 및 주소
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
@@ -44,7 +41,6 @@ function Landing() {
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = URI;
   };
-
 
   return (
     <Box
@@ -154,7 +150,7 @@ function Landing() {
             >
               당신의 하루를 진화시키는
               <br />
-              커피 구독 플랫폼, COFFEIENS 
+              커피 구독 플랫폼, COFFEIENS
             </Typography>
             <Typography sx={{ color: "#4a3426", fontSize: "0.9rem", mt: 1 }}>
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
@@ -262,7 +258,7 @@ function Landing() {
             <Typography sx={{ color: "#4a3426" }}>
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 6}}>
+            <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -306,16 +302,18 @@ function Landing() {
             <Typography
               sx={{ fontSize: "2rem", fontWeight: 700, color: "#4a3426" }}
             >
-              이제 우리 카페에도 사이렌 오더가 생깁니다.<br />
+              이제 우리 카페에도 사이렌 오더가 생깁니다.
+              <br />
               단골은 늘리고, 매출은 안정적으로
             </Typography>
             <Typography sx={{ color: "#4a3426" }}>
               CoffeeEns는 구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              매일 찾는 단골 고객을 확보하고, 주문과 결제를 간편하게 관리하세요. <br />
+              매일 찾는 단골 고객을 확보하고, 주문과 결제를 간편하게 관리하세요.{" "}
+              <br />
               프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1,  mt: 6}}>
+            <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"

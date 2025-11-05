@@ -810,7 +810,7 @@ const SubscriptionPage = () => {
           mb: 1.5,
         }}
       >
-        <Typography variant="h4" component="h1" fontWeight="bold">
+        <Typography variant="h6" component="h2" fontWeight="bold">
           나의 구독권
         </Typography>
       </Box>

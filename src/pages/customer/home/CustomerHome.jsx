@@ -33,42 +33,6 @@ function CustomerHome() {
   const [locError, setLocError] = useState('');
 
   const scrollRef = useRef(null);
-  // const localScrollRef = useRef(null);
-
-  useEffect(() => {
-    console.log('CUSTOMER HOME--------------------------------', authUser);
-    //
-    const initUser = async () => {
-      // token 은 있는데, 로그인한 사용자 정보가 없는 상태
-
-      if (!authUser) {
-        console.log('TOKEN OK, BUT USER INFO IS EMPTY-----------------');
-
-        try {
-          const res = await api.post('/login');
-          const userData = res.data?.data;
-          console.log("user data from '/login", userData);
-
-          if (userData) {
-            setUser(userData);
-            TokenService.setUser(userData);
-            console.log('userData 저장 완료-------------------');
-          } else {
-            console.warn('응답에 user data 없음');
-            //
-            window.href;
-          }
-        } catch (err) {
-          console.error(err);
-          navigate('/');
-        }
-      }
-    };
-
-    initUser();
-
-    console.log(authUser);
-  }, []);
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
