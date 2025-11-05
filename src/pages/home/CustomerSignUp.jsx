@@ -73,7 +73,7 @@ function CustomerSignUp() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/signup/member",
+        "http://localhost:8080/api/signup/store",
         { ...formData },
         { withCredentials: true }
       );

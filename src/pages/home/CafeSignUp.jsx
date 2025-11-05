@@ -272,21 +272,21 @@ function CafeSignUp() {
   //----------------회원가입 버튼 --------------------
   const handleSignup = async () => {
     try {
-      const newCafeData = {
-        storeName: formState.storeName,
-        roadAddress: formState.roadAddress,
-        detailAddress: formState.detailAddress,
-        businessNumber: formState.businessNumber, // 화면에 입력된 그대로(하이픈 포함)
-        // L_04 - 일단 이미지는 나중으로 미루기 나중에 수정해줘야함
-        storeImg: null,
-        detailInfo: formState.extraInfo,
-        storeTel: formState.storePhone, // 하이픈 제거된 숫자 문자열
-        xPoint: formState.xPoint,
-        yPoint: formState.yPoint,
-      };
+      const formData = new FormData();
+      formData.append("storeName", formState.storeName);
+      formData.append("roadAddress", formState.roadAddress);
+      formData.append("detailAddress", formState.detailAddress);
+      formData.append("businessNumber", formState.businessNumber); // 하이픈 포함 그대로
+      formData.append("detailInfo", formState.extraInfo);
+      formData.append("storeTel", formState.storePhone); // 숫자만(하이픈 제거)
+      formData.append("xPoint", formState.xPoint);
+      formData.append("yPoint", formState.yPoint);
 
-      const result = await postCafe(newCafeData);
-      // postCafe는 response.data.data를 반환하는 유틸이라고 가정
+      // 이미지 파일 (선택한 경우에만)
+      if(formState.storeImage) {
+        formData.append("storeImg", formState.storeImage);
+      }
+      const result = await postCafe(formData);
       const success = result;
 
       if (success) {
