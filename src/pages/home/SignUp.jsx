@@ -18,12 +18,11 @@ function SignUp() {
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
 
   const buildKakaoUrl = (role) => {
-    const BASE_URL = import.meta.env.VITE_API_URL;
-    const REDIRECT_URI = `${BASE_URL}/auth/kakao/callback`;
+    const LOGIN_REDIRECT_URI = import.meta.VITE_LOGIN_REDIRECT_URI;
 
     const encodedState = encodeURIComponent(role);
     
-    const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code&state=${encodedState}`;
+    const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code&state=${encodedState}`;
     return URI;
   };
 

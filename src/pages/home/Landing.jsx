@@ -32,13 +32,12 @@ function Landing() {
 
   // 카카오 소셜로그인 필요한 코드 및 주소
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
-  const BASE_URL = import.meta.env.VITE_API_URL;
-  const REDIRECT_URI = `${BASE_URL}/auth/kakao/callback`;
+  const LOGIN_REDIRECT_URI = import.meta.VITE_LOGIN_REDIRECT_URI;
 
   // 카카오 로그인 버튼
   const kakaoLogin = () => {
     console.log("KAKAO LOGIN-----------------------");
-    const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code`;
     window.location.href = URI;
   };
 

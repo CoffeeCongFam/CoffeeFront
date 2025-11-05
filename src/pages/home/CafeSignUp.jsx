@@ -4,10 +4,11 @@ import { Button, TextField, Chip } from "@mui/material";
 import axios from "axios";
 // L_03 - 카페 정보 등록만 담당하는 등록 api 호출
 import { postCafe } from "../../utils/login";
+const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
+const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 function CafeSignUp() {
   const navigate = useNavigate();
 
-  const JAVASCRIPT_API_KEY = "bfc6a794411e9c59db71d143bcc3d704";
   // 상태 관리
   const [formState, setFormState] = useState({
     businessNumber: "", // 사업자번호
@@ -58,8 +59,7 @@ function CafeSignUp() {
 
   // 사업자번호 인증 함수
   const handleVerifyBusinessNumber = async () => {
-    const SERVICE_KEY =
-      "4fe0dcce5252dbe501922fa22c734b67127a5944ad51aa556d3dd90f12a66b46"; // 여기에 실제 발급받은 서비스 키를 입력하세요.
+
     const cleanedBusinessNumber = formState.businessNumber.replace(/\D/g, "");
 
     if (cleanedBusinessNumber.length !== 10) {
