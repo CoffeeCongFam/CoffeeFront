@@ -13,8 +13,8 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import axios from 'axios';
 import useUserStore from '../../stores/useUserStore';
+import api from "../../utils/api";
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
@@ -149,10 +149,10 @@ export default function PastOrdersList() {
 
     try {
       // 🚨 요청 URL 구성: /api/stores/orders/past/{partnerStoreId}?searchDate={YYYY-MM-DD}
-      const url = `http://localhost:8080/api/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
+      const url = `/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
       // PARTNER_STORE_ID는 하드코딩된 테스트용 점주 매장 코드
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
 
       if (response.data.success) {
         setOrders(response.data.data);
