@@ -13,7 +13,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
-import axios from "axios";
 import useUserStore from "../../stores/useUserStore";
 import api from "../../utils/api";
 
