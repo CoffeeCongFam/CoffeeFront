@@ -32,7 +32,7 @@ function Landing() {
 
   // 카카오 소셜로그인 필요한 코드 및 주소
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
-  const LOGIN_REDIRECT_URI = import.meta.VITE_LOGIN_REDIRECT_URI;
+  const LOGIN_REDIRECT_URI = import.meta.env.VITE_LOGIN_REDIRECT_URI;
 
   // 카카오 로그인 버튼
   const kakaoLogin = () => {

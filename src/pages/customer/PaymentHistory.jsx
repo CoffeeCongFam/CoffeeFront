@@ -271,7 +271,6 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     // subscriptionPeriod,
     paidAt,
     purchaseType,
-    sender,
     receiver,
     refundReasons,
     isGift,

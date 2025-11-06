@@ -1,5 +1,6 @@
-import axios from 'axios';
-const API_BASE_URL = 'http://localhost:8080/api/stores/menus';
+import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = `${BASE_URL}/api/stores/menus`;
 
 // /api/stores/menus 매장 메뉴 등록
 // /api/stores/menus/{menuId} 매장 메뉴 상세 정보 수정
@@ -18,13 +19,13 @@ export const fetchStoreMenus = async (partnerStoreId) => {
     // 테스트용 PARTNER_STORE_ID
     const response = await axios.get(url);
     console.log(
-      '✅ GET 성공, 데이터 로드 완료:',
+      "✅ GET 성공, 데이터 로드 완료:",
       response.data.data.length,
-      '개'
+      "개"
     );
     return response.data.data;
   } catch (error) {
-    console.error('메뉴 리스트 조회 실패 :', error);
+    console.error("메뉴 리스트 조회 실패 :", error);
     throw error;
   }
 };
@@ -43,24 +44,24 @@ export const registerMenu = async (data, imageFile) => {
 
   // 이미지 파일 추가 - ** 이건 경로인가?
   if (imageFile) {
-    formData.append('file', imageFile);
+    formData.append("file", imageFile);
   }
 
   // 메뉴 json 데이터 추가
   const menuJson = new Blob([JSON.stringify(data)], {
-    type: 'application/json',
+    type: "application/json",
   });
-  formData.append('data', menuJson);
+  formData.append("data", menuJson);
 
   try {
     const response = await axios.post(url, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data.success; // data를 반환할 필요가 없고, 그냥 성공만 return하거나..
   } catch (error) {
-    console.error('메뉴 등록 실패 :', error);
+    console.error("메뉴 등록 실패 :", error);
     throw error;
   }
 };
@@ -78,20 +79,20 @@ export const updateMenu = async (menuId, updateData, imageFIle) => {
 
   // 이미지 파일 추가
   if (imageFIle) {
-    formData.append('file', imageFIle);
+    formData.append("file", imageFIle);
   }
 
   // 메뉴 json 데이터 추가
   const menuJson = new Blob([JSON.stringify(updateData)], {
-    type: 'application/json',
+    type: "application/json",
   });
-  formData.append('data', menuJson);
+  formData.append("data", menuJson);
 
   try {
     // put 요청
     const response = await axios.patch(url, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data.success; // data를 반환할 필요가 없고, 그냥 성공만 return하거나..

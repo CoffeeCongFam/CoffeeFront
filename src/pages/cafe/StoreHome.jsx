@@ -1,25 +1,24 @@
-import { Box, Button, Card, Grid, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import OrderDetailModal from './OrderDetailModal';
-import useUserStore from '../../stores/useUserStore';
-import api, { TokenService } from '../../utils/api';
+import { Box, Button, Card, Grid, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import OrderDetailModal from "./OrderDetailModal";
+import { ChevronLeft } from "@mui/icons-material";
+import api from "../../utils/api";
 
-const BASE_URL = 'http://localhost:8080';
+// const BASE_URL = ;
 
 const getOrderTypeLabel = (typeCode) => {
   switch (typeCode) {
-    case 'IN':
-      return '매장 내 이용';
-    case 'OUT':
-      return '테이크아웃';
+    case "IN":
+      return "매장 내 이용";
+    case "OUT":
+      return "테이크아웃";
     default:
-      return '정보 없음';
+      return "정보 없음";
   }
 };
 
 const getFormattedMenuList = (menuList) => {
-  if (!menuList || menuList.length === 0) return '메뉴 없음';
+  if (!menuList || menuList.length === 0) return "메뉴 없음";
 
   // 메뉴 이름과 수량을 조합하여 문자열 배열 생성: ['아메리카노 (2개)', '브라우니 (1개)']
   const formattedItems = menuList.map((menu) => {
@@ -27,7 +26,7 @@ const getFormattedMenuList = (menuList) => {
   });
 
   // 쉼표와 공백으로 연결
-  return formattedItems.join(', ');
+  return formattedItems.join(", ");
 };
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
@@ -54,23 +53,23 @@ function StoreHome() {
 
   // 로그인 했을 때 userId랑 partnerStoreId를 JUSTAND로 쓰기 위한 몸부림(App.js에 넣어야 함 - 테스트용임 이거는)
   useEffect(() => {
-    console.log('CUSTOMER HOME--------------------------------', authUser);
+    console.log("CUSTOMER HOME--------------------------------", authUser);
     //
     const initUser = async () => {
       // token 은 있는데, 로그인한 사용자 정보가 없는 상태
 
       if (!authUser) {
-        console.log('TOKEN OK, BUT USER INFO IS EMPTY-----------------');
+        console.log("TOKEN OK, BUT USER INFO IS EMPTY-----------------");
 
         try {
-          const res = await api.post('/login');
+          const res = await api.post("/login");
           const userData = res.data?.data;
           console.log("user data from '/login", userData);
 
           if (userData) {
             setUser(userData);
             TokenService.setUser(userData);
-            console.log('userData 저장 완료-------------------');
+            console.log("userData 저장 완료-------------------");
 
             if (userData.partnerStoreId) {
               setPartnerStoreId(userData.partnerStoreId);
@@ -79,7 +78,7 @@ function StoreHome() {
               );
             }
           } else {
-            console.warn('응답에 user data 없음');
+            console.warn("응답에 user data 없음");
             //
             window.href;
           }
@@ -101,30 +100,31 @@ function StoreHome() {
         // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
         if (!partnerStoreId || partnerStoreId <= 0) {
           console.log(
-            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
+            "⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:",
             partnerStoreId
           );
           return;
         }
 
-        const response = await axios.get(
-          `${BASE_URL}/api/stores/orders/today/${partnerStoreId}`
+        const response = await api.get(
+          `/stores/orders/today/${partnerStoreId}`
         );
+        // 하드코딩 partnerStoreId 테스트용**
 
         // 백엔드 응답 구조에 맞게 resposne.data.data
         if (response.data && response.data.data) {
           setOrders(response.data.data);
           console.log(
-            '✅ GET 성공, 데이터 로드 완료:',
+            "✅ GET 성공, 데이터 로드 완료:",
             response.data.data.length,
-            '개'
+            "개"
           );
         } else {
           setOrders(response.data.data || []);
-          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
+          console.log("✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.");
         }
       } catch (error) {
-        console.error('오늘의 주문 목록 로딩 실패:', error);
+        console.error("오늘의 주문 목록 로딩 실패:", error);
       }
     };
     fetchOrders();
@@ -141,12 +141,9 @@ function StoreHome() {
       // nextStatus는 'REJECTED'
 
       // 백엔드 요청
-      const response = await axios.patch(
-        `${BASE_URL}/api/stores/orders/reject/${orderId}`,
-        {
-          rejectedReason: rejectedReasonText,
-        }
-      );
+      const response = await api.patch(`/stores/orders/reject/${orderId}`, {
+        rejectedReason: rejectedReasonText,
+      });
 
       // 성공 시 FE 상태 업데이트
       if (response.status === 200) {
@@ -155,7 +152,7 @@ function StoreHome() {
             order.orderId === orderId
               ? {
                   ...order,
-                  orderStatus: 'REJECTED',
+                  orderStatus: "REJECTED",
                   rejectedReason: rejectedReasonText,
                 }
               : order
@@ -176,12 +173,9 @@ function StoreHome() {
   const handleStatusChange = async (orderId, nextStatus) => {
     try {
       // 백엔드 요청
-      const response = await axios.patch(
-        `${BASE_URL}/api/stores/orders/${orderId}`,
-        {
-          orderStatus: nextStatus,
-        }
-      );
+      const response = await api.patch(`/stores/orders/${orderId}`, {
+        orderStatus: nextStatus,
+      });
 
       // 성공 시 FE 상태 업데이트
       if (response.status === 200) {
@@ -208,27 +202,27 @@ function StoreHome() {
   // 현재 주문 상태를 기반으로 다음 수행 동작과 다음 상태를 결정하는 함수
   const getNextActionAndState = (currentStatus) => {
     switch (currentStatus) {
-      case 'REQUEST':
+      case "REQUEST":
         return {
-          label: '주문 접수하기',
-          nextStatus: 'INPROGRESS', // 접수 후 -> 제조중으로
-          color: '#FF9800',
+          label: "주문 접수하기",
+          nextStatus: "INPROGRESS", // 접수 후 -> 제조중으로
+          color: "#FF9800",
         };
 
-      case 'INPROGRESS':
+      case "INPROGRESS":
         return {
-          label: '제조 완료',
-          nextStatus: 'COMPLETED', // 제조중 -> 제조 완료
-          color: '#1976D2',
+          label: "제조 완료",
+          nextStatus: "COMPLETED", // 제조중 -> 제조 완료
+          color: "#1976D2",
         };
 
-      case 'COMPLETED':
+      case "COMPLETED":
         // 제조 완료 상태에는 고객이 오고, 고객의 주문 번호만 확인하고 건네준다.
         // 따라서 수령 완료 버튼을 표시하고 수령 완료로 처리하려면 점주만 '수령 완료 처리' 버튼을 누르게 정의
         return {
-          label: '수령 완료 처리',
-          nextStatus: 'RECEIVED', // 제조 완료 -> 수령 완료
-          color: '#388E3C',
+          label: "수령 완료 처리",
+          nextStatus: "RECEIVED", // 제조 완료 -> 수령 완료
+          color: "#388E3C",
         };
 
       default:
@@ -241,45 +235,45 @@ function StoreHome() {
     // 🔴 높은 우선순위 (급함)
     REQUEST: {
       // 접수중
-      header: '#FFC107', // 배경색 (밝게)
-      action: '#FF9800', // 버튼색 (주황 계열)
-      name: '접수중',
+      header: "#FFC107", // 배경색 (밝게)
+      action: "#FF9800", // 버튼색 (주황 계열)
+      name: "접수중",
       priority: 1, // 가장 앞
     },
     REJECTED: {
       // 주문 거부(점주가)
-      header: '#F44336', // 배경색 (경고/빨강)
-      action: '#D32F2F', // 버튼색 (빨강 계열)
-      name: '주문 거부',
+      header: "#F44336", // 배경색 (경고/빨강)
+      action: "#D32F2F", // 버튼색 (빨강 계열)
+      name: "주문 거부",
     },
     // 🟠 중간 우선순위 (진행 중)
     INPROGRESS: {
       // 제조중
-      header: '#2196F3', // 배경색 (파랑)
-      action: '#1976D2', // 버튼색 (진한 파랑)
-      name: '제조중',
+      header: "#2196F3", // 배경색 (파랑)
+      action: "#1976D2", // 버튼색 (진한 파랑)
+      name: "제조중",
       priority: 2,
     },
     // 🟢 낮은 우선순위 (픽업 대기)
     COMPLETED: {
       // 제조완료
-      header: '#4CAF50', // 배경색 (초록)
-      action: '#388E3C', // 버튼색 (진한 초록)
-      name: '제조 완료',
+      header: "#4CAF50", // 배경색 (초록)
+      action: "#388E3C", // 버튼색 (진한 초록)
+      name: "제조 완료",
       priority: 3,
     },
     // ⚫️ 매우 낮은 우선순위 (종료/처리 완료)
     RECEIVED: {
       // 수령완료
-      header: '#616161', // 배경색 (짙은 회색)
-      action: '#424242', // 버튼색 (아주 짙은 회색)
-      name: '수령 완료',
+      header: "#616161", // 배경색 (짙은 회색)
+      action: "#424242", // 버튼색 (아주 짙은 회색)
+      name: "수령 완료",
     },
     CANCELED: {
       // 주문 취소(고객이)
-      header: '#9E9E9E', // 배경색 (차분한 회색)
-      action: '#757575', // 버튼색 (중간 회색)
-      name: '주문 취소',
+      header: "#9E9E9E", // 배경색 (차분한 회색)
+      action: "#757575", // 버튼색 (중간 회색)
+      name: "주문 취소",
     },
   };
 
@@ -312,7 +306,7 @@ function StoreHome() {
       <Grid container spacing={2}>
         {sortedOrders.map((order) => {
           const statusInfo =
-            STATUS_COLORS[order.orderStatus] || STATUS_COLORS['CANCELED'];
+            STATUS_COLORS[order.orderStatus] || STATUS_COLORS["CANCELED"];
           console.log(order.orderStatus);
 
           // 현재 상태에 따른 액션 정보 가져오기
@@ -327,19 +321,19 @@ function StoreHome() {
             // sm = 6 : 중간 화면(태블릿) 한 줄에 2개
             // md = 4 : 데스크톱 화면에서는 한 줄에 3개 (12/4)
             <Grid item xs={12} sm={6} md={4} key={order.orderId}>
-              <Card sx={{ height: '100%', boxShadow: 2 }}>
+              <Card sx={{ height: "100%", boxShadow: 2 }}>
                 <Box sx={{ p: 2 }}>
                   <Typography
                     variant="caption"
                     sx={{
                       bgcolor: statusInfo.header,
-                      color: 'white',
-                      p: '2px 8px',
+                      color: "white",
+                      p: "2px 8px",
                     }}
                   >
                     {statusInfo.name}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
                     {/* 타입, 상세보기 버튼 */}
                     <Box sx={{ border: 1, padding: 1 }}>
                       {order.orderNumber}
@@ -347,7 +341,7 @@ function StoreHome() {
                     <Typography>
                       {getOrderTypeLabel(order.orderType)}
                     </Typography>
-                    <Box sx={{ mt: 1, textAlign: 'right' }}>
+                    <Box sx={{ mt: 1, textAlign: "right" }}>
                       {/* 상세보기 버튼 */}
                       <Button
                         onClick={() => handleModalOpen(order)}
@@ -376,7 +370,7 @@ function StoreHome() {
                         actionDetails.nextStatus
                       )
                     }
-                    sx={{ bgcolor: statusInfo.action, color: 'white' }}
+                    sx={{ bgcolor: statusInfo.action, color: "white" }}
                   >
                     {actionDetails.label}
                   </Button>

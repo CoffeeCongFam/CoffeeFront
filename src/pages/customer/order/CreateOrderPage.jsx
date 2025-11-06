@@ -142,9 +142,7 @@ function CreateOrderPage() {
 
   const hasBeverageInCart = useMemo(
     () =>
-      cartItems.some((ci) =>
-        beverageMenus.some((b) => b.menuId === ci.menuId)
-      ),
+      cartItems.some((ci) => beverageMenus.some((b) => b.menuId === ci.menuId)),
     [cartItems, beverageMenus]
   );
 
@@ -237,7 +235,6 @@ function CreateOrderPage() {
 
   // 최종 주문 요청
   async function requestOrder() {
-
     console.log(authUser);
     if (!authUser?.memberId) {
       alert("로그인 정보가 없습니다. 다시 로그인해 주세요.");
@@ -326,8 +323,7 @@ function CreateOrderPage() {
           flexDirection: { xs: "column", md: "row" },
           gap: 2,
           mb: 3,
-          alignItems: { xs: "stretch", md: "stretch" }, 
-
+          alignItems: { xs: "stretch", md: "stretch" },
         }}
       >
         <Box sx={{ flex: 2 }}>
@@ -392,11 +388,11 @@ function CreateOrderPage() {
             aria-label="order-type"
             sx={{
               width: "100%",
-              height: 74, 
+              height: 74,
               "& .MuiToggleButton-root": {
                 flex: 1,
-                height: "100%",      
-                borderRadius: 0,     
+                height: "100%",
+                borderRadius: 0,
               },
             }}
           >
@@ -404,7 +400,6 @@ function CreateOrderPage() {
             <ToggleButton value="OUT">포장</ToggleButton>
           </ToggleButtonGroup>
         </Box>
-
       </Box>
 
       {/* 본문: 메뉴 그리드 + 장바구니 */}
@@ -417,8 +412,8 @@ function CreateOrderPage() {
         }}
       >
         {/* 메뉴 그리드 영역 */}
-          
-        <Box sx={{ flex: 3 , width: "100%", }}>
+
+        <Box sx={{ flex: 3, width: "100%" }}>
           {/* 카테고리 탭 */}
           <ToggleButtonGroup
             color="primary"
@@ -496,7 +491,7 @@ function CreateOrderPage() {
                     >
                       <Box
                         component="img"
-                        src={menuDummy ||menu.menuImg || menuDummy}
+                        src={menuDummy || menu.menuImg || menuDummy}
                         alt={menu.menuName || menu.name}
                         onError={(e) => {
                           e.currentTarget.onerror = null;
@@ -551,9 +546,7 @@ function CreateOrderPage() {
                         >
                           <IconButton
                             size="small"
-                            onClick={() =>
-                              handleDecreaseFromCart(menu.menuId)
-                            }
+                            onClick={() => handleDecreaseFromCart(menu.menuId)}
                           >
                             <RemoveIcon fontSize="small" />
                           </IconButton>
@@ -655,10 +648,7 @@ function CreateOrderPage() {
                       >
                         {item.menu?.menuName || item.menu?.name}
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                      >
+                      <Typography variant="caption" color="text.secondary">
                         {(item.menu?.price || 0).toLocaleString()}원
                       </Typography>
                     </Box>
@@ -672,9 +662,7 @@ function CreateOrderPage() {
                     >
                       <IconButton
                         size="small"
-                        onClick={() =>
-                          handleDecreaseFromCart(item.menuId)
-                        }
+                        onClick={() => handleDecreaseFromCart(item.menuId)}
                       >
                         <RemoveIcon fontSize="small" />
                       </IconButton>
