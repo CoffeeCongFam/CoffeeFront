@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 
 const userTypeBoxStyle = {
@@ -11,10 +11,19 @@ const userTypeBoxStyle = {
 };
 
 function SignUp() {
-  // let navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     console.log("Sign UP --------------------------");
-  }, []);
+    const query = new URLSearchParams(location.search);
+    const fromPurpose = query.get("from-purpose");
+
+    // 비회원이 카카오톡 간편 로그인 접근 : 백엔드에서 redirecturl + SignUp?from-purpose=kakao로 온 경우
+    if (fromPurpose === "kakao") {
+      alert("회원가입이 필요한 회원입니다.");
+      navigate("/signup");
+    }
+  }, [location, navigate]);
   const CLIENT_KEY = import.meta.env.VITE_KAKAO_CLIENT_KEY;
 
   const buildKakaoUrl = (role) => {
