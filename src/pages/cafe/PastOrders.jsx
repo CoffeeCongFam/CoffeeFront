@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Typography,
   Paper,
@@ -11,10 +11,10 @@ import {
   Box,
   TextField,
   CircularProgress,
-} from "@mui/material";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
-import axios from "axios";
-import useUserStore from "../../stores/useUserStore";
+} from '@mui/material';
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import axios from 'axios';
+import useUserStore from '../../stores/useUserStore';
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
@@ -37,8 +37,8 @@ const getOffsetDateString = (days, months) => {
   }
 
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
@@ -64,255 +64,15 @@ const getKstBusinessDateStringFromUtc = (utcDateString) => {
   const businessDayDate = new Date(businessDayAdjustedTime);
 
   const year = businessDayDate.getUTCFullYear();
-  const month = (businessDayDate.getUTCMonth() + 1).toString().padStart(2, "0");
-  const day = businessDayDate.getUTCDate().toString().padStart(2, "0");
+  const month = (businessDayDate.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = businessDayDate.getUTCDate().toString().padStart(2, '0');
 
   return `${year}-${month}-${day}`;
 };
 
-// export const DUMMY_PAST_ORDERS_RESPONSE = {
-//   success: true,
-//   data: [
-//     // ==========================================================
-//     // 1. 오늘 주문 (2025-11-02 KST) - 3개
-//     // ==========================================================
-//     {
-//       orderId: 101,
-//       orderNumber: 7123,
-//       // KST 15:30:00 -> UTC 06:30:00Z
-//       createdAt: '2025-11-02T06:30:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 1,
-//       subscriptionName: '카페 모니카 BASIC 구독권',
-//       orderType: 'IN', // 매장 이용
-//       tel: '010-1111-2222',
-//       name: '홍길동',
-//       menuList: [{ menuId: 1, quantity: 2, menuName: '아메리카노' }],
-//     },
-//     {
-//       orderId: 102,
-//       orderNumber: 7124,
-//       // KST 12:05:00 -> UTC 03:05:00Z
-//       createdAt: '2025-11-02T03:05:00.000Z',
-//       orderStatus: 'CANCELED',
-//       memberSubscriptionId: 2,
-//       subscriptionName: '카페 모니카 PREMIUM 구독권',
-//       orderType: 'OUT', // 테이크아웃
-//       tel: '010-5555-4444',
-//       name: '김철수',
-//       menuList: [
-//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
-//         { menuId: 32, quantity: 1, menuName: '브라우니' },
-//       ],
-//     },
-//     {
-//       orderId: 103,
-//       orderNumber: 7125,
-//       // KST 09:15:00 -> UTC 00:15:00Z
-//       createdAt: '2025-11-02T00:15:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 3,
-//       subscriptionName: '카페 모니카 DESSERT 구독권',
-//       orderType: 'IN',
-//       tel: '010-8888-7777',
-//       name: '박영희',
-//       menuList: [{ menuId: 10, quantity: 3, menuName: '에스프레소' }],
-//     },
-
-//     // ==========================================================
-//     // 2. 어제 주문 (2025-11-01 KST) - 3개
-//     // ==========================================================
-//     {
-//       orderId: 201,
-//       orderNumber: 6511,
-//       // KST 17:55:00 -> UTC 08:55:00Z
-//       createdAt: '2025-11-01T08:55:00.000Z',
-//       orderStatus: 'REJECTED',
-//       memberSubscriptionId: 1,
-//       subscriptionName: '카페 모니카 BASIC 구독권',
-//       orderType: 'OUT',
-//       tel: '010-9999-1111',
-//       name: '최민수',
-//       menuList: [{ menuId: 5, quantity: 1, menuName: '샌드위치' }],
-//       rejectedReason: '매장 마감 임박으로 주문 거부',
-//     },
-//     {
-//       orderId: 202,
-//       orderNumber: 6512,
-//       // KST 14:30:00 -> UTC 05:30:00Z
-//       createdAt: '2025-11-01T05:30:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 2,
-//       subscriptionName: '카페 모니카 PREMIUM 구독권',
-//       orderType: 'IN',
-//       tel: '010-2222-3333',
-//       name: '이수진',
-//       menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
-//     },
-//     {
-//       orderId: 203,
-//       orderNumber: 6513,
-//       // KST 11:20:00 -> UTC 02:20:00Z
-//       createdAt: '2025-11-01T02:20:00.000Z',
-//       orderStatus: 'CANCELED',
-//       memberSubscriptionId: 3,
-//       subscriptionName: '카페 모니카 DESSERT 구독권',
-//       orderType: 'OUT',
-//       tel: '010-1111-2222',
-//       name: '홍길동',
-//       menuList: [
-//         { menuId: 32, quantity: 1, menuName: '브라우니' },
-//         { menuId: 12, quantity: 1, menuName: '마카롱' },
-//       ],
-//     },
-
-//     // ==========================================================
-//     // 3. 그제 주문 (2025-10-31 KST) - 3개
-//     // ==========================================================
-//     {
-//       orderId: 301,
-//       orderNumber: 5888,
-//       // KST 16:00:00 -> UTC 07:00:00Z
-//       createdAt: '2025-10-31T07:00:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 2,
-//       subscriptionName: '카페 모니카 PREMIUM 구독권',
-//       orderType: 'IN',
-//       tel: '010-5555-4444',
-//       name: '김철수',
-//       menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
-//     },
-//     {
-//       orderId: 302,
-//       orderNumber: 5889,
-//       // KST 13:30:00 -> UTC 04:30:00Z
-//       createdAt: '2025-10-31T04:30:00.000Z',
-//       orderStatus: 'REJECTED',
-//       memberSubscriptionId: 3,
-//       subscriptionName: '카페 모니카 DESSERT 구독권',
-//       orderType: 'OUT',
-//       tel: '010-8888-7777',
-//       name: '박영희',
-//       menuList: [{ menuId: 12, quantity: 1, menuName: '마카롱' }],
-//       rejectedReason: '재료 소진으로 주문 거부',
-//     },
-//     {
-//       orderId: 303,
-//       orderNumber: 5890,
-//       // KST 10:00:00 -> UTC 01:00:00Z
-//       createdAt: '2025-10-31T01:00:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 1,
-//       subscriptionName: '카페 모니카 BASIC 구독권',
-//       orderType: 'IN',
-//       tel: '010-9999-1111',
-//       name: '최민수',
-//       menuList: [
-//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
-//         { menuId: 32, quantity: 1, menuName: '브라우니' },
-//       ],
-//     },
-
-//     // ==========================================================
-//     // 4. 한 달 전 주문 (2025-10-02 KST) - 3개
-//     // ==========================================================
-//     {
-//       orderId: 401,
-//       orderNumber: 4321,
-//       // KST 18:00:00 -> UTC 09:00:00Z
-//       createdAt: '2025-10-02T09:00:00.000Z',
-//       orderStatus: 'CANCELED',
-//       memberSubscriptionId: 3,
-//       subscriptionName: '카페 모니카 DESSERT 구독권',
-//       orderType: 'OUT',
-//       tel: '010-2222-3333',
-//       name: '이수진',
-//       menuList: [{ menuId: 10, quantity: 1, menuName: '에스프레소' }],
-//     },
-//     {
-//       orderId: 402,
-//       orderNumber: 4322,
-//       // KST 14:30:00 -> UTC 05:30:00Z
-//       createdAt: '2025-10-02T05:30:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 1,
-//       subscriptionName: '카페 모니카 BASIC 구독권',
-//       orderType: 'IN',
-//       tel: '010-1111-2222',
-//       name: '홍길동',
-//       menuList: [
-//         { menuId: 1, quantity: 1, menuName: '아메리카노' },
-//         { menuId: 5, quantity: 1, menuName: '샌드위치' },
-//       ],
-//     },
-//     {
-//       orderId: 403,
-//       orderNumber: 4323,
-//       // KST 08:45:00 -> UTC 23:45:00Z (전날 UTC)
-//       createdAt: '2025-10-01T23:45:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 2,
-//       subscriptionName: '카페 모니카 PREMIUM 구독권',
-//       orderType: 'OUT',
-//       tel: '010-5555-4444',
-//       name: '김철수',
-//       menuList: [{ menuId: 21, quantity: 2, menuName: '카페라떼' }],
-//     },
-
-//     // ==========================================================
-//     // 5. 두 달 전 주문 (2025-09-02 KST) - 3개
-//     // ==========================================================
-//     {
-//       orderId: 501,
-//       orderNumber: 3101,
-//       // KST 15:00:00 -> UTC 06:00:00Z
-//       createdAt: '2025-09-02T06:00:00.000Z',
-//       orderStatus: 'COMPLETED',
-//       memberSubscriptionId: 3,
-//       subscriptionName: '카페 모니카 DESSERT 구독권',
-//       orderType: 'IN',
-//       tel: '010-8888-7777',
-//       name: '박영희',
-//       menuList: [{ menuId: 32, quantity: 1, menuName: '브라우니' }],
-//     },
-//     {
-//       orderId: 502,
-//       orderNumber: 3102,
-//       // KST 11:45:00 -> UTC 02:45:00Z
-//       createdAt: '2025-09-02T02:45:00.000Z',
-//       orderStatus: 'REJECTED',
-//       memberSubscriptionId: 1,
-//       subscriptionName: '카페 모니카 BASIC 구독권',
-//       orderType: 'OUT',
-//       tel: '010-9999-1111',
-//       name: '최민수',
-//       menuList: [{ menuId: 1, quantity: 1, menuName: '아메리카노' }],
-//       rejectedReason: '직원 부재로 주문 거부',
-//     },
-//     {
-//       orderId: 503,
-//       orderNumber: 3103,
-//       // KST 07:30:00 -> UTC 22:30:00Z (전날 UTC)
-//       createdAt: '2025-09-01T22:30:00.000Z',
-//       orderStatus: 'CANCELED',
-//       memberSubscriptionId: 2,
-//       subscriptionName: '카페 모니카 PREMIUM 구독권',
-//       orderType: 'IN',
-//       tel: '010-2222-3333',
-//       name: '이수진',
-//       menuList: [
-//         { menuId: 21, quantity: 1, menuName: '카페라떼' },
-//         { menuId: 12, quantity: 1, menuName: '마카롱' },
-//       ],
-//     },
-//   ],
-//   message: '과거 주문 내역 정적 데이터가 성공적으로 생성되었습니다.',
-// };
-// // 위에는 전부 가데이터 테스트 로직;
-
 // menuList에서 menuName과 quantity를 조합해서 보여주는 식
 const getFormattedMenuList = (menuList) => {
-  if (!menuList || menuList.length === 0) return "메뉴 없음";
+  if (!menuList || menuList.length === 0) return '메뉴 없음';
 
   // 메뉴 이름과 수량을 조합하여 문자열 배열 생성: ['아메리카노 (2개)', '브라우니 (1개)']
   const formattedItems = menuList.map((menu) => {
@@ -320,26 +80,26 @@ const getFormattedMenuList = (menuList) => {
   });
 
   // 쉼표와 공백으로 연결
-  return formattedItems.join(", ");
+  return formattedItems.join(', ');
 };
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#556cd6",
+      main: '#556cd6',
     },
     error: {
-      main: "#d32f2f",
+      main: '#d32f2f',
     },
     success: {
-      main: "#388e3c",
+      main: '#388e3c',
     },
   },
 });
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  margin: "auto",
+  margin: 'auto',
   marginTop: theme.spacing(4),
   borderRadius: theme.shape.borderRadius * 2,
 }));
@@ -347,14 +107,14 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 // 주문 상태를 사용자 친화적 한글 변환 및 색상 지정
 const getStatusProps = (orderStatus) => {
   switch (orderStatus) {
-    case "COMPLETED":
-      return { label: "수령 완료", color: theme.palette.success.main };
-    case "CANCELED":
-      return { label: "주문 취소", color: theme.palette.error.main };
-    case "REJECTED":
-      return { label: "주문 거부", color: theme.palette.error.main };
+    case 'COMPLETED':
+      return { label: '수령 완료', color: theme.palette.success.main };
+    case 'CANCELED':
+      return { label: '주문 취소', color: theme.palette.error.main };
+    case 'REJECTED':
+      return { label: '주문 거부', color: theme.palette.error.main };
     default:
-      return { label: "주문 접수", color: theme.palette.text.secondary };
+      return { label: '주문 접수', color: theme.palette.text.secondary };
   }
 };
 
@@ -399,14 +159,14 @@ export default function PastOrdersList() {
       } else {
         // 백엔드가 success: false와 message를 반환할 경우 처리
         throw new Error(
-          response.data.message || "주문 내역 조회에 실패했습니다."
+          response.data.message || '주문 내역 조회에 실패했습니다.'
         );
       }
     } catch (err) {
-      console.error("주문 내역 조회 오류:", err);
+      console.error('주문 내역 조회 오류:', err);
       // 사용자에게 보여줄 에러 메시지 설정
       setError(
-        "데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+        '데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
       );
     } finally {
       setIsLoading(false);
@@ -465,8 +225,8 @@ export default function PastOrdersList() {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          minHeight: "100vh",
-          backgroundColor: "#f5f5f5",
+          minHeight: '100vh',
+          backgroundColor: '#f5f5f5',
           padding: 2,
         }}
       >
@@ -474,14 +234,14 @@ export default function PastOrdersList() {
           {/* 제목 및 날짜 필터 영역 (수정 없음) */}
           <Box
             display="flex"
-            flexDirection={{ xs: "column", sm: "row" }}
+            flexDirection={{ xs: 'column', sm: 'row' }}
             justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
             mb={4}
             gap={2}
           >
             <Typography variant="h5" component="h1" fontWeight="bold">
-              지난 주문 내역 ({selectedDate.replace(/-/g, ".")})
+              지난 주문 내역 ({selectedDate.replace(/-/g, '.')})
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
               <Typography variant="body1" color="text.secondary">
@@ -493,7 +253,7 @@ export default function PastOrdersList() {
                 value={selectedDate}
                 onChange={handleDateChange}
                 size="small"
-                sx={{ width: { xs: "100%", sm: 180 } }}
+                sx={{ width: { xs: '100%', sm: 180 } }}
               />
             </Box>
           </Box>
@@ -501,9 +261,9 @@ export default function PastOrdersList() {
           <Box
             sx={{
               minHeight: 200,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
             {isLoading ? (
@@ -524,24 +284,24 @@ export default function PastOrdersList() {
                   sx={{ minWidth: 650 }}
                   aria-label="지난 주문 내역 테이블"
                 >
-                  <TableHead sx={{ backgroundColor: "#f8f8f8" }}>
+                  <TableHead sx={{ backgroundColor: '#f8f8f8' }}>
                     <TableRow>
                       {[
-                        "주문 번호",
-                        "주문 유형",
-                        "주문 상태",
-                        "주문 시간",
-                        "주문 메뉴",
-                        "결제 구독권 유형",
-                        "회원 이름",
-                        "전화번호",
+                        '주문 번호',
+                        '주문 유형',
+                        '주문 상태',
+                        '주문 시간',
+                        '주문 메뉴',
+                        '결제 구독권 유형',
+                        '회원 이름',
+                        '전화번호',
                       ].map((header) => (
                         <TableCell
                           key={header}
                           align="center"
                           sx={{
-                            fontWeight: "bold",
-                            fontSize: "0.8rem",
+                            fontWeight: 'bold',
+                            fontSize: '0.8rem',
                             color: theme.palette.text.primary,
                           }}
                         >
@@ -562,14 +322,14 @@ export default function PastOrdersList() {
                         // KST로 변환하여 로컬 시간 표시
                         const kstTimeDisplay = new Date(
                           order.createdAt
-                        ).toLocaleString("ko-KR", {
-                          timeZone: "Asia/Seoul",
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
+                        ).toLocaleString('ko-KR', {
+                          timeZone: 'Asia/Seoul',
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
                           hour12: false,
                         });
 
@@ -578,7 +338,7 @@ export default function PastOrdersList() {
                             key={order.orderId}
                             hover
                             sx={{
-                              "&:last-child td, &:last-child th": { border: 0 },
+                              '&:last-child td, &:last-child th': { border: 0 },
                             }}
                           >
                             <TableCell align="center">
@@ -591,7 +351,7 @@ export default function PastOrdersList() {
                               align="center"
                               sx={{
                                 color: statusProps.color,
-                                fontWeight: "medium",
+                                fontWeight: 'medium',
                               }}
                             >
                               {statusProps.label}
