@@ -6,13 +6,11 @@ import SubscriptionPage from './Subscription';
 import PaymentHistory from './PaymentHistory';
 import ReviewPage from './ReviewPage';
 import { handleLogout } from '../../utils/logout';
-// import useUserStore from "../../stores/useUserStore";
-
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
-import MyGiftPage from './MyGift';
-import useUserStore from '../../stores/useUserStore';
-// import GiftPage from "./Gift";
-// import PaymentHistory from "./PaymentHistory";
+import MyGiftPage from "./MyGift";
+import useUserStore from "../../stores/useUserStore";
+import OrderHistory from "./OrderHistory";
+
 
 // 임시 플레이스홀더 컴포넌트
 const PlaceholderComponent = ({ title }) => (
@@ -35,7 +33,8 @@ function MyPage() {
   const finalMenus = [
     "구독권 관리",
     "내 선물함",
-    "주문하기",
+    "주문 내역",
+
     "결제 내역",
     "리뷰내역",
     "내 정보",
@@ -69,9 +68,9 @@ function MyPage() {
         return <SubscriptionPage />;
       case '내 선물함':
         return <MyGiftPage />;
-      case '선물하기':
-        return <PlaceholderComponent title="선물하기" />;
-      case '결제 내역':
+      case "주문 내역":
+        return <OrderHistory />;
+      case "결제 내역":
         return <PaymentHistory />;
       case '리뷰내역':
         return <ReviewPage />;

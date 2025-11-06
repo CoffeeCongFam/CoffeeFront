@@ -75,7 +75,8 @@ function OrderPage() {
             lineHeight: 1.1,
           }}
         >
-          나의 주문 현황
+          오늘의 주문
+          {/* 나의 주문 현황 */}
         </Typography>
 
         {/* 날짜 + 버튼 한 줄 */}
@@ -92,7 +93,7 @@ function OrderPage() {
         >
           <Typography
             sx={{
-              fontSize: { xs: "0.95rem", md: "1rem" },
+              fontSize: { xs: "1rem", md: "1.2rem" },
               fontWeight: 600,
               flex: "1 1 auto",
               minWidth: 0,
@@ -128,7 +129,7 @@ function OrderPage() {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignContent: "center",
+          alignItems: "center",
         }}
       >
         {/* 탭 */}
@@ -146,8 +147,6 @@ function OrderPage() {
           <Tab label={`픽업 완료 (${completedOrders.length})`} />
           <Tab label={`취소 (${canceledOrders.length})`} />
         </Tabs>
-
-        <Button sx={{ padding: "0" }}>과거 주문 내역 보기</Button>
       </Box>
 
       {/* 리스트 영역 */}
