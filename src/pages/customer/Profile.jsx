@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { patchMember } from "../../utils/member";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import WcIcon from "@mui/icons-material/Wc";
@@ -36,6 +37,7 @@ function Profile() {
     gender: authUser?.gender || "",
     email: authUser?.email || "",
   });
+  const [saveFeedback, setSaveFeedback] = useState(null); // { type: 'success' | 'error', message: string }
 
   useEffect(() => {
     if (!authUser) return;
@@ -93,15 +95,53 @@ function Profile() {
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // 로컬 상태를 전역 authUser에도 반영
-    if (authUser) {
-      setAuthUser({ ...authUser, ...user });
-    } else {
-      setAuthUser(user);
+  const handleSave = async () => {
+    // 이전 피드백 초기화
+    setSaveFeedback(null);
+
+    try {
+      // 이름과 전화번호를 patchMember의 파라미터로 전달
+      // patchMember가 (payload) 형태를 받는다고 가정
+      const result = await patchMember({
+        name: user.name,
+        tel: user.tel,
+      });
+
+      // 반환값이 boolean 또는 { success: boolean } 둘 다 대응
+      const isSuccess = result === true || result?.success === true;
+
+      if (isSuccess) {
+        // 수정 성공: alert로 안내 후 실제 데이터(authUser) 갱신
+        alert("회원 정보가 수정되었습니다.");
+
+        if (authUser) {
+          const updated = { ...authUser, ...user };
+          setAuthUser(updated);
+          setUser((prev) => ({
+            ...prev,
+            name: updated.name,
+            tel: updated.tel,
+          }));
+        } else {
+          setAuthUser(user);
+        }
+
+        // alert 확인 후 편집 모드 해제 -> 변경된 정보가 화면에 반영됨
+        setIsEditing(false);
+      } else {
+        // 반환값이 false인 경우
+        setSaveFeedback({
+          type: "error",
+          message: "프로필 수정에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        });
+      }
+    } catch (error) {
+      console.error("patchMember 오류:", error);
+      setSaveFeedback({
+        type: "error",
+        message: "프로필 수정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      });
     }
-    // TODO: 필요하다면 여기서 서버로 프로필 업데이트 API를 호출하세요.
   };
 
 
@@ -301,7 +341,7 @@ function Profile() {
             </List>
           </Box>
           {isEditing && (
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ mt: 2, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 0.5 }}>
               <Button
                 variant="contained"
                 onClick={handleSave}
@@ -309,6 +349,15 @@ function Profile() {
               >
                 저장
               </Button>
+              {saveFeedback && (
+                <Typography
+                  variant="caption"
+                  color={saveFeedback.type === "error" ? "error" : "primary"}
+                  sx={{ mt: 0.5 }}
+                >
+                  {saveFeedback.message}
+                </Typography>
+              )}
             </Box>
           )}
         </CardContent>

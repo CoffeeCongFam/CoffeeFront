@@ -1,0 +1,29 @@
+import api from "./api";
+
+export async function postCafe(data) {
+  try {
+    const response = await api.post("/memberInfo/update", data, {
+      headers: {
+        "Content-Type" : "multipart/form-data",
+      }
+    });
+    // console.log(response.data.data)
+    return response.data.success === true;
+  } catch (error) {
+    console.error("Error fetching cafe data:", error);
+    return null;
+  }
+}
+
+
+// 회원 정보 수정
+export async function patchMember(data){ 
+  try {
+    const response = await api.patch("/memberInfo/update", data);
+    console.log(response.data.success)
+    return response.data.success;
+  } catch (error) {
+    console.error("Error fetching gift data:", error);
+    return null;
+  }
+}
