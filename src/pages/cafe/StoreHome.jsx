@@ -99,10 +99,6 @@ function StoreHome() {
       try {
         // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
         if (!partnerStoreId || partnerStoreId <= 0) {
-          console.log(
-            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
-            partnerStoreId
-          );
           return;
         }
 
@@ -113,14 +109,8 @@ function StoreHome() {
         // 백엔드 응답 구조에 맞게 resposne.data.data
         if (response.data && response.data.data) {
           setOrders(response.data.data);
-          console.log(
-            '✅ GET 성공, 데이터 로드 완료:',
-            response.data.data.length,
-            '개'
-          );
         } else {
           setOrders(response.data.data || []);
-          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
         }
       } catch (error) {
         console.error('오늘의 주문 목록 로딩 실패:', error);
@@ -347,10 +337,6 @@ function StoreHome() {
           const formattedMenuString = getFormattedMenuList(order.menuList);
 
           return (
-            // Grid Item : 각 카드를 감싸는 아이템
-            // xs = 12 : 가장 작은 화면에서는 한 줄에 1개 (12/12)
-            // sm = 6 : 중간 화면(태블릿) 한 줄에 2개
-            // md = 4 : 데스크톱 화면에서는 한 줄에 3개 (12/4)
             <Grid item xs={12} sm={6} md={4} key={order.orderId}>
               <Card sx={{ height: '100%', boxShadow: 2 }}>
                 <Box sx={{ p: 2 }}>
