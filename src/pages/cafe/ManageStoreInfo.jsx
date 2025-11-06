@@ -98,7 +98,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
     SAT: "토",
     SUN: "일",
   };
-
   // 일반 텍스트 입력 필드 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
