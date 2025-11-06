@@ -14,6 +14,7 @@ import useUserStore from "../../stores/useUserStore";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
+  const BASE_URL = import.meta.env.VITE_API_URL;
 
   // 상태 관리
   const [name, setName] = useState("");
@@ -73,7 +74,7 @@ function CustomerSignUp() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/signup/member",
+        `${BASE_URL}/signup/member`,
         { ...formData },
         { withCredentials: true }
       );
