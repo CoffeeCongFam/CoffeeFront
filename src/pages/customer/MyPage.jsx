@@ -6,12 +6,8 @@ import {
   Paper,
   Grid,
   Button,
-  Avatar,
-  IconButton,
-  Slide,
 } from "@mui/material";
 import Profile from "./Profile";
-import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
 import PaymentHistory from "./PaymentHistory";
@@ -40,8 +36,7 @@ function MyPage() {
   console.log("AUTH USER>> ", authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
-  const [drawerContent, setDrawerContent] = useState(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState("구독권 관리");
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
@@ -71,17 +66,12 @@ function MyPage() {
       navigate("/me/order/new"); // 절대 경로로 수정 및 오타 수정
       return;
     }
-    setDrawerContent(menu);
-    setIsDrawerOpen(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
+    setActiveMenu(menu);
   };
 
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
-    switch (drawerContent) {
+    switch (activeMenu) {
       case "구독권 관리":
         return <SubscriptionPage />;
       case "내 선물함":
@@ -139,52 +129,17 @@ function MyPage() {
           </Box>
         </Box>
       </Box>
-      {/* 흰색 구역 (Paper 컴포넌트 사용) - 시트가 열리면 숨김 */}
-      {!isDrawerOpen && (
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <Grid container spacing={1} justifyContent="flex-start">
-            {renderGridItems(finalMenus)}
-          </Grid>
-        </Paper>
-      )}
+      {/* 상단 메뉴 영역 */}
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Grid container spacing={1} justifyContent="flex-start">
+          {renderGridItems(finalMenus)}
+        </Grid>
+      </Paper>
 
-      {/* 하단에서 올라오는 Bottom Sheet (전체 화면 덮지 않음) */}
-      <Slide direction="up" in={isDrawerOpen} mountOnEnter unmountOnExit>
-        <Box
-          sx={{ zIndex: (theme) => theme.zIndex.drawer }}
-          // sx={{ backgroundColor: "yellow" }}
-          // sx={{
-          //   position: "fixed",
-          //   left: "30%",
-          //   transform: "translateX(-50%)",
-          //   bottom: 0,
-          //   width: "100%",
-          //   maxWidth: 800, // Container maxWidth="md"(약 900px)에 맞춤
-          //   height: "80vh", // 화면 일부만 차지
-          //   bgcolor: "background.paper",
-          //   borderTopLeftRadius: 2,
-          //   borderTopRightRadius: 2,
-          //   boxShadow: 24,
-          //   zIndex: (theme) => theme.zIndex.drawer, // AppBar 위로
-          // }}
-        >
-          {/* sx={{ position: "relative", height: "100%" }} */}
-          <Box>
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDrawer}
-              sx={{}}
-              // sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
-            >
-              <CloseIcon />
-            </IconButton>
-            {renderDrawerContent()}
-            {/* <Box sx={{ height: "100%", overflowY: "auto", pt: 2 }}>
-              {renderDrawerContent()}
-            </Box> */}
-          </Box>
-        </Box>
-      </Slide>
+      {/* 선택된 메뉴 컨텐츠 영역 */}
+      <Box sx={{ mt: 3 }}>
+        {renderDrawerContent()}
+      </Box>
     </Container>
   );
 }

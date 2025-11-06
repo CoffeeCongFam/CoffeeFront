@@ -366,8 +366,7 @@ function MyGift() {
   return (
     <Box
       sx={{
-        maxWidth: 600,
-        margin: "auto",
+        width: "100%",
         padding: 2,
         backgroundColor: "white",
       }}
@@ -394,6 +393,15 @@ function MyGift() {
         <Tab value="RECEIVED" label="받은선물" />
         <Tab value="SENT" label="보낸선물" />
       </Tabs>
+
+      {/* 데이터가 없을 때 표시할 메시지 */}
+      {filteredGiftList.length === 0 && (
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography variant="body1" color="text.secondary">
+            선물 내역이 존재하지 않습니다.
+          </Typography>
+        </Box>
+      )}
 
       {/* SENT 탭: getSendGiftData 기반 렌더링 */}
       {filter === "SENT" &&
