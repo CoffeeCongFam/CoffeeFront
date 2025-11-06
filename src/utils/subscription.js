@@ -3,7 +3,7 @@
 import api from "./api";
 export async function getSubscription() {
   try {
-    const response = await api.get("/api/customers/subscriptions", {
+    const response = await api.get("/customers/subscriptions", {
       transformResponse: [(data) => {
         if (typeof data === "string") {
           // 1) BOM/공백 제거
