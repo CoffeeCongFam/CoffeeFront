@@ -6,12 +6,13 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 function SubscriptionItem({ subscription }) {
-  if (!subscription || !subscription.subId) return null;
+  console.log("ITEM에서 받음", subscription);
+  if (!subscription || !subscription.subscriptionId) return null;
 
   const typeLabel =
-    subscription.subType === "PREMIUM"
+    subscription.subscriptionType === "PREMIUM"
       ? "프리미엄"
-      : subscription.subType === "STANDARD"
+      : subscription.subscriptionType === "STANDARD"
       ? "스탠다드"
       : "베이직";
 
@@ -33,7 +34,8 @@ function SubscriptionItem({ subscription }) {
       {/* 왼쪽 정보 */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {subscription.store?.storeName || "카페"}
+          {subscription?.store?.storeName || "카페 이름"}{" "}
+          {subscription?.subscriptionName}
         </Typography>
 
         {/* 간단한 혜택 설명 */}
@@ -48,18 +50,18 @@ function SubscriptionItem({ subscription }) {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <CalendarMonthIcon fontSize="small" />
-            <span>결제일 기준 30일 이용</span>
+            <span>결제일 기준 {subscription?.subscriptionPeriod}일 이용</span>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <CoffeeIcon fontSize="small" />
-            <span>매일 1잔 제공</span>
+            <span>매일 {subscription?.maxDailyUsage}잔 이용</span>
           </Box>
         </Box>
 
         {/* 상세 설명 */}
-        {subscription.description && (
+        {subscription.subscriptionDesc && (
           <Typography variant="body2" color="text.secondary">
-            {subscription.description}
+            {subscription.subscriptionDesc}
           </Typography>
         )}
       </Box>

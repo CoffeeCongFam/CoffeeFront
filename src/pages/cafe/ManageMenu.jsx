@@ -1,0 +1,158 @@
+import React, { useState, useEffect } from 'react';
+import { Container, Box, Typography, Button } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
+// 분리된 컴포넌트와 서비스 임포트
+import MenuTable from './ManageMenuSoC/MenuTable';
+import MenuRegistModal from './ManageMenuSoC/MenuRegistModal';
+import MenuEditModal from './ManageMenuSoC/MenuEditModal';
+
+// axios 전까지만 갖다 쓰는 용 ***
+const CURRENT_STORE_ID = 1;
+
+// axios 로직을 담고 있는 서비스 함수 임포트
+import {
+  fetchStoreMenus,
+  registerMenu,
+  deleteMenu,
+  updateMenu,
+} from './ManageMenuSoC/MenuService';
+
+// 🚩 ManageMenu.jsx는 컨테이너로 모든 CRUD 관련 API 호출(axios 사용) 밑 상태 관리
+
+export default function ManageMenu() {
+  const [menuList, setMenuList] = useState([]);
+  const [isRegModalOpen, setIsRegModalOpen] = useState(false);
+
+  // 수정 관련 상태 (수정 모달 구현 시 사용)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMenu, setEditingMenu] = useState(null);
+
+  // 1. 메뉴 리스트 조회 (READ)
+  const loadMenus = async () => {
+    try {
+      // API 호출: 매장 메뉴 조회
+      const data = await fetchStoreMenus(CURRENT_STORE_ID);
+      setMenuList(data);
+    } catch (error) {
+      console.error('메뉴 리스트 로딩 실패:', error);
+      // alert("메뉴 목록을 불러오지 못했습니다.");
+    }
+  };
+
+  useEffect(() => {
+    loadMenus();
+  }, []);
+
+  // 2. 신규 메뉴 등록 (CREATE)
+  const handleRegisterMenu = async (formData, selectedFile) => {
+    // menuService.js의 registerMenu가 FormData를 처리합니다.
+    try {
+      // API 호출: 메뉴 등록
+      const newMenuData = await registerMenu(formData, selectedFile);
+
+      // 성공 시 프론트엔드 리스트에 반영
+      // (서버에서 반환된 최종 URL과 ID가 담긴 데이터 사용)
+      setMenuList((prev) => [newMenuData, ...prev]);
+      alert(`메뉴 [${newMenuData.menuName}] 등록 성공!`);
+    } catch (error) {
+      console.error('메뉴 등록 실패:', error);
+      throw error; // 모달에서 catch하여 실패 알림
+    }
+  };
+
+  // 3. 메뉴 수정 클릭 핸들러 (UPDATE - Start)
+  const handleEditClick = (menu) => {
+    setEditingMenu(menu);
+    setIsEditModalOpen(true);
+  };
+
+  // 4. 메뉴 삭제 (DELETE)
+  const handleDeleteClick = async (menuId) => {
+    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까? (소프트 삭제)')) {
+      return;
+    }
+
+    try {
+      // API 호출: 메뉴 소프트 삭제
+      await deleteMenu(menuId);
+
+      // 성공 시 리스트에서 해당 메뉴 제거 (또는 상태 업데이트)
+      setMenuList((prev) => prev.filter((menu) => menu.menuId !== menuId));
+      alert('메뉴 삭제 성공!');
+    } catch (error) {
+      console.error(`메뉴 삭제 실패 (ID: ${menuId}):`, error);
+      alert('메뉴 삭제에 실패했습니다.');
+    }
+  };
+
+  // 5. 메뉴 수정 완료 핸들러 (UPDATE - End)
+  const handleUpdateMenu = async (menuId, formData, selectedFile) => {
+    try {
+      // API 호출: 메뉴 수정
+      const updatedMenu = await updateMenu(menuId, formData, selectedFile);
+
+      // 성공 시 리스트 업데이트
+      setMenuList((prev) =>
+        prev.map((menu) => (menu.menuId === menuId ? updatedMenu : menu))
+      );
+
+      // 모달 닫기
+      setIsEditModalOpen(false);
+      alert(`메뉴 [${updateMenu.menuName}] 수정 완료!`);
+    } catch (error) {
+      console.error('메뉴 수정 실패:', error);
+      alert('메뉴 수정에 실패했습니다.');
+    }
+  };
+
+  return (
+    <Container
+      maxWidth="xl"
+      sx={{ py: 4, minHeight: '100vh', bgcolor: 'background.default' }}
+    >
+      {/* 상단 헤더 및 버튼 */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Typography variant="h4" fontWeight="bold" color="text.primary">
+          메뉴 관리
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={() => setIsRegModalOpen(true)} // ⬅️ 모달 상태 관리
+          sx={{ fontWeight: 'bold' }}
+        >
+          메뉴 등록
+        </Button>
+      </Box>
+
+      {/* 메뉴 리스트 테이블 (MenuTable 컴포넌트로 분리) */}
+      <MenuTable
+        menuList={menuList}
+        onEditClick={handleEditClick} // ⬅️ 수정 로직 연결
+        onDeleteClick={handleDeleteClick} // ⬅️ 삭제 로직 연결
+      />
+
+      {/* 🌟 신규 메뉴 등록 모달 */}
+      <MenuRegistModal
+        open={isRegModalOpen}
+        onClose={() => setIsRegModalOpen(false)}
+        onRegister={handleRegisterMenu} // ⬅️ 등록 API 연결
+      />
+
+      {/* 🛠️ 메뉴 수정 모달  */}
+      <MenuEditModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        editingMenu={editingMenu}
+        onUpdate={handleUpdateMenu}
+      />
+    </Container>
+  );
+}

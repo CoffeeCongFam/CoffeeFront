@@ -18,33 +18,25 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { ExpandLess, ExpandMore, ConfirmationNumber } from "@mui/icons-material";
+import {
+  ExpandLess,
+  ExpandMore,
+  ConfirmationNumber,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
+import SubTypeChip from "../../common/SubTypeChip";
 
 const subDescBoxStyle = {
   backgroundColor: "#F2F2F2",
   padding: "12px 14px",
   borderRadius: "8px",
   width: "100%",
-  display: "flex", 
+  display: "flex",
   flexDirection: "column",
   gap: "0.8rem",
-  justifyContent: "space-around"
+  justifyContent: "space-around",
 };
-
-function getChipStyle(type) {
-  switch (type) {
-    case "BASIC":
-      return { bgcolor: "#E0E0E0", color: "#333" };
-    case "STANDARD":
-      return { bgcolor: "#E6F4EA", color: "#2e7d32" };
-    case "PREMIUM":
-      return { bgcolor: "#FFF3CD", color: "#B28704" };
-    default:
-      return { bgcolor: "#F1F3F4", color: "#5F6368" };
-  }
-}
 
 function CafeSubscriptionList({ subscriptions = [] }) {
   const navigate = useNavigate();
@@ -59,7 +51,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const subscriptionTypes = useMemo(() => {
     const set = new Set();
     subscriptions.forEach((s) => {
-      if (s.subType) set.add(s.subType);
+      if (s.subscriptionType) set.add(s.subscriptionType);
     });
     return Array.from(set);
   }, [subscriptions]);
@@ -68,7 +60,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const filteredList =
     filter === "ALL"
       ? subscriptions
-      : subscriptions.filter((sub) => sub.subType === filter);
+      : subscriptions.filter((sub) => sub.subscriptionType === filter);
 
   const handleFilterChange = (_, newValue) => {
     if (newValue !== null) {
@@ -90,16 +82,16 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   };
 
   // 페이지 이동 함수들
-  const goToPurchaseSub = (subId) => {
-    navigate(`/me/subscriptions/${subId}/purchase`);
+  const goToPurchaseSub = (subscriptionId) => {
+    navigate(`/me/subscriptions/${subscriptionId}/purchase`);
   };
   const goToOrder = (sub) => {
     navigate("/me/order/new", {
       state: { subscription: sub },
     });
   };
-  const goToSendGift = (subId) => {
-    navigate(`/me/subscriptions/${subId}/gift`);
+  const goToSendGift = (subscriptionId) => {
+    navigate(`/me/subscriptions/${subscriptionId}/gift`);
   };
 
   const getTypeLabel = (type) => {
@@ -185,7 +177,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
 
         {filteredList.map((sub) => (
           <Box
-            key={sub.subId || sub.id || sub.subName}
+            key={sub.subscriptionId || sub.subscriptionId || sub.subName}
             sx={{
               scrollSnapAlign: "start",
               px: isAppLike ? 0 : "10%",
@@ -195,6 +187,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           >
             {/* 카드 */}
             <Box
+              key={sub.subscriptionId}
               sx={{
                 border: "1px solid #e0e0e0",
                 borderRadius: 2,
@@ -209,19 +202,12 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             >
               {/* 타입 / 이름 / 가격 */}
               <Box sx={{ textAlign: "center" }}>
-                <Chip
-                  label={getTypeLabel(sub.subType)}
-                  size="small"
-                  sx={{
-                    mb: 1,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    borderRadius: "999px",
-                    ...getChipStyle(sub.subType),
-                  }}
-                />
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {sub.subName || sub.name}
+                <SubTypeChip type={sub.subscriptionType} />
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 600, mt: "0.5rem" }}
+                >
+                  {sub.subscriptionName}
                 </Typography>
                 <Typography sx={{ fontWeight: 800, fontSize: 28 }}>
                   ₩{sub.price?.toLocaleString()}
@@ -251,15 +237,20 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     금액
                   </Typography>
                   <Box>
-                    <Typography 
-                      sx={{ textAlign: "right", 
-                      fontSize: { xs: "0.8rem" , sm : "1rem"} 
+                    <Typography
+                      sx={{
+                        textAlign: "right",
+                        fontSize: { xs: "0.8rem", sm: "1rem" },
                       }}
                     >
                       월 {sub.price?.toLocaleString()}원
                     </Typography>
                     <Typography
-                      sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                      sx={{
+                        fontSize: 10,
+                        color: "#ff39caff",
+                        textAlign: "right",
+                      }}
                     >
                       한 잔당 약 ₩
                       {sub.price
@@ -267,15 +258,19 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         : 0}
                     </Typography>
                   </Box>
-                  
                 </Box>
 
                 <Box sx={subDescBoxStyle}>
                   <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
                     구독 주기
                   </Typography>
-                      
-                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"}   }}>
+
+                  <Typography
+                    sx={{
+                      textAlign: "right",
+                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                    }}
+                  >
                     1개월
                   </Typography>
                 </Box>
@@ -284,11 +279,20 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
                     사용 가능
                   </Typography>
-                  <Typography sx={{ textAlign: "right", fontSize: { xs: "0.8rem" , sm : "1rem"} }}>
+                  <Typography
+                    sx={{
+                      textAlign: "right",
+                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                    }}
+                  >
                     매일, 하루 {sub.maxDailyUsage}잔
                   </Typography>
                   <Typography
-                    sx={{ fontSize: 10, color: "#ff39caff", textAlign: "right" }}
+                    sx={{
+                      fontSize: 10,
+                      color: "#ff39caff",
+                      textAlign: "right",
+                    }}
                   >
                     결제일로부터 시작
                   </Typography>
@@ -304,8 +308,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   }}
                 >
                   {/* 왼쪽: 아이콘 + 라벨 */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
-                    
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      flex: 1,
+                    }}
+                  >
                     <ListItemText
                       primary="잔여 구독권 수량"
                       primaryTypographyProps={{
@@ -326,13 +336,17 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       textAlign: "center",
                       display: "flex",
                       flexDirection: "row",
-                      gap: "0.3rem"
+                      gap: "0.3rem",
                     }}
                   >
                     <Typography
-                      sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#202124" }}
+                      sx={{
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        color: "#202124",
+                      }}
                     >
-                      {sub.remain || 0} 개
+                      {sub.remainSalesQuantity || 0} 개
                     </Typography>
                     <ConfirmationNumber
                       sx={{ fontSize: 20, color: "#4d4d4d" }}
@@ -346,7 +360,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <ListItemButton
                   onClick={() =>
                     setOpenDescId((prev) =>
-                      prev === sub.subId ? null : sub.subId
+                      prev === sub.subscriptionId ? null : sub.subscriptionId
                     )
                   }
                   sx={{ borderRadius: 1 }}
@@ -358,10 +372,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       color: "#4d4d4d",
                     }}
                   />
-                  {openDescId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                  {openDescId === sub.subscriptionId ? (
+                    <ExpandLess />
+                  ) : (
+                    <ExpandMore />
+                  )}
                 </ListItemButton>
                 <Collapse
-                  in={openDescId === sub.subId}
+                  in={openDescId === sub.subscriptionId}
                   timeout="auto"
                   unmountOnExit
                 >
@@ -370,7 +388,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       variant="body2"
                       sx={{ color: "text.secondary", whiteSpace: "pre-line" }}
                     >
-                      {sub.description || "설명 정보가 없습니다."}
+                      {sub.subscriptionDesc || "설명 정보가 없습니다."}
                     </Typography>
                   </Box>
                 </Collapse>
@@ -381,7 +399,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <ListItemButton
                   onClick={() =>
                     setOpenMenuId((prev) =>
-                      prev === sub.subId ? null : sub.subId
+                      prev === sub.subscriptionId ? null : sub.subscriptionId
                     )
                   }
                   sx={{ borderRadius: 1 }}
@@ -393,21 +411,25 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       color: "#4d4d4d",
                     }}
                   />
-                  {openMenuId === sub.subId ? <ExpandLess /> : <ExpandMore />}
+                  {openMenuId === sub.subscriptionId ? (
+                    <ExpandLess />
+                  ) : (
+                    <ExpandMore />
+                  )}
                 </ListItemButton>
                 <Collapse
-                  in={openMenuId === sub.subId}
+                  in={openMenuId === sub.subscriptionId}
                   timeout="auto"
                   unmountOnExit
                 >
                   <List component="div" disablePadding>
-                    {(sub.menuList || []).map((menu) => (
-                      <ListItemButton key={menu} sx={{ pl: 4 }}>
-                        <ListItemIcon sx={{ minWidth: 32 }}>
+                    {(sub.menus || []).map((menu) => (
+                      <ListItemButton key={menu.menuId} sx={{ pl: 4 }}>
+                        <ListItemIcon key={menu.menuId} sx={{ minWidth: 32 }}>
                           <CoffeeIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText
-                          primary={menu}
+                          primary={menu.menuName}
                           primaryTypographyProps={{
                             fontSize: "0.8rem",
                             color: "#333",
@@ -431,7 +453,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 <Button
                   fullWidth
                   size="small"
-                  onClick={() => goToSendGift(sub.subId)}
+                  onClick={() => goToSendGift(sub.subscriptionId)}
                   startIcon={<CardGiftcardIcon />}
                   sx={{
                     backgroundColor: "black",
@@ -446,7 +468,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   <Button
                     fullWidth
                     size="small"
-                    onClick={() => goToPurchaseSub(sub.subId)}
+                    onClick={() => goToPurchaseSub(sub.subscriptionId)}
                     startIcon={<CreditCardIcon />}
                     sx={{
                       backgroundColor: "black",
@@ -470,7 +492,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   >
                     주문하기
                   </Button>
-
                 )}
               </Box>
             </Box>

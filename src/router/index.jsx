@@ -1,35 +1,43 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "../App";
+
+import ErrorPage from "../common/error/ErrorPage";
 import LandingPage from "../pages/home/Landing";
-import Login from "../pages/home/Login";
 import SignUp from "../pages/home/SignUp";
-import CustomerLayout from "../layout/CustomerLayout" // PWA 레이아웃
-// import CustomerLayout from "../common/CustomerLayout";   // 데스크탑 전용 레이아웃
-import CustomerHome from "../pages/customer/home/CustomerHome";
+
+import CustomerLayout from "../layout/CustomerLayout";
 import StoreLayout from "../common/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
+
+import CustomerHome from "../pages/customer/home/CustomerHome";
 import OrderPage from "../pages/customer/order/OrderPage";
 import SearchPage from "../pages/customer/search/SearchPage";
-import MyPage from "../pages/customer/MyPage";
 import CreateOrderPage from "../pages/customer/order/CreateOrderPage";
 import CompleteOrderPage from "../pages/customer/order/CompleteOrderPage";
 import StoreDetailPage from "../pages/customer/home/StoreDetailPage";
 import PurchaseSubscriptionPage from "../pages/customer/home/PurchaseSubscriptionPage";
 import CompletePurchasePage from "../pages/customer/order/CompletePurchasePage";
-import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
+
+import MyPage from "../pages/customer/MyPage";
 import Gift from "../pages/customer/Gift";
+import GiftSubscriptionPage from "../pages/customer/GiftSubscriptionPage";
 import PaymentHistory from "../pages/customer/PaymentHistory";
 import MyGift from "../pages/customer/MyGift";
 import Subscription from "../pages/customer/Subscription";
-import KakaoRedirect from '../pages/home/KakaoRedirect';
-import CustomerSignUp from '../pages/home/CustomerSignUp';
-import CafeSignUp from '../pages/home/CafeSignUp';
-import MemberSignUp  from '../pages/home/MemberSignUp';
-import ErrorPage from "../common/error/ErrorPage";
 
+import KakaoRedirect from "../pages/home/KakaoRedirect";
+import CustomerSignUp from "../pages/home/CustomerSignUp";
+import CafeSignUp from "../pages/home/CafeSignUp";
+import MemberSignUp from "../pages/home/MemberSignUp";
+
+import PastOrders from "../pages/cafe/PastOrders";
+import ManageMenu from "../pages/cafe/ManageMenu";
+import ManageProduct from "../pages/cafe/ManageProduct";
+import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
+import RequireMemberType from "../common/RequireMemberType";
 
 const router = createBrowserRouter([
   {
@@ -40,10 +48,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
-      },
-      {
-        path: "login",
-        element: <Login />,
       },
       {
         path: "signup",
@@ -65,114 +69,129 @@ const router = createBrowserRouter([
         path: "MemberSignUp",
         element: <MemberSignUp />,
       },
-    ],
-  },
+      // 일반 회원
+      // TODO!!! me 뒤에 :memberId 추가 필요
+      {
+        path: "/me",
+        element: (
+          // <RequireMemberType allow={["GENERAL"]}>
+          <CustomerLayout />
+          // </RequireMemberType>
+        ),
+        children: [
+          {
+            index: true,
+            element: <CustomerHome />,
+          },
+          {
+            path: "search",
+            element: <SearchPage />,
+          },
+          {
+            path: "order",
+            element: <OrderPage />,
+          },
+          {
+            path: "order/new",
+            element: <CreateOrderPage />,
+          },
+          {
+            path: "order/:orderId",
+            element: <CompleteOrderPage />,
+          },
+          {
+            path: "mypage",
+            element: <MyPage />,
+          },
+          {
+            path: "store/:storeId",
+            element: <StoreDetailPage />,
+          },
 
-  // 일반 회원
-  // TODO!!! me 뒤에 :memberId 추가 필요
-  {
-    path: "/me",
-    element: <CustomerLayout />,
-    children: [
-      {
-        index: true,
-        element: <CustomerHome />,
-      },
-      {
-        path: "search",
-        element: <SearchPage />,
-      },
-      {
-        path: "order",
-        element: <OrderPage />,
-      },
-      {
-        path: "order/new",
-        element: <CreateOrderPage />,
-      },
-      {
-        path: "order/:orderId",
-        element: <CompleteOrderPage />,
-      },
-      {
-        path: "mypage",
-        element: <MyPage />,
-      },
-      {
-        path: "store/:storeId",
-        element: <StoreDetailPage />,
+          // 구독권 구매
+          {
+            path: "subscriptions/:subId/purchase",
+            element: <PurchaseSubscriptionPage />,
+          },
+          //
+          {
+            path: "purchase/:purchaseId/complete",
+            element: <CompletePurchasePage />,
+          },
+          {
+            path: "subscriptions/:subId/gift",
+            element: <GiftSubscriptionPage />,
+          },
+          {
+            path: "subscription",
+            element: <Subscription />,
+          },
+          {
+            path: "gift",
+            element: <Gift />,
+          },
+          {
+            path: "mygift",
+            element: <MyGift />,
+          },
+          {
+            path: "paymentHistory",
+            element: <PaymentHistory />,
+          },
+          {
+            path: "subscription",
+            element: <Subscription />,
+          },
+          {
+            path: "gift",
+            element: <Gift />,
+          },
+          {
+            path: "mygift",
+            element: <MyGift />,
+          },
+        ],
       },
 
-      // 구독권 구매
+      // 점주
+      // 점주
+      // :storeId 붙여야 함.
       {
-        path: "subscriptions/:subId/purchase",
-        element: <PurchaseSubscriptionPage />,
+        path: "/store",
+        element: <StoreLayout />,
+        children: [
+          {
+            index: true,
+            element: <StoreHome />,
+          },
+          {
+            path: "pastOrders",
+            element: <PastOrders />,
+          },
+          {
+            path: "manageMenu",
+            element: <ManageMenu />,
+          },
+          {
+            path: "manageProduct",
+            element: <ManageProduct />,
+          },
+          {
+            path: "manageStoreInfo",
+            element: <ManageStoreInfo />,
+          },
+        ],
       },
-      //
+      // 관리자
       {
-        path: "purchase/:purchaseId/complete",
-        element: <CompletePurchasePage />,
-      },
-      {
-        path: "subscriptions/:subId/gift",
-        element: <GiftSubscriptionPage />,
-      },
-      {
-        path: "subscription",
-        element: <Subscription />,
-      },
-      {
-        path: "gift",
-        element: <Gift />,
-      },
-      {
-        path: "mygift",
-        element: <MyGift />,
-      },
-      {
-        path: "paymentHistory",
-        element: <PaymentHistory />,
-      },
-      {
-        path: "subscription",
-        element: <Subscription />,
-      },
-      {
-        path: "gift",
-        element: <Gift />,
-      },
-      {
-        path: "mygift",
-        element: <MyGift />,
-      },
-      {
-        path: "paymentHistory",
-        element: <PaymentHistory />,
-      },
-    ],
-  },
-
-  // 점주
-  // :storeId 붙여야 함.
-  {
-    path: "/store",
-    element: <StoreLayout />,
-    children: [
-      {
-        index: true,
-        element: <StoreHome />,
-      },
-    ],
-  },
-
-  // 관리자
-  {
-    path: "/admin",
-    element: <AdminLayout />,
-    children: [
-      {
-        index: true,
-        element: <AdminHome />,
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminHome />,
+          },
+        ],
       },
     ],
   },

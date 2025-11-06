@@ -35,7 +35,7 @@ function CafeInfo({ store }) {
         <Typography variant="h6" sx={{ mb: 1 }} style={subTitleStyle}>
           카페 소개
         </Typography>
-        <Typography variant="body2">{store.summary}</Typography>
+        <Typography variant="body2">{store.detailInfo}</Typography>
       </Box>
 
       {/* 주소 및 연락처 */}
@@ -51,7 +51,7 @@ function CafeInfo({ store }) {
             sx={{ mr: 1, color: "text.secondary" }}
           />
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {store.address}
+            {store.roadAddress}  {store.detailAddress}
           </Typography>
         </Box>
 
@@ -59,7 +59,7 @@ function CafeInfo({ store }) {
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {store.phone}
+            {store.storeTel}
           </Typography>
         </Box>
       </Box>
@@ -97,8 +97,8 @@ function CafeInfo({ store }) {
                   <strong>{dayMap[day.dayOfWeek] || day.dayOfWeek}</strong>
                 </Typography>
                 <Typography style={{ fontSize: "15px" }}>
-                  {day.isHoliday
-                    ? "휴무"
+                  {day.isClosed === "Y"
+                    ? "휴무일"
                     : `${day.openTime} ~ ${day.closeTime}`}
                 </Typography>
               </Box>

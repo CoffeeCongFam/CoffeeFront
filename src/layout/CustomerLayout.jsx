@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -29,6 +29,7 @@ import useAppShellMode from "../hooks/useAppShellMode";
 const drawerWidth = 240;
 
 export default function CustomerLayout() {
+  const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
   const { isAppLike } = useAppShellMode(); // ← 여기서 모바일/PWA 여부
@@ -37,7 +38,12 @@ export default function CustomerLayout() {
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
-    { to: "/me/order", label: "주문하기", icon: <ShoppingCartIcon />, end: true },
+    {
+      to: "/me/order",
+      label: "주문하기",
+      icon: <ShoppingCartIcon />,
+      end: true,
+    },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
 
@@ -51,7 +57,14 @@ export default function CustomerLayout() {
         {/* 상단 바 - 아주 얇게 */}
         <AppBar position="static" elevation={0} color="inherit">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Typography variant="h6">CoffeeEns</Typography>
+            <Typography
+              variant="h6"
+              fontWeight={"bold"}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/me")}
+            >
+              COFFEIENS
+            </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
@@ -104,19 +117,20 @@ export default function CustomerLayout() {
   }
 
   // ------------------------------------------
-  // 2) 데스크탑 모드 (네가 원래 쓰던 버전)
+  // 2) 데스크탑 모드
   // ------------------------------------------
   const DrawerContent = (
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
         <Box
-          style={{
+          sx={{
             height: 120,
             margin: "0 auto",
             cursor: "pointer",
             marginTop: "10px",
             marginBottom: "10px",
           }}
+          onClick={() => navigate("/me")}
         >
           <img src={logo} alt="CoffeeEns 로고" style={{ height: "100%" }} />
         </Box>
@@ -159,7 +173,7 @@ export default function CustomerLayout() {
       sx={{
         display: "flex",
         width: "100vw",
-        // height: "100vh",
+        height: "100vh",
         overflow: "hidden",
       }}
     >
@@ -194,17 +208,18 @@ export default function CustomerLayout() {
       >
         {/* 상단 헤더(AppBar) */}
         <AppBar
-          position="fixed"
-          color="inherit"
+          position="absolute"
           elevation={0}
           sx={{
-            width: `calc(100% - ${drawerWidth}px)`,
-            ml: `${drawerWidth}px`,
-            backgroundColor: "transparent",
+            top: 0,
+            left: 0,
+            width: "100%", // main 영역 전체
+            background: "transparent",
+            boxShadow: "none",
           }}
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <IconButton color="inherit">
+            <IconButton color="black">
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>
@@ -213,7 +228,9 @@ export default function CustomerLayout() {
         </AppBar>
 
         {/* 페이지 콘텐츠 */}
-        <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)", mt: 8 , pb: 10}}>
+        <Box
+          sx={{ width: "100%", minHeight: "calc(100vh - 64px)", mt: 8, pb: 10 }}
+        >
           <Outlet />
         </Box>
       </Box>

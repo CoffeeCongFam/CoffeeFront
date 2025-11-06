@@ -11,9 +11,8 @@ import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import { useEffect, useState } from "react";
 import { formatKoreanDateTime } from "../../../utils/dateUtil";
-import todayOrderList from "../../../data/customer/todayOrderList";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import api from "../../../utils/api";
+import { fetchTodayOrderList } from "../../../apis/customerApi";
 
 function OrderPage() {
   const navigate = useNavigate();
@@ -29,19 +28,22 @@ function OrderPage() {
   const completedOrders = todayOrders.filter(
     (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
   );
+  const canceledOrders = todayOrders.filter(
+    (it) => it.orderStatus === "CANCELED" 
+  );
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));
 
     (async () => {
       try {
-        const res = await api.get(`/me/orders/today`);
-        setTodayOrders(res.data?.data ?? []);
+        const res = await fetchTodayOrderList();
+        console.log("✅오늘 주문 목록 조회 성공:", res);
+
+        setTodayOrders(res ?? []);
       } catch (err) {
         console.error("오늘 주문 목록 조회 실패:", err);
       } finally {
-        // demo
-        setTodayOrders(todayOrderList.orderList);
         setIsLoading(false);
       }
     })();
@@ -75,6 +77,7 @@ function OrderPage() {
         >
           나의 주문 현황
         </Typography>
+
 
         {/* 날짜 + 버튼 한 줄 */}
         <Box
@@ -134,9 +137,10 @@ function OrderPage() {
       >
         <Tab label={`진행 중 (${inProgressOrders.length})`} />
         <Tab label={`픽업 완료 (${completedOrders.length})`} />
+        <Tab label={`취소 (${canceledOrders.length})`} />
       </Tabs>
 
-      {/* 리스트 영역 */}
+            {/* 리스트 영역 */}
       <Box
         sx={{
           display: "flex",
@@ -150,40 +154,45 @@ function OrderPage() {
       >
         {isLoading ? (
           <CircularProgress sx={{ color: "#999" }} size={40} />
-        ) : tab === 0 ? (
-          inProgressOrders.length > 0 ? (
-            inProgressOrders.map((order) => (
-              <TodayOrderItem order={order} key={order.orderId} />
-            ))
-          ) : (
-            <Box
-              sx={{
-                bgcolor: "#f5f5f5",
-                borderRadius: 2,
-                p: 2,
-                textAlign: "center",
-              }}
-            >
-              <Typography sx={{ mb: 1 }}>
-                현재 진행 중인 주문이 없습니다.
-              </Typography>
-            </Box>
-          )
-        ) : completedOrders.length > 0 ? (
-          completedOrders.map((order) => (
-            <TodayOrderItem order={order} key={order.orderId} />
-          ))
         ) : (
-          <Box
-            sx={{
-              bgcolor: "#f5f5f5",
-              borderRadius: 2,
-              p: 2,
-              textAlign: "center",
-            }}
-          >
-            <Typography>픽업 완료된 주문이 없습니다.</Typography>
-          </Box>
+          (() => {
+            // 현재 탭에 따라 보여줄 주문 리스트 선택
+            const currentOrders =
+              tab === 0
+                ? inProgressOrders
+                : tab === 1
+                ? completedOrders
+                : canceledOrders;
+
+            // 탭별 빈 상태 문구
+            const emptyMessage =
+              tab === 0
+                ? "현재 진행 중인 주문이 없습니다."
+                : tab === 1
+                ? "픽업 완료된 주문이 없습니다."
+                : "취소된 주문이 없습니다.";
+
+            // 주문이 없을 때
+            if (currentOrders.length === 0) {
+              return (
+                <Box
+                  sx={{
+                    bgcolor: "#f5f5f5",
+                    borderRadius: 2,
+                    p: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography>{emptyMessage}</Typography>
+                </Box>
+              );
+            }
+
+            // 주문이 있을 때
+            return currentOrders.map((order) => (
+              <TodayOrderItem order={order} key={order.orderId} />
+            ));
+          })()
         )}
       </Box>
     </Box>

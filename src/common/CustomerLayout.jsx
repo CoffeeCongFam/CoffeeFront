@@ -1,6 +1,5 @@
 import React from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-
 import {
   AppBar,
   Toolbar,
@@ -14,23 +13,19 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Typography,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
-import logo from '../assets/CoffeiensLogo.png';
+import logo from "../assets/CoffeiensLogo.png";
 
 const drawerWidth = 240;
 
 export default function CustomerLayout() {
   const location = useLocation();
-  // const navigate = useNavigate();
   const isSearchPage = location.pathname.startsWith("/me/search");
-
-  
 
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
@@ -47,18 +42,15 @@ export default function CustomerLayout() {
   const DrawerContent = (
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
-        <Box style={{ height:120 , margin: "0 auto", cursor:"pointer", marginTop: "10px", marginBottom: "10px"}}>
-          <img
-          src={logo}
-          alt="CoffeeEns 로고"
-          // 원하는 크기로 조정
-          style={{height: "100%"}}
-        />
+        <Box
+          sx={{
+            height: 120,
+            m: "10px auto",
+            cursor: "pointer",
+          }}
+        >
+          <img src={logo} alt="COFFEIENS 로고" style={{ height: "100%" }} />
         </Box>
-        
-        {/* <Typography variant="h6" component="div">
-          CoffeeEns
-        </Typography> */}
       </Toolbar>
       <Divider />
       <List sx={{ mt: 1 }}>
@@ -110,7 +102,7 @@ export default function CustomerLayout() {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
+          "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
             backgroundImage: "none",
@@ -121,29 +113,35 @@ export default function CustomerLayout() {
         {DrawerContent}
       </Drawer>
 
-      {/* 오른쪽 메인 영역 */}
+      {/* 오른쪽 메인 */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           height: "100vh",
-          // 검색 페이지일 때만 스크롤 막기
           overflow: isSearchPage ? "hidden" : "auto",
           position: "relative",
         }}
       >
-        {/* 상단 헤더(AppBar) */}
+        {/* 투명 헤더 */}
         <AppBar
-          position="fixed"
-          color="inherit"
+          position="absolute"
           elevation={0}
           sx={{
-            width: `calc(100% - ${drawerWidth}px)`,
-            ml: `${drawerWidth}px`,
-            backgroundColor: "transparent",
+            top: 0,
+            left: 0,
+            width: "100%", // main 영역 전체
+            background: "transparent",
+            boxShadow: "none",
+            pointerEvents: "none", // 밑에 요소 클릭 가능하도록
           }}
         >
-          <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Toolbar
+            sx={{
+              justifyContent: "flex-end",
+              pointerEvents: "auto", // 아이콘만 클릭 가능하게 복구
+            }}
+          >
             <IconButton color="inherit">
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
@@ -152,12 +150,15 @@ export default function CustomerLayout() {
           </Toolbar>
         </AppBar>
 
-        {/* Toolbar 높이만큼 여백 */}
-        {/* <Toolbar /> */}
-
-        {/* 페이지 콘텐츠 */}
-        {/* 여기 높이는 유지 */}
-        <Box sx={{ width: "100%", minHeight: "calc(100vh - 64px)" }}>
+        {/* 콘텐츠 영역 */}
+        <Box
+          sx={{
+            width: "100%",
+            minHeight: "100vh",
+            // 헤더가 콘텐츠 위에 떠있게 하고 싶으면 패딩X
+            // 만약 겹치는 게 싫으면 여기서 pt: '64px' 주면 됨
+          }}
+        >
           <Outlet />
         </Box>
       </Box>
