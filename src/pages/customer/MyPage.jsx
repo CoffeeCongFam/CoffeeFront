@@ -6,7 +6,6 @@ import SubscriptionPage from './Subscription';
 import PaymentHistory from './PaymentHistory';
 import ReviewPage from './ReviewPage';
 import { handleLogout } from '../../utils/logout';
-
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
