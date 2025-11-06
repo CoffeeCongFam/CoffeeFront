@@ -14,7 +14,7 @@ import {
   fetchNearbyCafes,
 } from "../../../apis/customerApi";
 import useUserStore from "../../../stores/useUserStore";
-import api, { TokenService } from "../../../utils/api";
+import { TokenService } from "../../../utils/api";
 import LocalCafeImgList from "./LocalCafeImgList";
 import getDistanceKm from "../../../utils/getDistanceKm";
 import { SubscriptionDetailCard } from "../Subscription";
@@ -23,7 +23,7 @@ import { SubscriptionDetailCard } from "../Subscription";
 function CustomerHome() {
   const navigate = useNavigate();
 
-  const { authUser, setUser } = useUserStore();
+  const { authUser } = useUserStore();
 
   const { isAppLike } = useAppShellMode();
   // const [isLoading, setIsLoading] = useState(true);

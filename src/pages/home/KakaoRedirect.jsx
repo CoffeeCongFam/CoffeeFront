@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../utils/api";
 
 // 컴포넌트 이름을 역할에 맞게 변경하는 것을 권장합니다. (예: KakaoRedirect)
 function KakaoRedirect() {
@@ -9,14 +9,13 @@ function KakaoRedirect() {
   const kakaoLoginHandler = async (code, role) => {
     try {
       // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
-      const res = await axios({
-        method: "GET",
-                url: `http://localhost:8080/auth/kakao/callback?code=${code}`,
-                withCredentials: true,
-            });
-            if (res.status !== 200) {
-                throw new Error(`Unexpected status: ${res.status}`);
-            }
+      const res = await api.get(
+        `/auth/kakao/callback?code=${code}`
+        // url: `http://localhost:8080/auth/kakao/callback?code=${code}`
+      );
+      if (res.status !== 200) {
+        throw new Error(`Unexpected status: ${res.status}`);
+      }
 
       // 3. 성공 응답 처리
       const ACCESS_TOKEN = res.data.accessToken;
