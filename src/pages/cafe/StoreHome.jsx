@@ -11,11 +11,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Box, Button, Card, Grid, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import OrderDetailModal from "./OrderDetailModal";
-import { ChevronLeft } from "@mui/icons-material";
 import api, { TokenService } from "../../utils/api";
-import useUserStore from "../../stores/useUserStore";
+import React, { useEffect, useState } from 'react';
+import OrderDetailModal from './OrderDetailModal';
+import useUserStore from '../../stores/useUserStore';
 
 // 상태 변경 확인을 위한 다이얼로그 컴포넌트
 const ConfirmDialog = ({ open, onClose, onConfirm, title, content }) => {
