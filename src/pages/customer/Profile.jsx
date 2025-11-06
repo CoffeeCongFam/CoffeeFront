@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -17,7 +18,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { patchMember } from "../../utils/member";
+import { patchMember, withdrawal } from "../../utils/member";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import WcIcon from "@mui/icons-material/Wc";
@@ -30,7 +31,8 @@ import withdrawal04 from "../../assets/withdrawal_04.png";
 import useUserStore from "../../stores/useUserStore";
 
 function Profile() {
-  const { authUser, setUser: setAuthUser } = useUserStore();
+  const { authUser, setUser: setAuthUser, clearUser } = useUserStore();
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     name: authUser?.name || "",
     tel: authUser?.tel || "",
@@ -53,6 +55,7 @@ function Profile() {
 
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isWithdrawCompleted, setIsWithdrawCompleted] = useState(false);
 
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [withdrawStep, setWithdrawStep] = useState(1);
@@ -61,7 +64,43 @@ function Profile() {
     setIsWithdrawOpen(true);
     setWithdrawStep(1);
   };
+  const handleGoodbyeConfirm = () => {
+    // 1) 주스텐드 유저 정보 초기화
+    try {
+      if (typeof clearUser === "function") {
+        clearUser();
+      }
+    } catch (e) {
+      console.error("clearUser 오류:", e);
+    }
 
+    // 2) 로컬스토리지 초기화
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.clear();
+      }
+    } catch (e) {
+      console.error("localStorage 초기화 오류:", e);
+    }
+
+    // 3) 쿠키 삭제
+    try {
+      if (typeof document !== "undefined" && document.cookie) {
+        document.cookie.split(";").forEach((cookie) => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          document.cookie =
+            name.trim() +
+            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        });
+      }
+    } catch (e) {
+      console.error("쿠키 삭제 오류:", e);
+    }
+
+    // 4) 마지막으로 메인으로 이동
+    navigate("/");
+  };
   const handleCloseWithdraw = () => {
     setIsWithdrawOpen(false);
   };
@@ -73,7 +112,22 @@ function Profile() {
   const handlePrevStep = () => {
     setWithdrawStep((prev) => (prev > 1 ? prev - 1 : prev));
   };
+  const handleWithdrawConfirm = async () => {
+    try {
+      const success = await withdrawal();
 
+      if (success) {
+        // 탈퇴 완료: 탈퇴 모달 닫고, 마지막 인사 화면으로 전환
+        setIsWithdrawOpen(false);
+        setIsWithdrawCompleted(true);
+      } else {
+        alert("탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("withdrawal 오류:", error);
+      alert("탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
   const handleEditClick = () => {
     setIsEditing((prev) => !prev);
   };
@@ -144,6 +198,84 @@ function Profile() {
     }
   };
 
+
+  if (isWithdrawCompleted) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "#fffdf7",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          px: 2,
+        }}
+      >
+        <Card
+          sx={{
+            width: "100%",
+            maxWidth: 480,
+            borderRadius: 4,
+            boxShadow: 6,
+            bgcolor: "white",
+          }}
+        >
+          <CardContent
+            sx={{
+              px: 4,
+              py: 5,
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 800,
+                mb: 2,
+              }}
+            >
+              언젠간 다시 돌아오세요
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                mb: 3,
+                color: "primary.main",
+              }}
+            >
+              커피엔스의 커피 세상으로
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", mb: 4, lineHeight: 1.7 }}
+            >
+              매일의 커피 한 잔으로 하루를 진화시키던 그 시간들처럼,
+              <br />
+              언젠가 다시, 당신의 하루를 깨우는 커피 한 잔이 필요해질 때
+              <br />
+              COFFEIENS가 여기에서 기다리고 있을게요.
+            </Typography>
+
+            <Button
+              variant="contained"
+              onClick={handleGoodbyeConfirm}
+              sx={{
+                borderRadius: 999,
+                px: 4,
+                py: 1.2,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              확인
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -563,7 +695,11 @@ function Profile() {
                   다음
                 </Button>
               ) : (
-                <Button variant="contained" color="error">
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleWithdrawConfirm}
+                >
                   탈퇴하기
                 </Button>
               )}

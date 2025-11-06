@@ -1,4 +1,5 @@
 import api from "./api";
+import useUserStore from "../stores/useUserStore";
 
 export async function postCafe(data) {
   try {
@@ -15,7 +16,6 @@ export async function postCafe(data) {
   }
 }
 
-
 // 회원 정보 수정
 export async function patchMember(data){ 
   try {
@@ -24,6 +24,19 @@ export async function patchMember(data){
     return response.data.success;
   } catch (error) {
     console.error("Error fetching gift data:", error);
+    return null;
+  }
+}
+
+// 회원 탈퇴
+export async function withdrawal() {
+  try {
+    const response = await api.patch("/active/update");
+    const success = response.data.success;
+    console.log(success);
+    return success;
+  } catch (error) {
+    console.error("Error data:", error);
     return null;
   }
 }
