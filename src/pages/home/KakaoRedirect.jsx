@@ -1,17 +1,20 @@
 import React, { useEffect } from "react";
-import api from "../../utils/api";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 // 컴포넌트 이름을 역할에 맞게 변경하는 것을 권장합니다. (예: KakaoRedirect)
 function KakaoRedirect() {
+  const BASE_URL = import.meta.env.VITE_API_URL
   const navigate = useNavigate();
   // 2. 인가 코드를 백엔드 서버로 전송하는 비동기 함수 정의
   const kakaoLoginHandler = async (code, role) => {
     try {
       // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
-      const res = await api.get("/auth/kakao/callback", {
-        params: { code },
-      });
+      const res = await axios({
+        method: "GET",
+                url: `${BASE_URL}/auth/kakao/callback?code=${code}`,
+                withCredentials: true,
+            });
       if (res.status !== 200) {
         throw new Error(`Unexpected status: ${res.status}`);
       }
