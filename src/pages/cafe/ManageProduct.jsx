@@ -51,24 +51,19 @@ export default function ManageProduct() {
   const loadSubscriptions = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    console.log('--- 구독권 로드 시작 ---');
     try {
       const data = await fetchSubscriptions();
-      console.log('로드된 데이터 (배열):', data); // ⚠️ 여기에 유효한 배열이 찍히는지 확인
       setSubscriptions(data);
-      console.log('setSubscriptions 호출 완료');
     } catch (err) {
       console.error('구독권 목록 로드 실패:', err);
       setError('구독권 목록을 불러오는 데 실패했습니다.');
     } finally {
-      console.log('--- 로드 종료, isLoading: false ---');
       setIsLoading(false);
     }
   }, []);
 
   // 🚩 메뉴 로드 함수
   const loadAllMenus = useCallback(async () => {
-    console.log('--- 전체 메뉴 로드 시작 ---');
     try {
       const menuData = await fetchAllMenus(partnerStoreId);
       setAllMenus(menuData);

@@ -219,6 +219,31 @@ const ProductDetailEditModal = ({
             fullWidth
             required
           />
+          {/* 구독권 이름 및 유형 */}
+          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
+            <FormControl fullWidth>
+              <InputLabel>구독권 유형</InputLabel>
+              <Select
+                label="구독권 유형"
+                name="subscriptionType"
+                value={formData.subscriptionType}
+                onChange={handleChange}
+              >
+                <MenuItem value="BASIC">BASIC</MenuItem>
+                <MenuItem value="STANDARD">STANDARD</MenuItem>
+                <MenuItem value="PREMIUM">PREMIUM</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="구독 기간 (일)"
+              name="subscriptionPeriod"
+              type="number"
+              value={formData.subscriptionPeriod}
+              onChange={handleChange}
+              fullWidth
+              inputProps={{ min: 1 }}
+            />
+          </Box>
           <TextField
             label="가격 (원)"
             name="price"
@@ -242,6 +267,7 @@ const ProductDetailEditModal = ({
             allMenus={allMenus}
             selectedMenuIds={selectedMenuIds}
             setSelectedMenuIds={setSelectedMenuIds}
+            subscriptionType={formData.subscriptionType}
           />
 
           {/* 판매 상태 및 수량 */}
@@ -267,32 +293,6 @@ const ProductDetailEditModal = ({
               onChange={handleChange}
               fullWidth
               inputProps={{ min: 0 }}
-            />
-          </Box>
-
-          {/* 유형 및 기간 */}
-          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
-            <FormControl fullWidth>
-              <InputLabel>구독권 유형</InputLabel>
-              <Select
-                label="구독권 유형"
-                name="subscriptionType"
-                value={formData.subscriptionType}
-                onChange={handleChange}
-              >
-                <MenuItem value="BASIC">BASIC</MenuItem>
-                <MenuItem value="PREMIUM">PREMIUM</MenuItem>
-                <MenuItem value="LIMITED">LIMITED</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label="구독 기간 (일)"
-              name="subscriptionPeriod"
-              type="number"
-              value={formData.subscriptionPeriod}
-              onChange={handleChange}
-              fullWidth
-              inputProps={{ min: 1 }}
             />
           </Box>
 

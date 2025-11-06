@@ -150,7 +150,6 @@ function StoreHome() {
         console.log(
           `주문 ID ${orderId} 거절 처리 완료 (사유 : ${rejectedReasonText})`
         );
-        handleModalClose();
       }
     } catch (error) {
       console.error(`주문 거부 API 호출 오류:`, error);
@@ -336,62 +335,66 @@ function StoreHome() {
           // 포맷된 메뉴 목록 문자열
           const formattedMenuString = getFormattedMenuList(order.menuList);
 
-          return (
-            <Grid item xs={12} sm={6} md={4} key={order.orderId}>
-              <Card sx={{ height: '100%', boxShadow: 2 }}>
-                <Box sx={{ p: 2 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      bgcolor: statusInfo.header,
-                      color: 'white',
-                      p: '2px 8px',
-                    }}
-                  >
-                    {statusInfo.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {/* 타입, 상세보기 버튼 */}
-                    <Box sx={{ border: 1, padding: 1 }}>
-                      {order.orderNumber}
-                    </Box>
-                    <Typography>
-                      {getOrderTypeLabel(order.orderType)}
+          if (
+            ['REQUEST', 'INPROGRESS', 'COMPLETED'].includes(order.orderStatus)
+          ) {
+            return (
+              <Grid item xs={12} sm={6} md={4} key={order.orderId}>
+                <Card sx={{ height: '100%', boxShadow: 2 }}>
+                  <Box sx={{ p: 2 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        bgcolor: statusInfo.header,
+                        color: 'white',
+                        p: '2px 8px',
+                      }}
+                    >
+                      {statusInfo.name}
                     </Typography>
-                    <Box sx={{ mt: 1, textAlign: 'right' }}>
-                      {/* 상세보기 버튼 */}
-                      <Button
-                        onClick={() => handleModalOpen(order)}
-                        variant="outlined"
-                        size="small"
-                        color="primary"
-                      >
-                        상세 <br />
-                        보기
-                      </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {/* 타입, 상세보기 버튼 */}
+                      <Box sx={{ border: 1, padding: 1 }}>
+                        {order.orderNumber}
+                      </Box>
+                      <Typography>
+                        {getOrderTypeLabel(order.orderType)}
+                      </Typography>
+                      <Box sx={{ mt: 1, textAlign: 'right' }}>
+                        {/* 상세보기 버튼 */}
+                        <Button
+                          onClick={() => handleModalOpen(order)}
+                          variant="outlined"
+                          size="small"
+                          color="primary"
+                        >
+                          상세 <br />
+                          보기
+                        </Button>
+                      </Box>
                     </Box>
+                    <Typography>{formattedMenuString}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {new Date(order.createdAt).toLocaleString()}
+                    </Typography>
                   </Box>
-                  <Typography>{formattedMenuString}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {new Date(order.createdAt).toLocaleString()}
-                  </Typography>
-                </Box>
-                {/* 조건부 렌더링 : actionDetails가 있을 때만 버튼 표시? */}
-                {actionDetails && (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() =>
-                      handleConfirmOpen(order.orderId, order.orderStatus)
-                    }
-                    sx={{ bgcolor: statusInfo.action, color: 'white' }}
-                  >
-                    {actionDetails.label}
-                  </Button>
-                )}
-              </Card>
-            </Grid>
-          );
+                  {/* 조건부 렌더링 : actionDetails가 있을 때만 버튼 표시? */}
+                  {actionDetails && (
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      onClick={() =>
+                        handleConfirmOpen(order.orderId, order.orderStatus)
+                      }
+                      sx={{ bgcolor: statusInfo.action, color: 'white' }}
+                    >
+                      {actionDetails.label}
+                    </Button>
+                  )}
+                </Card>
+              </Grid>
+            );
+          }
         })}
       </Grid>
 

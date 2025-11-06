@@ -79,6 +79,7 @@ export default function OrderDetailModal({
   statusColors,
   onReject,
 }) {
+  console.log(order);
   // 주문 거부 사유
   const [selectedReasonCode, setSelectedReasonCode] = useState(null);
 
@@ -113,6 +114,12 @@ export default function OrderDetailModal({
 
     // 실제 사유 텍스트까지 부모에게 전달
     onReject(order.orderId, 'REJECTED', reasonTextToSend);
+
+    // 선택 상태 초기화
+    setSelectedReasonCode(null);
+
+    // 여기서 모달 닫기
+    onClose();
   };
 
   return (
