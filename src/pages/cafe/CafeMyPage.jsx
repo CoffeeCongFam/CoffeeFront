@@ -175,7 +175,6 @@ function CafeMyPage() {
           {renderGridItems(finalMenus)}
         </Grid>
       </Paper>
-
       <Box sx={{ mt: 3 }}>
         {activeMenu && renderDrawerContent()}
       </Box>
