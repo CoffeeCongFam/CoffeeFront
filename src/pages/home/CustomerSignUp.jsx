@@ -7,10 +7,10 @@ import {
   TextField,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../../stores/useUserStore";
+import api from "../../utils/api";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
@@ -73,11 +73,7 @@ function CustomerSignUp() {
     };
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/signup/member`,
-        { ...formData },
-        { withCredentials: true }
-      );
+      const response = await api.post(`/signup/member`, { ...formData });
 
       // response 전체 출력
       console.log("응답 전체:", response.data);

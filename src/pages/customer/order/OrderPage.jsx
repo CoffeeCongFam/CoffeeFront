@@ -29,7 +29,7 @@ function OrderPage() {
     (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
   );
   const canceledOrders = todayOrders.filter(
-    (it) => it.orderStatus === "CANCELED" 
+    (it) => it.orderStatus === "CANCELED"
   );
 
   useEffect(() => {
@@ -78,7 +78,6 @@ function OrderPage() {
           나의 주문 현황
         </Typography>
 
-
         {/* 날짜 + 버튼 한 줄 */}
         <Box
           sx={{
@@ -124,23 +123,34 @@ function OrderPage() {
         </Box>
       </Box>
 
-      {/* 탭 */}
-      <Tabs
-        value={tab}
-        onChange={(e, v) => setTab(v)}
-        sx={{
-          mb: 2,
-          "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
-          "& .Mui-selected": { color: "black" },
-          "& .MuiTabs-indicator": { backgroundColor: "black" },
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignContent: "center",
         }}
       >
-        <Tab label={`진행 중 (${inProgressOrders.length})`} />
-        <Tab label={`픽업 완료 (${completedOrders.length})`} />
-        <Tab label={`취소 (${canceledOrders.length})`} />
-      </Tabs>
+        {/* 탭 */}
+        <Tabs
+          value={tab}
+          onChange={(e, v) => setTab(v)}
+          sx={{
+            mb: 2,
+            "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
+            "& .Mui-selected": { color: "black" },
+            "& .MuiTabs-indicator": { backgroundColor: "black" },
+          }}
+        >
+          <Tab label={`진행 중 (${inProgressOrders.length})`} />
+          <Tab label={`픽업 완료 (${completedOrders.length})`} />
+          <Tab label={`취소 (${canceledOrders.length})`} />
+        </Tabs>
 
-            {/* 리스트 영역 */}
+        <Button sx={{ padding: "0" }}>과거 주문 내역 보기</Button>
+      </Box>
+
+      {/* 리스트 영역 */}
       <Box
         sx={{
           display: "flex",

@@ -84,10 +84,6 @@ export default function SearchPage() {
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
 
-  const handleCurrentLocPopoverOpen = (event) => {
-    setCurrentLocRef(event.currentTarget);
-  };
-
   const handleCurrentLocPopoverClose = () => {
     setCurrentLocRef(null);
   };
@@ -113,6 +109,8 @@ export default function SearchPage() {
         if (!mounted) return;
         mapsRef.current = maps;
         setMapsReady(true);
+        console.log("지도 렌더링 준비 완료!");
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
         setIsMapError(true);
@@ -208,7 +206,6 @@ export default function SearchPage() {
 
     setStatus("ready");
     initedRef.current = true;
-    setIsLoading(false);
 
     // 언마운트 시 자원 정리
     return () => {

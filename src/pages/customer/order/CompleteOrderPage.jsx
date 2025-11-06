@@ -169,7 +169,7 @@ function CompleteOrderPage() {
   }
 
   return (
-    <Box sx={{ px: isAppLike ? 3 : 30, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton onClick={() => handleBack()} sx={{ mr: 1 }}>
           <ArrowBackIcon />

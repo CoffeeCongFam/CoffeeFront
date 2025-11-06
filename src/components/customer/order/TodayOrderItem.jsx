@@ -7,9 +7,8 @@ import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
-import menuDummy from '../../../assets/menuDummy.jpg';
+import menuDummy from "../../../assets/menuDummy.jpg";
 import { Box } from "@mui/material";
-
 
 function TodayOrderItem({ order }) {
   const navigate = useNavigate();
@@ -26,7 +25,8 @@ function TodayOrderItem({ order }) {
           padding: "16px",
           borderRadius: "12px",
           cursor: "pointer",
-          backgroundColor: order.orderStatus==="COMPLETED" ? "#e5e5e5a5" : "white"
+          backgroundColor:
+            order.orderStatus === "COMPLETED" ? "#e5e5e5a5" : "white",
         }}
         onClick={() => {
           navigate(`/me/order/${order.orderId}`);
@@ -57,9 +57,11 @@ function TodayOrderItem({ order }) {
             <Typography variant="subtitle1" fontWeight="bold">
               {order.storeName}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {order.menuList[0].menuName} × {order.menuList[0].quantity}
-            </Typography>
+            {order.menuList.map((menu) => (
+              <Typography variant="body2" color="text.secondary">
+                {menu.menuName} x {menu.quantity}
+              </Typography>
+            ))}
           </Box>
         </Box>
 
