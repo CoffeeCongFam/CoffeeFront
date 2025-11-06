@@ -54,6 +54,19 @@ function Profile() {
   }, [authUser]);
 
 
+  useEffect(() => {
+    if (!authUser) return;
+
+    setUser((prev) => ({
+      ...prev,
+      name: authUser.name ?? prev.name,
+      tel: authUser.tel ?? prev.tel,
+      gender: authUser.gender ?? prev.gender,
+      email: authUser.email ?? prev.email,
+    }));
+  }, [authUser]);
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [isWithdrawCompleted, setIsWithdrawCompleted] = useState(false);
 

@@ -147,6 +147,30 @@ function MyPage() {
             로그아웃
           </Button>
         </Box>
+
+        {/* 우측: 트렌디한 로그아웃 버튼 */}
+        <Button
+          onClick={logout}
+          variant="contained"
+          startIcon={<LogoutRoundedIcon />}
+          sx={{
+            borderRadius: 999,
+            px: 2.5,
+            py: 1,
+            fontWeight: 600,
+            fontSize: "0.9rem",
+            textTransform: "none",
+            boxShadow: "none",
+            bgcolor: "grey.900",
+            color: "common.white",
+            "&:hover": {
+              bgcolor: "grey.800",
+              boxShadow: 3,
+            },
+          }}
+        >
+          로그아웃
+        </Button>
       </Box>
       {/* 상단 메뉴 영역 */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>

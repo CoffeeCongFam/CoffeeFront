@@ -295,7 +295,6 @@ function StoreForm({ onSubmitSuccess }) {
       }
       const result = await postCafe(data);
       const success = result;
-
        if (result) {
         alert("매장 등록 완료!");
         // 부모로 성공 이벤트 전달
