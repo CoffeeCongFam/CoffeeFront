@@ -55,7 +55,7 @@ function CompleteOrderPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState(null);
-  const [openCancel, setOpenCancel] = React.useState(false); // 주문 취소 확인 모달
+  const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
 
   // 주문 정보 초기화
   useEffect(() => {
@@ -68,13 +68,9 @@ function CompleteOrderPage() {
 
         if (data) {
           setOrderInfo(data);
-        } else {
-          // 서버가 null 주면 더미라도 넣기
-          setOrderInfo(makeDummy(orderId));
         }
       } catch (err) {
         console.error(err);
-        setOrderInfo(makeDummy(orderId));
       } finally {
         setIsLoading(false);
       }
@@ -83,30 +79,7 @@ function CompleteOrderPage() {
     return () => {
       mounted = false;
     };
-  }, [orderId]);
-
-  // dummy 데이터로 초기화
-  function makeDummy(orderId) {
-    return {
-      orderId,
-      orderNumber: 4277,
-      orderStatus: "REQUEST",
-      store: { storeId: 1, storeName: "카페 모나카" },
-      subscription: { subscriptionId: 1, subscriptionType: "BASIC" },
-      menuList: [
-        {
-          menuId: 1,
-          menuName: "아메리카노",
-          menuType: "BEVERAGE",
-          quantity: 1,
-        },
-      ],
-      totalQuantity: 1,
-      payAmount: 0,
-      createdAt: new Date().toISOString(),
-      canceledAt: null,
-    };
-  }
+  }, [orderId, orderInfo]);
 
   // 주문 취소
   async function handleCancelOrder() {
@@ -119,8 +92,6 @@ function CompleteOrderPage() {
           canceledAt: new Date().toISOString(),
         }));
         console.log(`✅ ${orderId}번 주문 취소 성공`);
-      } else {
-        alert("주문 취소에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (e) {
       console.error("❌ 주문 취소 오류:", e);
@@ -128,7 +99,7 @@ function CompleteOrderPage() {
     } finally {
       console.error("✅ ${orderId}번 주문 취소 성공");
       setOpenCancel(false);
-      navigate("/me/order");
+      // navigate("/me/order");
     }
   }
 

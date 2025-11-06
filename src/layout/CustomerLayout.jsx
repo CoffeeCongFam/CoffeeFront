@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -17,14 +17,18 @@ import {
   BottomNavigation,
   BottomNavigationAction,
   Paper,
+  ListItemAvatar,
+  Avatar,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
+import CoffeeIcon from "@mui/icons-material/Coffee";
 import logo from "../assets/CoffeiensLogo.png";
 import useAppShellMode from "../hooks/useAppShellMode";
+import useNotificationStore from "../stores/useNotificationStore";
 
 const drawerWidth = 240;
 
@@ -32,8 +36,15 @@ export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
-  const { isAppLike } = useAppShellMode(); // ← 여기서 모바일/PWA 여부
+  const { isAppLike } = useAppShellMode(); // 모바일 여부
   const [bottomValue, setBottomValue] = React.useState(location.pathname);
+
+  const [notifOpen, setNotifOpen] = React.useState(false); // 알림 토글
+
+  // 페이지 이동 시 알림 드로어 자동 닫기
+  useEffect(() => {
+    setNotifOpen(false);
+  }, [location.pathname]);
 
   const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
@@ -46,6 +57,26 @@ export default function CustomerLayout() {
     },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
+
+  // 🔔 알림 더미 데이터 (나중에 SSE/Fetch로 교체)
+  const { notifications } = useNotificationStore();
+  console.log("알림 내역>>>>>> ", notifications);
+
+  // 알림 구조
+  // interface Notification {
+  //   notificationId: number;
+  //   notificationType: string;
+  //   notificationContent: String;
+  //   readAt: string; // timestamp
+  //   createdAT: string;
+  // }
+
+  function handleCloseNotif() {
+    setNotifOpen(false);
+  }
+  function openNotifDrawer() {
+    setNotifOpen(true);
+  }
 
   // ------------------------------------------
   // 1) 앱 / 모바일 모드
@@ -65,8 +96,12 @@ export default function CustomerLayout() {
             >
               COFFEIENS
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={3} color="error">
+            <IconButton
+              color="inherit"
+              onClick={openNotifDrawer}
+              // sx={{ zIndex: 1400 }}
+            >
+              <Badge badgeContent={notifications.length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -112,6 +147,76 @@ export default function CustomerLayout() {
             ))}
           </BottomNavigation>
         </Paper>
+
+        {/* 🔔 오른쪽 알림 드로어 (모바일에서도 동일하게 사용) */}
+        <Drawer
+          anchor="right"
+          open={notifOpen}
+          onClose={handleCloseNotif}
+          PaperProps={{
+            sx: {
+              width: "80vw",
+              maxWidth: 360,
+            },
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h6" fontWeight={700}>
+              알림
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", cursor: "pointer" }}
+              onClick={handleCloseNotif}
+            >
+              닫기
+            </Typography>
+          </Box>
+          <Divider />
+          <List sx={{ p: 0 }}>
+            {notifications.map((noti) => (
+              <ListItemButton key={noti.notificationId} alignItems="flex-start">
+                <ListItemAvatar>
+                  <Avatar>
+                    <CoffeeIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <Box sx={{ ml: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, mb: 0.5 }}
+                  >
+                    {noti.notificationType}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "text.secondary", mb: 0.3 }}
+                  >
+                    {noti.notificationContent}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: "text.disabled" }}>
+                    {noti.createdAT}
+                  </Typography>
+                </Box>
+              </ListItemButton>
+            ))}
+
+            {notifications.length === 0 && (
+              <Box sx={{ p: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  아직 도착한 알림이 없어요 ☕
+                </Typography>
+              </Box>
+            )}
+          </List>
+        </Drawer>
       </Box>
     );
   }
@@ -119,6 +224,7 @@ export default function CustomerLayout() {
   // ------------------------------------------
   // 2) 데스크탑 모드
   // ------------------------------------------
+
   const DrawerContent = (
     <Box role="navigation" sx={{ width: drawerWidth }}>
       <Toolbar>
@@ -219,8 +325,8 @@ export default function CustomerLayout() {
           }}
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <IconButton color="black">
-              <Badge badgeContent={3} color="error">
+            <IconButton color="black" onClick={openNotifDrawer}>
+              <Badge badgeContent={notifications.length} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -234,6 +340,76 @@ export default function CustomerLayout() {
           <Outlet />
         </Box>
       </Box>
+
+      {/* 🔔 오른쪽 알림 드로어 (데스크탑 공용) */}
+      <Drawer
+        anchor="right"
+        open={notifOpen}
+        onClose={handleCloseNotif}
+        PaperProps={{
+          sx: {
+            width: 360,
+            maxWidth: "80vw",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h6" fontWeight={700}>
+            알림
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: "text.secondary", cursor: "pointer" }}
+            onClick={handleCloseNotif}
+          >
+            닫기
+          </Typography>
+        </Box>
+        <Divider />
+        <List sx={{ p: 0 }}>
+          {notifications.map((noti) => (
+            <ListItemButton key={noti.notificationId} alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar>
+                  <CoffeeIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <Box sx={{ ml: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, mb: 0.5 }}
+                >
+                  {noti.notificationType}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "text.secondary", mb: 0.3 }}
+                >
+                  {noti.notificationContent}
+                </Typography>
+                <Typography variant="caption" sx={{ color: "text.disabled" }}>
+                  {noti.createdAT}
+                </Typography>
+              </Box>
+            </ListItemButton>
+          ))}
+
+          {notifications.length === 0 && (
+            <Box sx={{ p: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                아직 도착한 알림이 없어요 ☕
+              </Typography>
+            </Box>
+          )}
+        </List>
+      </Drawer>
     </Box>
   );
 }

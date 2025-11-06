@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Button,
-} from "@mui/material";
+import { Container, Box, Typography, Paper, Grid, Button } from "@mui/material";
 import Profile from "./Profile";
 import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
@@ -18,6 +11,7 @@ import { handleLogout } from "../../utils/logout";
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
+import OrderHistory from "./OrderHistory";
 // import GiftPage from "./Gift";
 // import PaymentHistory from "./PaymentHistory";
 
@@ -42,7 +36,7 @@ function MyPage() {
   const finalMenus = [
     "구독권 관리",
     "내 선물함",
-    "선물하기",
+    "주문 내역",
     "결제 내역",
     "리뷰내역",
     "내 정보",
@@ -76,8 +70,8 @@ function MyPage() {
         return <SubscriptionPage />;
       case "내 선물함":
         return <MyGiftPage />;
-      case "선물하기":
-        return <PlaceholderComponent title="선물하기" />;
+      case "주문 내역":
+        return <OrderHistory />;
       case "결제 내역":
         return <PaymentHistory />;
       case "리뷰내역":
@@ -137,9 +131,7 @@ function MyPage() {
       </Paper>
 
       {/* 선택된 메뉴 컨텐츠 영역 */}
-      <Box sx={{ mt: 3 }}>
-        {renderDrawerContent()}
-      </Box>
+      <Box sx={{ mt: 3 }}>{renderDrawerContent()}</Box>
     </Container>
   );
 }

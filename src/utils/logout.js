@@ -10,10 +10,10 @@ export const handleLogout = () => {
       REDIRECT_URI
     )}/`;
 
+    window.location.href = URI;
+
     // localStorage 삭제
     localStorage.removeItem("user");
     localStorage.clear();
-
-    window.location.href = URI;
   });
 };
