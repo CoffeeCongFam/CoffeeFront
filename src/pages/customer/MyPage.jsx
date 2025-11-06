@@ -1,29 +1,22 @@
-import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Button,
-} from "@mui/material";
-import Profile from "./Profile";
-import { useNavigate } from "react-router-dom";
-import SubscriptionPage from "./Subscription";
-import PaymentHistory from "./PaymentHistory";
-import ReviewPage from "./ReviewPage";
-import { handleLogout } from "../../utils/logout";
+import React, { useEffect, useState } from 'react';
+import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
+import Profile from './Profile';
+import { useNavigate } from 'react-router-dom';
+import SubscriptionPage from './Subscription';
+import PaymentHistory from './PaymentHistory';
+import ReviewPage from './ReviewPage';
+import { handleLogout } from '../../utils/logout';
 // import useUserStore from "../../stores/useUserStore";
 
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
-import MyGiftPage from "./MyGift";
-import useUserStore from "../../stores/useUserStore";
+import MyGiftPage from './MyGift';
+import useUserStore from '../../stores/useUserStore';
 // import GiftPage from "./Gift";
 // import PaymentHistory from "./PaymentHistory";
 
 // 임시 플레이스홀더 컴포넌트
 const PlaceholderComponent = ({ title }) => (
-  <Box sx={{ p: 3, textAlign: "center" }}>
+  <Box sx={{ p: 3, textAlign: 'center' }}>
     <Typography variant="h5">{title}</Typography>
     <Typography>이곳에 {title} 페이지 내용이 표시됩니다.</Typography>
   </Box>
@@ -33,23 +26,23 @@ function MyPage() {
   let navigate = useNavigate();
 
   const { authUser, clearUser } = useUserStore();
-  console.log("AUTH USER>> ", authUser);
+  console.log('AUTH USER>> ', authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
-  const [activeMenu, setActiveMenu] = useState("구독권 관리");
+  const [activeMenu, setActiveMenu] = useState('구독권 관리');
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
-    "구독권 관리",
-    "내 선물함",
-    "선물하기",
-    "결제 내역",
-    "리뷰내역",
-    "내 정보",
+    '구독권 관리',
+    '내 선물함',
+    '선물하기',
+    '결제 내역',
+    '리뷰내역',
+    '내 정보',
   ];
 
   useEffect(() => {
-    console.log("AUTH USER 변경됨 >>> ", authUser);
+    console.log('AUTH USER 변경됨 >>> ', authUser);
   }, [authUser]);
 
   const logout = () => {
@@ -61,9 +54,9 @@ function MyPage() {
   };
 
   const handleMenuClick = (menu) => {
-    if (menu === "선물하기") {
+    if (menu === '선물하기') {
       // "선물하기" 클릭 시 주문 페이지로 이동
-      navigate("/me/order/new"); // 절대 경로로 수정 및 오타 수정
+      navigate('/me/order/new'); // 절대 경로로 수정 및 오타 수정
       return;
     }
     setActiveMenu(menu);
@@ -72,17 +65,17 @@ function MyPage() {
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
-      case "구독권 관리":
+      case '구독권 관리':
         return <SubscriptionPage />;
-      case "내 선물함":
+      case '내 선물함':
         return <MyGiftPage />;
-      case "선물하기":
+      case '선물하기':
         return <PlaceholderComponent title="선물하기" />;
-      case "결제 내역":
+      case '결제 내역':
         return <PaymentHistory />;
-      case "리뷰내역":
+      case '리뷰내역':
         return <ReviewPage />;
-      case "내 정보":
+      case '내 정보':
         return <Profile />;
       default:
         return null;
@@ -98,9 +91,9 @@ function MyPage() {
           fullWidth
           sx={{
             py: 2,
-            fontSize: "1rem",
-            fontWeight: "bold",
-            color: "text.primary", // 텍스트 색상 유지
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            color: 'text.primary', // 텍스트 색상 유지
           }}
           onClick={() => handleMenuClick(menu)}
         >
@@ -137,9 +130,7 @@ function MyPage() {
       </Paper>
 
       {/* 선택된 메뉴 컨텐츠 영역 */}
-      <Box sx={{ mt: 3 }}>
-        {renderDrawerContent()}
-      </Box>
+      <Box sx={{ mt: 3 }}>{renderDrawerContent()}</Box>
     </Container>
   );
 }

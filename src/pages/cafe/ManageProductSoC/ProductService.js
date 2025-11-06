@@ -7,7 +7,7 @@ import axios from 'axios';
 // /api/owners/subscriptions/{subscriptionId} 구독권 수정
 
 // 🚨 백엔드 연결 시: 실제 API 기본 경로 사용 (예: '/api/owners/subscriptions')
-const BASE_URL = import.meta.env.VITE_API_UR;
+const BASE_URL = import.meta.env.VITE_API_URL;
 const API_BASE_URL = `${BASE_URL}/api/owners/subscriptions`;
 
 // 1. 구독권 리스트 조회 (GET)

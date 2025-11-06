@@ -1,12 +1,44 @@
-import { Box, Button, Card, Grid, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Typography,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
 import api from '../../utils/api';
 
-
-// const BASE_URL = ;
+// 상태 변경 확인을 위한 다이얼로그 컴포넌트
+const ConfirmDialog = ({ open, onClose, onConfirm, title, content }) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{content}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={onConfirm}
+          color="primary"
+          variant="contained"
+          autoFocus
+        >
+          확인
+        </Button>
+        <Button onClick={onClose} color="primary">
+          취소
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const getOrderTypeLabel = (typeCode) => {
   switch (typeCode) {
@@ -36,6 +68,15 @@ function StoreHome() {
   const partnerStoreId = useUserStore((state) => state.partnerStoreId);
 
   const [orders, setOrders] = useState([]);
+
+  // 상태 변경 확인 - 팝업 관리용 상태
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    orderId: null,
+    nextStatus: null,
+    title: '',
+    content: '',
+  });
 
   // 모달 상태 정의
   const [modalState, setModalState] = useState({
@@ -127,8 +168,40 @@ function StoreHome() {
     }
   };
 
+  // 팝업을 띄우는 함수
+  const handleConfirmOpen = (orderId, currentStatus) => {
+    const actionDetails = getNextActionAndState(currentStatus);
+    if (!actionDetails) return; // 버튼 없는 상태(픽업완료 RECEIVED, 거부 REJECTED)는 팝업 띄울 필요 없음
+
+    setConfirmState({
+      open: true,
+      orderId: orderId,
+      nextStatus: actionDetails.nextStatus,
+      title: `주문 상태 변경 확인 (${actionDetails.label})`,
+      content: `주문 번호 ${orderId}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`,
+    });
+  };
+
+  // 팝업 닫기 함수
+  const handleConfirmClose = () => {
+    setConfirmState({
+      open: false,
+      orderId: null,
+      nextStatus: null,
+      title: '',
+      content: '',
+    });
+  };
+
   // ⭐️버튼 클릭 시 orders 상태를 실제로 업데이트 하는 함수
-  const handleStatusChange = async (orderId, nextStatus) => {
+  const handleStatusChange = async () => {
+    // 팝업 닫고,
+    handleConfirmClose();
+
+    const { orderId, nextStatus } = confirmState;
+
+    if (!orderId || !nextStatus) return;
+
     try {
       // 백엔드 요청
       const response = await api.patch(`/stores/orders/${orderId}`, {
@@ -323,10 +396,7 @@ function StoreHome() {
                     fullWidth
                     variant="contained"
                     onClick={() =>
-                      handleStatusChange(
-                        order.orderId,
-                        actionDetails.nextStatus
-                      )
+                      handleConfirmOpen(order.orderId, order.orderStatus)
                     }
                     sx={{ bgcolor: statusInfo.action, color: 'white' }}
                   >
@@ -349,6 +419,14 @@ function StoreHome() {
           onReject={handleModalOrderReject}
         />
       )}
+
+      <ConfirmDialog
+        open={confirmState.open}
+        onClose={handleConfirmClose}
+        onConfirm={handleStatusChange} // '확인' 버튼 누를 시 실제 API 호출 함수 실행
+        title={confirmState.title}
+        content={confirmState.content}
+      />
     </div>
   );
 }
