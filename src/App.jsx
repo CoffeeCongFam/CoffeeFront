@@ -1,14 +1,12 @@
 // App.jsx
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import api, { TokenService } from './utils/api';
 import useUserStore from './stores/useUserStore';
 import { ThemeProvider } from '@emotion/react';
-import { createTheme } from '@mui/material';
 
 function App() {
   const { setUser, setPartnerStoreId } = useUserStore();
-  const navigate = useNavigate();
   const location = useLocation();
 
   // 로그인 없이 접근 가능한 경로들

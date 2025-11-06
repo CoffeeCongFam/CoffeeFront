@@ -1,10 +1,10 @@
 import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
+import api from '../../utils/api';
 
-const BASE_URL = 'http://localhost:8080';
+// const BASE_URL = ;
 
 const getOrderTypeLabel = (typeCode) => {
   switch (typeCode) {
@@ -63,8 +63,8 @@ function StoreHome() {
           return;
         }
 
-        const response = await axios.get(
-          `${BASE_URL}/api/stores/orders/today/${partnerStoreId}`
+        const response = await api.get(
+          `/stores/orders/today/${partnerStoreId}`
         );
 
         // 백엔드 응답 구조에 맞게 resposne.data.data
@@ -97,12 +97,9 @@ function StoreHome() {
       // nextStatus는 'REJECTED'
 
       // 백엔드 요청
-      const response = await axios.patch(
-        `${BASE_URL}/api/stores/orders/reject/${orderId}`,
-        {
-          rejectedReason: rejectedReasonText,
-        }
-      );
+      const response = await api.patch(`/stores/orders/reject/${orderId}`, {
+        rejectedReason: rejectedReasonText,
+      });
 
       // 성공 시 FE 상태 업데이트
       if (response.status === 200) {
@@ -132,12 +129,9 @@ function StoreHome() {
   const handleStatusChange = async (orderId, nextStatus) => {
     try {
       // 백엔드 요청
-      const response = await axios.patch(
-        `${BASE_URL}/api/stores/orders/${orderId}`,
-        {
-          orderStatus: nextStatus,
-        }
-      );
+      const response = await api.patch(`/stores/orders/${orderId}`, {
+        orderStatus: nextStatus,
+      });
 
       // 성공 시 FE 상태 업데이트
       if (response.status === 200) {

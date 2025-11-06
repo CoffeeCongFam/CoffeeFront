@@ -240,13 +240,7 @@ function CompleteOrderPage() {
                 )}
               </Typography>
             </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography>
-                {orderInfo.payAmount?.toLocaleString()} 원
-              </Typography>
-            </Box>
+
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
             >

@@ -112,7 +112,7 @@ function CafeMenuList({ menus = [] }) {
                     >
                       <Box
                         component="img"
-                        src={menuDummy || menu?.menuImage || menuDummy}
+                        src={menu?.menuImage || menuDummy}
                         alt={menu?.menuName}
                         sx={{
                           width: { xs: 80, sm: 100 },
