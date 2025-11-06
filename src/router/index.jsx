@@ -73,7 +73,7 @@ const router = createBrowserRouter([
       // 일반 회원
       // TODO!!! me 뒤에 :memberId 추가 필요
       {
-        path: "/me",
+        path: "me",
         element: (
           // <RequireMemberType allow={["GENERAL"]}>
           <CustomerLayout />
@@ -158,7 +158,7 @@ const router = createBrowserRouter([
       // 점주
       // :storeId 붙여야 함.
       {
-        path: "/store",
+        path: "store",
         element: <StoreLayout />,
         children: [
           {
@@ -189,7 +189,7 @@ const router = createBrowserRouter([
       },
       // 관리자
       {
-        path: "/admin",
+        path: "admin",
         element: <AdminLayout />,
         children: [
           {

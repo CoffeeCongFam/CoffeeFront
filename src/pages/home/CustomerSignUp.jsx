@@ -11,6 +11,7 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import useUserStore from "../../stores/useUserStore";
+import api from "../../utils/api";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
@@ -73,8 +74,6 @@ function CustomerSignUp() {
     };
 
     try {
-      // axios 직접 호출 대신 api 인스턴스 사용
-      // baseURL과 withCredentials는 api 인스턴스에 이미 설정되어 있음
       const response = await api.post("/signup/store", { ...formData },{ withCredentials: true });
 
       // response 전체 출력
