@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
 import Profile from './Profile';
@@ -11,20 +12,12 @@ import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
 import OrderHistory from "./OrderHistory";
 
-
-// 임시 플레이스홀더 컴포넌트
-const PlaceholderComponent = ({ title }) => (
-  <Box sx={{ p: 3, textAlign: 'center' }}>
-    <Typography variant="h5">{title}</Typography>
-    <Typography>이곳에 {title} 페이지 내용이 표시됩니다.</Typography>
-  </Box>
-);
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 function MyPage() {
   let navigate = useNavigate();
 
   const { authUser, clearUser } = useUserStore();
-  console.log('AUTH USER>> ', authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
   const [activeMenu, setActiveMenu] = useState('구독권 관리');
@@ -52,15 +45,6 @@ function MyPage() {
     handleLogout();
   };
 
-  const handleMenuClick = (menu) => {
-    if (menu === '선물하기') {
-      // "선물하기" 클릭 시 주문 페이지로 이동
-      navigate('/me/order/new'); // 절대 경로로 수정 및 오타 수정
-      return;
-    }
-    setActiveMenu(menu);
-  };
-
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
@@ -70,7 +54,7 @@ function MyPage() {
         return <MyGiftPage />;
       case "주문 내역":
         return <OrderHistory />;
-      case "결제 내역":
+      case '결제 내역':
         return <PaymentHistory />;
       case '리뷰내역':
         return <ReviewPage />;
@@ -94,7 +78,6 @@ function MyPage() {
             fontWeight: 'bold',
             color: 'text.primary', // 텍스트 색상 유지
           }}
-          onClick={() => handleMenuClick(menu)}
         >
           {menu}
         </Button>
@@ -114,33 +97,58 @@ function MyPage() {
         {/* 좌측: 유저 정보 */}
         <Box>
           <Typography variant="h5" component="h1" fontWeight="bold">
-            {authUser?.name}
+            {authUser?.name}님 환영합니다!
           </Typography>
         </Box>
 
-        {/* 우측: 트렌디한 로그아웃 버튼 */}
-        <Button
-          onClick={logout}
-          variant="contained"
-          startIcon={<LogoutRoundedIcon />}
-          sx={{
-            borderRadius: 999,
-            px: 2.5,
-            py: 1,
-            fontWeight: 600,
-            fontSize: "0.9rem",
-            textTransform: "none",
-            boxShadow: "none",
-            bgcolor: "grey.900",
-            color: "common.white",
-            "&:hover": {
-              bgcolor: "grey.800",
-              boxShadow: 3,
-            },
-          }}
-        >
-          로그아웃
-        </Button>
+        {/* 우측: 트렌디한 네비게이션 & 로그아웃 버튼 그룹 */}
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <Button
+            onClick={() => navigate('/store/cafeMyPage')}
+            variant="contained"
+            sx={{
+              borderRadius: 999,
+              px: 2.2,
+              py: 0.8,
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              textTransform: 'none',
+              boxShadow: 'none',
+              background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
+              color: 'grey.900',
+              border: '1px solid rgba(0,0,0,0.05)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
+                boxShadow: 2,
+              },
+            }}
+          >
+            카페 사장님 페이지
+          </Button>
+
+          <Button
+            onClick={logout}
+            variant="contained"
+            startIcon={<LogoutRoundedIcon />}
+            sx={{
+              borderRadius: 999,
+              px: 2.5,
+              py: 1,
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              textTransform: 'none',
+              boxShadow: 'none',
+              bgcolor: 'grey.900',
+              color: 'common.white',
+              '&:hover': {
+                bgcolor: 'grey.800',
+                boxShadow: 3,
+              },
+            }}
+          >
+            로그아웃
+          </Button>
+        </Box>
       </Box>
       {/* 상단 메뉴 영역 */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
