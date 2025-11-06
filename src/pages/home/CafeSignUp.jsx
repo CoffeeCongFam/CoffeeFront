@@ -59,7 +59,6 @@ function CafeSignUp() {
 
   // 사업자번호 인증 함수
   const handleVerifyBusinessNumber = async () => {
-
     const cleanedBusinessNumber = formState.businessNumber.replace(/\D/g, "");
 
     if (cleanedBusinessNumber.length !== 10) {
@@ -272,21 +271,29 @@ function CafeSignUp() {
   //----------------회원가입 버튼 --------------------
   const handleSignup = async () => {
     try {
-      const formData = new FormData();
-      formData.append("storeName", formState.storeName);
-      formData.append("roadAddress", formState.roadAddress);
-      formData.append("detailAddress", formState.detailAddress);
-      formData.append("businessNumber", formState.businessNumber); // 하이픈 포함 그대로
-      formData.append("detailInfo", formState.extraInfo);
-      formData.append("storeTel", formState.storePhone); // 숫자만(하이픈 제거)
-      formData.append("xPoint", formState.xPoint);
-      formData.append("yPoint", formState.yPoint);
+      const data = new FormData();
+
+      const dto = {
+        businessNumber: formState.businessNumber, // 하이픈 포함 그대로
+        storeName: formState.storeName,
+        roadAddress: formState.roadAddress,
+        detailAddress: formState.detailAddress,
+        detailInfo: formState.extraInfo,
+        storeTel: formState.storePhone, // 숫자만(하이픈 제거)
+        xPoint: formState.xPoint,
+        yPoint: formState.yPoint,
+      };
+
+      const jsonBlob = new Blob([JSON.stringify(dto)], {
+        type: "application/json",
+      });
+      data.append("data", jsonBlob);
 
       // 이미지 파일 (선택한 경우에만)
-      if(formState.storeImage) {
-        formData.append("storeImg", formState.storeImage);
+      if (formState.storeImage) {
+        data.append("file", formState.storeImage);
       }
-      const result = await postCafe(formData);
+      const result = await postCafe(data);
       const success = result;
 
       if (success) {
