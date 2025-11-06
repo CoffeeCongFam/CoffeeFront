@@ -107,7 +107,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
       menuDesc: '',
       menuType: 'BEVERAGE',
       menuStatus: 'Y',
-      partnerStoreId: 1,
+      partnerStoreId: partnerStoreId,
     });
     setErrors({});
     handleClearImage();

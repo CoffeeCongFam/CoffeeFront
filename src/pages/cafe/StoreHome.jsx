@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
-import api, { TokenService } from '../../utils/api';
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -32,8 +31,7 @@ const getFormattedMenuList = (menuList) => {
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
-  const { authUser, setUser, partnerStoreId, setPartnerStoreId } =
-    useUserStore();
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
 
   const [orders, setOrders] = useState([]);
 
@@ -51,48 +49,6 @@ function StoreHome() {
   const handleModalOpen = (order) => {
     setModalState({ open: true, selectedOrder: order });
   };
-
-  // 로그인 했을 때 userId랑 partnerStoreId를 JUSTAND로 쓰기 위한 몸부림(App.js에 넣어야 함 - 테스트용임 이거는)
-  useEffect(() => {
-    console.log('CUSTOMER HOME--------------------------------', authUser);
-    //
-    const initUser = async () => {
-      // token 은 있는데, 로그인한 사용자 정보가 없는 상태
-
-      if (!authUser) {
-        console.log('TOKEN OK, BUT USER INFO IS EMPTY-----------------');
-
-        try {
-          const res = await api.post('/login');
-          const userData = res.data?.data;
-          console.log("user data from '/login", userData);
-
-          if (userData) {
-            setUser(userData);
-            TokenService.setUser(userData);
-            console.log('userData 저장 완료-------------------');
-
-            if (userData.partnerStoreId) {
-              setPartnerStoreId(userData.partnerStoreId);
-              console.log(
-                `✅ Partner Store ID ${userData.partnerStoreId} 저장 완료.`
-              );
-            }
-          } else {
-            console.warn('응답에 user data 없음');
-            //
-            window.href;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    };
-
-    initUser();
-
-    console.log(authUser);
-  }, []);
 
   // 오늘의 주문 목록 조회 GET
   useEffect(() => {
