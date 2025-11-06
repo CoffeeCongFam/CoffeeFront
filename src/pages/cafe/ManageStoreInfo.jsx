@@ -12,10 +12,9 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-
-const STORE_API_URL = "/api/owners/stores"; // get, post 기본 경로
+import api from "../../utils/api";
+const STORE_API_URL = "/owners/stores"; // get, post 기본 경로
 const PARTNER_STORE_ID = 1; // partnerStoreId는 patch 요청 시 필요(로그인 후 저장된 값 사용)
-
 const today = new Date().toLocaleDateString("ko-KR");
 const dateParts = today.split(".").map((part) => part.trim());
 const month = dateParts[1];
@@ -98,14 +97,14 @@ export default function ManageStoreInfo() {
     setSuccessMessage(null);
     try {
       // 토큰 기반 조회 : {partnerStoreId}가 URL에 필요 없음(서버가 처리)
-      const response = await axios.get(STORE_API_URL);
+      const response = await api.get(STORE_API_URL);
 
       const data = response.data.data;
       setStoreInfo(data);
       setOriginalStoreInfo(data); // 원본 데이터 저장 (취소 시 복구용)
     } catch (err) {
       console.log("매장 정보 조회 실패. 더미 데이터 사용.", err);
-      setError("매장 정보를 불러오지 못했습니다. 더미 데이터를 표시.");
+      setError("매장 정보를 불러오지 못했습니다. 다시 시도해주세요");
       // API 실패 시, 미리 설정된 가데이터 INITIAL_STORE_INFO 사용하게끔
     } finally {
       setIsLoading(false);

@@ -48,7 +48,7 @@ export default function StoreLayout() {
       icon: <CardGiftcard />,
     },
     {
-      to: "/store/manageStoreInfo",
+      to: "/store/cafeMyPage",
       label: "매장 정보",
       icon: <LocationOn />,
     },

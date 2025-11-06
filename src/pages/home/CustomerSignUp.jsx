@@ -92,12 +92,17 @@ function CustomerSignUp() {
       if (response.data.data.message === "성공") {
         // L_04 - zustand의 useUserStore를 사용해서 memberId 업데이트해서 cafeSignUp에서 사용가능하게 해주기
         setUser({ memberId });
-        if (
-          window.confirm(
-            "회원정보 등록이 완료되었습니다. 카페 상세정보 입력창으로 넘어갑니다."
-          )
-        ) {
+
+        const goToCafeSignUp = window.confirm(
+          "회원정보 등록이 완료되었습니다. 매장 등록을 진행하시겠습니까?"
+        );
+
+        if (goToCafeSignUp) {
+          // 등록하기 선택 시: 기존 로직대로 카페 상세정보 입력 페이지로 이동
           navigate("/cafeSignUp");
+        } else {
+          // 건너뛰기 선택 시: 매장 목록 페이지로 이동
+          navigate("/store");
         }
       }
     } catch (err) {

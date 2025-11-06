@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -16,29 +16,39 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Chip,
-  Grid,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import WcIcon from "@mui/icons-material/Wc";
 import EmailIcon from "@mui/icons-material/Email";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import withdrawal01 from "../../assets/withdrawal_01.png";
 import withdrawal02 from "../../assets/withdrawal_02.png";
 import withdrawal03 from "../../assets/withdrawal_03.png";
 import withdrawal04 from "../../assets/withdrawal_04.png";
-
+import useUserStore from "../../stores/useUserStore";
 
 function Profile() {
-  // 실제 데이터 연동 전까지는 UI 구조를 보기 위한 더미 데이터
+  const { authUser, setUser: setAuthUser } = useUserStore();
   const [user, setUser] = useState({
-    name: "커피콩빵",
-    phone: "010-1234-5678",
-    gender: "남성",
-    email: "coffee@example.com",
+    name: authUser?.name || "",
+    tel: authUser?.tel || "",
+    gender: authUser?.gender || "",
+    email: authUser?.email || "",
   });
+
+  useEffect(() => {
+    if (!authUser) return;
+
+    setUser((prev) => ({
+      ...prev,
+      name: authUser.name ?? prev.name,
+      tel: authUser.tel ?? prev.tel,
+      gender: authUser.gender ?? prev.gender,
+      email: authUser.email ?? prev.email,
+    }));
+  }, [authUser]);
+
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -67,22 +77,38 @@ function Profile() {
   };
 
   const handleChange = (field) => (event) => {
+    let value = event.target.value;
+    if (field === "tel") {
+      // 숫자만 입력받고, 11자리를 넘지 않도록 처리
+      const digitsOnly = value.replace(/\D/g, "");
+      value = digitsOnly.slice(0, 11);
+    }
+    if (field === "name") {
+      // 한글과 영어만 입력 가능하도록 필터링
+      value = value.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g, "");
+    }
     setUser((prev) => ({
       ...prev,
-      [field]: event.target.value,
+      [field]: value,
     }));
   };
 
   const handleSave = () => {
     setIsEditing(false);
-    // 실제 저장 로직 추가 가능
+    // 로컬 상태를 전역 authUser에도 반영
+    if (authUser) {
+      setAuthUser({ ...authUser, ...user });
+    } else {
+      setAuthUser(user);
+    }
+    // TODO: 필요하다면 여기서 서버로 프로필 업데이트 API를 호출하세요.
   };
 
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: "70vh",
         bgcolor: "white",
         display: "flex",
         justifyContent: "center",
@@ -201,7 +227,7 @@ function Profile() {
                 {!isEditing ? (
                   <ListItemText
                     primary="전화번호"
-                    secondary={user.phone}
+                    secondary={user.tel}
                     primaryTypographyProps={{
                       variant: "caption",
                       color: "text.secondary",
@@ -217,8 +243,8 @@ function Profile() {
                     size="small"
                     label="전화번호"
                     variant="outlined"
-                    value={user.phone}
-                    onChange={handleChange("phone")}
+                    value={user.tel}
+                    onChange={handleChange("tel")}
                   />
                 )}
               </ListItem>
@@ -236,7 +262,7 @@ function Profile() {
                 </ListItemIcon>
                 <ListItemText
                   primary="성별"
-                  secondary={user.gender}
+                  secondary={user.gender === 'M' ? "남자" : "여자"}
                   primaryTypographyProps={{
                     variant: "caption",
                     color: "text.secondary",
@@ -276,7 +302,11 @@ function Profile() {
           </Box>
           {isEditing && (
             <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-              <Button variant="contained" onClick={handleSave}>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                disabled={user.name.trim().length < 2 || !user.tel.trim()}
+              >
                 저장
               </Button>
             </Box>

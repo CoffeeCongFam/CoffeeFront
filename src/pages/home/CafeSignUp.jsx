@@ -297,18 +297,18 @@ function CafeSignUp() {
 
       if (success) {
         if (
-          window.confirm("회원가입이 완료되었습니다. 회원 홈으로 이동합니다.")
+          window.confirm("매장등록이 완료되었습니다. 점주 홈으로 이동합니다.")
         ) {
           navigate("/store");
         }
       } else {
-        if (window.confirm("회원가입에 실패하였습니다. 메인으로 이동합니다.")) {
-          navigate("/");
+        if (window.confirm("매장등록에 실패하였습니다. 다시 시도해주세요")) {
+          navigate("/store");
         }
       }
     } catch (err) {
-      console.error("회원가입 실패:", err);
-      alert("회원가입 중 오류가 발생했습니다.");
+      console.error("매장등록 실패:", err);
+      alert("매장등록 중 오류가 발생했습니다.");
     }
   };
   //------------------------------------

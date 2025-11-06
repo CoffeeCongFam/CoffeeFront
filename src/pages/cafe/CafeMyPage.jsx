@@ -1,48 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
-import Profile from './Profile';
-import { useNavigate } from 'react-router-dom';
-import SubscriptionPage from './Subscription';
-import PaymentHistory from './PaymentHistory';
-import ReviewPage from './ReviewPage';
-import { handleLogout } from '../../utils/logout';
-// import useUserStore from "../../stores/useUserStore";
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Button,
+} from "@mui/material";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import Profile from "../customer/Profile";
+import { handleLogout } from "../../utils/logout";
+import useUserStore from "../../stores/useUserStore";
+import ManageStoreInfo from "./ManageStoreInfo";
+import { useNavigate } from "react-router-dom";
 
-// TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
-import MyGiftPage from './MyGift';
-import useUserStore from '../../stores/useUserStore';
-// import GiftPage from "./Gift";
-// import PaymentHistory from "./PaymentHistory";
-
-// 임시 플레이스홀더 컴포넌트
-const PlaceholderComponent = ({ title }) => (
-  <Box sx={{ p: 3, textAlign: 'center' }}>
-    <Typography variant="h5">{title}</Typography>
-    <Typography>이곳에 {title} 페이지 내용이 표시됩니다.</Typography>
-  </Box>
-);
-
-function MyPage() {
-  let navigate = useNavigate();
+function CafeMyPage() {
 
   const { authUser, clearUser } = useUserStore();
-  console.log('AUTH USER>> ', authUser);
+  console.log("AUTH USER>> ", authUser);
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
+  const navigate = useNavigate();
+  const [activeMenu, setActiveMenu] = useState("매장 정보");
 
-  const [activeMenu, setActiveMenu] = useState('구독권 관리');
-
-  // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
+  // MUI Paper 구역에 포함되어 할 최종 버튼 목록
   const finalMenus = [
-    "구독권 관리",
-    "내 선물함",
-    "주문하기",
-    "결제 내역",
-    "리뷰내역",
+    "매장 정보",
     "내 정보",
   ];
 
+  const handleMenuClick = (menu) => {
+    setActiveMenu(menu);
+  };
+
   useEffect(() => {
-    console.log('AUTH USER 변경됨 >>> ', authUser);
+    console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
 
   const logout = () => {
@@ -53,29 +44,12 @@ function MyPage() {
     handleLogout();
   };
 
-  const handleMenuClick = (menu) => {
-    if (menu === '선물하기') {
-      // "선물하기" 클릭 시 주문 페이지로 이동
-      navigate('/me/order/new'); // 절대 경로로 수정 및 오타 수정
-      return;
-    }
-    setActiveMenu(menu);
-  };
-
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
-      case '구독권 관리':
-        return <SubscriptionPage />;
-      case '내 선물함':
-        return <MyGiftPage />;
-      case '선물하기':
-        return <PlaceholderComponent title="선물하기" />;
-      case '결제 내역':
-        return <PaymentHistory />;
-      case '리뷰내역':
-        return <ReviewPage />;
-      case '내 정보':
+      case "매장 정보":
+        return <ManageStoreInfo />;
+      case "내 정보":
         return <Profile />;
       default:
         return null;
@@ -91,9 +65,9 @@ function MyPage() {
           fullWidth
           sx={{
             py: 2,
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            color: 'text.primary', // 텍스트 색상 유지
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "text.primary", // 텍스트 색상 유지
           }}
           onClick={() => handleMenuClick(menu)}
         >
@@ -113,10 +87,31 @@ function MyPage() {
         mb={3}
       >
         {/* 좌측: 유저 정보 */}
-        <Box>
+        <Box display="flex" alignItems="center" gap={2}>
           <Typography variant="h5" component="h1" fontWeight="bold">
             {authUser?.name}
           </Typography>
+          <Button
+            onClick={() => navigate("/me")}
+            variant="contained"
+            sx={{
+              borderRadius: 999,
+              px: 2,
+              py: 0.7,
+              fontWeight: 600,
+              fontSize: "0.8rem",
+              textTransform: "none",
+              boxShadow: "none",
+              bgcolor: "linear-gradient(45deg, #d7c4a3 30%, #f5f0e6 90%)",
+              color: "text.primary",
+              "&:hover": {
+                boxShadow: "0 4px 10px rgba(215, 196, 163, 0.5)",
+                bgcolor: "linear-gradient(45deg, #d7c4a3 30%, #f5f0e6 90%)",
+              },
+            }}
+          >
+            소비자 페이지
+          </Button>
         </Box>
 
         {/* 우측: 트렌디한 로그아웃 버튼 */}
@@ -151,9 +146,11 @@ function MyPage() {
       </Paper>
 
       {/* 선택된 메뉴 컨텐츠 영역 */}
-      <Box sx={{ mt: 3 }}>{renderDrawerContent()}</Box>
+      <Box sx={{ mt: 3 }}>
+        {renderDrawerContent()}
+      </Box>
     </Container>
   );
 }
 
-export default MyPage;
+export default CafeMyPage;

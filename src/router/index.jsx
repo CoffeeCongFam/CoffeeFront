@@ -38,6 +38,7 @@ import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 import RequireMemberType from "../common/RequireMemberType";
+import CafeMyPage from "../pages/cafe/cafeMyPage";
 
 const router = createBrowserRouter([
   {
@@ -167,6 +168,10 @@ const router = createBrowserRouter([
           {
             path: "pastOrders",
             element: <PastOrders />,
+          },
+          {
+            path: "cafeMyPage",
+            element: <CafeMyPage />,
           },
           {
             path: "manageMenu",
