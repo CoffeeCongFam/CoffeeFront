@@ -16,11 +16,6 @@ import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import axios from "axios";
 import useUserStore from "../../stores/useUserStore";
 
-// 🚨 [필수 설정] 점주 ID 설정
-// 실제 애플리케이션에서는 로그인 정보에서 가져와야 함
-// ==========================================================
-const PARTNER_STORE_ID = 1; // 예시로 사용할 점주 매장 ID
-
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
  * 현재 날짜를 기준으로 지정된 일/월 오프셋을 적용한 'YYYY-MM-DD' 형식의 문자열을 반환합니다.
@@ -393,9 +388,8 @@ export default function PastOrdersList() {
     setOrders([]); // 새 요청 시 이전 데이터 초기화
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_URL;
       // 🚨 요청 URL 구성: /api/stores/orders/past/{partnerStoreId}?searchDate={YYYY-MM-DD}
-      const url = `${BASE_URL}/api/stores/orders/past/${PARTNER_STORE_ID}?searchDate=${date}`;
+      const url = `http://localhost:8080/api/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
       // PARTNER_STORE_ID는 하드코딩된 테스트용 점주 매장 코드
 
       const response = await axios.get(url);
