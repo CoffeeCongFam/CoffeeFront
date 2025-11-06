@@ -10,6 +10,7 @@ import {
   IconButton,
   Slide,
 } from "@mui/material";
+import Profile from "./Profile";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import SubscriptionPage from "./Subscription";
@@ -49,6 +50,7 @@ function MyPage() {
     "선물하기",
     "결제 내역",
     "리뷰내역",
+    "내 정보",
   ];
 
   useEffect(() => {
@@ -90,6 +92,8 @@ function MyPage() {
         return <PaymentHistory />;
       case "리뷰내역":
         return <ReviewPage />;
+      case "내 정보":
+        return <Profile />;
       default:
         return null;
     }

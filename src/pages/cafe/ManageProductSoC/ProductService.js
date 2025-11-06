@@ -10,7 +10,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_UR;
 const API_BASE_URL = `${BASE_URL}/api/owners/subscriptions`;
 
-const SUBSCRIPTION_ID = 1;
+// const SUBSCRIPTION_ID = 1;
 
 // 1. 구독권 리스트 조회 (GET)
 // Endpoint: /api/owners/subscriptions
@@ -61,7 +61,7 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
 
 export const updateSubscription = async (subscriptionId, updateData) => {
   // 🚩 [실제 axios 코드]
-  const url = `${API_BASE_URL}/${SUBSCRIPTION_ID}`;
+  const url = `${API_BASE_URL}/${subscriptionId}`;
   // SUBSCRIPTION_ID 테스트용 가데이터
 
   try {
