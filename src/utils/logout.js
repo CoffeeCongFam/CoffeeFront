@@ -13,8 +13,6 @@ export const handleLogout = () => {
 
     window.location.href = URI;
 
-    window.location.href = URI;
-
     // localStorage 삭제
     localStorage.removeItem("user");
     localStorage.clear();
