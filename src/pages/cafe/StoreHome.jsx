@@ -4,7 +4,6 @@ import axios from 'axios';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
 
-
 // const BASE_URL = ;
 
 const getOrderTypeLabel = (typeCode) => {

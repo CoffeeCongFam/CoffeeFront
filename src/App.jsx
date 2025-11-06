@@ -5,6 +5,8 @@ import useUserStore from './stores/useUserStore';
 import { ThemeProvider } from '@emotion/react';
 import { createTheme } from '@mui/material';
 
+import { createTheme } from '@mui/material';
+
 function App() {
   const { setUser, setPartnerStoreId } = useUserStore();
   const navigate = useNavigate();
