@@ -14,11 +14,7 @@ import {
 } from '@mui/material';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import axios from 'axios';
-
-// 🚨 [필수 설정] 점주 ID 설정
-// 실제 애플리케이션에서는 로그인 정보에서 가져와야 함
-// ==========================================================
-const PARTNER_STORE_ID = 1; // 예시로 사용할 점주 매장 ID
+import useUserStore from '../../stores/useUserStore';
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
@@ -47,10 +43,6 @@ const getOffsetDateString = (days, months) => {
 };
 
 const TODAY_DATE = getOffsetDateString(0, 0); // 오늘
-const YESTERDAY_DATE = getOffsetDateString(-1, 0); // 어제
-const DAY_BEFORE_YESTERDAY_DATE = getOffsetDateString(-2, 0); // 그제
-const ONE_MONTH_AGO_DATE = getOffsetDateString(0, -1); // 한 달 전
-const TWO_MONTHS_AGO_DATE = getOffsetDateString(0, -2); // 두 달 전
 
 // ⭐️한국 시간(KST)으로 00:00~09:00 사이에 생성된 주문은 UTC 기준으로는 전날로 기록될
 // DAILY_CUTOFF_HOUR_KST는 9로 유지 (KST 9시를 하루의 시작점으로 설정)
@@ -362,12 +354,13 @@ const getStatusProps = (orderStatus) => {
     case 'REJECTED':
       return { label: '주문 거부', color: theme.palette.error.main };
     default:
-      return { label: '알 수 없음', color: theme.palette.text.secondary };
+      return { label: '주문 접수', color: theme.palette.text.secondary };
   }
 };
 
 // 🚨 메인 컴포넌트
 export default function PastOrdersList() {
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
   const defaultDate = TODAY_DATE;
   const [selectedDate, setSelectedDate] = useState(defaultDate);
 
@@ -387,7 +380,7 @@ export default function PastOrdersList() {
   // ----------------------------------------------------------
   // 2. API 호출 함수 구현 (useCallback 사용)
   // ----------------------------------------------------------
-  const fetchOrders = useCallback(async (date) => {
+  const fetchOrders = useCallback(async (date, partnerStoreId) => {
     if (!date) return;
 
     setIsLoading(true);
@@ -396,7 +389,7 @@ export default function PastOrdersList() {
 
     try {
       // 🚨 요청 URL 구성: /api/stores/orders/past/{partnerStoreId}?searchDate={YYYY-MM-DD}
-      const url = `http://localhost:8080/api/stores/orders/past/${PARTNER_STORE_ID}?searchDate=${date}`;
+      const url = `http://localhost:8080/api/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
       // PARTNER_STORE_ID는 하드코딩된 테스트용 점주 매장 코드
 
       const response = await axios.get(url);
@@ -425,10 +418,10 @@ export default function PastOrdersList() {
   // ----------------------------------------------------------
   useEffect(() => {
     // 선택된 날짜가 유효한 경우에만 API 호출
-    if (selectedDate) {
-      fetchOrders(selectedDate);
+    if (selectedDate && partnerStoreId) {
+      fetchOrders(selectedDate, partnerStoreId);
     }
-  }, [selectedDate, fetchOrders]);
+  }, [selectedDate, fetchOrders, partnerStoreId]);
 
   // ----------------------------------------------------------
   // 4. 필터링 로직 수정 (가져온 데이터에 대해 영업시간 제한 필터 적용)
