@@ -11,7 +11,6 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import useUserStore from "../../stores/useUserStore";
-
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
   const { search } = useLocation();
