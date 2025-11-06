@@ -655,7 +655,7 @@ function MyGift() {
                           isRefunded: detail.isRefunded,
                           purchaseId: detail.purchaseId,
                         }}
-                        purchaseId={detail.purchaseId}
+                        purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
                         subscriptionType={detail.subscriptionType}
                         maxDailyUsage={detail.maxDailyUsage}
                         giftType="SENT"
@@ -742,7 +742,7 @@ function MyGift() {
                           isRefunded: detail.isRefunded,
                           purchaseId: detail.purchaseId,
                         }}
-                        purchaseId={detail.purchaseId}
+                        purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
                         subscriptionType={detail.subscriptionType}
                         maxDailyUsage={detail.dailyRemainCount}
                         giftType="RECEIVED"
@@ -750,7 +750,7 @@ function MyGift() {
                         isExpired={detail.usageStatus === 'EXPIRED'}
                         usedAt={detail.usedAt}
                         refundedAt={detail.refundedAt}
-                        isRefunded={detail.isRefunded}
+                        isRefunded={item.isRefunded} // detail 대신 list item의 isRefunded를 직접 사용
                         hideCancel={detail.usageStatus === 'ACTIVE'}
                         headerExtra={
                           <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
@@ -762,36 +762,22 @@ function MyGift() {
                             })()}
                           </Stack>
                         }
-                        onRefundSuccess={(pid, refundedAtFromApi) => {
-                          // detail 캐시 갱신
-                          setReceiveDetailById((prev) => {
-                            const target = prev[pid];
-                            if (!target) return prev;
-                            const updated = {
-                              ...target,
+                        onRefundSuccess={(pid, refundedAtFromApi, msid) => {
+                          // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
+                          const updateItem = (g) => {
+                            if (g.purchaseId !== pid) return g;
+                            return {
+                              ...g,
                               isRefunded: true,
                               refundedAt:
                                 refundedAtFromApi ??
-                                target.refundedAt ??
+                                g.refundedAt ??
                                 new Date().toISOString(),
                             };
-                            return { ...prev, [pid]: updated };
-                          });
-                          // RECEIVED 탭 리스트도 함께 갱신
-                          setReceivedGiftList((prev) =>
-                            prev.map((g) =>
-                              g.purchaseId === pid
-                                ? {
-                                    ...g,
-                                    isRefunded: true,
-                                    refundedAt:
-                                      refundedAtFromApi ??
-                                      g.refundedAt ??
-                                      new Date().toISOString(),
-                                  }
-                                : g
-                            )
-                          );
+                          };
+                          setGiftList(prev => prev.map(updateItem));
+                          setReceivedGiftList(prev => prev.map(updateItem));
+                          setSentGiftList(prev => prev.map(updateItem));
                         }}
                       />
                     ) : null;

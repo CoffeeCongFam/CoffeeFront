@@ -48,6 +48,8 @@ export const SubscriptionDetailCard = ({
   actionsSlot = null,
   giftType,
   onRefundSuccess = null,
+  isRefunded: isRefundedProp, // isRefunded prop을 명시적으로 받도록 추가 (이름 충돌 방지)
+  purchaseId, // purchaseId prop을 명시적으로 받도록 추가
 }) => {
   const [selectedMenu, setSelectedMenu] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
@@ -93,10 +95,10 @@ export const SubscriptionDetailCard = ({
     ? refundReasons.map((r) => (r || "").toString().toUpperCase())
     : [];
   const refundedAt = cardRefundedAt ?? "";
-  const isRefunded =
-    typeof cardIsRefunded === "boolean"
-      ? cardIsRefunded
-      : !!(refundedAt && String(refundedAt).trim() !== "");
+  // prop으로 받은 isRefunded를 최우선으로 사용
+  const isRefunded = typeof isRefundedProp === 'boolean'
+    ? isRefundedProp
+    : (typeof cardIsRefunded === "boolean" ? cardIsRefunded : !!(refundedAt && String(refundedAt).trim() !== ""));
   // const memberId = 1;
   let refundMessage = null;
   if (!isRefundable) {
@@ -186,7 +188,8 @@ export const SubscriptionDetailCard = ({
 
   // 환불/거절 처리 핸들러 (purchaseId를 성공 콜백에 전달)
   const handleRefundOrDeny = async () => {
-    const pid = subscriptionData?.purchaseId;
+    // prop으로 받은 purchaseId를 우선 사용하고, 없으면 subscriptionData의 값을 사용
+    const pid = purchaseId ?? subscriptionData?.purchaseId;
 
     if (!pid) {
       window.alert("환불에 필요한 purchaseId가 없습니다.");
@@ -200,7 +203,7 @@ export const SubscriptionDetailCard = ({
         const refundedAtFromApi = res?.data?.refundedAt ?? null;
         console.log("refundedAtFromApi: ", refundedAtFromApi)
         if (typeof onRefundSuccess === "function") {
-          onRefundSuccess(pid, refundedAtFromApi);
+          onRefundSuccess(pid, refundedAtFromApi, subscriptionData?.memberSubscriptionId);
         }
       } else {
         window.alert(res?.message || "환불처리에 실패했습니다. 다시 시도해주세요");
