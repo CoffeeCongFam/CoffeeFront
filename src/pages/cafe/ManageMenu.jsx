@@ -112,7 +112,6 @@ export default function ManageMenu() {
         await loadMenus(partnerStoreId);
         // 모달 닫기
         setIsEditModalOpen(false);
-        alert(`메뉴 [${updateMenu.menuName}] 수정 완료!`);
       } else {
         throw new Error('서버에서 수정 실패 응답');
       }

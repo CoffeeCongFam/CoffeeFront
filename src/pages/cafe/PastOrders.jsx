@@ -107,14 +107,14 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 // 주문 상태를 사용자 친화적 한글 변환 및 색상 지정
 const getStatusProps = (orderStatus) => {
   switch (orderStatus) {
-    case 'COMPLETED':
+    case 'RECEIVED':
       return { label: '수령 완료', color: theme.palette.success.main };
     case 'CANCELED':
       return { label: '주문 취소', color: theme.palette.error.main };
     case 'REJECTED':
       return { label: '주문 거부', color: theme.palette.error.main };
     default:
-      return { label: '주문 접수', color: theme.palette.text.secondary };
+      return { label: '나오면 안됨', color: theme.palette.text.secondary };
   }
 };
 
@@ -333,56 +333,64 @@ export default function PastOrdersList() {
                           hour12: false,
                         });
 
-                        return (
-                          <TableRow
-                            key={order.orderId}
-                            hover
-                            sx={{
-                              '&:last-child td, &:last-child th': { border: 0 },
-                            }}
-                          >
-                            <TableCell align="center">
-                              {order.orderNumber}
-                            </TableCell>
-                            <TableCell align="center">
-                              {order.orderType}
-                            </TableCell>
-                            <TableCell
-                              align="center"
+                        if (
+                          ['CANCELED', 'REJECTED', 'RECEIVED'].includes(
+                            order.orderStatus
+                          )
+                        ) {
+                          return (
+                            <TableRow
+                              key={order.orderId}
+                              hover
                               sx={{
-                                color: statusProps.color,
-                                fontWeight: 'medium',
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
                               }}
                             >
-                              {statusProps.label}
-                            </TableCell>
-                            <TableCell align="center">
-                              {/* ⬅️ 주문 시간 표시 포맷 개선 */}
-                              {kstTimeDisplay}
-                            </TableCell>
-                            <TableCell align="center">
-                              {formattedMenuString}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{ color: theme.palette.text.secondary }}
-                            >
-                              {order.subscriptionName}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{ color: theme.palette.text.secondary }}
-                            >
-                              {order.name}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{ color: theme.palette.text.secondary }}
-                            >
-                              {order.tel}
-                            </TableCell>
-                          </TableRow>
-                        );
+                              <TableCell align="center">
+                                {order.orderNumber}
+                              </TableCell>
+                              <TableCell align="center">
+                                {order.orderType}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{
+                                  color: statusProps.color,
+                                  fontWeight: 'medium',
+                                }}
+                              >
+                                {statusProps.label}
+                              </TableCell>
+                              <TableCell align="center">
+                                {/* ⬅️ 주문 시간 표시 포맷 개선 */}
+                                {kstTimeDisplay}
+                              </TableCell>
+                              <TableCell align="center">
+                                {formattedMenuString}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{ color: theme.palette.text.secondary }}
+                              >
+                                {order.subscriptionName}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{ color: theme.palette.text.secondary }}
+                              >
+                                {order.name}
+                              </TableCell>
+                              <TableCell
+                                align="center"
+                                sx={{ color: theme.palette.text.secondary }}
+                              >
+                                {order.tel}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        }
                       })
                     ) : (
                       <TableRow>
