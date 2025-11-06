@@ -7,9 +7,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import api from "../../utils/api";
 import useUserStore from "../../stores/useUserStore";
 // 이메일은 부모 컴포넌트에서 props로 전달받는다고 가정합니다.
 function CustomerSignUp() {
@@ -73,11 +73,9 @@ function CustomerSignUp() {
     };
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/signup/member`,
-        { ...formData },
-        { withCredentials: true }
-      );
+      // axios 직접 호출 대신 api 인스턴스 사용
+      // baseURL과 withCredentials는 api 인스턴스에 이미 설정되어 있음
+      const response = await api.post("/signup/store", { ...formData },{ withCredentials: true });
 
       // response 전체 출력
       console.log("응답 전체:", response.data);

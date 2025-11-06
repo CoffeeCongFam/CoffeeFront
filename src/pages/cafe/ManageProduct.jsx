@@ -155,7 +155,7 @@ export default function ManageProduct() {
       setIsLoading(false);
     }
   };
-ss
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box
