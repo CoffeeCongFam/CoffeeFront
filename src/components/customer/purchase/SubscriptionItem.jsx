@@ -34,7 +34,7 @@ function SubscriptionItem({ subscription }) {
       {/* 왼쪽 정보 */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {subscription?.store?.storeName || "카페 이름"}{" "}
+          {subscription?.storeName || "카페 이름"}{" "}
           {subscription?.subscriptionName}
         </Typography>
 

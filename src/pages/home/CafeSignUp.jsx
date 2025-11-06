@@ -59,7 +59,6 @@ function CafeSignUp() {
 
   // 사업자번호 인증 함수
   const handleVerifyBusinessNumber = async () => {
-
     const cleanedBusinessNumber = formState.businessNumber.replace(/\D/g, "");
 
     if (cleanedBusinessNumber.length !== 10) {
@@ -285,7 +284,9 @@ function CafeSignUp() {
         yPoint: formState.yPoint,
       };
 
-      const jsonBlob = new Blob([JSON.stringify(dto)], { type: "application/json" });
+      const jsonBlob = new Blob([JSON.stringify(dto)], {
+        type: "application/json",
+      });
       data.append("data", jsonBlob);
 
       // 이미지 파일 (선택한 경우에만)

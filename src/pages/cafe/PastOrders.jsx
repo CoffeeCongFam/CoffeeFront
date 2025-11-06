@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Typography,
   Paper,
@@ -11,10 +11,10 @@ import {
   Box,
   TextField,
   CircularProgress,
-} from '@mui/material';
-import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import axios from 'axios';
-import useUserStore from '../../stores/useUserStore';
+} from "@mui/material";
+import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import useUserStore from "../../stores/useUserStore";
+import api from "../../utils/api";
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
 /**
@@ -37,8 +37,8 @@ const getOffsetDateString = (days, months) => {
   }
 
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -64,15 +64,15 @@ const getKstBusinessDateStringFromUtc = (utcDateString) => {
   const businessDayDate = new Date(businessDayAdjustedTime);
 
   const year = businessDayDate.getUTCFullYear();
-  const month = (businessDayDate.getUTCMonth() + 1).toString().padStart(2, '0');
-  const day = businessDayDate.getUTCDate().toString().padStart(2, '0');
+  const month = (businessDayDate.getUTCMonth() + 1).toString().padStart(2, "0");
+  const day = businessDayDate.getUTCDate().toString().padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 };
 
 // menuList에서 menuName과 quantity를 조합해서 보여주는 식
 const getFormattedMenuList = (menuList) => {
-  if (!menuList || menuList.length === 0) return '메뉴 없음';
+  if (!menuList || menuList.length === 0) return "메뉴 없음";
 
   // 메뉴 이름과 수량을 조합하여 문자열 배열 생성: ['아메리카노 (2개)', '브라우니 (1개)']
   const formattedItems = menuList.map((menu) => {
@@ -80,26 +80,26 @@ const getFormattedMenuList = (menuList) => {
   });
 
   // 쉼표와 공백으로 연결
-  return formattedItems.join(', ');
+  return formattedItems.join(", ");
 };
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#556cd6',
+      main: "#556cd6",
     },
     error: {
-      main: '#d32f2f',
+      main: "#d32f2f",
     },
     success: {
-      main: '#388e3c',
+      main: "#388e3c",
     },
   },
 });
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  margin: 'auto',
+  margin: "auto",
   marginTop: theme.spacing(4),
   borderRadius: theme.shape.borderRadius * 2,
 }));
@@ -107,14 +107,14 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 // 주문 상태를 사용자 친화적 한글 변환 및 색상 지정
 const getStatusProps = (orderStatus) => {
   switch (orderStatus) {
-    case 'COMPLETED':
-      return { label: '수령 완료', color: theme.palette.success.main };
-    case 'CANCELED':
-      return { label: '주문 취소', color: theme.palette.error.main };
-    case 'REJECTED':
-      return { label: '주문 거부', color: theme.palette.error.main };
+    case "COMPLETED":
+      return { label: "수령 완료", color: theme.palette.success.main };
+    case "CANCELED":
+      return { label: "주문 취소", color: theme.palette.error.main };
+    case "REJECTED":
+      return { label: "주문 거부", color: theme.palette.error.main };
     default:
-      return { label: '주문 접수', color: theme.palette.text.secondary };
+      return { label: "주문 접수", color: theme.palette.text.secondary };
   }
 };
 
@@ -149,24 +149,24 @@ export default function PastOrdersList() {
 
     try {
       // 🚨 요청 URL 구성: /api/stores/orders/past/{partnerStoreId}?searchDate={YYYY-MM-DD}
-      const url = `http://localhost:8080/api/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
+      const url = `/stores/orders/past/${partnerStoreId}?searchDate=${date}`;
       // PARTNER_STORE_ID는 하드코딩된 테스트용 점주 매장 코드
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
 
       if (response.data.success) {
         setOrders(response.data.data);
       } else {
         // 백엔드가 success: false와 message를 반환할 경우 처리
         throw new Error(
-          response.data.message || '주문 내역 조회에 실패했습니다.'
+          response.data.message || "주문 내역 조회에 실패했습니다."
         );
       }
     } catch (err) {
-      console.error('주문 내역 조회 오류:', err);
+      console.error("주문 내역 조회 오류:", err);
       // 사용자에게 보여줄 에러 메시지 설정
       setError(
-        '데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+        "데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
       );
     } finally {
       setIsLoading(false);
@@ -225,8 +225,8 @@ export default function PastOrdersList() {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          minHeight: '100vh',
-          backgroundColor: '#f5f5f5',
+          minHeight: "100vh",
+          backgroundColor: "#f5f5f5",
           padding: 2,
         }}
       >
@@ -234,14 +234,14 @@ export default function PastOrdersList() {
           {/* 제목 및 날짜 필터 영역 (수정 없음) */}
           <Box
             display="flex"
-            flexDirection={{ xs: 'column', sm: 'row' }}
+            flexDirection={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            alignItems={{ xs: "flex-start", sm: "center" }}
             mb={4}
             gap={2}
           >
             <Typography variant="h5" component="h1" fontWeight="bold">
-              지난 주문 내역 ({selectedDate.replace(/-/g, '.')})
+              지난 주문 내역 ({selectedDate.replace(/-/g, ".")})
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
               <Typography variant="body1" color="text.secondary">
@@ -253,7 +253,7 @@ export default function PastOrdersList() {
                 value={selectedDate}
                 onChange={handleDateChange}
                 size="small"
-                sx={{ width: { xs: '100%', sm: 180 } }}
+                sx={{ width: { xs: "100%", sm: 180 } }}
               />
             </Box>
           </Box>
@@ -261,9 +261,9 @@ export default function PastOrdersList() {
           <Box
             sx={{
               minHeight: 200,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
             {isLoading ? (
@@ -284,24 +284,24 @@ export default function PastOrdersList() {
                   sx={{ minWidth: 650 }}
                   aria-label="지난 주문 내역 테이블"
                 >
-                  <TableHead sx={{ backgroundColor: '#f8f8f8' }}>
+                  <TableHead sx={{ backgroundColor: "#f8f8f8" }}>
                     <TableRow>
                       {[
-                        '주문 번호',
-                        '주문 유형',
-                        '주문 상태',
-                        '주문 시간',
-                        '주문 메뉴',
-                        '결제 구독권 유형',
-                        '회원 이름',
-                        '전화번호',
+                        "주문 번호",
+                        "주문 유형",
+                        "주문 상태",
+                        "주문 시간",
+                        "주문 메뉴",
+                        "결제 구독권 유형",
+                        "회원 이름",
+                        "전화번호",
                       ].map((header) => (
                         <TableCell
                           key={header}
                           align="center"
                           sx={{
-                            fontWeight: 'bold',
-                            fontSize: '0.8rem',
+                            fontWeight: "bold",
+                            fontSize: "0.8rem",
                             color: theme.palette.text.primary,
                           }}
                         >
@@ -322,14 +322,14 @@ export default function PastOrdersList() {
                         // KST로 변환하여 로컬 시간 표시
                         const kstTimeDisplay = new Date(
                           order.createdAt
-                        ).toLocaleString('ko-KR', {
-                          timeZone: 'Asia/Seoul',
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
+                        ).toLocaleString("ko-KR", {
+                          timeZone: "Asia/Seoul",
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
                           hour12: false,
                         });
 
@@ -338,7 +338,7 @@ export default function PastOrdersList() {
                             key={order.orderId}
                             hover
                             sx={{
-                              '&:last-child td, &:last-child th': { border: 0 },
+                              "&:last-child td, &:last-child th": { border: 0 },
                             }}
                           >
                             <TableCell align="center">
@@ -351,7 +351,7 @@ export default function PastOrdersList() {
                               align="center"
                               sx={{
                                 color: statusProps.color,
-                                fontWeight: 'medium',
+                                fontWeight: "medium",
                               }}
                             >
                               {statusProps.label}

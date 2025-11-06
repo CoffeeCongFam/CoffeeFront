@@ -29,7 +29,7 @@ function OrderPage() {
     (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
   );
   const canceledOrders = todayOrders.filter(
-    (it) => it.orderStatus === "CANCELED" 
+    (it) => it.orderStatus === "CANCELED"
   );
 
   useEffect(() => {
@@ -75,9 +75,9 @@ function OrderPage() {
             lineHeight: 1.1,
           }}
         >
-          나의 주문 현황
+          오늘의 주문
+          {/* 나의 주문 현황 */}
         </Typography>
-
 
         {/* 날짜 + 버튼 한 줄 */}
         <Box
@@ -93,7 +93,7 @@ function OrderPage() {
         >
           <Typography
             sx={{
-              fontSize: { xs: "0.95rem", md: "1rem" },
+              fontSize: { xs: "1rem", md: "1.2rem" },
               fontWeight: 600,
               flex: "1 1 auto",
               minWidth: 0,
@@ -124,23 +124,32 @@ function OrderPage() {
         </Box>
       </Box>
 
-      {/* 탭 */}
-      <Tabs
-        value={tab}
-        onChange={(e, v) => setTab(v)}
-        sx={{
-          mb: 2,
-          "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
-          "& .Mui-selected": { color: "black" },
-          "& .MuiTabs-indicator": { backgroundColor: "black" },
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Tab label={`진행 중 (${inProgressOrders.length})`} />
-        <Tab label={`픽업 완료 (${completedOrders.length})`} />
-        <Tab label={`취소 (${canceledOrders.length})`} />
-      </Tabs>
+        {/* 탭 */}
+        <Tabs
+          value={tab}
+          onChange={(e, v) => setTab(v)}
+          sx={{
+            mb: 2,
+            "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
+            "& .Mui-selected": { color: "black" },
+            "& .MuiTabs-indicator": { backgroundColor: "black" },
+          }}
+        >
+          <Tab label={`진행 중 (${inProgressOrders.length})`} />
+          <Tab label={`픽업 완료 (${completedOrders.length})`} />
+          <Tab label={`취소 (${canceledOrders.length})`} />
+        </Tabs>
+      </Box>
 
-            {/* 리스트 영역 */}
+      {/* 리스트 영역 */}
       <Box
         sx={{
           display: "flex",
