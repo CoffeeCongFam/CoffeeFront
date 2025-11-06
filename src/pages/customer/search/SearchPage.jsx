@@ -179,7 +179,7 @@ export default function SearchPage() {
     // 지도 생성
     const map = new maps.Map(mapContainerRef.current, {
       center,
-      zoom: 17,
+      zoom: 20,
       minZoom: 8,
       maxZoom: 20,
       scaleControl: true,
@@ -249,7 +249,7 @@ export default function SearchPage() {
             position: here,
             map,
             title: "현재 위치",
-            // 현재 위치 아이콘은 기본 파란색 아이콘으로 하도록
+            // 현재 위치 아이콘은 기본 파란색 아이콘
             // icon: {
             //   url: hereMarkerIcon,
             //   size: new maps.Size(32, 32),
@@ -450,8 +450,8 @@ export default function SearchPage() {
         <IconButton
           onClick={setCurrentLocation}
           aria-label="current-location"
-          onMouseEnter={handleCurrentLocPopoverOpen}
-          onMouseLeave={handleCurrentLocPopoverClose}
+          // onMouseEnter={handleCurrentLocPopoverOpen}
+          // onMouseLeave={handleCurrentLocPopoverClose}
           sx={{
             backgroundColor: "white",
             color: "gray",

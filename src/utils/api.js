@@ -71,13 +71,10 @@ api.interceptors.response.use(
       try {
         // Refresh Token을 사용하여 새 Access Token 발급 요청
         // Refresh Token은 `withCredentials: true` 설정으로 인해 쿠키에 담겨 자동으로 전송됩니다.
-        const rs = await axios.post(
-          "YOUR_API_BASE_URL/auth/refresh-token",
-          null,
-          {
-            withCredentials: true,
-          }
-        );
+        const BASE_URL = import.meta.env.VITE_API_URL;
+        const rs = await axios.post(`${BASE_URL}/auth/refresh-token`, null, {
+          withCredentials: true,
+        });
 
         const { accessToken } = rs.data; // 서버 응답에 새 Access Token 필드명 확인 필요
 

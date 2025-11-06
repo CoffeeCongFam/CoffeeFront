@@ -6,14 +6,17 @@ import {
   Button,
   Box,
   Chip,
+  Tooltip,
 } from "@mui/material";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import React from "react";
-import dummyImg from "../../../assets/cafeInfoDummy.png"
+import dummyImg from "../../../assets/cafeInfoDummy.png";
 import { useNavigate } from "react-router-dom";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
+  const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   const isUsedToday = item.remainingCount <= 0;
@@ -29,7 +32,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
   return (
     <Card
       sx={{
-        width: "100%",
+        width: isAppLike ? "100%" : "250px",
         minWidth: "250px",
         display: "flex",
         flexDirection: "column",
@@ -97,9 +100,22 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             gap: "1.5rem",
           }}
         >
-          <Typography variant="subtitle1" fontWeight="700">
-            {item.store.storeName}
-          </Typography>
+          <Tooltip title={item.store.storeName} arrow>
+            <Typography
+              variant="subtitle1"
+              fontWeight="700"
+              noWrap
+              sx={{
+                flex: 1,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: "default",
+              }}
+            >
+              {item.store.storeName}
+            </Typography>
+          </Tooltip>
 
           <Chip
             icon={<StarBorderIcon sx={{ color: "white" }} />}
