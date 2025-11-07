@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 
 import ErrorPage from "../common/error/ErrorPage";
@@ -37,8 +37,7 @@ import PastOrders from "../pages/cafe/PastOrders";
 import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
-import RequireMemberType from "../common/RequireMemberType";
-import CafeMyPage from "../pages/cafe/cafeMyPage";
+import CafeMyPage from "../pages/cafe/CafeMyPage";
 
 const router = createBrowserRouter([
   {
