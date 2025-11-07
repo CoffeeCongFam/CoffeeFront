@@ -21,6 +21,7 @@ import {
   Avatar,
   Button,
 } from "@mui/material";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -53,6 +54,12 @@ export default function CustomerLayout() {
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
     {
       to: "/me/order",
+      label: "주문 내역",
+      icon: <ReceiptLongIcon />,
+      end: true,
+    },
+    {
+      to: "/me/order/new",
       label: "주문하기",
       icon: <ShoppingCartIcon />,
       end: true,

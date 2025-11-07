@@ -4,7 +4,7 @@ import React from "react";
 // 매장 상태
 const STATUS_MAP = {
   PREPARING: {
-    label: "매장 준비중",
+    label: "정보 없음",
     sx: {
       backgroundColor: "#F1F3F4",
       color: "#5F6368",

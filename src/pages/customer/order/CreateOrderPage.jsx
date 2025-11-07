@@ -75,7 +75,8 @@ function CreateOrderPage() {
             list.find((it) => it.remainingCount > 0) || list[0] || null;
         }
 
-        setSelectedInventory(defaultInventory || null);
+        // setSelectedInventory(defaultInventory || null);
+        setSelectedInventory(null);
       } catch (err) {
         console.error("구독권 목록 조회 실패: ", err);
 
@@ -169,6 +170,22 @@ function CreateOrderPage() {
 
   // 장바구니 추가
   function handleAddToCart(menuId) {
+    if (!selectedInventory) {
+      alert("구독권을 먼저 선택해주세요.");
+      return;
+    }
+
+    const maxCount = selectedInventory.remainingCount ?? 0;
+
+    // 현재까지 담긴 총 잔 수
+    const currentTotal = cartItems.reduce((sum, ci) => sum + ci.qty, 0);
+
+    // 이번에 1잔 더 담으면 한도를 넘는지 체크
+    if (currentTotal + 1 > maxCount) {
+      alert(`이번 주문에서는 최대 ${maxCount}잔까지 선택할 수 있어요.`);
+      return;
+    }
+
     setCartItems((prev) => {
       const existing = prev.find((ci) => ci.menuId === menuId);
       if (existing) {
@@ -341,7 +358,7 @@ function CreateOrderPage() {
       >
         <Box sx={{ flex: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
-            주문 매장
+            구독권 선택
           </Typography>
           <Select
             id="order-target-store"
@@ -350,6 +367,10 @@ function CreateOrderPage() {
             fullWidth
             displayEmpty
           >
+            {/* placeholder 역할 */}
+            <MenuItem value="" disabled>
+              구독권을 선택해주세요.
+            </MenuItem>
             {inventoryList.length === 0 && (
               <MenuItem value="">
                 <em>사용 가능한 구독권이 없습니다.</em>
@@ -620,7 +641,7 @@ function CreateOrderPage() {
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <ShoppingCartIcon />
-                <Typography fontWeight="bold">주문 내역</Typography>
+                <Typography fontWeight="bold">장바구니</Typography>
               </Box>
               {cartItems.length > 0 && (
                 <Button

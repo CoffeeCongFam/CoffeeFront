@@ -35,7 +35,7 @@ function CafeMenuList({ menus = [] }) {
   // 타입 표시 예쁘게
   const getTypeLabel = (type) => {
     if (type === "BEVERAGE") return "음료";
-    if (type === "DESERT") return "디저트";
+    if (type === "DESSERT") return "디저트";
     return type;
   };
 
@@ -88,7 +88,7 @@ function CafeMenuList({ menus = [] }) {
                       flexDirection: { xs: "column", sm: "row" },
                       justifyContent: "space-between",
                       gap: { xs: 1.5, sm: 2 },
-                      alignItems: "center",
+                      alignItems: { xs: "stretch", sm: "center" },
                       py: 1.2,
                       borderBottom: "1px solid #cacacaff",
                       "&:last-of-type": { borderBottom: "none" },
@@ -112,7 +112,7 @@ function CafeMenuList({ menus = [] }) {
                     >
                       <Box
                         component="img"
-                        src={menu?.menuImage || menuDummy}
+                        src={menu?.menuImg || menuDummy}
                         alt={menu?.menuName}
                         sx={{
                           width: { xs: 80, sm: 100 },
@@ -122,20 +122,6 @@ function CafeMenuList({ menus = [] }) {
                           flexShrink: 0,
                         }}
                       />
-                      {menu.menuImg && (
-                        <Box
-                          component="img"
-                          src={menu?.menuImage || menuDummy}
-                          alt={menu?.menuName}
-                          sx={{
-                            width: { xs: 80, sm: 100 },
-                            height: { xs: 64, sm: 70 },
-                            objectFit: "cover",
-                            borderRadius: 1.2,
-                            flexShrink: 0,
-                          }}
-                        />
-                      )}
 
                       <Box
                         sx={{

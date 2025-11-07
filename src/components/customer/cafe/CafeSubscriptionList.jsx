@@ -287,7 +287,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       fontSize: { xs: "0.8rem", sm: "1rem" },
                     }}
                   >
-                    1개월
+                    {sub.subscriptionPeriod} 일
                   </Typography>
                 </Box>
 
@@ -301,7 +301,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       fontSize: { xs: "0.8rem", sm: "1rem" },
                     }}
                   >
-                    매일, 하루 {sub.maxDailyUsage}잔
+                    매일, 하루 {sub.maxDailyUsage} 번
                   </Typography>
                   <Typography
                     sx={{
@@ -310,7 +310,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       textAlign: "right",
                     }}
                   >
-                    결제일로부터 시작
+                    결제일부터 사용 가능
                   </Typography>
                 </Box>
               </Box>
