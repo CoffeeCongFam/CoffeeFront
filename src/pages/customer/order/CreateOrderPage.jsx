@@ -284,11 +284,24 @@ function CreateOrderPage() {
       console.log("주문 요청 >> ", orderPayload);
 
       const res = await requestNewOrder(orderPayload);
-      const orderId = res?.orderId;
+
+      // API 응답 구조: { success, data, message }
+      const { data, message, success } = res;
+
+      console.log(data, message, success);
+
+      // 서버에서 에러 메시지가 왔다면 경고 표시하고 종료
+      if (message && !success) {
+        alert(message || "주문 처리 중 오류가 발생했습니다.");
+        return;
+      }
+
+      const orderId = data?.orderId;
 
       if (orderId) {
         navigate(`/me/order/${orderId}`);
       } else {
+        alert("주문 정보를 불러올 수 없습니다.");
         navigate(-1);
       }
     } catch (err) {

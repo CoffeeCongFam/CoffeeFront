@@ -23,17 +23,6 @@ function connectSSE(addNotification) {
     }
   });
 
-  // source.onmessage = (event) => {
-  //   try {
-  //     console.log("");
-  //     const newNotification = JSON.parse(event.data);
-  //     // 수신 데이터를 Store 액션으로 상태에 저장
-  //     addNotification(newNotification);
-  //   } catch (e) {
-  //     console.log("FAILED TO PARSE SSE MESSAGE", e);
-  //   }
-  // };
-
   source.onerror = (error) => {
     console.error("SSE connection error:", error);
   };
@@ -110,52 +99,6 @@ function App() {
       }
     };
   }, [authUser?.memberId, addNotification]);
-
-  // useEffect(() => {
-  //   console.log("SSE 연결 useEffect 실행"); // 인증된 사용자의 memberId가 있을 때만 연결 시도
-
-  //   if (authUser?.memberId) {
-  //     console.log("SSE : USER상태 설정 되어 있음. 연결 시작.");
-  //     const source = connectSSE(addNotification);
-
-  //     // 3. setEventSource 제거. 인스턴스는 클린업 함수에서 바로 사용
-
-  //     return () => {
-  //       // 컴포넌트 언마운트 또는 authUser.memberId 변경 시 기존 연결 해제
-  //       console.log("SSE 연결 해제");
-  //       source.close(); // 생성된 source 인스턴스를 닫음
-  //     };
-  //   }
-
-  //   // authUser?.memberId가 없으면 연결하지 않고, 클린업 함수에서 아무것도 하지 않음
-  //   return () => {};
-
-  //   // 4. 의존성 배열에서 eventSource 제거
-  // }, [authUser?.memberId, addNotification]);
-
-  // useEffect(() => {
-  //   console.log("sse 연결");
-  //   // user 상태가 설정 되엇는지 확인
-  //   if (!authUser?.memberId) {
-  //     console.log("SSE : USER상태 설정 되어 있음");
-  //     //
-  //     console.log(`user id ${user.memberId} 로 SSE 연결 시작...`);
-  //     // store 의 addNotification 을 인수로 전달
-
-  //     const source = connectSSE(addNotification);
-  //     setEventSource(source);
-
-  //     // setEventSrouce 는 app 컴포넌트 내부
-  //   }
-
-  //   return () => {
-  //     if (eventSource) {
-  //       console.log("SSE 연결 해제");
-  //       eventSource.close();
-  //       setEventSource(null);
-  //     }
-  //   };
-  // }, [authUser, eventSource, addNotification]);
 
   useEffect(() => {
     console.log("APP MOUNT----------------------------------");

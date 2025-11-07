@@ -39,8 +39,17 @@ export async function fetchTodayOrderList() {
 
 // 주문 요청
 export async function requestNewOrder(payload) {
-  const res = await api.post("/me/orders/new", payload);
-  return res.data?.data || null;
+  try {
+    const res = await api.post("/me/orders/new", payload);
+    return res.data; // 정상 200 응답
+  } catch (err) {
+    // 서버에서 JSON 에러 응답을 준 경우
+    if (err.response?.data) {
+      return err.response.data; // { success:false, message:"...", data:null }
+    }
+    // 네트워크나 서버 다운 등
+    throw err;
+  }
 }
 
 // 주문 상세 조회
