@@ -31,7 +31,7 @@ function OrderPage() {
 
   // 취소 또는 매장 거부 내역 한 탭으로 보여주기
   const canceledOrders = todayOrders.filter(
-    (it) => it.orderStatus === "CANCELED" || "REJECTED"
+    (it) => it.orderStatus === "CANCELED" || it.orderStatus === "REJECTED"
   );
   // const rejectedOrders = todayOrders.filter(
   //   (it) => it.orderStatus === "REJECTED"

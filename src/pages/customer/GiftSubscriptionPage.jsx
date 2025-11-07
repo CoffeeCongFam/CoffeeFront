@@ -29,7 +29,7 @@ import useUserStore from "../../stores/useUserStore";
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
 
-  const { authUser } = useUserStore();
+  const authUser = useUserStore((state) => state.authUser);
   console.log("authUser>> ", authUser);
 
   const { subId } = useParams();
@@ -99,10 +99,14 @@ function GiftSubscriptionPage() {
     }
   }
 
-  async function handleSearch(phone) {
-    console.log("검색할 전화번호", phone);
+  async function handleSearch(inputPhone) {
+    console.log("검색할 전화번호", inputPhone);
+    if (authUser.tel === inputPhone) {
+      alert("자기 자신에게 선물을 보낼 수는 없어요. ");
+      return;
+    }
     const payload = {
-      tel: phone,
+      tel: inputPhone,
     };
 
     const findMember = await findReceiver(payload);

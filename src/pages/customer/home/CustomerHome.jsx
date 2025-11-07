@@ -135,7 +135,24 @@ function CustomerHome() {
   };
 
   return isLoading ? (
-    <Loading />
+    <Box
+      sx={{
+        px: isAppLike ? 2 : 12,
+        py: isAppLike ? 2 : 5,
+        minHeight: "100%",
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: isAppLike ? "23px" : "30px",
+          fontWeight: "bold",
+          mb: 2,
+        }}
+      >
+        안녕하세요 {authUser?.name ?? "고객"} 님 👋
+      </Typography>
+      <Loading />
+    </Box>
   ) : (
     <Box
       sx={{

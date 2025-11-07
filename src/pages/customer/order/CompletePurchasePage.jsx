@@ -24,7 +24,7 @@ function CompletePurchasePage() {
   }, [purchaseId]);
 
   function handleBack() {
-    navigate("/me/subscriptions");
+    navigate(-1);
   }
 
   if (!purchase) return null;

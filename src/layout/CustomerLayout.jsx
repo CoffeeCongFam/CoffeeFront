@@ -19,6 +19,7 @@ import {
   Paper,
   ListItemAvatar,
   Avatar,
+  Button,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import HomeIcon from "@mui/icons-material/Home";
@@ -29,6 +30,7 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import logo from "../assets/CoffeiensLogo.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
+import api from "../utils/api";
 
 const drawerWidth = 240;
 
@@ -67,6 +69,10 @@ export default function CustomerLayout() {
   //   notificationId: number;
   //   notificationType: string;
   //   notificationContent: String;
+  // notificationContent : {
+  //   message : '',
+  //   targetId : '',
+  // }
   //   readAt: string; // timestamp
   //   createdAT: string;
   // }
@@ -76,6 +82,20 @@ export default function CustomerLayout() {
   }
   function openNotifDrawer() {
     setNotifOpen(true);
+  }
+
+  //
+  function deleteAllNotifications() {
+    // 모든 알림 읽음 처리
+  }
+
+  // 특정 알림 읽음 처리
+  async function readMarkNotification(notificationId) {
+    //
+    console.log("삭제할 알림>> ", notificationId);
+    // /api/common/notification/{notificationId}
+    const res = await api.patch(`/common/notification/${notificationId}`);
+    console.log(res.data?.data);
   }
 
   // ------------------------------------------
@@ -171,6 +191,7 @@ export default function CustomerLayout() {
             <Typography variant="h6" fontWeight={700}>
               알림
             </Typography>
+
             <Typography
               variant="body2"
               sx={{ color: "text.secondary", cursor: "pointer" }}
@@ -182,9 +203,19 @@ export default function CustomerLayout() {
           <Divider />
           <List sx={{ p: 0 }}>
             {notifications.map((noti) => (
-              <ListItemButton key={noti.notificationId} alignItems="flex-start">
+              <ListItemButton
+                key={noti.notificationId}
+                alignItems="flex-start"
+                onClick={() => readMarkNotification(noti.notificationId)}
+              >
                 <ListItemAvatar>
-                  <Avatar>
+                  <Avatar
+                    sx={{
+                      backgroundColor: noti.readAt
+                        ? "rgba(223, 223, 223, 1)"
+                        : "brown",
+                    }}
+                  >
                     <CoffeeIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -202,7 +233,8 @@ export default function CustomerLayout() {
                     {noti.notificationContent}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                    {noti.createdAT}
+                    {noti.createdAT.split("T")[0]}{" "}
+                    {noti.createdAT.split("T")[1].split(".")[0]}
                   </Typography>
                 </Box>
               </ListItemButton>
@@ -364,20 +396,29 @@ export default function CustomerLayout() {
           <Typography variant="h6" fontWeight={700}>
             알림
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", cursor: "pointer" }}
-            onClick={handleCloseNotif}
-          >
-            닫기
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Button onClick={deleteAllNotifications}>전체 삭제</Button>
+            <Button onClick={handleCloseNotif} color="gray">
+              닫기
+            </Button>
+          </Box>
         </Box>
         <Divider />
         <List sx={{ p: 0 }}>
           {notifications.map((noti) => (
-            <ListItemButton key={noti.notificationId} alignItems="flex-start">
+            <ListItemButton
+              key={noti.notificationId}
+              alignItems="flex-start"
+              onClick={() => readMarkNotification(noti.notificationId)}
+            >
               <ListItemAvatar>
-                <Avatar>
+                <Avatar
+                  sx={{
+                    backgroundColor: noti.readAt
+                      ? "rgba(223, 223, 223, 1)"
+                      : "brown",
+                  }}
+                >
                   <CoffeeIcon />
                 </Avatar>
               </ListItemAvatar>
@@ -395,7 +436,8 @@ export default function CustomerLayout() {
                   {noti.notificationContent}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                  {noti.createdAT}
+                  {noti.createdAT.split("T")[0]}{" "}
+                  {noti.createdAT.split("T")[1].split(".")[0]}
                 </Typography>
               </Box>
             </ListItemButton>
