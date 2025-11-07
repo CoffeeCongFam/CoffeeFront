@@ -42,7 +42,9 @@ export default function ManageMenu() {
     try {
       // API 호출: 매장 메뉴 조회
       const data = await fetchStoreMenus(storeId);
-      setMenuList(data);
+      setMenuList(data.filter((menu) => {
+        return (!menu.deletedAt);
+      }));
       console.log(storeId, '해치웠나?2');
     } catch (error) {
       console.error('메뉴 리스트 로딩 실패:', error);
@@ -84,7 +86,7 @@ export default function ManageMenu() {
 
   // 4. 메뉴 삭제 (DELETE)
   const handleDeleteClick = async (menuId) => {
-    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까? (소프트 삭제)')) {
+    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
       return;
     }
 
