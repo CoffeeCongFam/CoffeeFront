@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -16,31 +17,58 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Chip,
-  Grid,
 } from "@mui/material";
+import { patchMember, withdrawal } from "../../utils/member";
 import PersonIcon from "@mui/icons-material/Person";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import WcIcon from "@mui/icons-material/Wc";
 import EmailIcon from "@mui/icons-material/Email";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import LocalCafeOutlinedIcon from "@mui/icons-material/LocalCafeOutlined";
 import withdrawal01 from "../../assets/withdrawal_01.png";
 import withdrawal02 from "../../assets/withdrawal_02.png";
 import withdrawal03 from "../../assets/withdrawal_03.png";
 import withdrawal04 from "../../assets/withdrawal_04.png";
-
+import useUserStore from "../../stores/useUserStore";
 
 function Profile() {
-  // 실제 데이터 연동 전까지는 UI 구조를 보기 위한 더미 데이터
+  const { authUser, setUser: setAuthUser, clearUser } = useUserStore();
+  const navigate = useNavigate();
   const [user, setUser] = useState({
-    name: "커피콩빵",
-    phone: "010-1234-5678",
-    gender: "남성",
-    email: "coffee@example.com",
+    name: authUser?.name || "",
+    tel: authUser?.tel || "",
+    gender: authUser?.gender || "",
+    email: authUser?.email || "",
   });
+  const [saveFeedback, setSaveFeedback] = useState(null); // { type: 'success' | 'error', message: string }
+
+  useEffect(() => {
+    if (!authUser) return;
+
+    setUser((prev) => ({
+      ...prev,
+      name: authUser.name ?? prev.name,
+      tel: authUser.tel ?? prev.tel,
+      gender: authUser.gender ?? prev.gender,
+      email: authUser.email ?? prev.email,
+    }));
+  }, [authUser]);
+
+
+  useEffect(() => {
+    if (!authUser) return;
+
+    setUser((prev) => ({
+      ...prev,
+      name: authUser.name ?? prev.name,
+      tel: authUser.tel ?? prev.tel,
+      gender: authUser.gender ?? prev.gender,
+      email: authUser.email ?? prev.email,
+    }));
+  }, [authUser]);
+
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isWithdrawCompleted, setIsWithdrawCompleted] = useState(false);
 
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [withdrawStep, setWithdrawStep] = useState(1);
@@ -49,7 +77,43 @@ function Profile() {
     setIsWithdrawOpen(true);
     setWithdrawStep(1);
   };
+  const handleGoodbyeConfirm = () => {
+    // 1) 주스텐드 유저 정보 초기화
+    try {
+      if (typeof clearUser === "function") {
+        clearUser();
+      }
+    } catch (e) {
+      console.error("clearUser 오류:", e);
+    }
 
+    // 2) 로컬스토리지 초기화
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.clear();
+      }
+    } catch (e) {
+      console.error("localStorage 초기화 오류:", e);
+    }
+
+    // 3) 쿠키 삭제
+    try {
+      if (typeof document !== "undefined" && document.cookie) {
+        document.cookie.split(";").forEach((cookie) => {
+          const eqPos = cookie.indexOf("=");
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          document.cookie =
+            name.trim() +
+            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        });
+      }
+    } catch (e) {
+      console.error("쿠키 삭제 오류:", e);
+    }
+
+    // 4) 마지막으로 메인으로 이동
+    navigate("/");
+  };
   const handleCloseWithdraw = () => {
     setIsWithdrawOpen(false);
   };
@@ -61,28 +125,175 @@ function Profile() {
   const handlePrevStep = () => {
     setWithdrawStep((prev) => (prev > 1 ? prev - 1 : prev));
   };
+  const handleWithdrawConfirm = async () => {
+    try {
+      const success = await withdrawal();
 
+      if (success) {
+        // 탈퇴 완료: 탈퇴 모달 닫고, 마지막 인사 화면으로 전환
+        setIsWithdrawOpen(false);
+        setIsWithdrawCompleted(true);
+      } else {
+        alert("탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("withdrawal 오류:", error);
+      alert("탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
   const handleEditClick = () => {
     setIsEditing((prev) => !prev);
   };
 
   const handleChange = (field) => (event) => {
+    let value = event.target.value;
+    if (field === "tel") {
+      // 숫자만 입력받고, 11자리를 넘지 않도록 처리
+      const digitsOnly = value.replace(/\D/g, "");
+      value = digitsOnly.slice(0, 11);
+    }
+    if (field === "name") {
+      // 한글과 영어만 입력 가능하도록 필터링
+      value = value.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g, "");
+    }
     setUser((prev) => ({
       ...prev,
-      [field]: event.target.value,
+      [field]: value,
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // 실제 저장 로직 추가 가능
+  const handleSave = async () => {
+    // 이전 피드백 초기화
+    setSaveFeedback(null);
+
+    try {
+      // 이름과 전화번호를 patchMember의 파라미터로 전달
+      // patchMember가 (payload) 형태를 받는다고 가정
+      const result = await patchMember({
+        name: user.name,
+        tel: user.tel,
+      });
+
+      // 반환값이 boolean 또는 { success: boolean } 둘 다 대응
+      const isSuccess = result === true || result?.success === true;
+
+      if (isSuccess) {
+        // 수정 성공: alert로 안내 후 실제 데이터(authUser) 갱신
+        alert("회원 정보가 수정되었습니다.");
+
+        if (authUser) {
+          const updated = { ...authUser, ...user };
+          setAuthUser(updated);
+          setUser((prev) => ({
+            ...prev,
+            name: updated.name,
+            tel: updated.tel,
+          }));
+        } else {
+          setAuthUser(user);
+        }
+
+        // alert 확인 후 편집 모드 해제 -> 변경된 정보가 화면에 반영됨
+        setIsEditing(false);
+      } else {
+        // 반환값이 false인 경우
+        setSaveFeedback({
+          type: "error",
+          message: "프로필 수정에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        });
+      }
+    } catch (error) {
+      console.error("patchMember 오류:", error);
+      setSaveFeedback({
+        type: "error",
+        message: "프로필 수정 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      });
+    }
   };
 
+
+  if (isWithdrawCompleted) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "#fffdf7",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          px: 2,
+        }}
+      >
+        <Card
+          sx={{
+            width: "100%",
+            maxWidth: 480,
+            borderRadius: 4,
+            boxShadow: 6,
+            bgcolor: "white",
+          }}
+        >
+          <CardContent
+            sx={{
+              px: 4,
+              py: 5,
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 800,
+                mb: 2,
+              }}
+            >
+              언젠간 다시 돌아오세요
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                mb: 3,
+                color: "primary.main",
+              }}
+            >
+              커피엔스의 커피 세상으로
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", mb: 4, lineHeight: 1.7 }}
+            >
+              매일의 커피 한 잔으로 하루를 진화시키던 그 시간들처럼,
+              <br />
+              언젠가 다시, 당신의 하루를 깨우는 커피 한 잔이 필요해질 때
+              <br />
+              COFFEIENS가 여기에서 기다리고 있을게요.
+            </Typography>
+
+            <Button
+              variant="contained"
+              onClick={handleGoodbyeConfirm}
+              sx={{
+                borderRadius: 999,
+                px: 4,
+                py: 1.2,
+                fontWeight: 700,
+                textTransform: "none",
+              }}
+            >
+              확인
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: "70vh",
         bgcolor: "white",
         display: "flex",
         justifyContent: "center",
@@ -201,7 +412,7 @@ function Profile() {
                 {!isEditing ? (
                   <ListItemText
                     primary="전화번호"
-                    secondary={user.phone}
+                    secondary={user.tel}
                     primaryTypographyProps={{
                       variant: "caption",
                       color: "text.secondary",
@@ -217,8 +428,8 @@ function Profile() {
                     size="small"
                     label="전화번호"
                     variant="outlined"
-                    value={user.phone}
-                    onChange={handleChange("phone")}
+                    value={user.tel}
+                    onChange={handleChange("tel")}
                   />
                 )}
               </ListItem>
@@ -236,7 +447,7 @@ function Profile() {
                 </ListItemIcon>
                 <ListItemText
                   primary="성별"
-                  secondary={user.gender}
+                  secondary={user.gender === 'M' ? "남자" : "여자"}
                   primaryTypographyProps={{
                     variant: "caption",
                     color: "text.secondary",
@@ -275,10 +486,23 @@ function Profile() {
             </List>
           </Box>
           {isEditing && (
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-              <Button variant="contained" onClick={handleSave}>
+            <Box sx={{ mt: 2, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 0.5 }}>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                disabled={user.name.trim().length < 2 || !user.tel.trim()}
+              >
                 저장
               </Button>
+              {saveFeedback && (
+                <Typography
+                  variant="caption"
+                  color={saveFeedback.type === "error" ? "error" : "primary"}
+                  sx={{ mt: 0.5 }}
+                >
+                  {saveFeedback.message}
+                </Typography>
+              )}
             </Box>
           )}
         </CardContent>
@@ -484,7 +708,11 @@ function Profile() {
                   다음
                 </Button>
               ) : (
-                <Button variant="contained" color="error">
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleWithdrawConfirm}
+                >
                   탈퇴하기
                 </Button>
               )}

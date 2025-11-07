@@ -45,7 +45,6 @@ export default function ManageMenu() {
       setMenuList(data.filter((menu) => {
         return (!menu.deletedAt);
       }));
-      console.log(storeId, '해치웠나?2');
     } catch (error) {
       console.error('메뉴 리스트 로딩 실패:', error);
       // alert("메뉴 목록을 불러오지 못했습니다.");
@@ -56,7 +55,6 @@ export default function ManageMenu() {
     // 🚨 partnerStoreId가 로드된 후에만 loadMenus 실행
     if (partnerStoreId && partnerStoreId > 0) {
       loadMenus(partnerStoreId);
-      console.log(partnerStoreId, '해치웠나?1');
     }
   }, [partnerStoreId]);
 
