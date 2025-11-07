@@ -52,13 +52,13 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
       sx={{
         flexGrow: 1,
         padding: 1,
-        backgroundColor: "#FFFFFF",
-        borderRadius: "8px",
-        minHeight: "64px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        border: "1px solid #E0E0E0",
+        backgroundColor: '#FFFFFF',
+        borderRadius: '8px',
+        minHeight: '64px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        border: '1px solid #E0E0E0',
       }}
     >
       <Typography
@@ -111,20 +111,42 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
 
           {/* 구독권 메타 정보 (텍스트로 표시) */}
           <Box>
-            <Box sx={{ mb : 1 }} variant="body1">
+            <Box sx={{ mb: 1 }} variant="body1">
               <InfoBox title="이름" content={subscription.subscriptionName} />
             </Box>
-            <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 1 }} variant="body1">
-              <InfoBox title="구독권 유형" content={subscription.subscriptionType} />
-              <InfoBox title="가격" content={subscription.price?.toLocaleString() + '원'} />
+            <Box sx={{ display: 'flex', gap: 1, mt: 1, mb: 1 }} variant="body1">
+              <InfoBox
+                title="구독권 유형"
+                content={subscription.subscriptionType}
+              />
+              <InfoBox
+                title="가격"
+                content={subscription.price?.toLocaleString() + '원'}
+              />
             </Box>
-            <Box sx={{ mb : 1 }} variant="body1">
-              <InfoBox title="설명" content={subscription.subscriptionDesc || '없음'} />
+            <Box sx={{ mb: 1 }} variant="body1">
+              <InfoBox
+                title="설명"
+                content={subscription.subscriptionDesc || '없음'}
+              />
             </Box>
-            <Box sx={{ display: "flex", gap: 1, mt: 1 }} variant="body1">
-              <InfoBox title="구독 기간" content={subscription.subscriptionPeriod + '일'} />
-              <InfoBox title="일일 최대 사용 횟수" content={subscription.maxDailyUsage} />
-              <InfoBox title="남은 판매 수량" content={subscription.remainSalesQuantity} />
+            <Box sx={{ display: 'flex', gap: 1, mt: 1 }} variant="body1">
+              <InfoBox
+                title="구독 기간"
+                content={subscription.subscriptionPeriod + '일'}
+              />
+              <InfoBox
+                title="일일 최대 사용 횟수"
+                content={subscription.maxDailyUsage + '회'}
+              />
+              <InfoBox
+                title="남은 판매 수량"
+                content={
+                  subscription.remainSalesQuantity +
+                  ' / ' +
+                  subscription.salesLimitQuantity
+                }
+              />
             </Box>
           </Box>
 
@@ -138,29 +160,43 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
               name="subscriptionStatus"
               value={formData.subscriptionStatus || ''}
               onChange={handleChange}
+              // 구독권 상태 변경이 허용되지 않은 경우 비활성화
+              disabled={!subscription.isStatusChangeAllowed}
             >
               <MenuItem value="ONSALE">판매 중</MenuItem>
               <MenuItem value="SOLDOUT">품절</MenuItem>
               <MenuItem value="SUSPENDED">판매 중지</MenuItem>
             </Select>
+            {/* 비활성화된 경우 메시지 표시 */}
+            {!subscription.isStatusChangeAllowed && (
+              <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                아직 판매 중지/품절 처리가 불가능합니다. (허용일 :{' '}
+                {subscription.isStatusChangeAllowDate} 이후)
+              </Typography>
+            )}
           </FormControl>
         </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
-        <DialogActions sx={{ p : 3 }}>
+        <DialogActions sx={{ p: 3 }}>
           <Box>
-              <Button onClick={onClose} disabled={isSubmitting} color="secondary" sx={{ mr: 1 }}>
-                  닫기
-              </Button>
-              <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  variant="contained"
-                  color="primary"
-              >
-                  {isSubmitting ? '저장 중...' : '판매 상태 수정'}
-              </Button>
+            <Button
+              onClick={onClose}
+              disabled={isSubmitting}
+              color="secondary"
+              sx={{ mr: 1 }}
+            >
+              닫기
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              variant="contained"
+              color="primary"
+            >
+              {isSubmitting ? '저장 중...' : '판매 상태 수정'}
+            </Button>
           </Box>
         </DialogActions>
       </DialogActions>

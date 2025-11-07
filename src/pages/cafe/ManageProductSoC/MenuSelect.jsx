@@ -42,6 +42,26 @@ const MenuSelect = ({
     );
   }
 
+  // 판매중인 상태('Y")인 메뉴만 필터링
+  const activeMenus = allMenus.filter((menu) => menu.menuStatus === 'Y');
+
+  // 활성 메뉴가 전혀 없다면 메시지를 띄운다.
+  if (activeMenus.length === 0) {
+    return (
+      <Typography
+        color="error"
+        sx={{
+          p: 2,
+          border: '1px dashed #ff9999',
+          backgroundColor: '#d62d2dff',
+        }}
+      >
+        현재 판매중인 메뉴가 없습니다. 메뉴 관리 페이지에서 메뉴를 활성화해야
+        구독권에 포함될 수 있습니다.
+      </Typography>
+    );
+  }
+
   // 구독권 유형에 따라 표시할 메뉴 타입을 결정
   let allowedMenuTypes = [];
   if (subscriptionType === 'PREMIUM') {
@@ -50,7 +70,7 @@ const MenuSelect = ({
     allowedMenuTypes = ['BEVERAGE'];
   }
 
-  // 전체 메뉴 목록을 타입별로 필터링 및 그룹화
+  // 필터링된 활성 메뉴 목록(activeMenus)을 타입별로 필터링 및 그룹화
   const groupedMenus = allowedMenuTypes.reduce((acc, type) => {
     acc[type] = allMenus.filter((menu) => menu.menuType === type);
     return acc;

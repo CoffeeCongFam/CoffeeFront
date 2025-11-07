@@ -188,15 +188,15 @@ const ProductList = ({ subscriptions, onCardClick }) => {
                           : 'error'
                       }
                     >
-                      {subscription.remainSalesQuantity.toLocaleString()} 개
+                      {subscription.remainSalesQuantity.toLocaleString()} 개 /
+                      {subscription.salesLimitQuantity} 개
                     </Typography>
                   </Box>
                 </Box>
               </Box>
             </Paper>
           );
-        }
-      )}
+        })}
     </Box>
   );
 };

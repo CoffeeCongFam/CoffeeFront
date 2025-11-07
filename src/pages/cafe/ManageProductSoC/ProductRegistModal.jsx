@@ -132,8 +132,8 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
     // 2. 가격 (필수, 숫자, 0 초과)
     validateNumberField('price', '가격', 1);
 
-    // 3. 구독 기간 (필수, 숫자, 1 이상)
-    validateNumberField('subscriptionPeriod', '구독 기간', 1);
+    // 3. 구독 기간 (필수, 숫자, 1 이상 - 0은 시연 용도)
+    validateNumberField('subscriptionPeriod', '구독 기간', 0);
 
     // 4. 판매 수량 (필수, 숫자, 0 이상)
     validateNumberField('salesLimitQuantity', '판매 가능 수량', 0);

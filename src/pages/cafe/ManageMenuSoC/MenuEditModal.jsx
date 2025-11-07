@@ -54,6 +54,11 @@ export default function MenuEditModal({
   const fileInputRef = useRef(null);
   const [errors, setErrors] = useState({});
 
+  // 🚩구독권 포함 여부 플래그 추충(백엔드에서 제공 가정)
+  // 현재 판매 중인 구독권 중에 하나라도 포함되어 있으면 true
+  // 이 메뉴가 어떤 구독권에도 포함되어 있지 않거나, 포함되어 있어도 그 구독권이 ONSALE 상태가 아닌 경우는 false
+  const isSubscriptionActive = editingMenu?.isSubscriptionActive ?? true;
+
   // 💡 핵심: editingMenu 값이 변경될 때마다 폼 상태를 업데이트
   useEffect(() => {
     if (editingMenu) {
@@ -167,7 +172,6 @@ export default function MenuEditModal({
 
         // 성공 시 모달 닫기 (onUpdate 성공 후 부모 컴포넌트에서 리스트 업데이트됨)
         resetFormAndClose();
-        alert(`메뉴 [${formData.menuName}] 수정 완료!`);
       } catch (error) {
         console.error('메뉴 수정 중 에러 발생:', error);
         alert('메뉴 수정에 실패했습니다. (API 오류)');
@@ -189,6 +193,27 @@ export default function MenuEditModal({
       </DialogTitle>
       <DialogContent dividers sx={{ pt: 2 }}>
         {/* 폼 UI는 등록 모달과 거의 동일합니다. */}
+
+        {isSubscriptionActive && (
+          <Box
+            sx={{
+              mb: 2,
+              p: 1.5,
+              border: '1px solid #ff0000',
+              backgroundColor: '#fff5f5',
+              borderRadius: 1,
+            }}
+          >
+            <Typography variant="body2" color="error" fontWeight="bold">
+              ⚠️ 중요 알림: 현재 판매 중인 구독권에 포함된 메뉴입니다.
+            </Typography>
+            <Typography variant="caption" color="error">
+              소비자 보호를 위해 **메뉴명, 타입, 활성 상태**는 구독권 판매 중지
+              후 수정이 가능합니다.
+            </Typography>
+          </Box>
+        )}
+
         <Grid container spacing={2}>
           {/* 메뉴 활성 상태 (4/12) */}
           <Grid item xs={12} sm={4}>
@@ -199,6 +224,9 @@ export default function MenuEditModal({
                 value={formData.menuStatus}
                 label="메뉴 활성 상태"
                 onChange={handleChange}
+                // 어떤 구독권에라도 포함되어 있으면 비활성화
+                // disabled={isSubscriptionActive}
+                disabled={isSubscriptionActive}
               >
                 <MenuItem value="Y">ACTIVE (판매 중)</MenuItem>
                 <MenuItem value="N">INACTIVE (판매 중지)</MenuItem>
@@ -219,6 +247,8 @@ export default function MenuEditModal({
               onChange={handleChange}
               error={!!errors.menuName}
               helperText={errors.menuName}
+              disabled={isSubscriptionActive}
+              // 구독권에 포함되어 있으면 비활성화
             />
           </Grid>
 
@@ -247,6 +277,8 @@ export default function MenuEditModal({
                 value={formData.menuType}
                 label="메뉴 타입"
                 onChange={handleChange}
+                disabled={isSubscriptionActive}
+                // 구독권에 포함되어 있으면 비활성화
               >
                 {MENU_TYPES.map((type) => (
                   <MenuItem key={type.value} value={type.value}>

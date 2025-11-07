@@ -72,7 +72,15 @@ const tableHeaders = [
 ];
 
 // 메뉴 리스트를 표시하는 테이블 컴포넌트
-export default function MenuTable({ menuList, onEditClick, onDeleteClick }) {
+export default function MenuTable({ menuList, onEditClick }) {
+  const sortedByCreatedAtMenuList = [...(menuList || [])].sort((a, b) => {
+    const dataA = new Date(a.createdAt);
+    const dataB = new Date(b.createdAt);
+
+    // 내림차순 b - a
+    return dataB - dataA;
+  });
+
   return (
     <TableContainer component={Paper} elevation={1} sx={{ borderRadius: 2 }}>
       <Table sx={{ minWidth: 1000 }} aria-label="메뉴 관리 테이블">
@@ -95,8 +103,8 @@ export default function MenuTable({ menuList, onEditClick, onDeleteClick }) {
         </TableHead>
 
         <TableBody>
-          {menuList.length > 0 ? (
-            menuList.map((menu) => {
+          {sortedByCreatedAtMenuList.length > 0 ? (
+            sortedByCreatedAtMenuList.map((menu) => {
               const statusProps = getMenuStatusChipProps(menu.menuStatus);
               return (
                 <TableRow key={menu.menuId} hover>
@@ -149,14 +157,6 @@ export default function MenuTable({ menuList, onEditClick, onDeleteClick }) {
                         onClick={() => onEditClick(menu)} // ⬅️ 부모 함수 호출
                       >
                         수정
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => onDeleteClick(menu.menuId)} // ⬅️ 부모 함수 호출
-                      >
-                        삭제
                       </Button>
                     </Box>
                   </TableCell>
