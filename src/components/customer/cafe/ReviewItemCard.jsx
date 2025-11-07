@@ -15,14 +15,14 @@ import React from "react";
 
 import useUserStore from "../../../stores/useUserStore";
 
-const fmt = (d) =>
-  new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
+// const fmt = (d) =>
+//   new Intl.DateTimeFormat("ko-KR", {
+//     year: "numeric",
+//     month: "2-digit",
+//     day: "2-digit",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   }).format(d);
 
 function ReviewItemCard({ review, handleDelete }) {
   const {
@@ -45,7 +45,7 @@ function ReviewItemCard({ review, handleDelete }) {
     ? `매장 #${storeId}`
     : "알 수 없는 매장";
   const contentText = reviewContent ?? review_content ?? "";
-  const createdVal = createdAt ?? created_at;
+  // const createdVal = createdAt ?? created_at;
 
   const { authUser } = useUserStore();
 
@@ -74,11 +74,12 @@ function ReviewItemCard({ review, handleDelete }) {
             <Stack
               direction="row"
               spacing={1}
+              // justifyContent={"space-between"}
               alignItems="center"
               flexWrap="wrap"
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {storeLabel}
+                {storeLabel} {review.subscriptionName}
               </Typography>
               {subscriptionName && (
                 <Chip label={subscriptionName} size="small" />
@@ -86,12 +87,6 @@ function ReviewItemCard({ review, handleDelete }) {
               <Tooltip title={`${rating}점`}>
                 <Rating value={Number(rating) || 0} precision={0.5} readOnly />
               </Tooltip>
-              <Typography
-                variant="caption"
-                sx={{ color: "text.secondary", ml: "auto" }}
-              >
-                {createdVal ? fmt(new Date(createdVal)) : "-"}
-              </Typography>
 
               <Box
                 sx={{
@@ -101,6 +96,12 @@ function ReviewItemCard({ review, handleDelete }) {
                   flexGrow: 1,
                 }}
               >
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", ml: "auto" }}
+                >
+                  {review.updatedAt ? `${review.updatedAt}` : review.createdAt}
+                </Typography>
                 {memberId === authUser.memberId && (
                   <Button onClick={() => handleDelete(review.reviewId)}>
                     삭제
@@ -111,6 +112,9 @@ function ReviewItemCard({ review, handleDelete }) {
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
               {contentText}
+            </Typography>
+            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+              {review.name}
             </Typography>
           </Box>
         </Stack>

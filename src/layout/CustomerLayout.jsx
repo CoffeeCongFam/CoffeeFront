@@ -95,7 +95,7 @@ export default function CustomerLayout() {
     console.log("삭제할 알림>> ", notificationId);
     // /api/common/notification/{notificationId}
     const res = await api.patch(`/common/notification/${notificationId}`);
-    console.log(res.data?.data);
+    console.log(res.data?.message);
   }
 
   // ------------------------------------------

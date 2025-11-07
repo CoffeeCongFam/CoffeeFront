@@ -170,10 +170,21 @@ function CafeReviewList({ storeName, storeId }) {
   }
 
   return (
-    <Box>
-      <Button variant="contained" onClick={handleCreateReview} sx={{ mb: 2 }}>
-        리뷰 작성
-      </Button>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <Box>
+        <Button
+          variant="outlined"
+          sx={{
+            justifyContent: "flex-end",
+            width: "fit-content",
+            float: "right",
+            mb: 2,
+          }}
+          onClick={handleCreateReview}
+        >
+          리뷰 작성
+        </Button>
+      </Box>
 
       {localReviews && localReviews.length > 0 ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
