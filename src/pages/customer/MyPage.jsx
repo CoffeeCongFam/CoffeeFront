@@ -76,6 +76,7 @@ function MyPage() {
             fontWeight: "bold",
             color: "text.primary", // 텍스트 색상 유지
           }}
+          onClick={() => setActiveMenu(menu)}
         >
           {menu}
         </Button>

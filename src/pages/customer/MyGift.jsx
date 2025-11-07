@@ -276,7 +276,6 @@ function MyGift() {
     };
 
     const mId = normalizeId(memberId);
-    const sId = normalizeId(item.senderId);
     const rId = normalizeId(item.receiverId);
 
     // receiverId 와 memberId 를 기준으로 판별:
@@ -773,7 +772,7 @@ function MyGift() {
                             })()}
                           </Stack>
                         }
-                        onRefundSuccess={(pid, refundedAtFromApi, msid) => {
+                        onRefundSuccess={(pid, refundedAtFromApi) => {
                           // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
                           const updateItem = (g) => {
                             if (g.purchaseId !== pid) return g;

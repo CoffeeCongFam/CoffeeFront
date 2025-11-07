@@ -1,5 +1,4 @@
 import api from "./api";
-import useUserStore from "../stores/useUserStore";
 
 export async function postCafe(data) {
   try {

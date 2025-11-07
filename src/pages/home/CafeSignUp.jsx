@@ -19,7 +19,7 @@ const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
-function StoreForm({ onSubmitSuccess }) {
+function StoreForm() {
 
   // 상태 관리
   const [formState, setFormState] = useState({
@@ -294,7 +294,6 @@ function StoreForm({ onSubmitSuccess }) {
         data.append("file", formState.storeImage);
       }
       const result = await postCafe(data);
-      const success = result;
        if (result) {
         alert("매장 등록 완료!");
         // 부모로 성공 이벤트 전달
