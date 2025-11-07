@@ -258,7 +258,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
               label: "매장 이름",
               name: "storeName",
               value: storeInfo.storeName || "-",
-              disabled: true,
+              // disabled: true,
             }, // 이름은 보통 수정 불가
             { label: "매장 전화번호", name: "tel", value: storeInfo.tel || "-" },
             {
