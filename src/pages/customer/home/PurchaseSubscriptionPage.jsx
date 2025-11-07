@@ -12,14 +12,18 @@ import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
 import {
   fetchSubscriptionInfo,
   requestPurchase,
 } from "../../../apis/customerApi";
+import axios from "axios";
+import useUserStore from "../../../stores/useUserStore";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
+  const { authUser } = useUserStore();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
@@ -43,30 +47,70 @@ function PurchaseSubscriptionPage() {
     navigate(-1);
   }
 
-  //결제 진행 함수 (로딩 + 완료 페이지 이동)
-  async function confirmPayment() {
-    setIsPurchaseLoading(true);
-    setPayOpen(false);
+async function confirmPayment(pg = "danal_tpay") {
+  setIsLoading(true);
+  setPayOpen(false);
 
-    console.log("결제 진행 ----------------------------");
+  try {
+    // 서버에 주문(PENDING) 먼저 생성
+    const payload = {
+      subscriptionId: subscription.subscriptionId,
+    };
 
-    try {
-      const payload = {
-        subscriptionId: subscription.subscriptionId,
-        purchaseType: "CREDIT_CARD",
-      };
-      const data = await requestPurchase(payload);
+    const created = await requestPurchase(payload);
+    const merchantUid = created.merchantUid;
 
-      console.log("구매 완료!", data.purchaseId);
+    const { IMP } = window;
+    IMP.init("imp03140165");
 
-      navigate(`/me/purchase/${data.purchaseId}/complete`);
-    } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제 처리 중 오류가 발생했습니다.");
-    } finally {
-      setIsPurchaseLoading(false);
-    }
+    // PortOne 결제 요청
+    IMP.request_pay(
+      {
+        pg,
+        pay_method: "card",
+        amount: subscription.price,
+        name: subscription.subscriptionName,
+        merchant_uid: merchantUid, 
+        buyer_name: authUser.name,
+        buyer_email: authUser.email,
+        buyer_tel: authUser.tel,
+      },
+      async (response) => {
+        if (response.success) {
+          console.log("결제 성공:", response);
+
+          try {
+            // 결제 검증 요청
+            const validationRes = await axios.post("/api/payments/validation", {
+              purchaseId: created.purchaseId,
+              impUid: response.imp_uid,
+              merchantUid: response.merchant_uid,
+            });
+
+            console.log("검증 성공:", validationRes.data);
+
+            // 결제 검증 완료 → 결제 확정
+            navigate(`/me/purchase/${created.purchaseId}/complete`);
+          } catch (error) {
+            console.error("결제 검증 실패:", error);
+            alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
+            navigate("/");
+          }
+        } else {
+          // 결제 실패
+          alert(`결제 실패: ${response.error_msg}`);
+        }
+      }
+    );
+  } catch (error) {
+    console.error("결제 요청 오류:", error);
+    alert("결제 요청 중 문제가 발생했습니다.");
+  } finally {
+    setIsLoading(false);
   }
+}
+
+
 
   //   {
   //   isLoading ? <Loading></Loading> :
@@ -164,75 +208,91 @@ function PurchaseSubscriptionPage() {
         </Box>
       </Box>
 
-      {/* 결제 선택 패널 */}
-      <Backdrop
-        open={payOpen}
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        onClick={() => setPayOpen(false)}
+     {/* 결제 선택 패널 */}
+<Backdrop
+  open={payOpen}
+  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+  onClick={() => setPayOpen(false)}
+>
+  <Fade in={payOpen}>
+    <Box
+      onClick={(e) => e.stopPropagation()}
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        mx: "auto",
+        maxWidth: 820,
+        bgcolor: "#5e5e5e",
+        borderRadius: "24px 24px 0 0",
+        minHeight: 420,
+        px: 3,
+        pt: 3,
+      }}
+    >
+      {/* 상단 닫기 */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <IconButton onClick={() => setPayOpen(false)}>
+          <CloseIcon sx={{ color: "white" }} />
+        </IconButton>
+      </Box>
+
+      {/* 결제수단 선택 */}
+      <Typography
+        variant="subtitle1"
+        sx={{ color: "white", fontWeight: 600, mb: 2 }}
       >
-        <Fade in={payOpen}>
+        결제 수단을 선택하세요
+      </Typography>
+
+      {/* 카드들 (6개 grid) */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        {[
+          { label: "신용카드", pg: "danal_tpay" },
+          { label: "휴대폰결제", pg: "danal_tpay" },
+          { label: "카카오페이", pg: "kakaopay" },
+          { label: "스마일페이", pg: "smilepay" },
+          { label: "토스페이", pg: "tosspay" },
+          { label: "페이코", pg: "payco" },
+        ].map((method) => (
           <Box
-            onClick={(e) => e.stopPropagation()}
+            key={method.label}
+            onClick={() => confirmPayment(method.pg)} // ✅ 클릭 시 해당 PG로 결제
             sx={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              mx: "auto",
-              maxWidth: 820,
-              bgcolor: "#5e5e5e",
-              borderRadius: "24px 24px 0 0",
-              minHeight: 320,
-              px: 3,
+              bgcolor: "#dcdcdc",
+              border: "4px solid rgba(255,128,0,0.4)",
+              borderRadius: 4,
+              height: 100,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#555",
+              cursor: "pointer",
+              "&:hover": {
+                bgcolor: "#eaeaea",
+                transform: "scale(1.03)",
+                transition: "all 0.2s ease",
+              },
             }}
           >
-            {/* 상단 닫기 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-              <IconButton onClick={() => setPayOpen(false)}>
-                <CloseIcon sx={{ color: "white" }} />
-              </IconButton>
-            </Box>
-
-            {/* 카드 선택 영역 (더미) */}
-            <Box
-              sx={{
-                bgcolor: "#dcdcdc",
-                border: "4px solid rgba(255,128,0,0.4)",
-                borderRadius: 4,
-                height: 180,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 28,
-                fontWeight: 700,
-                color: "#666",
-                mb: 2,
-                cursor: "pointer",
-              }}
-            >
-              신한 카드
-            </Box>
-
-            {/* 밑에 실제 결제 버튼 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Box
-                sx={{
-                  bgcolor: "white",
-                  color: "black",
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={confirmPayment}
-              >
-                결제 진행
-              </Box>
-            </Box>
+            {method.label}
           </Box>
-        </Fade>
-      </Backdrop>
+        ))}
+      </Box>
+    </Box>
+  </Fade>
+</Backdrop>
+
 
       {/* ✅ 결제 로딩 화면 */}
       <Backdrop
