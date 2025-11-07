@@ -60,13 +60,14 @@ function CafeMyPage() {
   };
 
   useEffect(() => {
+    // Always call syncStoreInfo on mount
+    syncStoreInfo();
+    console.log("받아온 매장 정보야!!",storeInfo)
     if (!authUser) {
       setStoreInfo(null);
       setActiveMenu("매장 등록");
-      return;
     }
-    syncStoreInfo();
-  }, [authUser]);
+  }, []);
 
   const logout = () => {
     clearUser();

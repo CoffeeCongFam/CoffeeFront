@@ -223,7 +223,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
       sx={{
         py: 4,
         px: 2,
-        bgcolor: "#f5f7fb",
         minHeight: "100vh",
       }}
     >
@@ -233,10 +232,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
           sx={{
             p: 4,
             borderRadius: 4,
-            background:
-              "linear-gradient(145deg, #ffffff 0%, #f6f4ff 40%, #f0fbff 100%)",
-            boxShadow:
-              "0 18px 45px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04)",
           }}
         >
         {/* 헤더 및 수정 버튼 */}
@@ -261,7 +256,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
               />
             </Stack>
             <Typography variant="h5" component="h1" fontWeight={800}>
-              가게 관리
+              매장 관리
             </Typography>
             <Typography variant="body2" color="text.secondary" mt={0.5}>
               오늘 기준 매장 정보를 한 번에 확인하고 수정해 보세요.
@@ -277,13 +272,11 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
               py: 1,
               fontWeight: 700,
               textTransform: "none",
-              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.18)",
               background:
                 isEditing
                   ? "linear-gradient(135deg, #f97373 0%, #ef4444 100%)"
                   : "linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #06b6d4 100%)",
               "&:hover": {
-                boxShadow: "0 18px 40px rgba(15, 23, 42, 0.28)",
                 transform: "translateY(-1px)",
               },
             }}
@@ -315,27 +308,25 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
             gap: 1,
           }}
         >
-          기본 정보
+          매장 정보
           <Box
             component="span"
             sx={{
               width: 6,
               height: 6,
               borderRadius: "999px",
-              bgcolor: "#22c55e",
-              boxShadow: "0 0 0 6px rgba(34, 197, 94, 0.18)",
             }}
           />
         </Typography>
         <Grid container spacing={3}>
           {[
             {
-              label: "가게 이름",
+              label: "매장 이름",
               name: "storeName",
               value: storeInfo.storeName,
               disabled: true,
             }, // 이름은 보통 수정 불가
-            { label: "가게 전화번호", name: "tel", value: storeInfo.tel },
+            { label: "매장 전화번호", name: "tel", value: storeInfo.tel },
             {
               label: "도로명 주소",
               name: "roadAddress",
@@ -384,7 +375,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                     },
                     "&.Mui-focused fieldset": {
                       borderColor: "#4f46e5",
-                      boxShadow: "0 0 0 1px rgba(79, 70, 229, 0.25)",
                     },
                   },
                   "& .MuiInputLabel-root.Mui-focused": {
@@ -416,7 +406,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
               height: 6,
               borderRadius: "999px",
               bgcolor: "#0ea5e9",
-              boxShadow: "0 0 0 6px rgba(14, 165, 233, 0.18)",
             }}
           />
         </Typography>
@@ -429,7 +418,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
             p: 3,
             bgcolor: "rgba(255,255,255,0.92)",
             border: "1px solid rgba(148, 163, 184, 0.25)",
-            boxShadow: "0 16px 30px rgba(15, 23, 42, 0.08)",
           }}
         >
           <Grid container spacing={2}>
@@ -490,8 +478,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                           },
                           "&.Mui-focused fieldset": {
                             borderColor: "#2563eb",
-                            boxShadow:
-                              "0 0 0 1px rgba(37, 99, 235, 0.2)",
                           },
                         },
                         "& .MuiInputLabel-root.Mui-focused": {
@@ -543,8 +529,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                           },
                           "&.Mui-focused fieldset": {
                             borderColor: "#2563eb",
-                            boxShadow:
-                              "0 0 0 1px rgba(37, 99, 235, 0.2)",
                           },
                         },
                         "& .MuiInputLabel-root.Mui-focused": {
@@ -571,9 +555,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                         py: 0.6,
                         fontWeight: 600,
                         textTransform: "none",
-                        boxShadow: isClosed
-                          ? "none"
-                          : "0 8px 18px rgba(15, 23, 42, 0.18)",
                       }}
                     >
                       {isClosed ? "휴무" : "영업"}
@@ -599,11 +580,9 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                 py: 1.2,
                 fontWeight: 700,
                 textTransform: "none",
-                boxShadow: "0 14px 30px rgba(15, 23, 42, 0.2)",
                 background:
                   "linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #0ea5e9 100%)",
                 "&:hover": {
-                  boxShadow: "0 18px 40px rgba(15, 23, 42, 0.25)",
                   transform: "translateY(-1px)",
                 },
               }}
