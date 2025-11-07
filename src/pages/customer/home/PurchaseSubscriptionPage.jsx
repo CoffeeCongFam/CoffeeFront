@@ -12,7 +12,6 @@ import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useUserStore from "../stores/useUserStore";
 
 import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
 import {
@@ -20,6 +19,7 @@ import {
   requestPurchase,
 } from "../../../apis/customerApi";
 import axios from "axios";
+import useUserStore from "../../../stores/useUserStore";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
@@ -50,54 +50,66 @@ async function confirmPayment(pg = "danal_tpay") {
   setIsLoading(true);
   setPayOpen(false);
 
-  const { IMP } = window;
-  IMP.init("imp03140165");
+  try {
+    // 서버에 주문(PENDING) 먼저 생성
+    const payload = {
+      subscriptionId: subscription.subscriptionId,
+    };
 
-  IMP.request_pay(
-    {
-      pg, // ✅ 선택된 결제 PG사
-      pay_method: "card",
-      amount: 1000,
-      name: subscription.subscriptionName,
-      merchant_uid: "merchant_" + new Date().getTime(),
-      buyer_name: authUser.name,
-      buyer_email: authUser.email,
-      buyer_tel: authUser.tel,
-    },
-    // async (response) => {
-    //   if(response.success) {
-    //     console.log(response);
-    //     try axios.post("/api")
-    //   }
-    // }
-    // (response) => {
-    //   console.log("결제 응답:", response);
-    //   if (response.success) {
-    //     alert("✅ 결제 성공!");
-    //   } else {
-    //     alert("❌ 결제 실패: " + response.error_msg);
-    //   }
-    //   setIsLoading(false);
-    // }
-  );
+    const created = await requestPurchase(payload);
+    const merchantUid = created.merchantUid;
 
-    // try {
-    //   const payload = {
-    //     subscriptionId: subscription.subscriptionId,
-    //     purchaseType: "CREDIT_CARD",
-    //   };
-    //   const data = await requestPurchase(payload);
+    const { IMP } = window;
+    IMP.init("imp03140165");
 
-    //   console.log("구매 완료!", data.purchaseId);
+    // PortOne 결제 요청
+    IMP.request_pay(
+      {
+        pg,
+        pay_method: "card",
+        amount: subscription.price,
+        name: subscription.subscriptionName,
+        merchant_uid: merchantUid, 
+        buyer_name: authUser.name,
+        buyer_email: authUser.email,
+        buyer_tel: authUser.tel,
+      },
+      async (response) => {
+        if (response.success) {
+          console.log("결제 성공:", response);
 
-    //   navigate(`/me/purchase/${data.purchaseId}/complete`);
-    // } catch (error) {
-    //   console.error("결제 실패:", error);
-    //   alert("결제 처리 중 오류가 발생했습니다.");
-    // } finally {
-    //   setIsLoading(false);
-    // }
+          try {
+            // 결제 검증 요청
+            const validationRes = await axios.post("/api/payments/validation", {
+              purchaseId: created.purchaseId,
+              impUid: response.imp_uid,
+              merchantUid: response.merchant_uid,
+            });
+
+            console.log("검증 성공:", validationRes.data);
+
+            // 결제 검증 완료 → 결제 확정
+            navigate(`/me/purchase/${created.purchaseId}/complete`);
+          } catch (error) {
+            console.error("결제 검증 실패:", error);
+            alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
+            navigate("/");
+          }
+        } else {
+          // 결제 실패
+          alert(`결제 실패: ${response.error_msg}`);
+        }
+      }
+    );
+  } catch (error) {
+    console.error("결제 요청 오류:", error);
+    alert("결제 요청 중 문제가 발생했습니다.");
+  } finally {
+    setIsLoading(false);
   }
+}
+
+
 
   return (
     <>
