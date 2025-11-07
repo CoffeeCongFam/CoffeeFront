@@ -72,7 +72,53 @@ export const SubscriptionDetailCard = ({
     refundedAt: cardRefundedAt,
     isRefunded: cardIsRefunded,
     usedAt,
+    subStart,
+    subEnd,
   } = subscriptionData;
+
+  // 구독 기간 및 남은 일 수 계산
+  const parseDate = (value) => {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d) ? null : d;
+  };
+
+  const startDate = parseDate(subStart);
+  const endDate = parseDate(subEnd);
+
+  const formatDate = (d) => {
+    if (!d) return "-";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}.${m}.${day}`;
+  };
+
+  const subPeriodLabel =
+    startDate && endDate
+      ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
+      : startDate
+      ? `${formatDate(startDate)} ~ -`
+      : "-";
+
+  const today = new Date();
+  const todayMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  let remainingLabel = "-";
+  if (endDate) {
+    const diffMs = endDate.getTime() - todayMidnight.getTime();
+    const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (remainingDays <= 0) {
+      remainingLabel = "만료";
+    } else {
+      remainingLabel = `${remainingDays}일 남음`;
+    }
+  }
 
   const dailyRemainCount = subscriptionData.dailyRemainCount ?? 0;
   const isDailyUsedUp = dailyRemainCount <= 0;
@@ -220,7 +266,8 @@ export const SubscriptionDetailCard = ({
       elevation={3}
       sx={{
         position: "relative",
-        maxWidth: 400,
+        width:350,
+        maxWidth: 700,
         margin: "auto",
         padding: 2.5,
         borderRadius: "12px",
@@ -388,7 +435,11 @@ export const SubscriptionDetailCard = ({
 
             <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 0.5 }}>
               <InfoBox title="금액" content={`${formattedPrice}원`} />
-              <InfoBox title="구독 기간" content={`1일`} />
+              <InfoBox
+                title="남은 일수"
+                content={subPeriodLabel}
+                subContent={remainingLabel}
+              />
               <InfoBox
                 title={dailyLabel}
                 content={`${resolvedMaxDaily ?? 0}잔`}
@@ -729,6 +780,7 @@ const adaptToCardData = (s) => {
     giverName: s?.sender,
     receiver: s?.receiver,
     subStart: s?.subStart,
+    subEnd: s?.subEnd,
     usageStatus: s?.usageStatus,
     purchaseId: s?.purchaseId,
     paymentStatus: s?.paymentStatus,
@@ -884,7 +936,7 @@ const SubscriptionPage = () => {
         }}
       >
         <Typography variant="h6" component="h2" fontWeight="bold">
-          나의 구독권
+          구독권
         </Typography>
       </Box>
       <Tabs

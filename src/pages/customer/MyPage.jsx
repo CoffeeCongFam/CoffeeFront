@@ -19,16 +19,15 @@ function MyPage() {
   const { authUser, clearUser } = useUserStore();
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
-  const [activeMenu, setActiveMenu] = useState("구독권 관리");
+  const [activeMenu, setActiveMenu] = useState("구독권");
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
-    "구독권 관리",
-    "내 선물함",
-    "주문 내역",
+    "구독권",
+    "선물함",
     "결제 내역",
     "리뷰내역",
-    "내 정보",
+    "회원 정보",
   ];
 
   useEffect(() => {
@@ -46,17 +45,15 @@ function MyPage() {
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
-      case "구독권 관리":
+      case "구독권":
         return <SubscriptionPage />;
-      case "내 선물함":
+      case "선물함":
         return <MyGiftPage />;
-      case "주문 내역":
-        return <OrderHistory />;
       case '결제 내역':
         return <PaymentHistory />;
       case "리뷰내역":
         return <ReviewPage />;
-      case "내 정보":
+      case "회원 정보":
         return <Profile />;
       default:
         return null;
@@ -123,29 +120,6 @@ function MyPage() {
             }}
           >
             카페 사장님 페이지
-          </Button>
-
-          <Button
-            onClick={logout}
-            variant="contained"
-            startIcon={<LogoutRoundedIcon />}
-            sx={{
-              borderRadius: 999,
-              px: 2.5,
-              py: 1,
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              textTransform: 'none',
-              boxShadow: 'none',
-              bgcolor: 'grey.900',
-              color: 'common.white',
-              '&:hover': {
-                bgcolor: 'grey.800',
-                boxShadow: 3,
-              },
-            }}
-          >
-            로그아웃
           </Button>
         </Box>
 
