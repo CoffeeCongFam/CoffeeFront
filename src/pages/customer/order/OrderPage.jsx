@@ -28,9 +28,14 @@ function OrderPage() {
   const completedOrders = todayOrders.filter(
     (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
   );
+
+  // 취소 또는 매장 거부 내역 한 탭으로 보여주기
   const canceledOrders = todayOrders.filter(
-    (it) => it.orderStatus === "CANCELED"
+    (it) => it.orderStatus === "CANCELED" || "REJECTED"
   );
+  // const rejectedOrders = todayOrders.filter(
+  //   (it) => it.orderStatus === "REJECTED"
+  // );
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));

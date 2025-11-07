@@ -3,7 +3,9 @@ import api from "../utils/api";
 /*
     소비자 요청 api 모음
     받는 쪽에서 await 로 받아야 함.
-*/
+    
+    백에서 HTTP 상태 코드가 200이 아닌 경우 (예: 400, 409 등)라면
+    Axios는 이 응답을 “에러로 간주”하고 response 를 반환하지 않음.
 
 /*  메인 홈 */
 
@@ -94,6 +96,9 @@ export async function fetchSubscriptionInfo(subscriptionId) {
 export async function requestPurchase(payload) {
   console.log("구독권 구매 요청>> ", payload);
 
+  // try {
+
+  // }
   const res = await api.post(`/me/purchase/new`, payload);
 
   console.log("result: ", res.data?.data);
