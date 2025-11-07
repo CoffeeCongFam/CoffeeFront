@@ -54,17 +54,21 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
   }
 };
 
-// 3. 구독권 수정 (PATCH) - (소프트) 실제 구독권 변경이 아니라 상태 변경?
+// 3. 구독권 수정 (PATCH) - (소프트) 실제 구독권 변경이 아니라 상태 변경
 // Endpoint: /api/owners/subscriptions/{subscriptionId}
 
 export const updateSubscription = async (subscriptionId, updateData) => {
-  // 🚩 [실제 axios 코드]
   const url = `${API_BASE_URL}/${subscriptionId}`;
-  // SUBSCRIPTION_ID 테스트용 가데이터
-
+  
   try {
-    const response = await axios.patch(url, updateData);
-    return response.data.data;
+    const response = await axios.patch(
+      url, 
+      updateData,
+      {
+        withCredentials: true
+      }
+    );
+    return response;
   } catch (error) {
     console.error(`구독권 수정 실패 (ID: ${subscriptionId}):`, error);
     throw error;
@@ -93,7 +97,11 @@ export const softDeleteSubscription = async (subscriptionId) => {
   // 🚩 [실제 axios 코드]
   try {
     const url = `${API_BASE_URL}/${subscriptionId}`;
-    const response = await axios.delete(url);
+    const response = await axios.delete(url,
+      { 
+        withCredentials: true
+      }
+    );
     return response.data.data || response.data;
   } catch (error) {
     console.error(`구독권 삭제 실패 (ID: ${subscriptionId}):`, error);

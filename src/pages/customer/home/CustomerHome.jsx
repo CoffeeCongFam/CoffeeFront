@@ -7,7 +7,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import SubscriptionCard from "../../../components/customer/cafe/SubscriptionCard";
+import Loading from "../../../components/common/Loading";
 
 import {
   fetchCustomerSubscriptions,
@@ -26,7 +26,7 @@ function CustomerHome() {
   const { authUser } = useUserStore();
 
   const { isAppLike } = useAppShellMode();
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [subscriptions, setSubscriptions] = useState([]);
   const [today, setToday] = useState(null);
   const [nearbyCafes, setNearbyCafes] = useState([]);
@@ -68,6 +68,8 @@ function CustomerHome() {
       console.log(data);
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -132,12 +134,9 @@ function CustomerHome() {
     });
   };
 
-  // const localScrollBy = (offset) => {
-  //   if (!localScrollRef.current) return;
-  //   localScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
-  // };
-
-  return (
+  return isLoading ? (
+    <Loading />
+  ) : (
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
@@ -268,70 +267,11 @@ function CustomerHome() {
           </Typography>
         )}
 
-        {/* <Box
-          style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
-        >
-          <IconButton onClick={() => localScrollBy(-260)} size="small">
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton onClick={() => localScrollBy(260)} size="small">
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <Box
-          ref={localScrollRef}
-          sx={{
-            display: "flex",
-            gap: 2,
-            overflowX: "auto",
-            scrollSnapType: "x mandatory",
-            mb: 5,
-            py: 2,
-            "&::-webkit-scrollbar": {
-              height: isAppLike ? 0 : 6,
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#ccc",
-              borderRadius: 8,
-            },
-            // backgroundColor: "#ccccccaf",
-            // borderRadius: "8px",
-          }}
-        >
-          {nearbyCafes.map((store) => (
-            <Box
-              key={store.id || store.storeId}
-              sx={{
-                scrollSnapAlign: "start",
-                px: isAppLike ? "8%" : 0,
-                flex: isAppLike ? "0 0 100%" : "0 0 auto",
-              }}
-            >
-              <LocalCafeCard store={store} key={store.id || store.storeId} />
-            </Box>
-          ))}
-        </Box> */}
-
-        {/* <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: isAppLike
-              ? "1fr"
-              : "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "10px",
-          }}
-        >
-          {nearbyCafes.map((store) => (
-            <LocalCafeCard store={store} key={store.id || store.storeId} />
-          ))}
-
-          {!locError && nearbyCafes.length === 0 && (
-            <Typography sx={{ color: "text.secondary" }}>
-              500m 안에 등록된 카페가 아직 없어요 ☕
-            </Typography>
-          )}
-        </Box> */}
+        {!locError && nearbyCafes.length === 0 && (
+          <Typography sx={{ color: "text.secondary" }}>
+            500m 안에 등록된 카페가 아직 없어요 ☕
+          </Typography>
+        )}
       </Box>
     </Box>
   );

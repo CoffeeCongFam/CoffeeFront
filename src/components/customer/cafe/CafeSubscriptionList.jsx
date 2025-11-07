@@ -48,13 +48,13 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const scrollRef = useRef(null);
 
   // 실제 데이터에 있는 타입만 추출
-  const subscriptionTypes = useMemo(() => {
-    const set = new Set();
-    subscriptions.forEach((s) => {
-      if (s.subscriptionType) set.add(s.subscriptionType);
-    });
-    return Array.from(set);
-  }, [subscriptions]);
+  // const subscriptionTypes = useMemo(() => {
+  //   const set = new Set();
+  //   subscriptions.forEach((s) => {
+  //     if (s.subscriptionType) set.add(s.subscriptionType);
+  //   });
+  //   return Array.from(set);
+  // }, [subscriptions]);
 
   // 필터 적용
   const filteredList =
@@ -126,13 +126,19 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           size="small"
         >
           <ToggleButton value="ALL">전체</ToggleButton>
-          {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
+          {/* {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
             subscriptionTypes.includes(type) ? (
               <ToggleButton key={type} value={type}>
                 {getTypeLabel(type)}
               </ToggleButton>
             ) : null
-          )}
+          )} */}
+
+          {["STANDARD", "BASIC", "PREMIUM"].map((type) => (
+            <ToggleButton key={type} value={type}>
+              {getTypeLabel(type)}
+            </ToggleButton>
+          ))}
         </ToggleButtonGroup>
 
         {/* 우측 화살표는 항상 보이게 */}
@@ -159,6 +165,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           gap: 2,
           overflowX: "auto",
           scrollSnapType: "x mandatory",
+          minHeight: "300px",
           py: 1,
           "&::-webkit-scrollbar": {
             height: isAppLike ? 0 : 6,
@@ -170,9 +177,18 @@ function CafeSubscriptionList({ subscriptions = [] }) {
         }}
       >
         {filteredList.length === 0 && (
-          <Typography color="text.secondary">
-            이 조건에 맞는 구독권이 없습니다.
-          </Typography>
+          <Box
+            sx={{
+              minHeight: "200px",
+              width: "100%",
+              // backgroundColor: "#f2f2f2",
+              p: "1rem",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              이 조건에 맞는 구독권이 없습니다.
+            </Typography>
+          </Box>
         )}
 
         {filteredList.map((sub) => (
