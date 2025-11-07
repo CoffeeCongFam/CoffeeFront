@@ -98,30 +98,32 @@ function MyPage() {
         </Box>
 
         {/* 우측: 트렌디한 네비게이션 & 로그아웃 버튼 그룹 */}
-        <Box display="flex" alignItems="center" gap={1.5}>
-          <Button
-            onClick={() => navigate('/store/cafeMyPage')}
-            variant="contained"
-            sx={{
-              borderRadius: 999,
-              px: 2.2,
-              py: 0.8,
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              textTransform: 'none',
-              boxShadow: 'none',
-              background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
-              color: 'grey.900',
-              border: '1px solid rgba(0,0,0,0.05)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
-                boxShadow: 2,
-              },
-            }}
-          >
-            카페 사장님 페이지
-          </Button>
-        </Box>
+        {authUser?.memberType == "STORE" && (
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <Button
+              onClick={() => navigate('/store/cafeMyPage')}
+              variant="contained"
+              sx={{
+                borderRadius: 999,
+                px: 2.2,
+                py: 0.8,
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                textTransform: 'none',
+                boxShadow: 'none',
+                background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
+                color: 'grey.900',
+                border: '1px solid rgba(0,0,0,0.05)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
+                  boxShadow: 2,
+                },
+              }}
+            >
+              카페 사장님 페이지
+            </Button>
+          </Box>
+        )}
 
         {/* 우측: 트렌디한 로그아웃 버튼 */}
         <Button

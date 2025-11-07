@@ -232,6 +232,20 @@ export const SubscriptionDetailCard = ({
   const isUsageStatusExpired =
     subscriptionData?.usageStatus === "EXPIRED";
 
+  // 환불/거절 확인 다이얼로그 후 실행하는 핸들러
+  const handleClickRefund = () => {
+    const message =
+      giftType === "RECEIVED"
+        ? "정말 이 선물을 거절하시겠습니까?"
+        : "정말 결제를 취소하시겠습니까?";
+
+    const confirmed = window.confirm(message);
+    if (!confirmed) return;
+
+    // 사용자가 확인을 눌렀을 때만 기존 환불/거절 로직 실행
+    handleRefundOrDeny();
+  };
+
   // 환불/거절 처리 핸들러 (purchaseId를 성공 콜백에 전달)
   const handleRefundOrDeny = async () => {
     // prop으로 받은 purchaseId를 우선 사용하고, 없으면 subscriptionData의 값을 사용
@@ -520,8 +534,8 @@ export const SubscriptionDetailCard = ({
                   제공메뉴
                 </MenuItem>
                 {menus.map((menu, index) => (
-                  <MenuItem key={index} value={menu}>
-                    {menu}
+                  <MenuItem key={index} value={menu.menuName}>
+                    {menu.menuName}
                   </MenuItem>
                 ))}
               </Select>
@@ -541,7 +555,7 @@ export const SubscriptionDetailCard = ({
                         color: "#757575",
                         fontWeight: "bold",
                       }}
-                      onClick={handleRefundOrDeny}
+                      onClick={handleClickRefund}
                     >
                       {giftType === "RECEIVED" ? "선물 거절" : "구독권 환불"}
                     </Button>
@@ -864,8 +878,13 @@ const SubscriptionPage = () => {
         // 사용 가능: isExpired 값이 "EXPIRED"가 아닌 모든 구독권
         // 만료: isExpired 값이 "EXPIRED"인 구독권만
         const norm = (v) => (v ?? "").toString().toUpperCase();
-        const avail = arr.filter((s) => norm(s?.isExpired) !== "EXPIRED");
-        const exp = arr.filter((s) => norm(s?.isExpired) === "EXPIRED");
+        const isExpired = (s) => norm(s?.isExpired) === "EXPIRED";
+        const hasRefundedAt = (s) => {
+          const v = s?.refundedAt;
+          return v != null && String(v).trim() !== "";
+        };
+        const avail = arr.filter((s) => !isExpired(s) && !hasRefundedAt(s));
+        const exp   = arr.filter((s) => isExpired(s) || hasRefundedAt(s));
         console.log(
           "[Subscription] available:",
           avail.length,

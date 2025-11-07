@@ -38,6 +38,7 @@ import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 import CafeMyPage from "../pages/cafe/CafeMyPage";
+import Withdrawal from "../pages/customer/Withdrawal";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
+      },
+      {
+        path: "withdrawal",
+        element: <Withdrawal />,
       },
       {
         path: "signup",

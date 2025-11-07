@@ -61,6 +61,7 @@ function App() {
     "/customerSignUp",
     "/cafeSignUp",
     "/MemberSignUp",
+    "/withdrawal"
   ];
 
   //
