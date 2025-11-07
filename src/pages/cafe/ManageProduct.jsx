@@ -22,7 +22,7 @@ import {
   fetchSubscriptions,
   registerSubscription,
   updateSubscription,
-  fetchAllMenus, // 👈  ProductService에서 메뉴 로드 함수 import
+  fetchAllMenus,
 } from './ManageProductSoC/ProductService';
 import useUserStore from '../../stores/useUserStore';
 
@@ -133,11 +133,14 @@ export default function ManageProduct() {
 
   // 6. 수정 로직
   const handleUpdateSubscription = async (id, updatedData) => {
+    const confirmed = window.confirm("정말 이 구독권을 수정하시겠습니까?");
+    if (!confirmed) return;
+
     setIsLoading(true);
     try {
-      const success = await updateSubscription(id, updatedData);
+      const response = await updateSubscription(id, updatedData);
 
-      if (success) {
+      if (response.status === 200) {
         await loadSubscriptions();
         handleCloseDetailEditModal();
       }

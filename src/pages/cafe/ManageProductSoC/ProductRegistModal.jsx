@@ -76,7 +76,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
 
   const handleSubmit = async () => {
     if (!formData.subscriptionName || formData.price <= 0) {
-      console.warn('구독권 이름과 가격은 필수입니다.');
+      alert('구독권 이름과 가격은 필수입니다.');
       return;
     }
 
