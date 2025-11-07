@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
 import Profile from './Profile';
@@ -7,11 +6,11 @@ import SubscriptionPage from './Subscription';
 import PaymentHistory from './PaymentHistory';
 import ReviewPage from './ReviewPage';
 import { handleLogout } from '../../utils/logout';
+
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
 import OrderHistory from "./OrderHistory";
-
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 function MyPage() {
@@ -20,21 +19,20 @@ function MyPage() {
   const { authUser, clearUser } = useUserStore();
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
-  const [activeMenu, setActiveMenu] = useState('구독권 관리');
+  const [activeMenu, setActiveMenu] = useState("구독권 관리");
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
     "구독권 관리",
     "내 선물함",
     "주문 내역",
-
     "결제 내역",
     "리뷰내역",
     "내 정보",
   ];
 
   useEffect(() => {
-    console.log('AUTH USER 변경됨 >>> ', authUser);
+    console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
 
   const logout = () => {
@@ -48,17 +46,17 @@ function MyPage() {
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
-      case '구독권 관리':
+      case "구독권 관리":
         return <SubscriptionPage />;
-      case '내 선물함':
+      case "내 선물함":
         return <MyGiftPage />;
       case "주문 내역":
         return <OrderHistory />;
       case '결제 내역':
         return <PaymentHistory />;
-      case '리뷰내역':
+      case "리뷰내역":
         return <ReviewPage />;
-      case '내 정보':
+      case "내 정보":
         return <Profile />;
       default:
         return null;
@@ -74,9 +72,9 @@ function MyPage() {
           fullWidth
           sx={{
             py: 2,
-            fontSize: '1rem',
-            fontWeight: 'bold',
-            color: 'text.primary', // 텍스트 색상 유지
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "text.primary", // 텍스트 색상 유지
           }}
         >
           {menu}

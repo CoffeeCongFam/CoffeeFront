@@ -32,6 +32,7 @@ import { fetchAllCafes } from "../../../apis/customerApi.js";
 import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
 // import cafeMarkerIcon from "../../../assets/cafeMarker.png"; // 카페용 마커 아이콘
 import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
+import Loading from "../../../components/common/Loading.jsx";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -72,7 +73,7 @@ export default function SearchPage() {
   const [mapsReady, setMapsReady] = useState(false);
   const [isMapError, setIsMapError] = useState(false);
   const [status, setStatus] = useState("loading"); // "loading" | "ready" | "error"
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // (lng, lat)
   const [currentLocRef, setCurrentLocRef] = useState(null);
 
@@ -156,9 +157,6 @@ export default function SearchPage() {
         }));
         setCafes(normalized);
       }
-      // finally {
-      //   setIsLoading(false);
-      // }
     })();
     return () => {
       mounted = false;
@@ -335,7 +333,7 @@ export default function SearchPage() {
         overflow: "hidden", // SearchPage 내부에서만 스크롤 컨트롤
       }}
     >
-      {isMapError ? (
+      {isMapError && (
         <Box
           sx={{
             position: "absolute",
@@ -358,6 +356,9 @@ export default function SearchPage() {
             온라인으로 다시 접속하거나 새로고침 해주세요.
           </Typography>
         </Box>
+      )}
+      {isLoading ? (
+        <Loading title={"지도 그리는 중..."} message={"지도 그리는 중..."} />
       ) : (
         <div
           ref={mapContainerRef}
