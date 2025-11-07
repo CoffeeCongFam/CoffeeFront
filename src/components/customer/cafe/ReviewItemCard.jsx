@@ -10,19 +10,12 @@ import {
   Stack,
   Tooltip,
   Typography,
+  Avatar
 } from "@mui/material";
 import React from "react";
+import PhotoIcon from '@mui/icons-material/Photo';
 
 import useUserStore from "../../../stores/useUserStore";
-
-// const fmt = (d) =>
-//   new Intl.DateTimeFormat("ko-KR", {
-//     year: "numeric",
-//     month: "2-digit",
-//     day: "2-digit",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//   }).format(d);
 
 function ReviewItemCard({ review, handleDelete }) {
   const {
@@ -34,8 +27,6 @@ function ReviewItemCard({ review, handleDelete }) {
     reviewContent,
     review_content,
     rating = 0,
-    createdAt,
-    created_at,
     reviewImg,
   } = review || {};
   const storeId = partnerStoreId ?? partner_store_id;
@@ -56,7 +47,7 @@ function ReviewItemCard({ review, handleDelete }) {
     <Card variant="outlined">
       <CardContent>
         <Stack direction="row" spacing={2} alignItems="flex-start">
-          {reviewImg && (
+          {reviewImg ? (
             <Box
               component="img"
               src={reviewImg}
@@ -68,8 +59,16 @@ function ReviewItemCard({ review, handleDelete }) {
                 objectFit: "cover",
                 flexShrink: 0,
               }}
-            />
-          )}
+            /> )
+            : <Avatar 
+              sx={{
+                width: 84,
+                height: 84,
+                borderRadius: 1,
+                objectFit: "cover",
+                flexShrink: 0,
+              }}><PhotoIcon /></Avatar>
+          }
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack
               direction="row"
@@ -94,6 +93,7 @@ function ReviewItemCard({ review, handleDelete }) {
                   display: "flex",
                   justifyContent: "flex-end",
                   flexGrow: 1,
+                  alignItems: "center"
                 }}
               >
                 <Typography
@@ -103,7 +103,7 @@ function ReviewItemCard({ review, handleDelete }) {
                   {review.updatedAt ? `${review.updatedAt}` : review.createdAt}
                 </Typography>
                 {memberId === authUser.memberId && (
-                  <Button onClick={() => handleDelete(review.reviewId)}>
+                  <Button onClick={() => handleDelete(review.reviewId)} sx={{fontSize: "0.8rem",}}>
                     삭제
                   </Button>
                 )}

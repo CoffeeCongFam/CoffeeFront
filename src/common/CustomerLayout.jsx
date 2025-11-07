@@ -19,7 +19,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
-import logo from "../assets/CoffeiensLogo.png";
+import logo from "../assets/coffeiensLogoTitle.png";
 
 const drawerWidth = 240;
 

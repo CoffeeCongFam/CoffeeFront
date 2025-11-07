@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import CakeIcon from '@mui/icons-material/Cake';
 import {
   ExpandLess,
   ExpandMore,
@@ -26,6 +27,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import SubTypeChip from "../../common/SubTypeChip";
+import SubscriptionCard from "../../../components/customer/cafe/SubscriptionCard";
 
 const subDescBoxStyle = {
   backgroundColor: "#F2F2F2",
@@ -46,6 +48,28 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const [openMenuId, setOpenMenuId] = useState(null); // 카드별 메뉴 열기
   const [openDescId, setOpenDescId] = useState(null); // 구독권 설명
   const scrollRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0); // 캐러셀 현재 인덱스
+
+
+  // 필터나 데이터 변경 시 인덱스/스크롤 초기화 한 번 더 안전하게
+  useEffect(() => {
+    setCurrentIndex(0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ left: 0, behavior: "auto" });
+    }
+  }, [filter, subscriptions]);
+
+
+  // 타입별 개수 계산
+ const counts = useMemo(() => {
+   const base = { ALL: subscriptions.length, STANDARD: 0, BASIC: 0, PREMIUM: 0 };
+   subscriptions.forEach((s) => {
+     if (s.subscriptionType && base[s.subscriptionType] !== undefined) {
+       base[s.subscriptionType] += 1;
+     }
+   });
+   return base;
+ }, [subscriptions]);
 
   // 실제 데이터에 있는 타입만 추출
   // const subscriptionTypes = useMemo(() => {
@@ -65,7 +89,11 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   const handleFilterChange = (_, newValue) => {
     if (newValue !== null) {
       setFilter(newValue);
-      // 필터 바꾸면 맨 앞으로 스크롤
+      // // 필터 바꾸면 맨 앞으로 스크롤
+      // if (scrollRef.current) {
+      //   scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      // }
+      setCurrentIndex(0);
       if (scrollRef.current) {
         scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
       }
@@ -73,12 +101,37 @@ function CafeSubscriptionList({ subscriptions = [] }) {
   };
 
   // 좌우 스크롤
-  const scrollBy = (offset) => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({
-      left: offset,
+  // const scrollBy = (offset) => {
+  //   if (!scrollRef.current) return;
+  //   scrollRef.current.scrollBy({
+  //     left: offset,
+  //     behavior: "smooth",
+  //   });
+  // };
+
+  // 좌우 페이지 이동 (슬라이드 단위)
+  const goToPage = (direction) => {
+    if (!scrollRef.current || filteredList.length === 0) return;
+    const container = scrollRef.current;
+    const width = container.clientWidth || 1;
+
+    let newIndex = currentIndex + direction;
+    if (newIndex < 0) newIndex = 0;
+    if (newIndex > filteredList.length - 1) newIndex = filteredList.length - 1;
+
+    setCurrentIndex(newIndex);
+    container.scrollTo({
+      left: newIndex * width,
       behavior: "smooth",
     });
+  };
+
+  // 스크롤 시 현재 인덱스 계산
+  const handleScroll = (e) => {
+    const container = e.target;
+    const width = container.clientWidth || 1;
+    const index = Math.round(container.scrollLeft / width);
+    setCurrentIndex(index);
   };
 
   // 페이지 이동 함수들
@@ -125,7 +178,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           onChange={handleFilterChange}
           size="small"
         >
-          <ToggleButton value="ALL">전체</ToggleButton>
+          <ToggleButton value="ALL">전체 ({counts.ALL})</ToggleButton>
           {/* {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
             subscriptionTypes.includes(type) ? (
               <ToggleButton key={type} value={type}>
@@ -136,7 +189,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
 
           {["STANDARD", "BASIC", "PREMIUM"].map((type) => (
             <ToggleButton key={type} value={type}>
-              {getTypeLabel(type)}
+               {getTypeLabel(type)} ({counts[type] || 0})
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
@@ -146,16 +199,37 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           sx={{
             display: "flex",
             gap: 1,
+            alignItems: "center"
           }}
         >
-          <IconButton onClick={() => scrollBy(-320)} size="small">
+          <IconButton
+            onClick={() => goToPage(-1)}
+            size="small"
+            disabled={currentIndex === 0} // 첫 페이지면 비활성화
+          >
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
-          <IconButton onClick={() => scrollBy(320)} size="small">
+
+          <Typography
+            variant="caption"
+            sx={{ minWidth: 56, textAlign: "center" }}
+          >
+            {filteredList.length === 0
+              ? "0 / 0"
+              : `${currentIndex + 1} / ${filteredList.length}`}
+          </Typography>
+
+          <IconButton
+            onClick={() => goToPage(1)}
+            size="small"
+            disabled={currentIndex === filteredList.length - 1} // 마지막 페이지면 비활성화
+          >
             <ArrowForwardIosIcon fontSize="small" />
           </IconButton>
+
         </Box>
       </Box>
+
 
       {/* 캐러셀 영역 */}
       <Box
@@ -175,6 +249,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             borderRadius: 8,
           },
         }}
+        onScroll={handleScroll}
       >
         {filteredList.length === 0 && (
           <Box
@@ -190,42 +265,104 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             </Typography>
           </Box>
         )}
+       
 
-        {filteredList.map((sub) => (
+        {filteredList.map((sub) =>{
+          const isSoldOut = sub.subscriptionStatus === "SOLDOUT";
+        return (
+          
           <Box
-            key={sub.subscriptionId || sub.subscriptionId || sub.subName}
+            key={sub.subscriptionId || sub.subName}
             sx={{
               scrollSnapAlign: "start",
               px: isAppLike ? 0 : "10%",
               flex: "0 0 100%",
-              // flex: isAppLike ? "0 0 100%" : "0 0 340px",
             }}
           >
             {/* 카드 */}
             <Box
               key={sub.subscriptionId}
               sx={{
-                border: "1px solid #e0e0e0",
+                position: "relative",
+                border: isSoldOut ? "1px solid #ffcdd2" : "1px solid #e0e0e0",
                 borderRadius: 2,
-                backgroundColor: "white",
+                backgroundColor: isSoldOut ? "#fafafa" : "white",
                 p: 2,
                 minHeight: 380,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 gap: 1.5,
+                opacity: isSoldOut ? 0.7 : 1,
               }}
             >
+              {/* SOLD OUT 뱃지 */}
+              {/* {isSoldOut && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    px: 1.2,
+                    py: 0.3,
+                    borderRadius: 999,
+                    backgroundColor: "#ffebee",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                      color: "#c62828",
+                    }}
+                  >
+                    SOLD OUT
+                  </Typography>
+                </Box>
+              )} */}
+              {isSoldOut && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    bgcolor: "rgba(0, 0, 0, 0.44)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 2,
+                    zIndex: 10,  
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      borderRadius: 999,
+                      // bgcolor: "rgba(0,0,0,0.75)",
+                      // color: "white",
+                      color: "#ffffffff",
+                      fontSize: '2rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    판매 완료
+                  </Typography>
+                </Box>
+              )}
               {/* 타입 / 이름 / 가격 */}
               <Box sx={{ textAlign: "center" }}>
                 <SubTypeChip type={sub.subscriptionType} />
                 <Typography
                   variant="subtitle1"
-                  sx={{ fontWeight: 600, mt: "0.5rem" }}
+                  sx={{
+                    fontWeight: 600,
+                    mt: "0.5rem",
+                  }}
                 >
-                  {sub.subscriptionName}
+                  {sub.subscriptionName}  
                 </Typography>
-                <Typography sx={{ fontWeight: 800, fontSize: 28 }}>
+                <Typography sx={{ fontWeight: 800, fontSize: 28, color: isSoldOut ? "text.disabled" : "inherit",}}>
                   ₩{sub.price?.toLocaleString()}
                   <Typography
                     component="span"
@@ -347,7 +484,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       px: 1.5,
                       py: 0.4,
                       borderRadius: 999,
-                      bgcolor: "#f1f3f4",
+                      bgcolor: isSoldOut ? "#b6b6b6ff" : "#f1f3f4",
                       minWidth: 54,
                       textAlign: "center",
                       display: "flex",
@@ -442,7 +579,10 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     {(sub.menus || []).map((menu) => (
                       <ListItemButton key={menu.menuId} sx={{ pl: 4 }}>
                         <ListItemIcon key={menu.menuId} sx={{ minWidth: 32 }}>
-                          <CoffeeIcon fontSize="small" />
+                          {
+                            menu.menuType === "BEVERAGE" ?<CoffeeIcon fontSize="small" /> : <CakeIcon fontSize="small" />
+                          }
+                          
                         </ListItemIcon>
                         <ListItemText
                           primary={menu.menuName}
@@ -472,10 +612,13 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                   onClick={() => goToSendGift(sub.subscriptionId)}
                   startIcon={<CardGiftcardIcon />}
                   sx={{
-                    backgroundColor: "black",
-                    color: "white",
-                    "&:hover": { backgroundColor: "#222" },
+                    backgroundColor: isSoldOut ? "#e0e0e0" : "black",
+                    color: isSoldOut ? "text.disabled" : "white",
+                    "&:hover": {
+                      backgroundColor: isSoldOut ? "#e0e0e0" : "#222",
+                    },
                   }}
+                  disabled={sub.subscriptionStatus === "SOLDOUT"}
                 >
                   선물하기
                 </Button>
@@ -487,10 +630,13 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     onClick={() => goToPurchaseSub(sub.subscriptionId)}
                     startIcon={<CreditCardIcon />}
                     sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      "&:hover": { backgroundColor: "#222" },
+                      backgroundColor: isSoldOut ? "#e0e0e0" : "black",
+                      color: isSoldOut ? "text.disabled" : "white",
+                      "&:hover": {
+                        backgroundColor: isSoldOut ? "#e0e0e0" : "#222",
+                      },
                     }}
+                    disabled={sub.subscriptionStatus === "SOLDOUT"}
                   >
                     구매하기
                   </Button>
@@ -512,7 +658,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
               </Box>
             </Box>
           </Box>
-        ))}
+        )})}
       </Box>
     </Box>
   );

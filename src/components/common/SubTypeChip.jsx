@@ -6,8 +6,6 @@ function SubTypeChip({ type }) {
   let emoji = "";
   let label = "";
 
-  console.log(type);
-
   switch (type) {
     case "BASIC":
       emoji = "☕";

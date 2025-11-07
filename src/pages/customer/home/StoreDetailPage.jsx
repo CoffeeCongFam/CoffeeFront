@@ -175,7 +175,7 @@ function StoreDetailPage() {
         <TabPanel value={tab} index={2}>
           <CafeSubscriptionList
             subscriptions={store.subscriptions.filter(
-              (sub) => sub.subscriptionStatus === "ONSALE"
+              (sub) => sub.subscriptionStatus === "ONSALE" || sub.subscriptionStatus === "SOLDOUT"
             )}
           />
         </TabPanel>

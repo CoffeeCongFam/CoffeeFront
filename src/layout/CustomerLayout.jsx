@@ -28,7 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import logo from "../assets/CoffeiensLogo.png";
+import logo from "../assets/coffeiensLogoTitle.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
 import api from "../utils/api";
