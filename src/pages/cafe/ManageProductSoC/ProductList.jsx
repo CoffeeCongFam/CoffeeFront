@@ -71,129 +71,132 @@ const ProductList = ({ subscriptions, onCardClick }) => {
       }}
     >
       {/* 🚩 subscriptions 배열을 순회하며 개별 카드를 렌더링합니다. */}
-      {subscriptions.map((subscription) => {
-        // 단일 구독권 객체에 대한 카드 렌더링 로직 (기존 코드를 그대로 사용)
-        const statusProps = getStatusProps(subscription.subscriptionStatus);
-        console.log(subscription);
-        return (
-          <Paper
-            key={subscription.subscriptionId} // key는 배열 반복 시 필수
-            elevation={3}
-            sx={{
-              borderRadius: 2,
-              overflow: 'hidden',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: 6,
-              },
-              cursor: 'pointer',
-              position: 'relative',
-              height: '100%', // Grid 내에서 높이 통일
-            }}
-            onClick={() => onCardClick(subscription)} // 클릭 시 부모로 이벤트 전달
-          >
-            {/* 상단 이미지 */}
-            <Box sx={{ position: 'relative' }}>
-              <Box
-                component="img"
-                src={
-                  subscription.subscriptionImg ||
-                  'https://placehold.co/400x150/6c757d/ffffff?text=No+Image'
-                }
-                alt={subscription.subscriptionName}
-                sx={{
-                  width: '100%',
-                  height: 150,
-                  objectFit: 'cover',
-                  borderBottom: `4px solid ${
-                    statusProps.color === 'success' ? '#4CAF50' : '#E0E0E0'
-                  }`,
-                }}
-              />
-
-              {/* 상태 Chip */}
-              <Chip
-                label={statusProps.label}
-                color={statusProps.color}
-                icon={statusProps.icon}
-                size="small"
-                sx={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  fontWeight: 'bold',
-                }}
-              />
-            </Box>
-
-            {/* 본문 정보 */}
-            <Box
-              p={2}
-              display="flex"
-              flexDirection="column"
-              justifyContent="space-between"
-              flexGrow={1}
+      {subscriptions
+        .filter((subscription) => !subscription.deletedAt)
+        .map((subscription) => {
+          // 단일 구독권 객체에 대한 카드 렌더링 로직 (기존 코드를 그대로 사용)
+          const statusProps = getStatusProps(subscription.subscriptionStatus);
+          console.log(subscription);
+          return (
+            <Paper
+              key={subscription.subscriptionId} // key는 배열 반복 시 필수
+              elevation={3}
+              sx={{
+                borderRadius: 2,
+                overflow: 'hidden',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 6,
+                },
+                cursor: 'pointer',
+                position: 'relative',
+                height: '100%', // Grid 내에서 높이 통일
+              }}
+              onClick={() => onCardClick(subscription)} // 클릭 시 부모로 이벤트 전달
             >
-              <div>
-                <Typography
-                  variant="h6"
+              {/* 상단 이미지 */}
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  component="img"
+                  src={
+                    subscription.subscriptionImg ||
+                    'https://placehold.co/400x150/6c757d/ffffff?text=No+Image'
+                  }
+                  alt={subscription.subscriptionName}
                   sx={{
-                    fontWeight: 'bold',
-                    mb: 0.5,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    width: '100%',
+                    height: 150,
+                    objectFit: 'cover',
+                    borderBottom: `4px solid ${
+                      statusProps.color === 'success' ? '#4CAF50' : '#E0E0E0'
+                    }`,
                   }}
-                >
-                  {subscription.subscriptionName}
-                </Typography>
+                />
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 1, height: 40, overflow: 'hidden' }}
-                >
-                  {subscription.subscriptionDesc}
-                </Typography>
-              </div>
+                {/* 상태 Chip */}
+                <Chip
+                  label={statusProps.label}
+                  color={statusProps.color}
+                  icon={statusProps.icon}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    fontWeight: 'bold',
+                  }}
+                />
+              </Box>
 
+              {/* 본문 정보 */}
               <Box
+                p={2}
                 display="flex"
+                flexDirection="column"
                 justifyContent="space-between"
-                alignItems="center"
-                mt={2}
-                pt={1}
-                borderTop="1px solid #eee"
+                flexGrow={1}
               >
-                <Typography
-                  variant="h5"
-                  color="primary"
-                  sx={{ fontWeight: 'extrabold' }}
-                >
-                  {subscription.price.toLocaleString()}원
-                </Typography>
-                <Box textAlign="right">
-                  <Typography variant="caption" color="text.secondary">
-                    남은 수량
-                  </Typography>
+                <div>
                   <Typography
-                    variant="subtitle1"
-                    sx={{ fontWeight: 'bold' }}
-                    color={
-                      subscription.remainSalesQuantity > 0
-                        ? 'text.primary'
-                        : 'error'
-                    }
+                    variant="h6"
+                    sx={{
+                      fontWeight: 'bold',
+                      mb: 0.5,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
                   >
-                    {subscription.remainSalesQuantity.toLocaleString()} 개
+                    {subscription.subscriptionName}
                   </Typography>
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1, height: 40, overflow: 'hidden' }}
+                  >
+                    {subscription.subscriptionDesc}
+                  </Typography>
+                </div>
+
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={2}
+                  pt={1}
+                  borderTop="1px solid #eee"
+                >
+                  <Typography
+                    variant="h5"
+                    color="primary"
+                    sx={{ fontWeight: 'extrabold' }}
+                  >
+                    {subscription.price.toLocaleString()}원
+                  </Typography>
+                  <Box textAlign="right">
+                    <Typography variant="caption" color="text.secondary">
+                      남은 수량
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 'bold' }}
+                      color={
+                        subscription.remainSalesQuantity > 0
+                          ? 'text.primary'
+                          : 'error'
+                      }
+                    >
+                      {subscription.remainSalesQuantity.toLocaleString()} 개
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </Paper>
-        );
-      })}
+            </Paper>
+          );
+        }
+      )}
     </Box>
   );
 };
