@@ -15,15 +15,19 @@ import ManageStoreInfo from "./ManageStoreInfo";
 import { StoreForm } from "../home/CafeSignUp";
 import { useNavigate } from "react-router-dom";
 import { getStoreInfo } from "../../utils/store";
-function CafeMyPage() {
 
+function CafeMyPage() {
   const { authUser, clearUser, setPartnerStoreId } = useUserStore();
 
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
+  const [isLoadingStore, setIsLoadingStore] = useState(false);
 
-  const finalMenus = authUser?.partnerStoreId
+  // ✅ 매장 정보 있으면 “매장 정보 / 내 정보”
+  //    없으면 “매장 등록 / 내 정보”
+  const hasStore = !!(authUser?.partnerStoreId || storeInfo?.partnerStoreId);
+  const finalMenus = hasStore
     ? ["매장 정보", "내 정보"]
     : ["매장 등록", "내 정보"];
 
@@ -31,43 +35,46 @@ function CafeMyPage() {
     setActiveMenu(menu);
   };
 
-  useEffect(() => {
-    if (authUser?.partnerStoreId || storeInfo) {
-      setActiveMenu("매장 정보");
-    } else {
-      setActiveMenu("매장 등록");
-    }
-  }, [authUser, storeInfo]);
-
-  const syncStoreInfo = async () => {
+  // ✅ 매장 정보 동기화
+  const syncStoreInfo = async (partnerStoreId) => {
     try {
-      const data = await getStoreInfo(authUser?.partnerStoreId);
-      setStoreInfo(data);
+      setIsLoadingStore(true);
 
-      if (data?.partnerStoreId) {
-        setPartnerStoreId(data.partnerStoreId);
-      }
+      const data = await getStoreInfo(partnerStoreId);
+      console.log("📡 받아온 매장 정보:", data);
 
-      if (!data) {
-        setActiveMenu("매장 등록");
-      } else {
+      if (data) {
+        setStoreInfo(data);
+
+        if (data.partnerStoreId) {
+          setPartnerStoreId(data.partnerStoreId);
+        }
+
         setActiveMenu("매장 정보");
+      } else {
+        setStoreInfo(null);
+        setActiveMenu("매장 등록");
       }
     } catch (error) {
+      console.error("매장 정보 조회 실패:", error);
       setStoreInfo(null);
       setActiveMenu("매장 등록");
+    } finally {
+      setIsLoadingStore(false);
     }
   };
 
+  // ✅ authUser가 준비되면 한 번 매장 정보 조회
   useEffect(() => {
-    // Always call syncStoreInfo on mount
-    syncStoreInfo();
-    console.log("받아온 매장 정보야!!",storeInfo)
     if (!authUser) {
       setStoreInfo(null);
       setActiveMenu("매장 등록");
+      return;
     }
-  }, []);
+
+    syncStoreInfo(authUser.partnerStoreId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authUser?.partnerStoreId]);
 
   const logout = () => {
     clearUser();
@@ -123,7 +130,7 @@ function CafeMyPage() {
 
         <Box display="flex" alignItems="center" gap={1.5}>
           <Button
-            onClick={() => navigate('/me/myPage')}
+            onClick={() => navigate("/me/myPage")}
             variant="contained"
             sx={{
               borderRadius: 999,
@@ -137,8 +144,9 @@ function CafeMyPage() {
               border: "1px solid #f3e0c7",
               boxShadow: "none",
               minWidth: 0,
-              '&:hover': {
-                background: "linear-gradient(90deg, #ffe8b3 0%, #ffcce9 100%)",
+              "&:hover": {
+                background:
+                  "linear-gradient(90deg, #ffe8b3 0%, #ffcce9 100%)",
                 boxShadow: 2,
               },
             }}
@@ -170,13 +178,21 @@ function CafeMyPage() {
           </Button>
         </Box>
       </Box>
+
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Grid container spacing={1} justifyContent="flex-start">
           {renderGridItems(finalMenus)}
         </Grid>
       </Paper>
+
       <Box sx={{ mt: 3 }}>
-        {activeMenu && renderDrawerContent()}
+        {isLoadingStore ? (
+          <Typography color="text.secondary">
+            매장 정보를 불러오는 중입니다...
+          </Typography>
+        ) : (
+          activeMenu && renderDrawerContent()
+        )}
       </Box>
     </Container>
   );

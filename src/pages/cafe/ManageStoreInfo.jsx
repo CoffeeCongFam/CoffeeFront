@@ -7,83 +7,23 @@ import {
   Paper,
   Stack,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import axios from "axios";
 import useUserStore from "../../stores/useUserStore";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import api from "../../utils/api";
 const STORE_API_URL = "/owners/stores"; // get, post 기본 경로
-const PARTNER_STORE_ID = 1; // partnerStoreId는 patch 요청 시 필요(로그인 후 저장된 값 사용)
 const today = new Date().toLocaleDateString("ko-KR");
 const dateParts = today.split(".").map((part) => part.trim());
 const month = dateParts[1];
 
-// 🚨 [가데이터 초기화]
-const INITIAL_STORE_INFO = {
-  success: true,
-  data: {
-    partnerStoreId: 1,
-    storeName: "카페 모니카",
-    storeTel: "010-1111-1111",
-    tel: "010-1234-5678",
-    roadAddress: "서울시 강남구 테헤란로 123",
-    detailAddress: "1층 102호",
-    businessNumber: "111-22-33333",
-    detailInfo: "조용한 카페",
-    storeHours: [
-      {
-        dayOfWeek: "MON",
-        openTime: "09:00",
-        closeTime: "18:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "TUE",
-        openTime: "09:00",
-        closeTime: "18:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "WED",
-        openTime: "09:00",
-        closeTime: "18:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "THU",
-        openTime: "09:00",
-        closeTime: "18:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "FRI",
-        openTime: "09:00",
-        closeTime: "18:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "SAT",
-        openTime: "10:00",
-        closeTime: "17:00",
-        isClosed: "N",
-      },
-      {
-        dayOfWeek: "SUN",
-        openTime: null,
-        closeTime: null,
-        isClosed: "Y",
-      },
-    ],
-  },
-  message: "요청이 성공적으로 처리되었습니다.",
-};
-
 export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
-  const [storeInfo, setStoreInfo] = useState(initialStoreInfo || INITIAL_STORE_INFO.data);
-  const [originalStoreInfo, setOriginalStoreInfo] = useState(initialStoreInfo || INITIAL_STORE_INFO.data);
+  // Props로 받은 initialStoreInfo가 없을 경우 빈 객체로 초기화하여 오류 방지
+  const [storeInfo, setStoreInfo] = useState(initialStoreInfo || {});
+  const [originalStoreInfo, setOriginalStoreInfo] = useState(
+    initialStoreInfo || {}
+  );
 
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
@@ -98,6 +38,20 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
     SAT: "토",
     SUN: "일",
   };
+  const DAY_ORDER = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+  // Merge storeHours with defaults for all days
+  const rawStoreHours = storeInfo.storeHours || [];
+  const mergedStoreHours = DAY_ORDER.map((day) => {
+    const found = rawStoreHours.find((hour) => hour.dayOfWeek === day);
+    return (
+      found || {
+        dayOfWeek: day,
+        openTime: null,
+        closeTime: null,
+        isClosed: null,
+      }
+    );
+  });
   // 일반 텍스트 입력 필드 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,27 +60,10 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
 
   // 시간 입력 필드 표시 포맷 (예: "0900" → "09:00")
   const formatTimeDisplay = (value) => {
-    if (!value) return "";
-    const digits = value.replace(/\D/g, "");
+    if (!value) return isEditing ? "" : "-";
+    const digits = String(value).replace(/\D/g, "");
     if (digits.length <= 2) return digits;
     return `${digits.slice(0, 2)}${digits.length > 2 ? ":" + digits.slice(2, 4) : ""}`;
-  };
-
-  // 시간 입력 변경 핸들러 (숫자만, 4자리까지만 저장)
-  const handleTimeChange = (name) => (e) => {
-    if (!isEditing) return;
-    let input = e.target.value || "";
-    // 숫자만 남기기
-    let digits = input.replace(/\D/g, "");
-    // 최대 4자리까지만 허용 (HHMM)
-    if (digits.length > 4) {
-      digits = digits.slice(0, 4);
-    }
-    // 실제 상태에는 숫자 4자리(또는 입력 중이면 0~4자리)만 저장
-    setStoreInfo((prev) => ({
-      ...prev,
-      [name]: digits,
-    }));
   };
 
   // 요일별 영업시간 및 휴무일 변경 핸들러
@@ -174,10 +111,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
 
     _handleHoursChange(dayOfWeek, field, digits);
   };
-  // 휴무일 토글 핸들러
-  const handleClosedDayToggle = (e, newClosedDays) => {
-    setStoreInfo((prev) => ({ ...prev, closedDays: newClosedDays }));
-  };
 
   // 매장 정보 수정 (PATCH /api/owners/stores/{partnerStoreId})
   const handleSave = async () => {
@@ -185,8 +118,8 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
     setSuccessMessage(null);
 
     try {
-      // 🚨 PARTNER_STORE_ID(response를 써야하는데)를 URL 경로에 사용
-      const url = `${STORE_API_URL}/${PARTNER_STORE_ID}`;
+      // storeInfo에서 partnerStoreId를 가져와 URL 경로에 사용
+      const url = `${STORE_API_URL}/${storeInfo.partnerStoreId}`;
 
       // 실제 API에 맞게 수정할 데이터만 전송(PATCH)
       const dataToSend = { ...storeInfo };
@@ -324,19 +257,19 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
             {
               label: "매장 이름",
               name: "storeName",
-              value: storeInfo.storeName,
+              value: storeInfo.storeName || "-",
               disabled: true,
             }, // 이름은 보통 수정 불가
-            { label: "매장 전화번호", name: "tel", value: storeInfo.tel },
+            { label: "매장 전화번호", name: "tel", value: storeInfo.tel || "-" },
             {
               label: "도로명 주소",
               name: "roadAddress",
-              value: storeInfo.roadAddress,
+              value: storeInfo.roadAddress || "-",
             },
             {
               label: "상세 주소",
               name: "detailAddress",
-              value: storeInfo.detailAddress,
+              value: storeInfo.detailAddress || "-",
             },
             {
               label: "사업자 번호",
@@ -422,9 +355,18 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
           }}
         >
           <Grid container spacing={2}>
-            {storeInfo.storeHours?.map((hour) => {
+            {mergedStoreHours.map((hour) => {
               const isClosed = hour.isClosed === "Y";
               const dayLabel = DAY_LABELS[hour.dayOfWeek] || hour.dayOfWeek;
+              const hasTime = !!(hour.openTime || hour.closeTime);
+              const isUndefinedStatus =
+                !hasTime && (hour.isClosed === null || hour.isClosed === undefined);
+              const statusLabel = isUndefinedStatus ? "미정" : isClosed ? "휴무" : "영업";
+              const buttonVariant = isUndefinedStatus
+                ? "outlined"
+                : isClosed
+                ? "outlined"
+                : "contained";
 
               return (
                 <Grid item xs={12} key={hour.dayOfWeek}>
@@ -538,9 +480,9 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                       }}
                     />
 
-                    {/* 휴무 토글 버튼 */}
+                    {/* 휴무/영업/미정 표시 버튼 */}
                     <Button
-                      variant={isClosed ? "outlined" : "contained"}
+                      variant={buttonVariant}
                       onClick={() =>
                         isEditing &&
                         _handleHoursChange(
@@ -556,9 +498,14 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
                         py: 0.6,
                         fontWeight: 600,
                         textTransform: "none",
+                        ...(isUndefinedStatus && {
+                          bgcolor: "grey.100",
+                          color: "grey.600",
+                          borderColor: "grey.400",
+                        }),
                       }}
                     >
-                      {isClosed ? "휴무" : "영업"}
+                      {statusLabel}
                     </Button>
                   </Box>
                 </Grid>
