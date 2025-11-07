@@ -113,9 +113,6 @@ function ReviewItemCard({ review, handleDelete }) {
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
               {contentText}
             </Typography>
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-              {review.name}
-            </Typography>
           </Box>
         </Stack>
       </CardContent>
