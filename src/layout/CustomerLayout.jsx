@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -31,35 +31,12 @@ import CoffeeIcon from "@mui/icons-material/Coffee";
 import logo from "../assets/coffeiensLogoTitle.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
-import api from "../utils/api";
 import { deleteNotification, readNotification } from "../apis/notificationApi";
 import NotificationItem from "../components/common/NotificationItem";
 
 const drawerWidth = 240;
 
-export default function CustomerLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isSearchPage = location.pathname.startsWith("/me/search");
-  const {
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    deleteAllNotifications,
-    getNotification
-  } = useNotificationStore();
-  const { isAppLike } = useAppShellMode(); // 모바일 여부
-  const [bottomValue, setBottomValue] = React.useState(location.pathname);
-
-  const [notifOpen, setNotifOpen] = React.useState(false); // 알림 토글
-
-  // 페이지 이동 시 알림 드로어 자동 닫기
-  useEffect(() => {
-    setNotifOpen(false);
-  }, [location.pathname]);
-
-  const links = [
+const links = [
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
     {
@@ -75,20 +52,27 @@ export default function CustomerLayout() {
       end: true,
     },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
-  ];
+];
 
-  // 알림 구조
-  // interface Notification {
-  //   notificationId: number;
-  //   notificationType: string;
-  //   notificationContent: String;
-  // notificationContent : {
-  //   message : '',
-  //   targetId : '',
-  // }
-  //   readAt: string; // timestamp
-  //   createdAT: string;
-  // }
+export default function CustomerLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isSearchPage = location.pathname.startsWith("/me/search");
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    deleteAllNotifications,
+  } = useNotificationStore();
+  const { isAppLike } = useAppShellMode(); // 모바일 여부
+  const [bottomValue, setBottomValue] = useState(location.pathname);
+
+  const [notifOpen, setNotifOpen] = useState(false); // 알림 토글
+
+  // 페이지 이동 시 알림 드로어 자동 닫기
+  useEffect(() => {
+    setNotifOpen(false);
+  }, [location.pathname]);
 
   function handleCloseNotif() {
     setNotifOpen(false);
@@ -127,7 +111,7 @@ export default function CustomerLayout() {
 
     console.log("📨 클릭된 알림:", noti);
 
-    // 1) 안 읽은 알림이면 서버에 읽음 처리 + 상태 업데이트
+    // 안 읽은 알림이면 서버에 읽음 처리 + 상태 업데이트
     if (!noti.readAt && !noti.isRead) {
       try {
         await readNotification(notificationId); // PATCH 요청
@@ -137,7 +121,7 @@ export default function CustomerLayout() {
       }
     }
 
-    // 2) 타입별 네비게이션
+    // 타입별 네비게이션
     try {
       // notificationContent 가 { message, targetId } 형태라고 가정
       const content = notificationContent;
