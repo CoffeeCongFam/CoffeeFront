@@ -16,6 +16,7 @@ import {
   Avatar,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import useUserStore from '../../../stores/useUserStore';
 
 const MENU_TYPES = [
   { value: 'BEVERAGE', label: '음료' },
@@ -28,13 +29,15 @@ const defaultImageUrl = 'https://placehold.co/40x40/CCCCCC/333333?text=New';
  * 신규 메뉴 등록 모달 컴포넌트
  */
 export default function MenuRegistModal({ open, onClose, onRegister }) {
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
+
   const [formData, setFormData] = useState({
     menuName: '',
     price: '',
     menuDesc: '',
     menuType: 'BEVERAGE',
     menuStatus: 'Y',
-    partnerStoreId: 1, // 고정 값
+    partnerStoreId: partnerStoreId, // 고정 값
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -56,19 +59,44 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
     let tempErrors = {};
     let isValid = true;
 
+    // 메뉴명 (필수 입력)
     if (!formData.menuName.trim()) {
-      tempErrors.menuName = '메뉴명을 입력해야 합니다.';
+      tempErrors.menuName = '필수 입력 항목입니다. 메뉴명을 입력해주세요.';
       isValid = false;
     }
-    const priceNum = parseInt(formData.price);
-    if (isNaN(priceNum) || priceNum <= 0) {
-      tempErrors.price = '유효한 가격(숫자)을 입력해야 합니다.';
+
+    // 가격 (필수 입력 및 유효한 숫자)
+    const priceValue = formData.price.trim();
+    const priceNum = parseInt(priceValue, 10);
+
+    if (!priceValue) {
+      tempErrors.price = '필수 입력 항목입니다. 가격을 입력해주세요.';
+      isValid = false;
+    } else if (isNaN(priceNum) || priceNum < 0) {
+      // 0원 이상 허용
+      tempErrors.price =
+        '유효하지 않은 가격입니다. 0 이상의 숫자만 입력 가능합니다.';
+      isValid = false;
+    } else if (priceValue.includes('.')) {
+      tempErrors.price =
+        '가격은 정수만 입력 가능합니다. 소수점을 제거해주세요.';
       isValid = false;
     }
+
+    // 메뉴 설명 (필수 입력)
     if (!formData.menuDesc.trim()) {
-      tempErrors.menuDesc = '메뉴 설명을 입력해야 합니다.';
+      tempErrors.menuDesc = '필수 입력 항목입니다. 메뉴 설명을 입력해주세요.';
       isValid = false;
     }
+
+    // 메뉴 이미지 (등록 시 필수)
+    if (!selectedFile) {
+      // 이미지 첨부 관련 에러 메시지를 별도 필드(예: file)에 저장하여 UI에 표시할 수 있으나,
+      // 현재는 버튼 하단에 메시지를 보여줄 TextField가 없으므로 handleSubmit에서 처리
+      tempErrors.file = '필수 항목입니다. 메뉴 이미지를 첨부해주세요.';
+      isValid = false;
+    }
+
     setErrors(tempErrors);
     return isValid;
   };
@@ -104,7 +132,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
       menuDesc: '',
       menuType: 'BEVERAGE',
       menuStatus: 'Y',
-      partnerStoreId: 1,
+      partnerStoreId: partnerStoreId,
     });
     setErrors({});
     handleClearImage();
@@ -119,15 +147,22 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
   const handleSubmit = async () => {
     if (validate()) {
       try {
+        // 🚩 [수정] 가격(price)을 문자열에서 숫자로 변환
+        const dataToRegister = {
+          ...formData,
+          price: parseInt(formData.price), // 문자열인 가격을 숫자로 변환
+        };
+
         // 부모 컴포넌트의 onRegister 함수 호출 (API 연결 책임은 부모에게 있음)
         await onRegister(
-          formData,
+          dataToRegister,
           selectedFile,
           imagePreview || defaultImageUrl // 현재 미리보기 URL 전송
         );
 
         // 성공 시 폼 초기화 및 닫기
         resetFormAndClose();
+        alert(`메뉴 [${formData.menuName}] 등록 완료!`);
       } catch (error) {
         // onRegister에서 발생한 API 에러 처리
         console.error('메뉴 등록 중 에러 발생:', error);
@@ -284,6 +319,16 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
                 </Box>
               </Box>
             </Box>
+
+            {!errors.file && (
+              <Typography
+                color="error"
+                variant="caption"
+                sx={{ mt: 1, display: 'block' }}
+              >
+                {errors.file}
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </DialogContent>

@@ -1,8 +1,12 @@
 import api from "./api";
 
-export async function postCafe(data) {
+export async function postCafe(formData) {
   try {
-    const response = await api.post("/owners/stores", data);
+    const response = await api.post("/owners/stores", formData, {
+      headers: {
+        "Content-Type" : "multipart/form-data",
+      }
+    });
     // console.log(response.data.data)
     return response.data.success === true;
   } catch (error) {
@@ -10,3 +14,4 @@ export async function postCafe(data) {
     return null;
   }
 }
+

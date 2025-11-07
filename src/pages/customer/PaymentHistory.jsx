@@ -271,7 +271,6 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
     // subscriptionPeriod,
     paidAt,
     purchaseType,
-    sender,
     receiver,
     refundReasons,
     isGift,
@@ -399,10 +398,10 @@ function EmptyState() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
       <Typography variant="subtitle1" sx={{ mb: 1 }}>
-        결제 내역이 비어 있어요
+        결제 내역이 비어 있습니다.
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        결제 또는 선물하기를 진행하면 이곳에서 내역을 확인할 수 있어요.
+        결제 또는 선물하기를 진행하면 이곳에서 내역을 확인할 수 있습니다.
       </Typography>
     </Box>
   );

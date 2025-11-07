@@ -250,7 +250,8 @@ export default class MarkerManager {
       this.map.setCenter(center);
       if (this.map.getZoom() > 17) this.map.setZoom(17);
     } else if (cafes.length > 1) {
-      this.map.fitBounds(bounds);
+      this.map.fitBounds(bounds); // 줌이 빠지게 됨.
+      // this.map.setZoom(15); // 줌 기본 세팅
     }
   }
 
@@ -270,7 +271,7 @@ export default class MarkerManager {
     const pos = marker.getPosition();
     this.map.setCenter(pos);
 
-    // ✅ 클릭 말풍선과 동일한 템플릿 사용
+    // 클릭 말풍선과 동일한 템플릿 사용
     const html = this._buildInfoHtml(cafe);
     this.infoWindow.setContent(html);
     this.infoWindow.open(this.map, marker);

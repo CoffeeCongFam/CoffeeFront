@@ -6,9 +6,10 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MenuTable from './ManageMenuSoC/MenuTable';
 import MenuRegistModal from './ManageMenuSoC/MenuRegistModal';
 import MenuEditModal from './ManageMenuSoC/MenuEditModal';
+import useUserStore from '../../stores/useUserStore';
 
 // axios 전까지만 갖다 쓰는 용 ***
-const CURRENT_STORE_ID = 1;
+// const CURRENT_STORE_ID = 1;
 
 // axios 로직을 담고 있는 서비스 함수 임포트
 import {
@@ -21,6 +22,7 @@ import {
 // 🚩 ManageMenu.jsx는 컨테이너로 모든 CRUD 관련 API 호출(axios 사용) 밑 상태 관리
 
 export default function ManageMenu() {
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
   const [menuList, setMenuList] = useState([]);
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
 
@@ -29,11 +31,20 @@ export default function ManageMenu() {
   const [editingMenu, setEditingMenu] = useState(null);
 
   // 1. 메뉴 리스트 조회 (READ)
-  const loadMenus = async () => {
+  const loadMenus = async (storeId) => {
+    if (!storeId || storeId <= 0) {
+      console.log(
+        '⚠️ partnerStoreId 로드 대기 중이거나 유효하지 않아 메뉴 로드를 건너뜁니다.'
+      );
+      return;
+    }
+
     try {
       // API 호출: 매장 메뉴 조회
-      const data = await fetchStoreMenus(CURRENT_STORE_ID);
-      setMenuList(data);
+      const data = await fetchStoreMenus(storeId);
+      setMenuList(data.filter((menu) => {
+        return (!menu.deletedAt);
+      }));
     } catch (error) {
       console.error('메뉴 리스트 로딩 실패:', error);
       // alert("메뉴 목록을 불러오지 못했습니다.");
@@ -41,20 +52,24 @@ export default function ManageMenu() {
   };
 
   useEffect(() => {
-    loadMenus();
-  }, []);
+    // 🚨 partnerStoreId가 로드된 후에만 loadMenus 실행
+    if (partnerStoreId && partnerStoreId > 0) {
+      loadMenus(partnerStoreId);
+    }
+  }, [partnerStoreId]);
 
   // 2. 신규 메뉴 등록 (CREATE)
   const handleRegisterMenu = async (formData, selectedFile) => {
     // menuService.js의 registerMenu가 FormData를 처리합니다.
     try {
       // API 호출: 메뉴 등록
-      const newMenuData = await registerMenu(formData, selectedFile);
 
-      // 성공 시 프론트엔드 리스트에 반영
-      // (서버에서 반환된 최종 URL과 ID가 담긴 데이터 사용)
-      setMenuList((prev) => [newMenuData, ...prev]);
-      alert(`메뉴 [${newMenuData.menuName}] 등록 성공!`);
+      const success = await registerMenu(formData, selectedFile);
+
+      if (success) {
+        await loadMenus(partnerStoreId);
+        // 등록 성공 시, 전체 메뉴 리스트를 다시 불러와
+      }
     } catch (error) {
       console.error('메뉴 등록 실패:', error);
       throw error; // 모달에서 catch하여 실패 알림
@@ -69,7 +84,7 @@ export default function ManageMenu() {
 
   // 4. 메뉴 삭제 (DELETE)
   const handleDeleteClick = async (menuId) => {
-    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까? (소프트 삭제)')) {
+    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
       return;
     }
 
@@ -90,16 +105,16 @@ export default function ManageMenu() {
   const handleUpdateMenu = async (menuId, formData, selectedFile) => {
     try {
       // API 호출: 메뉴 수정
-      const updatedMenu = await updateMenu(menuId, formData, selectedFile);
+      const success = await updateMenu(menuId, formData, selectedFile);
 
-      // 성공 시 리스트 업데이트
-      setMenuList((prev) =>
-        prev.map((menu) => (menu.menuId === menuId ? updatedMenu : menu))
-      );
-
-      // 모달 닫기
-      setIsEditModalOpen(false);
-      alert(`메뉴 [${updateMenu.menuName}] 수정 완료!`);
+      if (success) {
+        // 🚩 [핵심 수정] 수정 성공 시, 전체 메뉴 리스트를 다시 불러옵니다.
+        await loadMenus(partnerStoreId);
+        // 모달 닫기
+        setIsEditModalOpen(false);
+      } else {
+        throw new Error('서버에서 수정 실패 응답');
+      }
     } catch (error) {
       console.error('메뉴 수정 실패:', error);
       alert('메뉴 수정에 실패했습니다.');

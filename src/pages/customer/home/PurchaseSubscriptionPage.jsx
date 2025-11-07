@@ -27,7 +27,8 @@ function PurchaseSubscriptionPage() {
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPurchaseLoading, setIsPurchaseLoading] = useState(false); // 결제 처리 로딩 상태
   const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
 
   async function fetchSubData() {
@@ -110,6 +111,10 @@ async function confirmPayment(pg = "danal_tpay") {
 }
 
 
+
+  //   {
+  //   isLoading ? <Loading></Loading> :
+  // }
 
   return (
     <>
@@ -291,7 +296,7 @@ async function confirmPayment(pg = "danal_tpay") {
 
       {/* ✅ 결제 로딩 화면 */}
       <Backdrop
-        open={isLoading}
+        open={isPurchaseLoading}
         sx={{
           color: "#fff",
           zIndex: (theme) => theme.zIndex.modal + 2,

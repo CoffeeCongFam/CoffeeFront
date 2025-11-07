@@ -22,10 +22,9 @@ import {
   fetchSubscriptions,
   registerSubscription,
   updateSubscription,
-  fetchAllMenus, // 👈  ProductService에서 메뉴 로드 함수 import
+  fetchAllMenus,
 } from './ManageProductSoC/ProductService';
-
-const PartnerStoreId = 13; // 하드코딩
+import useUserStore from '../../stores/useUserStore';
 
 /**
  * 구독권 관리 페이지 (컨테이너 컴포넌트)
@@ -34,6 +33,7 @@ const PartnerStoreId = 13; // 하드코딩
  * - 모달 제어 로직
  */
 export default function ManageProduct() {
+  const partnerStoreId = useUserStore((state) => state.partnerStoreId);
   // 1. 상태 관리
   const [subscriptions, setSubscriptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,26 +51,21 @@ export default function ManageProduct() {
   const loadSubscriptions = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    console.log('--- 구독권 로드 시작 ---');
     try {
       const data = await fetchSubscriptions();
-      console.log('로드된 데이터 (배열):', data); // ⚠️ 여기에 유효한 배열이 찍히는지 확인
       setSubscriptions(data);
-      console.log('setSubscriptions 호출 완료');
     } catch (err) {
       console.error('구독권 목록 로드 실패:', err);
       setError('구독권 목록을 불러오는 데 실패했습니다.');
     } finally {
-      console.log('--- 로드 종료, isLoading: false ---');
       setIsLoading(false);
     }
   }, []);
 
   // 🚩 메뉴 로드 함수
   const loadAllMenus = useCallback(async () => {
-    console.log('--- 전체 메뉴 로드 시작 ---');
     try {
-      const menuData = await fetchAllMenus(PartnerStoreId);
+      const menuData = await fetchAllMenus(partnerStoreId);
       setAllMenus(menuData);
     } catch (err) {
       console.error('전체 메뉴 목록 로드 실패:', err); // 메뉴 로드 실패는 별도 에러 처리 또는 무시
@@ -138,17 +133,17 @@ export default function ManageProduct() {
 
   // 6. 수정 로직
   const handleUpdateSubscription = async (id, updatedData) => {
+    const confirmed = window.confirm("정말 이 구독권을 수정하시겠습니까?");
+    if (!confirmed) return;
+
     setIsLoading(true);
     try {
-      await updateSubscription(id, updatedData);
+      const response = await updateSubscription(id, updatedData);
 
-      // 리스트 상태에서 수정된 항목 업데이트
-      setSubscriptions((prev) =>
-        prev.map((sub) =>
-          sub.subscriptionId === id ? { ...sub, ...updatedData } : sub
-        )
-      );
-      handleCloseDetailEditModal(); // 성공 시 모달 닫기
+      if (response.status === 200) {
+        await loadSubscriptions();
+        handleCloseDetailEditModal();
+      }
     } catch (err) {
       console.error(`구독권 수정 실패 (ID: ${id}):`, err);
       setError('구독권 수정 중 오류가 발생했습니다.');
