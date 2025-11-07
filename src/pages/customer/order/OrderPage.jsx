@@ -23,10 +23,10 @@ function OrderPage() {
   const [tab, setTab] = useState(0);
 
   const inProgressOrders = todayOrders.filter(
-    (it) => it.orderStatus === "REQUEST" || it.orderStatus === "INPROGRESS"
+    (it) => it.orderStatus === "REQUEST" || it.orderStatus === "INPROGRESS" || it.orderStatus === "COMPLETED"
   );
   const completedOrders = todayOrders.filter(
-    (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
+    (it) => it.orderStatus === "RECEIVED"
   );
 
   // 취소 또는 매장 거부 내역 한 탭으로 보여주기

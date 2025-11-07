@@ -430,8 +430,8 @@ function CreateOrderPage() {
               },
             }}
           >
-            <ToggleButton value="IN">매장</ToggleButton>
-            <ToggleButton value="OUT">포장</ToggleButton>
+            <ToggleButton value="IN">매장 이용</ToggleButton>
+            <ToggleButton value="OUT">포장 이용</ToggleButton>
           </ToggleButtonGroup>
         </Box>
       </Box>

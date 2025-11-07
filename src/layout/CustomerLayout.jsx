@@ -32,6 +32,8 @@ import logo from "../assets/coffeiensLogoTitle.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
 import api from "../utils/api";
+import { deleteNotification, readNotification } from "../apis/notificationApi";
+import NotificationItem from "../components/common/NotificationItem";
 
 const drawerWidth = 240;
 
@@ -39,6 +41,14 @@ export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteAllNotifications,
+    getNotification
+  } = useNotificationStore();
   const { isAppLike } = useAppShellMode(); // 모바일 여부
   const [bottomValue, setBottomValue] = React.useState(location.pathname);
 
@@ -53,23 +63,19 @@ export default function CustomerLayout() {
     { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
     { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
     {
-      to: "/me/order",
-      label: "주문 내역",
-      icon: <ReceiptLongIcon />,
-      end: true,
-    },
-    {
       to: "/me/order/new",
       label: "주문하기",
       icon: <ShoppingCartIcon />,
       end: true,
     },
+    {
+      to: "/me/order",
+      label: "주문 내역",
+      icon: <ReceiptLongIcon />,
+      end: true,
+    },
     { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
   ];
-
-  // 🔔 알림 더미 데이터 (나중에 SSE/Fetch로 교체)
-  const { notifications } = useNotificationStore();
-  console.log("알림 내역>>>>>> ", notifications);
 
   // 알림 구조
   // interface Notification {
@@ -91,19 +97,94 @@ export default function CustomerLayout() {
     setNotifOpen(true);
   }
 
-  //
-  function deleteAllNotifications() {
+  // 전체 알림 삭제 요청
+  async function handleDeleteAllNotifications() {
+    console.log("알림 전체 삭제");
+
+    if (!notifications.length) return;
+    const ok = window.confirm("알림을 모두 삭제하시겠습니까?");
+    if (!ok) return;
     // 모든 알림 읽음 처리
+    try {
+      // 서버에 있는 알림들 전부 삭제 요청
+      await Promise.all(
+        notifications.map((n) => deleteNotification(n.notificationId))
+      );
+
+      // 프론트 상태 비우기
+      deleteAllNotifications();
+
+    } catch (e) {
+      console.error("전체 알림 삭제 실패:", e);
+      alert("알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+
   }
 
-  // 특정 알림 읽음 처리
-  async function readMarkNotification(notificationId) {
-    //
-    console.log("삭제할 알림>> ", notificationId);
-    // /api/common/notification/{notificationId}
-    const res = await api.patch(`/common/notification/${notificationId}`);
-    console.log(res.data?.message);
+  // 특정 알림 읽음 처리  + 페이지 이동
+  async function handleNotificationClick(noti) {
+    const { notificationId, notificationType, notificationContent } = noti;
+
+    console.log("📨 클릭된 알림:", noti);
+
+    // 1) 안 읽은 알림이면 서버에 읽음 처리 + 상태 업데이트
+    if (!noti.readAt && !noti.isRead) {
+      try {
+        await readNotification(notificationId); // PATCH 요청
+        markAsRead(notificationId);             // Zustand 상태 업데이트
+      } catch (e) {
+        console.error("알림 읽음 처리 실패:", e);
+      }
+    }
+
+    // 2) 타입별 네비게이션
+    try {
+      // notificationContent 가 { message, targetId } 형태라고 가정
+      const content = notificationContent;
+      const targetId =
+        content && typeof content === "object" ? content.targetId : null;
+
+      // ORDER(주문) 타입 + targetId 있으면 주문 상세로 이동
+      if (
+        (notificationType === "ORDER" || notificationType === "주문") &&
+        targetId
+      ) {
+        navigate(`/me/order/${targetId}`);
+        setNotifOpen(false); // 드로어 닫기
+      }
+
+      // 다른 타입들도 나중에 추가 가능
+      // else if (notificationType === "GIFT" || notificationType === "선물") { ... }
+
+    } catch (e) {
+      console.error("알림 클릭 후 이동 처리 중 오류:", e);
+    }
   }
+
+  // async function readMarkNotification(notificationId) {
+  //   const target = useNotificationStore.getState().getNotification(notificationId);
+
+  //   if (!target) {
+  //     console.warn("❌ 알림을 찾을 수 없음:", notificationId);
+  //     return;
+  //   }
+  //   console.log("📨 클릭된 알림:", target);
+
+  //   if (target.readAt || target.isRead) {
+  //     console.log("✅ 이미 읽은 알림입니다. 요청 생략.");
+  //     return;
+  //   }
+    
+    
+  //    try {
+  //     await readNotification(notificationId); // PATCH 요청
+  //     markAsRead(notificationId); // 상태 업데이트
+  //   } catch (e) {
+  //     console.error("알림 읽음 처리 실패:", e);
+  //   } finally {
+  //     console.log("🔄 알림 상태 업데이트 완료");
+  //   }
+  // }
 
   // ------------------------------------------
   // 1) 앱 / 모바일 모드
@@ -128,7 +209,7 @@ export default function CustomerLayout() {
               onClick={openNotifDrawer}
               // sx={{ zIndex: 1400 }}
             >
-              <Badge badgeContent={notifications.length} color="error">
+              <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -198,53 +279,21 @@ export default function CustomerLayout() {
             <Typography variant="h6" fontWeight={700}>
               알림
             </Typography>
-
-            <Typography
-              variant="body2"
-              sx={{ color: "text.secondary", cursor: "pointer" }}
-              onClick={handleCloseNotif}
-            >
-              닫기
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
+              <Button onClick={handleCloseNotif} color="gray">
+                닫기
+              </Button>
+          </Box>
           </Box>
           <Divider />
           <List sx={{ p: 0 }}>
             {notifications.map((noti) => (
-              <ListItemButton
+              <NotificationItem
                 key={noti.notificationId}
-                alignItems="flex-start"
-                onClick={() => readMarkNotification(noti.notificationId)}
-              >
-                <ListItemAvatar>
-                  <Avatar
-                    sx={{
-                      backgroundColor: noti.readAt
-                        ? "rgba(223, 223, 223, 1)"
-                        : "brown",
-                    }}
-                  >
-                    <CoffeeIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <Box sx={{ ml: 1 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, mb: 0.5 }}
-                  >
-                    {noti.notificationType}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.secondary", mb: 0.3 }}
-                  >
-                    {noti.notificationContent}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                    {noti.createdAT.split("T")[0]}{" "}
-                    {noti.createdAT.split("T")[1].split(".")[0]}
-                  </Typography>
-                </Box>
-              </ListItemButton>
+                noti={noti}
+                onClick={handleNotificationClick}
+              />
             ))}
 
             {notifications.length === 0 && (
@@ -365,7 +414,7 @@ export default function CustomerLayout() {
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
             <IconButton color="black" onClick={openNotifDrawer}>
-              <Badge badgeContent={notifications.length} color="error">
+              <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -404,7 +453,7 @@ export default function CustomerLayout() {
             알림
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <Button onClick={deleteAllNotifications}>전체 삭제</Button>
+            <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
             <Button onClick={handleCloseNotif} color="gray">
               닫기
             </Button>
@@ -413,41 +462,11 @@ export default function CustomerLayout() {
         <Divider />
         <List sx={{ p: 0 }}>
           {notifications.map((noti) => (
-            <ListItemButton
+            <NotificationItem
               key={noti.notificationId}
-              alignItems="flex-start"
-              onClick={() => readMarkNotification(noti.notificationId)}
-            >
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    backgroundColor: noti.readAt
-                      ? "rgba(223, 223, 223, 1)"
-                      : "brown",
-                  }}
-                >
-                  <CoffeeIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <Box sx={{ ml: 1 }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, mb: 0.5 }}
-                >
-                  {noti.notificationType}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", mb: 0.3 }}
-                >
-                  {noti.notificationContent}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                  {noti.createdAT.split("T")[0]}{" "}
-                  {noti.createdAT.split("T")[1].split(".")[0]}
-                </Typography>
-              </Box>
-            </ListItemButton>
+              noti={noti}
+              onClick={handleNotificationClick}
+            />
           ))}
 
           {notifications.length === 0 && (
