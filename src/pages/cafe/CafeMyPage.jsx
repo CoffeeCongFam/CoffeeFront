@@ -26,7 +26,7 @@ function CafeMyPage() {
 
   // ✅ 매장 정보 있으면 “매장 정보 / 내 정보”
   //    없으면 “매장 등록 / 내 정보”
-  const hasStore = !!(authUser?.partnerStoreId || storeInfo?.partnerStoreId);
+  const hasStore = !!storeInfo?.partnerStoreId;  // 또는 그냥 !!storeInfo
   const finalMenus = hasStore
     ? ["매장 정보", "내 정보"]
     : ["매장 등록", "내 정보"];
