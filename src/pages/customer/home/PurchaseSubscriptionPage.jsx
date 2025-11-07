@@ -23,7 +23,8 @@ function PurchaseSubscriptionPage() {
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPurchaseLoading, setIsPurchaseLoading] = useState(false); // 결제 처리 로딩 상태
   const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
 
   async function fetchSubData() {
@@ -44,7 +45,7 @@ function PurchaseSubscriptionPage() {
 
   //결제 진행 함수 (로딩 + 완료 페이지 이동)
   async function confirmPayment() {
-    setIsLoading(true);
+    setIsPurchaseLoading(true);
     setPayOpen(false);
 
     console.log("결제 진행 ----------------------------");
@@ -63,9 +64,13 @@ function PurchaseSubscriptionPage() {
       console.error("결제 실패:", error);
       alert("결제 처리 중 오류가 발생했습니다.");
     } finally {
-      setIsLoading(false);
+      setIsPurchaseLoading(false);
     }
   }
+
+  //   {
+  //   isLoading ? <Loading></Loading> :
+  // }
 
   return (
     <>
@@ -231,7 +236,7 @@ function PurchaseSubscriptionPage() {
 
       {/* ✅ 결제 로딩 화면 */}
       <Backdrop
-        open={isLoading}
+        open={isPurchaseLoading}
         sx={{
           color: "#fff",
           zIndex: (theme) => theme.zIndex.modal + 2,

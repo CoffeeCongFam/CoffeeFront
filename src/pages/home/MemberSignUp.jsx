@@ -59,11 +59,7 @@ function MemberSignUp() {
     };
 
     try {
-      const response = await api.post(
-        "/signup/member",
-        { ...formData },
-        { withCredentials: true }
-      );
+      const response = await api.post("/signup/member", { ...formData });
 
       // response 전체 출력
       console.log("응답 전체:", response.data);

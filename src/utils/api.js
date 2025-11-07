@@ -31,7 +31,7 @@ export const TokenService = {
   removeLocalAccessToken: () => {
     localStorage.removeItem("accessToken");
   },
-  // user 정보 관련 함수
+  // user 정보 관련 함수 => 근데 로컬 스토리지에 없을 텐데...
   getUser: () => {
     return JSON.parse(localStorage.getItem("user"));
   },

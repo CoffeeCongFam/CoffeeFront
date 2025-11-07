@@ -9,6 +9,7 @@ import useAppShellMode from "../../../hooks/useAppShellMode.js";
 import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
 import dummyImg from "./../../../assets/cafeInfoDummy.png";
+import Loading from "../../../components/common/Loading.jsx";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -49,29 +50,48 @@ function StoreDetailPage() {
   };
 
   useEffect(() => {
-    // 카페 정보 초기화
-    try {
-      loadStoreDetail(storeId);
-      // 카페 상태 계산
-      setStoreStatus(getStoreStatusByDate(store.storeHours));
-      setIsLoading(false);
-    } catch (err) {
-      console.log("카페 상세  정보 요청 실패: ", err);
-      alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
-    }
+    let mounted = true; // 언마운트 후 setState 방지용
+
+    const init = async () => {
+      console.log("카페 페이지 로딩 시작");
+      setIsLoading(true);
+
+      try {
+        const data = await fetchStoreDetail(storeId);
+        if (!mounted) return;
+
+        setStore(data);
+        setStoreStatus(getStoreStatusByDate(data.storeHours));
+      } catch (err) {
+        console.log("카페 상세 정보 요청 실패: ", err);
+        alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
+      } finally {
+        if (mounted) {
+          setIsLoading(false); // ✅ 여기서 로딩 종료
+          console.log("카페 페이지 로딩 완료");
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      mounted = false;
+    };
   }, [storeId]);
 
-  const loadStoreDetail = async (storeId) => {
-    try {
-      const data = await fetchStoreDetail(storeId);
-      setStore(data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return isLoading ? (
-    <Box>로딩 중...</Box>
+    <Box
+      sx={{
+        width: "100%",
+        height: "100vh",
+      }}
+    >
+      <Loading
+        title={"☕ 잠시만요, 카페로 향하는 중이에요"}
+        message={"매장 정보를 불러오는 중이에요."}
+      />
+    </Box>
   ) : (
     <Box
       sx={{
@@ -93,7 +113,7 @@ function StoreDetailPage() {
         }}
       >
         <img
-          src={dummyImg || store.storeImg}
+          src={store.storeImg || dummyImg}
           alt={store.storeName}
           sx={{
             width: "100%",
