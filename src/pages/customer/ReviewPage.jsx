@@ -272,10 +272,10 @@ function EmptyState() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
       <Typography variant="subtitle1" sx={{ mb: 1 }}>
-        아직 작성한 리뷰가 없어요
+        아직 작성한 리뷰가 없습니다
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        주문 후 매장에서 받은 서비스와 음료에 대해 리뷰를 남겨보세요.
+        주문 후 매장에서 받은 서비스와 음료에 대해 리뷰를 남길 수 있습니다.
       </Typography>
     </Box>
   );

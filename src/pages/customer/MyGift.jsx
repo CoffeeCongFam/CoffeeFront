@@ -276,7 +276,6 @@ function MyGift() {
     };
 
     const mId = normalizeId(memberId);
-    const sId = normalizeId(item.senderId);
     const rId = normalizeId(item.receiverId);
 
     // receiverId 와 memberId 를 기준으로 판별:
@@ -396,11 +395,14 @@ function MyGift() {
 
       {/* 데이터가 없을 때 표시할 메시지 */}
       {filteredGiftList.length === 0 && (
-        <Box sx={{ textAlign: "center", py: 8 }}>
-          <Typography variant="body1" color="text.secondary">
-            선물 내역이 존재하지 않습니다.
-          </Typography>
-        </Box>
+         <Box sx={{ mt: 6, textAlign: "center" }}>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                선물 내역이 비어 있습니다.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                선물하기 또는 선물을 받으면 이곳에서 내역을 확인할 수 있습니다.
+              </Typography>
+            </Box>
       )}
 
       {/* SENT 탭: getSendGiftData 기반 렌더링 */}
@@ -770,7 +772,7 @@ function MyGift() {
                             })()}
                           </Stack>
                         }
-                        onRefundSuccess={(pid, refundedAtFromApi, msid) => {
+                        onRefundSuccess={(pid, refundedAtFromApi) => {
                           // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
                           const updateItem = (g) => {
                             if (g.purchaseId !== pid) return g;

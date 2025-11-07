@@ -1,13 +1,25 @@
 import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, TextField, Chip } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  CheckCircleRounded,
+  PhotoCameraRounded,
+  SearchRounded,
+} from "@mui/icons-material";
 import axios from "axios";
 // L_03 - 카페 정보 등록만 담당하는 등록 api 호출
 import { postCafe } from "../../utils/login";
 const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
+
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
-function CafeSignUp() {
-  const navigate = useNavigate();
+
+function StoreForm() {
 
   // 상태 관리
   const [formState, setFormState] = useState({
@@ -247,19 +259,6 @@ function CafeSignUp() {
     reader.readAsDataURL(file);
   };
 
-  const inputRowStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    width: "100%",
-    justifyContent: "flex-start",
-  };
-
-  const labelTextStyle = {
-    color: "black",
-    minWidth: "90px",
-    textAlign: "right",
-  };
 
   // 모든 필수 필드가 채워졌는지 확인하는 변수
   const isFormValid =
@@ -268,6 +267,7 @@ function CafeSignUp() {
     formState.roadAddress.trim() !== "" &&
     formState.detailAddress.trim() !== "" &&
     formState.storePhone.trim() !== "";
+
   //----------------회원가입 버튼 --------------------
   const handleSignup = async () => {
     try {
@@ -294,25 +294,421 @@ function CafeSignUp() {
         data.append("file", formState.storeImage);
       }
       const result = await postCafe(data);
-      const success = result;
-
-      if (success) {
-        if (
-          window.confirm("회원가입이 완료되었습니다. 회원 홈으로 이동합니다.")
-        ) {
-          navigate("/store");
-        }
+       if (result) {
+        alert("매장 등록 완료!");
+        // 부모로 성공 이벤트 전달
+        window.location.reload();
       } else {
-        if (window.confirm("회원가입에 실패하였습니다. 메인으로 이동합니다.")) {
-          navigate("/");
-        }
+        alert("매장 등록 실패!");
       }
     } catch (err) {
-      console.error("회원가입 실패:", err);
-      alert("회원가입 중 오류가 발생했습니다.");
+      console.error("매장등록 실패:", err);
+      alert("매장등록 중 오류가 발생했습니다.");
     }
   };
   //------------------------------------
+
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 520,
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+      }}
+    >
+      {/* 헤더 영역 */}
+      <Chip
+        label="카페 사장님 전용"
+        size="small"
+        sx={{
+          alignSelf: "flex-start",
+          borderRadius: 999,
+          px: 1.4,
+          py: 0.2,
+          fontSize: "0.7rem",
+          fontWeight: 600,
+          borderColor: "primary.light",
+          color: "primary.main",
+          bgcolor: "primary.main",
+          backgroundImage:
+            "linear-gradient(135deg, rgba(248,250,252,0.95), rgba(219,234,254,0.95))",
+        }}
+        variant="outlined"
+      />
+
+      <Box>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+            mb: 0.5,
+          }}
+        >
+          매장 등록
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          우리 동네 대표 카페로 등록하고, 구독 · 선물 서비스를 시작해보세요 ☕
+        </Typography>
+      </Box>
+
+      <Divider sx={{ my: 1 }} />
+
+      <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.8 }}>
+          {/* 사업자번호 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 1,
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+              >
+                사업자번호
+              </Typography>
+              {formState.isBusinessVerified && (
+                <Chip
+                  icon={
+                    <CheckCircleRounded
+                      sx={{ fontSize: 16, color: "success.main" }}
+                    />
+                  }
+                  label="인증완료"
+                  size="small"
+                  sx={{
+                    borderRadius: 999,
+                    px: 0.6,
+                    bgcolor: "success.light",
+                    color: "success.dark",
+                    "& .MuiChip-icon": {
+                      ml: 0.2,
+                    },
+                  }}
+                />
+              )}
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                disabled={formState.isBusinessVerified} // 인증 후 비활성화
+                value={formState.businessNumber}
+                onChange={(e) => {
+                  const formatted = formatBusinessNumber(e.target.value);
+                  setFormState((prev) => ({
+                    ...prev,
+                    businessNumber: formatted,
+                    isBusinessVerified: false, // 번호 변경 시 인증 상태 초기화
+                  }));
+                }}
+                placeholder="000-00-00000"
+                size="small"
+                variant="outlined"
+                fullWidth
+                type="text"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9-]*",
+                  maxLength: 12,
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={handleVerifyBusinessNumber}
+                disabled={formState.isBusinessVerified}
+                sx={{
+                  flexShrink: 0,
+                  borderRadius: 999,
+                  px: 2,
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  backgroundImage:
+                    "linear-gradient(135deg, #111827, #4b5563)",
+                  boxShadow: "0 6px 16px rgba(15,23,42,0.35)",
+                  "&:disabled": {
+                    backgroundImage: "none",
+                  },
+                }}
+              >
+                사업자 인증
+              </Button>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              국세청에 등록된 사업자만 가입이 가능해요.
+            </Typography>
+          </Box>
+
+          {/* 상호명 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+            >
+              상호명
+            </Typography>
+            <TextField
+              value={formState.storeName}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  storeName: e.target.value,
+                }))
+              }
+              placeholder="예) 달빛다방"
+              size="small"
+              variant="outlined"
+              fullWidth
+            />
+          </Box>
+
+          {/* 주소 섹션 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+            >
+              매장 주소
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                value={formState.postcode}
+                onChange={() => {}}
+                placeholder="우편번호"
+                size="small"
+                variant="outlined"
+                fullWidth
+                inputProps={{ readOnly: true }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleClickAddressSearch}
+                startIcon={
+                  <SearchRounded sx={{ fontSize: 18, color: "primary.main" }} />
+                }
+                sx={{
+                  flexShrink: 0,
+                  borderRadius: 999,
+                  px: 1.8,
+                  fontSize: "0.8rem",
+                  textTransform: "none",
+                  borderColor: "primary.light",
+                }}
+              >
+                주소 찾기
+              </Button>
+            </Box>
+
+            <TextField
+              value={formState.roadAddress}
+              onChange={() => {}}
+              placeholder="도로명 주소"
+              size="small"
+              variant="outlined"
+              fullWidth
+              inputProps={{ readOnly: true }}
+            />
+
+            <TextField
+              value={formState.detailAddress}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  detailAddress: e.target.value,
+                }))
+              }
+              placeholder="상세주소 (층, 호수 등)"
+              size="small"
+              variant="outlined"
+              fullWidth
+              inputRef={detailAddressRef}
+            />
+          </Box>
+
+          {/* 상세정보 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+            >
+              매장 소개
+            </Typography>
+            <TextField
+              value={formState.extraInfo}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  extraInfo: e.target.value,
+                }))
+              }
+              placeholder="우리 카페의 분위기, 인기 메뉴 등을 자유롭게 적어주세요."
+              size="small"
+              variant="outlined"
+              fullWidth
+              multiline
+              minRows={3}
+            />
+          </Box>
+
+          {/* 매장사진 업로드 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+            >
+              매장 사진
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                flexWrap: "wrap",
+              }}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  fileInputRef.current && fileInputRef.current.click()
+                }
+                startIcon={
+                  <PhotoCameraRounded
+                    sx={{ fontSize: 18, color: "text.secondary" }}
+                  />
+                }
+                sx={{
+                  borderRadius: 999,
+                  px: 2,
+                  textTransform: "none",
+                  fontSize: "0.85rem",
+                }}
+              >
+                이미지 업로드
+              </Button>
+              <Typography variant="caption" color="text.secondary">
+                JPG / PNG, 10MB 이하 권장
+              </Typography>
+            </Box>
+
+            {formState.imagePreviewUrl && (
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={formState.imagePreviewUrl}
+                  alt="store-preview"
+                  sx={{
+                    width: "100%",
+                    maxWidth: 360,
+                    maxHeight: 220,
+                    borderRadius: 3,
+                    objectFit: "cover",
+                    border: "1px solid",
+                    borderColor: "grey.200",
+                    boxShadow: "0 10px 30px rgba(15,23,42,0.18)",
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+
+          {/* 매장 전화번호 */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+            >
+              매장 전화번호
+            </Typography>
+            <TextField
+              value={formatPhoneNumber(formState.storePhone)}
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, ""); // 숫자만 추출
+                setFormState((prev) => ({
+                  ...prev,
+                  storePhone: digitsOnly, // 하이픈 없는 문자열로 저장
+                }));
+              }}
+              placeholder="000-0000-0000"
+              size="small"
+              variant="outlined"
+              fullWidth
+              type="text"
+              inputProps={{
+                inputMode: "tel",
+                pattern: "[0-9-]*",
+                maxLength: 13,
+              }}
+            />
+          </Box>
+
+          {/* 안내 메시지 */}
+          {!formState.isBusinessVerified && (
+            <Typography
+              variant="caption"
+              color="error.main"
+              sx={{ mt: -0.5 }}
+            >
+              사업자 인증을 먼저 진행해주세요.
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={!isFormValid}
+            sx={{
+              mt: 0.5,
+              borderRadius: 999,
+              py: 1.2,
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              textTransform: "none",
+              backgroundImage:
+                "linear-gradient(135deg, #0f172a 0%, #1f2937 40%, #111827 100%)",
+              boxShadow: "0 10px 30px rgba(15,23,42,0.55)",
+              "&:hover": {
+                backgroundImage:
+                  "linear-gradient(135deg, #020617 0%, #111827 100%)",
+                boxShadow: "0 12px 40px rgba(15,23,42,0.7)",
+              },
+              "&:disabled": {
+                backgroundImage: "none",
+                backgroundColor: "grey.400",
+                boxShadow: "none",
+              },
+            }}
+          >
+            매장 등록 완료하기
+          </Button>
+        </Box>
+      </form>
+    </Box>
+  );
+}
+
+function CafeSignUp() {
   return (
     <div
       style={{
@@ -340,253 +736,11 @@ function CafeSignUp() {
           backgroundColor: "#fff",
         }}
       >
-        <div
-          style={{
-            fontWeight: "bold",
-            fontSize: "22px",
-            color: "black",
-            marginBottom: "10px",
-          }}
-        >
-          점주회원
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {/* 사업자번호 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>사업자번호:</span>
-            <TextField
-              disabled={formState.isBusinessVerified} // 인증 후 비활성화
-              value={formState.businessNumber}
-              onChange={(e) => {
-                const formatted = formatBusinessNumber(e.target.value);
-                setFormState((prev) => ({
-                  ...prev,
-                  businessNumber: formatted,
-                  isBusinessVerified: false, // 번호 변경 시 인증 상태 초기화
-                }));
-              }}
-              placeholder="000-00-00000"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 150, flexGrow: 1 }}
-              type="text"
-              inputProps={{
-                inputMode: "numeric",
-                pattern: "[0-9-]*",
-                maxLength: 12,
-              }}
-            />
-            <Button
-              variant="outlined"
-              onClick={handleVerifyBusinessNumber}
-              disabled={formState.isBusinessVerified}
-              sx={{ textTransform: "none", whiteSpace: "nowrap" }}
-            >
-              사업자 인증
-            </Button>
-            {formState.isBusinessVerified && (
-              <Chip label="인증완료" color="success" size="small" />
-            )}
-          </div>
-
-          {/* 상호명 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>상호명:</span>
-            <TextField
-              value={formState.storeName}
-              onChange={(e) =>
-                setFormState((prev) => ({ ...prev, storeName: e.target.value }))
-              }
-              placeholder="상호명"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240 }}
-            />
-          </div>
-
-          {/* 우편번호 - 주소 찾기 버튼 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>우편번호:</span>
-            <TextField
-              value={formState.postcode}
-              onChange={() => {}}
-              placeholder="우편번호"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 160 }}
-              inputProps={{ readOnly: true }}
-            />
-            <Button
-              variant="outlined"
-              onClick={handleClickAddressSearch}
-              sx={{ textTransform: "none" }}
-            >
-              주소 찾기
-            </Button>
-            <div style={{ flexGrow: 1 }}></div>
-          </div>
-
-          {/* 도로명 주소 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>도로명 주소:</span>
-            <TextField
-              value={formState.roadAddress}
-              onChange={() => {}}
-              placeholder="도로명 주소"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240, flexGrow: 1 }}
-              inputProps={{ readOnly: true }}
-            />
-          </div>
-
-          {/* 상세주소 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>상세주소:</span>
-            <TextField
-              value={formState.detailAddress}
-              onChange={(e) =>
-                setFormState((prev) => ({
-                  ...prev,
-                  detailAddress: e.target.value,
-                }))
-              }
-              placeholder="상세주소"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240 }}
-              inputRef={detailAddressRef}
-            />
-          </div>
-
-          {/* 상세정보 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>상세정보:</span>
-            <TextField
-              value={formState.extraInfo}
-              onChange={(e) =>
-                setFormState((prev) => ({ ...prev, extraInfo: e.target.value }))
-              }
-              placeholder="매장을 소개글을 작성해주세요"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240 }}
-            />
-          </div>
-
-          {/* 매장사진 업로드 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>매장사진:</span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-            <Button
-              variant="outlined"
-              onClick={() =>
-                fileInputRef.current && fileInputRef.current.click()
-              }
-              sx={{ textTransform: "none" }}
-            >
-              이미지 업로드
-            </Button>
-            <div style={{ flexGrow: 1 }}></div>
-          </div>
-
-          {/* 이미지 미리보기 */}
-          {formState.imagePreviewUrl && (
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src={formState.imagePreviewUrl}
-                alt="store-preview"
-                style={{
-                  maxWidth: "320px",
-                  maxHeight: "200px",
-                  objectFit: "cover",
-                  borderRadius: "6px",
-                  border: "1px solid #eee",
-                }}
-              />
-            </div>
-          )}
-
-          {/* 매장 전화번호 */}
-          <div style={inputRowStyle}>
-            <span style={labelTextStyle}>매장 전화번호:</span>
-            <TextField
-              value={formatPhoneNumber(formState.storePhone)}
-              onChange={(e) => {
-                const digitsOnly = e.target.value.replace(/\D/g, ""); // 숫자만 추출
-                setFormState((prev) => ({
-                  ...prev,
-                  storePhone: digitsOnly, // 하이픈 없는 문자열로 저장
-                }));
-              }}
-              placeholder="000-0000-0000"
-              size="small"
-              variant="outlined"
-              sx={{ minWidth: 240 }}
-              type="text"
-              inputProps={{
-                inputMode: "tel",
-                pattern: "[0-9-]*",
-                maxLength: 13,
-              }}
-            />
-          </div>
-
-          {/* 안내 메시지 */}
-          {!formState.isBusinessVerified && (
-            <div
-              style={{
-                color: "#d32f2f",
-                fontSize: "12px",
-                marginTop: "10px",
-                textAlign: "center",
-              }}
-            >
-              사업자 인증을 먼저 진행해주세요.
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={!isFormValid}
-            sx={{
-              backgroundColor: "black",
-              "&:hover": { backgroundColor: "#111" },
-              textTransform: "none",
-              marginTop: "15px",
-              width: "100%",
-              padding: "10px 0",
-            }}
-          >
-            회원가입
-          </Button>
-        </form>
+        <StoreForm />
       </div>
     </div>
   );
 }
 
+export { StoreForm };
 export default CafeSignUp;

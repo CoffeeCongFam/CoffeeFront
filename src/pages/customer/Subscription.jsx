@@ -982,11 +982,14 @@ const SubscriptionPage = () => {
           </IconButton>
         </Box>
       ) : (
-        <Typography>
-          {activeTab === "expired"
-            ? "만료된 구독권이 없습니다."
-            : "보유한 구독권이 없습니다."}
-        </Typography>
+         <Box sx={{ mt: 6, textAlign: "center" }}>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                구독권 내역이 비어 있습니다.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
+              </Typography>
+            </Box>
       )}
     </Container>
   );
