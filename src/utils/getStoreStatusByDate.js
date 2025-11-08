@@ -4,7 +4,7 @@ export default function getStoreStatusByDate(
   now = new Date()
 ) {
   if (!Array.isArray(storeHours) || storeHours.length === 0) {
-    return "CLOSED";
+    return "PREPARING";
   }
 
   const dayCode = DAY_CODE[now.getDay()]; // 오늘 요일 코드 ex) "MON"

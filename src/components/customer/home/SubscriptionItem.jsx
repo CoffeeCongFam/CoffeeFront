@@ -14,6 +14,7 @@ import React from "react";
 import dummyImg from "../../../assets/cafeInfoDummy.png";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
+import SubTypeChip from "../../common/SubTypeChip";
 
 function SubscriptionItem({ today, item, handleOrderClick }) {
   const { isAppLike } = useAppShellMode();
@@ -82,7 +83,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             objectFit: "cover",
             backgroundColor: "#ddd",
           }}
-          image={dummyImg}
+          image={item.store.storeImg || dummyImg}
           // image={item.store.storeImg || dummayImg}
           alt={item.store.storeName}
         />
@@ -113,11 +114,12 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
                 cursor: "default",
               }}
             >
-              {item.store.storeName}
+              {item.store.storeName} {item.subName}
             </Typography>
           </Tooltip>
+          <SubTypeChip type={item.subscriptionType} />
 
-          <Chip
+          {/* <Chip
             icon={<StarBorderIcon sx={{ color: "white" }} />}
             label={item.subscriptionType}
             size="small"
@@ -128,7 +130,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
               "& .MuiChip-icon": { mr: 0 },
               borderRadius: "16px",
             }}
-          />
+          /> */}
         </Box>
 
         {/* 이용 기간 (가운데 정렬, 회색) */}
@@ -149,7 +151,8 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             fontWeight: 500,
           }}
         >
-          남은 이용일: {getRemainingDays(today, item.subEnd)}일
+          {/* 남은 이용일 : {item.subscriptionPeriod} */}
+          남은 이용일: {getRemainingDays(today, item.subEnd) - 1}일
         </Typography>
       </CardContent>
 

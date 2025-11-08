@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, Avatar  } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import menuDummy from "../../../assets/menuDummy.jpg";
+import CoffeeIcon from "@mui/icons-material/Coffee";
+import CakeIcon from '@mui/icons-material/Cake';
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 function CafeMenuList({ menus = [] }) {
@@ -35,7 +37,7 @@ function CafeMenuList({ menus = [] }) {
   // 타입 표시 예쁘게
   const getTypeLabel = (type) => {
     if (type === "BEVERAGE") return "음료";
-    if (type === "DESERT") return "디저트";
+    if (type === "DESSERT") return "디저트";
     return type;
   };
 
@@ -56,6 +58,7 @@ function CafeMenuList({ menus = [] }) {
               overflow: "hidden",
             }}
           >
+
             {/* 섹션 헤더 */}
             <Box
               sx={{
@@ -71,6 +74,12 @@ function CafeMenuList({ menus = [] }) {
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                 {getTypeLabel(type)}
+                <Typography
+                  component="span"
+                  sx={{ fontSize: 13, color: "text.secondary", ml: 0.5 }}
+                >
+                  ({grouped[type].length})
+                </Typography>
               </Typography>
               <IconButton size="small">
                 {openState[type] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -88,7 +97,7 @@ function CafeMenuList({ menus = [] }) {
                       flexDirection: { xs: "column", sm: "row" },
                       justifyContent: "space-between",
                       gap: { xs: 1.5, sm: 2 },
-                      alignItems: "center",
+                      alignItems: { xs: "stretch", sm: "center" },
                       py: 1.2,
                       borderBottom: "1px solid #cacacaff",
                       "&:last-of-type": { borderBottom: "none" },
@@ -110,32 +119,42 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-                      <Box
-                        component="img"
-                        src={menu?.menuImage || menuDummy}
-                        alt={menu?.menuName}
-                        sx={{
-                          width: { xs: 80, sm: 100 },
-                          height: { xs: 64, sm: 70 },
-                          objectFit: "cover",
-                          borderRadius: 1.2,
-                          flexShrink: 0,
-                        }}
-                      />
-                      {menu.menuImg && (
-                        <Box
-                          component="img"
-                          src={menu?.menuImage || menuDummy}
-                          alt={menu?.menuName}
-                          sx={{
-                            width: { xs: 80, sm: 100 },
-                            height: { xs: 64, sm: 70 },
-                            objectFit: "cover",
-                            borderRadius: 1.2,
-                            flexShrink: 0,
-                          }}
-                        />
-                      )}
+                      {
+                        menu?.menuImg ? (
+                          <Box
+                            component="img"
+                            src={menuDummy || menu.menuImg}
+                            alt={menu.menuName}
+                            sx={{
+                              width: { xs: 80, sm: 100 },
+                              height: { xs: 64, sm: 70 },
+                              objectFit: "cover",
+                              borderRadius: 1.2,
+                              flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <Avatar
+                            sx={{
+                              width: { xs: 80, sm: 100 },
+                              height: { xs: 64, sm: 70 },
+                              bgcolor: "#85766cc4",
+                              // bgcolor: "#ffe082",
+                              // color: "#5a3e2b",
+                              borderRadius: 1.2, // 박스 모양 맞추기
+                              flexShrink: 0,
+                            }}
+                          >
+                            {menu.menuType === "DESSERT" ? (
+                              <CakeIcon sx={{ fontSize: 36 }} />
+                            ) : (
+                              <CoffeeIcon sx={{ fontSize: 36 }} />
+                            )}
+                          </Avatar>
+                        )
+                      }
+
+                      
 
                       <Box
                         sx={{

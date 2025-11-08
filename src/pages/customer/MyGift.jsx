@@ -1,54 +1,56 @@
-  // ✅ 공통: 리스트 응답(normalize)
-  // - 배열 그대로 반환
-  // - axios 응답: { data: [...] } 또는 { data: { success, data: [...] } }
-  // - 직접 래핑: { success, data: [...] }
-  const extractListFromResponse = (res) => {
-    if (Array.isArray(res)) return res;
-    if (!res || typeof res !== "object") return [];
-    const root = res.data ?? res; // axios면 res.data, 아니면 res
-    if (Array.isArray(root)) return root;
-    if (root && typeof root === "object" && Array.isArray(root.data)) return root.data;
-    return [];
-  };
+// ✅ 공통: 리스트 응답(normalize)
+// - 배열 그대로 반환
+// - axios 응답: { data: [...] } 또는 { data: { success, data: [...] } }
+// - 직접 래핑: { success, data: [...] }
+const extractListFromResponse = (res) => {
+  if (Array.isArray(res)) return res;
+  if (!res || typeof res !== "object") return [];
+  const root = res.data ?? res; // axios면 res.data, 아니면 res
+  if (Array.isArray(root)) return root;
+  if (root && typeof root === "object" && Array.isArray(root.data))
+    return root.data;
+  return [];
+};
 
-  // ✅ 공통: 사용 내역 및 환불 여부 정규화
-  const normalizeUsageAndRefund = (src) => {
-    if (!src || typeof src !== "object") {
-      return { usedAt: [], isRefunded: false };
-    }
+// ✅ 공통: 사용 내역 및 환불 여부 정규화
+const normalizeUsageAndRefund = (src) => {
+  if (!src || typeof src !== "object") {
+    return { usedAt: [], isRefunded: false };
+  }
 
-    const usageHistoryList = Array.isArray(src.usageHistoryList)
-      ? src.usageHistoryList
-      : [];
+  const usageHistoryList = Array.isArray(src.usageHistoryList)
+    ? src.usageHistoryList
+    : [];
 
-    const usedAtArray = usageHistoryList
-      .map((u) => (u && u.usedAt ? u.usedAt : null))
-      .filter(Boolean);
+  const usedAtArray = usageHistoryList
+    .map((u) => (u && u.usedAt ? u.usedAt : null))
+    .filter(Boolean);
 
-    const usedAt = usedAtArray.length > 0
+  const usedAt =
+    usedAtArray.length > 0
       ? usedAtArray
       : Array.isArray(src.usedAt)
       ? src.usedAt
       : [];
 
-    const isRefunded =
-      typeof src.isRefunded === "boolean"
-        ? src.isRefunded
-        : !!(src.refundedAt && String(src.refundedAt).trim() !== "");
+  const isRefunded =
+    typeof src.isRefunded === "boolean"
+      ? src.isRefunded
+      : !!(src.refundedAt && String(src.refundedAt).trim() !== "");
 
-    return { usedAt, isRefunded };
-  };
+  return { usedAt, isRefunded };
+};
 
-  // ✅ 공통: 메뉴 리스트 정규화
-  const normalizeMenuList = (src) => {
-    if (!src || typeof src !== "object") return [];
-    const raw = Array.isArray(src.menuList)
-      ? src.menuList
-      : Array.isArray(src.menuNameList)
-      ? src.menuNameList
-      : [];
-    return raw;
-  };
+// ✅ 공통: 메뉴 리스트 정규화
+const normalizeMenuList = (src) => {
+  if (!src || typeof src !== "object") return [];
+  const raw = Array.isArray(src.menuList)
+    ? src.menuList
+    : Array.isArray(src.menuNameList)
+    ? src.menuNameList
+    : [];
+  return raw;
+};
 // /src/pages/customer/MyGift.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import GiftListItem from "../../components/customer/gift/GiftListItem";
@@ -80,7 +82,7 @@ import {
   getReceiveGift,
 } from "../../utils/gift";
 import { SubscriptionDetailCard } from "./Subscription";
-import useUserStore from "../../stores/useUserStore"; 
+import useUserStore from "../../stores/useUserStore";
 
 function MyGift() {
   const { authUser } = useUserStore();
@@ -88,8 +90,8 @@ function MyGift() {
   const [filter, setFilter] = useState("ALL");
   const [openIndex, setOpenIndex] = useState(null);
   const [giftList, setGiftList] = useState([]);
-  const [sentGiftList, setSentGiftList, ] = useState([]);
-  const [receivedGiftList, setReceivedGiftList] = useState([])
+  const [sentGiftList, setSentGiftList] = useState([]);
+  const [receivedGiftList, setReceivedGiftList] = useState([]);
   const [sendDetailById, setSendDetailById] = useState({});
   const [loadingSendDetailId, setLoadingSendDetailId] = useState(null);
   const [receiveDetailById, setReceiveDetailById] = useState({});
@@ -257,7 +259,6 @@ function MyGift() {
     [giftList]
   );
 
-
   // ✅ 탭 필터링
   const filteredGiftList = useMemo(() => {
     if (filter === "RECEIVED") return receivedGiftList; // RECEIVED 탭은 getReceievGiftData 결과만 사용
@@ -276,15 +277,13 @@ function MyGift() {
     };
 
     const mId = normalizeId(memberId);
-    const sId = normalizeId(item.senderId);
     const rId = normalizeId(item.receiverId);
 
     // receiverId 와 memberId 를 기준으로 판별:
     //  - 같으면: 내가 받은 선물
     //  - 다르면: 내가 보낸 선물로 간주
     const isMineReceived = mId !== null && rId !== null && mId === rId;
-    const isMineSent =
-      mId !== null && rId !== null && mId !== rId;
+    const isMineSent = mId !== null && rId !== null && mId !== rId;
 
     // 내가 받은 선물: sender -> 나 (receiverId === memberId)
     if (isMineReceived) {
@@ -362,7 +361,6 @@ function MyGift() {
       .filter(Boolean);
   };
 
-
   return (
     <Box
       sx={{
@@ -396,9 +394,12 @@ function MyGift() {
 
       {/* 데이터가 없을 때 표시할 메시지 */}
       {filteredGiftList.length === 0 && (
-        <Box sx={{ textAlign: "center", py: 8 }}>
-          <Typography variant="body1" color="text.secondary">
-            선물 내역이 존재하지 않습니다.
+        <Box sx={{ mt: 6, textAlign: "center" }}>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            선물 내역이 비어 있습니다.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            선물하기 또는 선물을 받으면 이곳에서 내역을 확인할 수 있습니다.
           </Typography>
         </Box>
       )}
@@ -530,192 +531,220 @@ function MyGift() {
                 />
               </Button>
 
-            <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
-              <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
-                <SubscriptionDetailCard
-                  subscriptionData={{
-                    storeName: item.storeName,
-                    subscriptionType: item.subscriptionType,
-                    price: item.price,
-                    subscriptionDesc: item.subscriptionName,
-                    subscriptionPeriod: item.subscriptionPeriod,
-                    subscriptionStart: item.subscriptionStart,
-                    subscriptionEnd: item.subscriptionEnd,
-                    menuNameList: extractMenuNames(item.menuList),
-                    giverName: item.sender,
-                    receiver: item.receiver,
-                    dailyRemainCount: item.dailyRemainCount,
-                    usedAt: item.usedAt,
-                    usageStatus: item.usageStatus,
-                    refundedAt: item.refundedAt,
-                    isRefunded: item.isRefunded,
-                    purchaseId: item.purchaseId,
-                  }}
-                  purchaseId={item.purchaseId}
-                  subscriptionType={item.subscriptionType}
-                  maxDailyUsage={item.dailyRemainCount}
-                  giftType="RECEIVED"
-                  isGifted={true}
-                  isExpired={item.usageStatus === 'EXPIRED'}
-                  usedAt={item.usedAt}
-                  refundedAt={item.refundedAt}
-                  isRefunded={item.isRefunded}
-                  hideCancel={item.usageStatus === 'ACTIVE'}
-                  headerExtra={
-                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
-                      {(() => {
-                        const color =
-                          item.usageStatus === 'ACTIVE' ? 'success' :
-                          (item.usageStatus === 'NOT_ACTIVATED' ? 'default' : 'warning');
-                        return <Chip size="small" color={color} label={item.usageStatus} />;
-                      })()}
-                    </Stack>
-                  }
-                  onRefundSuccess={(pid, refundedAtFromApi) => {
-                    setReceivedGiftList((prev) =>
-                      prev.map((g) =>
-                        g.purchaseId === pid
-                          ? {
-                              ...g,
-                              isRefunded: true,
-                              refundedAt:
-                                refundedAtFromApi ??
-                                g.refundedAt ??
-                                new Date().toISOString(),
-                            }
-                          : g
-                      )
-                    );
-                  }}
-                />
-              </Box>
-            </Collapse>
-          </Box>
-        );
-      })}
-
-      {/* ALL 탭: getGiftData 기반, memberId / senderId / receiverId로 분기 */}
-      {filter === "ALL" && filteredGiftList.map((item, index) => {
-        const { node, isSent, isMineSent, isMineReceived } = formatMessage(item, memberId);
-        const canToggle = isMineSent || isMineReceived;
-
-        const handleClick = async () => {
-          if (!canToggle) return;
-          const next = openIndex === index ? null : index;
-          setOpenIndex(next);
-
-          if (next !== null) {
-            if (isMineSent && item.purchaseId) {
-              await fetchSendDetail(item.purchaseId);
-            }
-            if (isMineReceived && item.memberSubscriptionId) {
-              await fetchReceiveDetail(item.memberSubscriptionId);
-            }
-          }
-        };
-
-        return (
-          <Box key={item.purchaseId ?? index} sx={{ mb: 1 }}>
-            <Button fullWidth variant="text" onClick={handleClick} sx={{ p: 0, justifyContent: "flex-start", textTransform: "none" }}>
-              <GiftListItem
-                messageComponent={node}
-                date={formatKST(item.createdAt)}
-                isSent={isSent}
-              />
-            </Button>
-
-            {isMineSent && (
               <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
                 <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
-                  {(() => {
-                    const pid = item.purchaseId;
-                    const detail = pid ? sendDetailById[pid] : null;
-
-                    if (pid && !detail) {
-                      return (
-                        <Typography
-                          variant="body2"
-                          sx={{ color: "text.secondary", p: 1 }}
-                        >
-                          {loadingSendDetailId === pid
-                            ? "불러오는 중…"
-                            : "상세 정보를 불러올 수 없습니다."}
-                        </Typography>
-                      );
-                    }
-
-                    // detail이 있으면 SENT 탭 카드와 동일한 구성으로 표시
-                    return detail ? (
-                      <SubscriptionDetailCard
-                        subscriptionData={{
-                          storeName: detail.storeName,
-                          subscriptionType: detail.subscriptionType,
-                          price: detail.price,
-                          subscriptionDesc: detail.subscriptionName,
-                          subscriptionPeriod: detail.subscriptionPeriod,
-                          subscriptionStart: detail.subscriptionStart || detail.paidAt,
-                          subscriptionEnd: detail.subscriptionEnd,
-                          menuNameList: extractMenuNames(detail.menuList),
-                          dailyRemainCount: detail.maxDailyUsage,
-                          receiver: detail.receiver,
-                          usedAt: detail.usedAt,
-                          refundedAt: detail.refundedAt,
-                          isRefunded: detail.isRefunded,
-                          purchaseId: detail.purchaseId,
-                        }}
-                        purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
-                        subscriptionType={detail.subscriptionType}
-                        maxDailyUsage={detail.maxDailyUsage}
-                        giftType="SENT"
-                        isGifted={true}
-                        isExpired={detail.isExpired}
-                        usedAt={detail.usedAt}
-                        refundedAt={detail.refundedAt}
-                        isRefunded={detail.isRefunded}
-                        onRefundSuccess={(pid, refundedAtFromApi) => {
-                          // detail 캐시 갱신
-                          setSendDetailById((prev) => {
-                            const target = prev[pid];
-                            if (!target) return prev;
-                            const updated = {
-                              ...target,
-                              isRefunded: true,
-                              refundedAt:
-                                refundedAtFromApi ??
-                                target.refundedAt ??
-                                new Date().toISOString(),
-                            };
-                            return { ...prev, [pid]: updated };
-                          });
-                          // SENT 탭 리스트도 함께 갱신
-                          setSentGiftList((prev) =>
-                            prev.map((g) =>
-                              g.purchaseId === pid
-                                ? {
-                                    ...g,
-                                    isRefunded: true,
-                                    refundedAt:
-                                      refundedAtFromApi ??
-                                      g.refundedAt ??
-                                      new Date().toISOString(),
-                                  }
-                                : g
-                            )
+                  <SubscriptionDetailCard
+                    subscriptionData={{
+                      storeName: item.storeName,
+                      subscriptionType: item.subscriptionType,
+                      price: item.price,
+                      subscriptionDesc: item.subscriptionName,
+                      subscriptionPeriod: item.subscriptionPeriod,
+                      subscriptionStart: item.subscriptionStart,
+                      subscriptionEnd: item.subscriptionEnd,
+                      menuNameList: extractMenuNames(item.menuList),
+                      giverName: item.sender,
+                      receiver: item.receiver,
+                      dailyRemainCount: item.dailyRemainCount,
+                      usedAt: item.usedAt,
+                      usageStatus: item.usageStatus,
+                      refundedAt: item.refundedAt,
+                      isRefunded: item.isRefunded,
+                      purchaseId: item.purchaseId,
+                    }}
+                    purchaseId={item.purchaseId}
+                    subscriptionType={item.subscriptionType}
+                    maxDailyUsage={item.dailyRemainCount}
+                    giftType="RECEIVED"
+                    isGifted={true}
+                    isExpired={item.usageStatus === "EXPIRED"}
+                    usedAt={item.usedAt}
+                    refundedAt={item.refundedAt}
+                    isRefunded={item.isRefunded}
+                    hideCancel={item.usageStatus === "ACTIVE"}
+                    headerExtra={
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        {(() => {
+                          const color =
+                            item.usageStatus === "ACTIVE"
+                              ? "success"
+                              : item.usageStatus === "NOT_ACTIVATED"
+                              ? "default"
+                              : "warning";
+                          return (
+                            <Chip
+                              size="small"
+                              color={color}
+                              label={item.usageStatus}
+                            />
                           );
-                        }}
-                      />
-                    ) : null;
-                  })()}
+                        })()}
+                      </Stack>
+                    }
+                    onRefundSuccess={(pid, refundedAtFromApi) => {
+                      setReceivedGiftList((prev) =>
+                        prev.map((g) =>
+                          g.purchaseId === pid
+                            ? {
+                                ...g,
+                                isRefunded: true,
+                                refundedAt:
+                                  refundedAtFromApi ??
+                                  g.refundedAt ??
+                                  new Date().toISOString(),
+                              }
+                            : g
+                        )
+                      );
+                    }}
+                  />
                 </Box>
               </Collapse>
-            )}
+            </Box>
+          );
+        })}
 
-            {isMineReceived && (
-              <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
-                <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
-                  {(() => {
-                    const msid = item.memberSubscriptionId;
-                    const detail = msid ? receiveDetailById[msid] : null;
+      {/* ALL 탭: getGiftData 기반, memberId / senderId / receiverId로 분기 */}
+      {filter === "ALL" &&
+        filteredGiftList.map((item, index) => {
+          const { node, isSent, isMineSent, isMineReceived } = formatMessage(
+            item,
+            memberId
+          );
+          const canToggle = isMineSent || isMineReceived;
+
+          const handleClick = async () => {
+            if (!canToggle) return;
+            const next = openIndex === index ? null : index;
+            setOpenIndex(next);
+
+            if (next !== null) {
+              if (isMineSent && item.purchaseId) {
+                await fetchSendDetail(item.purchaseId);
+              }
+              if (isMineReceived && item.memberSubscriptionId) {
+                await fetchReceiveDetail(item.memberSubscriptionId);
+              }
+            }
+          };
+
+          return (
+            <Box key={item.purchaseId ?? index} sx={{ mb: 1 }}>
+              <Button
+                fullWidth
+                variant="text"
+                onClick={handleClick}
+                sx={{
+                  p: 0,
+                  justifyContent: "flex-start",
+                  textTransform: "none",
+                }}
+              >
+                <GiftListItem
+                  messageComponent={node}
+                  date={formatKST(item.createdAt)}
+                  isSent={isSent}
+                />
+              </Button>
+
+              {isMineSent && (
+                <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+                  <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                    {(() => {
+                      const pid = item.purchaseId;
+                      const detail = pid ? sendDetailById[pid] : null;
+
+                      if (pid && !detail) {
+                        return (
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary", p: 1 }}
+                          >
+                            {loadingSendDetailId === pid
+                              ? "불러오는 중…"
+                              : "상세 정보를 불러올 수 없습니다."}
+                          </Typography>
+                        );
+                      }
+
+                      // detail이 있으면 SENT 탭 카드와 동일한 구성으로 표시
+                      return detail ? (
+                        <SubscriptionDetailCard
+                          subscriptionData={{
+                            storeName: detail.storeName,
+                            subscriptionType: detail.subscriptionType,
+                            price: detail.price,
+                            subscriptionDesc: detail.subscriptionName,
+                            subscriptionPeriod: detail.subscriptionPeriod,
+                            subscriptionStart:
+                              detail.subscriptionStart || detail.paidAt,
+                            subscriptionEnd: detail.subscriptionEnd,
+                            menuNameList: extractMenuNames(detail.menuList),
+                            dailyRemainCount: detail.maxDailyUsage,
+                            receiver: detail.receiver,
+                            usedAt: detail.usedAt,
+                            refundedAt: detail.refundedAt,
+                            isRefunded: detail.isRefunded,
+                            purchaseId: detail.purchaseId,
+                          }}
+                          purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
+                          subscriptionType={detail.subscriptionType}
+                          maxDailyUsage={detail.maxDailyUsage}
+                          giftType="SENT"
+                          isGifted={true}
+                          isExpired={detail.isExpired}
+                          usedAt={detail.usedAt}
+                          refundedAt={detail.refundedAt}
+                          isRefunded={detail.isRefunded}
+                          onRefundSuccess={(pid, refundedAtFromApi) => {
+                            // detail 캐시 갱신
+                            setSendDetailById((prev) => {
+                              const target = prev[pid];
+                              if (!target) return prev;
+                              const updated = {
+                                ...target,
+                                isRefunded: true,
+                                refundedAt:
+                                  refundedAtFromApi ??
+                                  target.refundedAt ??
+                                  new Date().toISOString(),
+                              };
+                              return { ...prev, [pid]: updated };
+                            });
+                            // SENT 탭 리스트도 함께 갱신
+                            setSentGiftList((prev) =>
+                              prev.map((g) =>
+                                g.purchaseId === pid
+                                  ? {
+                                      ...g,
+                                      isRefunded: true,
+                                      refundedAt:
+                                        refundedAtFromApi ??
+                                        g.refundedAt ??
+                                        new Date().toISOString(),
+                                    }
+                                  : g
+                              )
+                            );
+                          }}
+                        />
+                      ) : null;
+                    })()}
+                  </Box>
+                </Collapse>
+              )}
+
+              {isMineReceived && (
+                <Collapse in={openIndex === index} timeout="auto" unmountOnExit>
+                  <Box sx={{ pl: 1, pr: 1, pb: 1 }}>
+                    {(() => {
+                      const msid = item.memberSubscriptionId;
+                      const detail = msid ? receiveDetailById[msid] : null;
 
                       if (msid && !detail) {
                         return (
@@ -730,72 +759,86 @@ function MyGift() {
                         );
                       }
 
-                    return detail ? (
-                      <SubscriptionDetailCard
-                        subscriptionData={{
-                          storeName: detail.storeName,
-                          subscriptionType: detail.subscriptionType,
-                          price: detail.price,
-                          subscriptionDesc: detail.subscriptionName,
-                          subscriptionPeriod: detail.subscriptionPeriod,
-                          subscriptionStart: detail.subscriptionStart,
-                          subscriptionEnd: detail.subscriptionEnd,
-                          menuNameList: extractMenuNames(detail.menuList),
-                          giverName: detail.sender,
-                          receiver: detail.receiver,
-                          dailyRemainCount: detail.dailyRemainCount,
-                          usedAt: detail.usedAt,
-                          usageStatus: detail.usageStatus,
-                          refundedAt: detail.refundedAt,
-                          isRefunded: detail.isRefunded,
-                          purchaseId: detail.purchaseId,
-                        }}
-                        purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
-                        subscriptionType={detail.subscriptionType}
-                        maxDailyUsage={detail.dailyRemainCount}
-                        giftType="RECEIVED"
-                        isGifted={true}
-                        isExpired={detail.usageStatus === 'EXPIRED'}
-                        usedAt={detail.usedAt}
-                        refundedAt={detail.refundedAt}
-                        isRefunded={item.isRefunded} // detail 대신 list item의 isRefunded를 직접 사용
-                        hideCancel={detail.usageStatus === 'ACTIVE'}
-                        headerExtra={
-                          <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
-                            {(() => {
-                              const color =
-                                detail.usageStatus === 'ACTIVE' ? 'success' :
-                                (detail.usageStatus === 'NOT_ACTIVATED' ? 'default' : 'warning');
-                              return <Chip size="small" color={color} label={detail.usageStatus} />;
-                            })()}
-                          </Stack>
-                        }
-                        onRefundSuccess={(pid, refundedAtFromApi, msid) => {
-                          // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
-                          const updateItem = (g) => {
-                            if (g.purchaseId !== pid) return g;
-                            return {
-                              ...g,
-                              isRefunded: true,
-                              refundedAt:
-                                refundedAtFromApi ??
-                                g.refundedAt ??
-                                new Date().toISOString(),
+                      return detail ? (
+                        <SubscriptionDetailCard
+                          subscriptionData={{
+                            storeName: detail.storeName,
+                            subscriptionType: detail.subscriptionType,
+                            price: detail.price,
+                            subscriptionDesc: detail.subscriptionName,
+                            subscriptionPeriod: detail.subscriptionPeriod,
+                            subscriptionStart: detail.subscriptionStart,
+                            subscriptionEnd: detail.subscriptionEnd,
+                            menuNameList: extractMenuNames(detail.menuList),
+                            giverName: detail.sender,
+                            receiver: detail.receiver,
+                            dailyRemainCount: detail.dailyRemainCount,
+                            usedAt: detail.usedAt,
+                            usageStatus: detail.usageStatus,
+                            refundedAt: detail.refundedAt,
+                            isRefunded: detail.isRefunded,
+                            purchaseId: detail.purchaseId,
+                          }}
+                          purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
+                          subscriptionType={detail.subscriptionType}
+                          maxDailyUsage={detail.dailyRemainCount}
+                          giftType="RECEIVED"
+                          isGifted={true}
+                          isExpired={detail.usageStatus === "EXPIRED"}
+                          usedAt={detail.usedAt}
+                          refundedAt={detail.refundedAt}
+                          isRefunded={item.isRefunded} // detail 대신 list item의 isRefunded를 직접 사용
+                          hideCancel={detail.usageStatus === "ACTIVE"}
+                          headerExtra={
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              {(() => {
+                                const color =
+                                  detail.usageStatus === "ACTIVE"
+                                    ? "success"
+                                    : detail.usageStatus === "NOT_ACTIVATED"
+                                    ? "default"
+                                    : "warning";
+                                return (
+                                  <Chip
+                                    size="small"
+                                    color={color}
+                                    label={detail.usageStatus}
+                                  />
+                                );
+                              })()}
+                            </Stack>
+                          }
+                          onRefundSuccess={(pid, refundedAtFromApi) => {
+                            // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
+                            const updateItem = (g) => {
+                              if (g.purchaseId !== pid) return g;
+                              return {
+                                ...g,
+                                isRefunded: true,
+                                refundedAt:
+                                  refundedAtFromApi ??
+                                  g.refundedAt ??
+                                  new Date().toISOString(),
+                              };
                             };
-                          };
-                          setGiftList(prev => prev.map(updateItem));
-                          setReceivedGiftList(prev => prev.map(updateItem));
-                          setSentGiftList(prev => prev.map(updateItem));
-                        }}
-                      />
-                    ) : null;
-                  })()}
-                </Box>
-              </Collapse>
-            )}
-          </Box>
-        );
-      })}
+                            setGiftList((prev) => prev.map(updateItem));
+                            setReceivedGiftList((prev) => prev.map(updateItem));
+                            setSentGiftList((prev) => prev.map(updateItem));
+                          }}
+                        />
+                      ) : null;
+                    })()}
+                  </Box>
+                </Collapse>
+              )}
+            </Box>
+          );
+        })}
     </Box>
   );
 }

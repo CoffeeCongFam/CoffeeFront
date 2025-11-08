@@ -10,6 +10,7 @@ import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
 import { fetchStoreDetail } from "../../../apis/customerApi.js";
 import dummyImg from "./../../../assets/cafeInfoDummy.png";
 import Loading from "../../../components/common/Loading.jsx";
+import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -33,8 +34,7 @@ function a11yProps(index) {
   };
 }
 
-const DAY_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
+// 매장 상세 정보 페이지
 function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
@@ -67,7 +67,7 @@ function StoreDetailPage() {
         alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
       } finally {
         if (mounted) {
-          setIsLoading(false); // ✅ 여기서 로딩 종료
+          setIsLoading(false);
           console.log("카페 페이지 로딩 완료");
         }
       }
@@ -136,25 +136,7 @@ function StoreDetailPage() {
             mt: 3,
           }}
         >
-          {storeStatus && (
-            <Chip
-              label={
-                storeStatus === "OPEN"
-                  ? "영업중"
-                  : storeStatus === "HOLIDAY"
-                  ? "휴무일"
-                  : "영업종료"
-              }
-              size="small"
-              color={
-                storeStatus === "OPEN"
-                  ? "success"
-                  : storeStatus === "HOLIDAY"
-                  ? "warning"
-                  : "default"
-              }
-            />
-          )}
+          {storeStatus && <CafeStatusChip status={storeStatus} />}
           <Typography
             variant={isAppLike ? "h5" : "h4"}
             sx={{ fontWeight: 700 }}
@@ -191,7 +173,11 @@ function StoreDetailPage() {
 
         {/* 2. 구독권 탭 */}
         <TabPanel value={tab} index={2}>
-          <CafeSubscriptionList subscriptions={store.subscriptions} />
+          <CafeSubscriptionList
+            subscriptions={store.subscriptions.filter(
+              (sub) => sub.subscriptionStatus === "ONSALE" || sub.subscriptionStatus === "SOLDOUT"
+            )}
+          />
         </TabPanel>
 
         {/* 3. 리뷰 탭 */}

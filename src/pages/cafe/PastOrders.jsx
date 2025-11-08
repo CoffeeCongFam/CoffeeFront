@@ -11,9 +11,9 @@ import {
   Box,
   TextField,
   CircularProgress,
-} from "@mui/material";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
-import useUserStore from "../../stores/useUserStore";
+} from '@mui/material';
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import useUserStore from '../../stores/useUserStore';
 import api from "../../utils/api";
 
 // 현재 시점의 'YYYY-MM-DDTHH:MM:SS.msZ' 타임스탬프를 반환하도록
@@ -107,7 +107,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 // 주문 상태를 사용자 친화적 한글 변환 및 색상 지정
 const getStatusProps = (orderStatus) => {
   switch (orderStatus) {
-
     case 'RECEIVED':
       return { label: '수령 완료', color: theme.palette.success.main };
     case 'CANCELED':

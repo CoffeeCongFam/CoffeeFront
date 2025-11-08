@@ -10,8 +10,10 @@ export function formatKoreanDateTime(date) {
   const hour = d.hour() % 12 === 0 ? 12 : d.hour() % 12;
   const minute = d.minute().toString().padStart(2, "0");
 
-  const emoji = (ampm === "AM" && hour >=6 && hour <= 12) ? '☀️' :'🌠';
-  return `${d.year()}년 ${d.month() + 1}월 ${d.date()}일 ${ampm} ${hour}: ${minute} ${emoji}`;
+  const emoji = ampm === "AM" && hour >= 6 && hour <= 12 ? "☀️" : "🌠";
+  return `${d.year()}년 ${
+    d.month() + 1
+  }월 ${d.date()}일 ${ampm} ${hour}: ${minute} ${emoji}`;
 }
 
 /**
