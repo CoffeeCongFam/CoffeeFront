@@ -72,7 +72,53 @@ export const SubscriptionDetailCard = ({
     refundedAt: cardRefundedAt,
     isRefunded: cardIsRefunded,
     usedAt,
+    subStart,
+    subEnd,
   } = subscriptionData;
+
+  // 구독 기간 및 남은 일 수 계산
+  const parseDate = (value) => {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d) ? null : d;
+  };
+
+  const startDate = parseDate(subStart);
+  const endDate = parseDate(subEnd);
+
+  const formatDate = (d) => {
+    if (!d) return "-";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}.${m}.${day}`;
+  };
+
+  const subPeriodLabel =
+    startDate && endDate
+      ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
+      : startDate
+      ? `${formatDate(startDate)} ~ -`
+      : "-";
+
+  const today = new Date();
+  const todayMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  let remainingLabel = "-";
+  if (endDate) {
+    const diffMs = endDate.getTime() - todayMidnight.getTime();
+    const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (remainingDays <= 0) {
+      remainingLabel = "만료";
+    } else {
+      remainingLabel = `${remainingDays}일 남음`;
+    }
+  }
 
   const dailyRemainCount = subscriptionData.dailyRemainCount ?? 0;
   const isDailyUsedUp = dailyRemainCount <= 0;
@@ -81,8 +127,7 @@ export const SubscriptionDetailCard = ({
     : Array.isArray(menuList)
     ? menuList
     : [];
-  const resolvedMaxDaily =
-    maxDailyUsage ?? subscriptionData.dailyRemainCount;
+  const resolvedMaxDaily = maxDailyUsage ?? subscriptionData.dailyRemainCount;
   const dailyLabel =
     giftType === "RECEIVED" ? "일일 잔여" : "일일 사용가능 횟수";
 
@@ -96,9 +141,12 @@ export const SubscriptionDetailCard = ({
     : [];
   const refundedAt = cardRefundedAt ?? "";
   // prop으로 받은 isRefunded를 최우선으로 사용
-  const isRefunded = typeof isRefundedProp === 'boolean'
-    ? isRefundedProp
-    : (typeof cardIsRefunded === "boolean" ? cardIsRefunded : !!(refundedAt && String(refundedAt).trim() !== ""));
+  const isRefunded =
+    typeof isRefundedProp === "boolean"
+      ? isRefundedProp
+      : typeof cardIsRefunded === "boolean"
+      ? cardIsRefunded
+      : !!(refundedAt && String(refundedAt).trim() !== "");
   // const memberId = 1;
   let refundMessage = null;
   if (!isRefundable) {
@@ -183,8 +231,21 @@ export const SubscriptionDetailCard = ({
   // 요구사항: refundReasons === null 이면 환불 가능 → 버튼 보임, 그 외에는 버튼 숨김
   const shouldShowRefundButton = isRefundable;
 
-  const isUsageStatusExpired =
-    subscriptionData?.usageStatus === "EXPIRED";
+  const isUsageStatusExpired = subscriptionData?.usageStatus === "EXPIRED";
+
+  // 환불/거절 확인 다이얼로그 후 실행하는 핸들러
+  const handleClickRefund = () => {
+    const message =
+      giftType === "RECEIVED"
+        ? "정말 이 선물을 거절하시겠습니까?"
+        : "정말 결제를 취소하시겠습니까?";
+
+    const confirmed = window.confirm(message);
+    if (!confirmed) return;
+
+    // 사용자가 확인을 눌렀을 때만 기존 환불/거절 로직 실행
+    handleRefundOrDeny();
+  };
 
   // 환불/거절 처리 핸들러 (purchaseId를 성공 콜백에 전달)
   const handleRefundOrDeny = async () => {
@@ -201,12 +262,18 @@ export const SubscriptionDetailCard = ({
 
       if (res && res.success) {
         const refundedAtFromApi = res?.data?.refundedAt ?? null;
-        console.log("refundedAtFromApi: ", refundedAtFromApi)
+        console.log("refundedAtFromApi: ", refundedAtFromApi);
         if (typeof onRefundSuccess === "function") {
-          onRefundSuccess(pid, refundedAtFromApi, subscriptionData?.memberSubscriptionId);
+          onRefundSuccess(
+            pid,
+            refundedAtFromApi,
+            subscriptionData?.memberSubscriptionId
+          );
         }
       } else {
-        window.alert(res?.message || "환불처리에 실패했습니다. 다시 시도해주세요");
+        window.alert(
+          res?.message || "환불처리에 실패했습니다. 다시 시도해주세요"
+        );
       }
     } catch (e) {
       window.alert(
@@ -220,7 +287,8 @@ export const SubscriptionDetailCard = ({
       elevation={3}
       sx={{
         position: "relative",
-        maxWidth: 400,
+        width:350,
+        maxWidth: 700,
         margin: "auto",
         padding: 2.5,
         borderRadius: "12px",
@@ -388,7 +456,11 @@ export const SubscriptionDetailCard = ({
 
             <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 0.5 }}>
               <InfoBox title="금액" content={`${formattedPrice}원`} />
-              <InfoBox title="구독 기간" content={`1일`} />
+              <InfoBox
+                title="남은 일수"
+                content={subPeriodLabel}
+                subContent={remainingLabel}
+              />
               <InfoBox
                 title={dailyLabel}
                 content={`${resolvedMaxDaily ?? 0}잔`}
@@ -469,8 +541,8 @@ export const SubscriptionDetailCard = ({
                   제공메뉴
                 </MenuItem>
                 {menus.map((menu, index) => (
-                  <MenuItem key={index} value={menu}>
-                    {menu}
+                  <MenuItem key={index} value={menu.menuName}>
+                    {menu.menuName}
                   </MenuItem>
                 ))}
               </Select>
@@ -490,7 +562,7 @@ export const SubscriptionDetailCard = ({
                         color: "#757575",
                         fontWeight: "bold",
                       }}
-                      onClick={handleRefundOrDeny}
+                      onClick={handleClickRefund}
                     >
                       {giftType === "RECEIVED" ? "선물 거절" : "구독권 환불"}
                     </Button>
@@ -697,11 +769,12 @@ const normalizeUsageAndRefund = (raw) => {
     .map((u) => (u && u.usedAt ? u.usedAt : null))
     .filter(Boolean);
 
-  const usedAt = usedAtFromHistory.length > 0
-    ? usedAtFromHistory
-    : Array.isArray(raw.usedAt)
-    ? raw.usedAt
-    : [];
+  const usedAt =
+    usedAtFromHistory.length > 0
+      ? usedAtFromHistory
+      : Array.isArray(raw.usedAt)
+      ? raw.usedAt
+      : [];
 
   const refundReasons = raw.refundReasons ?? null;
   const refundedAt = raw.refundedAt ?? "";
@@ -715,7 +788,8 @@ const normalizeUsageAndRefund = (raw) => {
 
 // API 데이터를 카드 컴포넌트에서 쓰기 좋게 변환
 const adaptToCardData = (s) => {
-  const { usedAt, refundReasons, refundedAt, isRefunded } = normalizeUsageAndRefund(s);
+  const { usedAt, refundReasons, refundedAt, isRefunded } =
+    normalizeUsageAndRefund(s);
 
   return {
     storeName: s?.store?.storeName ?? "",
@@ -729,6 +803,7 @@ const adaptToCardData = (s) => {
     giverName: s?.sender,
     receiver: s?.receiver,
     subStart: s?.subStart,
+    subEnd: s?.subEnd,
     usageStatus: s?.usageStatus,
     purchaseId: s?.purchaseId,
     paymentStatus: s?.paymentStatus,
@@ -812,8 +887,13 @@ const SubscriptionPage = () => {
         // 사용 가능: isExpired 값이 "EXPIRED"가 아닌 모든 구독권
         // 만료: isExpired 값이 "EXPIRED"인 구독권만
         const norm = (v) => (v ?? "").toString().toUpperCase();
-        const avail = arr.filter((s) => norm(s?.isExpired) !== "EXPIRED");
-        const exp = arr.filter((s) => norm(s?.isExpired) === "EXPIRED");
+        const isExpired = (s) => norm(s?.isExpired) === "EXPIRED";
+        const hasRefundedAt = (s) => {
+          const v = s?.refundedAt;
+          return v != null && String(v).trim() !== "";
+        };
+        const avail = arr.filter((s) => !isExpired(s) && !hasRefundedAt(s));
+        const exp   = arr.filter((s) => isExpired(s) || hasRefundedAt(s));
         console.log(
           "[Subscription] available:",
           avail.length,
@@ -865,9 +945,7 @@ const SubscriptionPage = () => {
         paymentStatus: "REFUNDED",
         refundReasons: removed.refundReasons ?? null,
         refundedAt:
-          refundedAtFromApi ??
-          removed.refundedAt ??
-          new Date().toISOString(),
+          refundedAtFromApi ?? removed.refundedAt ?? new Date().toISOString(),
       };
       setExpiredList((prev) => [...prev, moved]);
     }
@@ -884,7 +962,7 @@ const SubscriptionPage = () => {
         }}
       >
         <Typography variant="h6" component="h2" fontWeight="bold">
-          나의 구독권
+          구독권
         </Typography>
       </Box>
       <Tabs
@@ -982,14 +1060,14 @@ const SubscriptionPage = () => {
           </IconButton>
         </Box>
       ) : (
-         <Box sx={{ mt: 6, textAlign: "center" }}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                구독권 내역이 비어 있습니다.
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
-              </Typography>
-            </Box>
+        <Box sx={{ mt: 6, textAlign: "center" }}>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            구독권 내역이 비어 있습니다.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
+          </Typography>
+        </Box>
       )}
     </Container>
   );

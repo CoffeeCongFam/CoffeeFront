@@ -7,7 +7,7 @@ import LandingPage from "../pages/home/Landing";
 import SignUp from "../pages/home/SignUp";
 
 import CustomerLayout from "../layout/CustomerLayout";
-import StoreLayout from "../common/StoreLayout";
+import StoreLayout from "../layout/StoreLayout";
 import StoreHome from "../pages/cafe/StoreHome";
 import AdminLayout from "../common/AdminLayout";
 import AdminHome from "../pages/admin/AdminHome";
@@ -38,6 +38,8 @@ import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 import CafeMyPage from "../pages/cafe/CafeMyPage";
+import Withdrawal from "../pages/customer/Withdrawal";
+import OrderHistory from "../pages/customer/order/OrderHistory";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +50,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
+      },
+      {
+        path: "withdrawal",
+        element: <Withdrawal />,
       },
       {
         path: "signup",
@@ -70,7 +76,6 @@ const router = createBrowserRouter([
         element: <MemberSignUp />,
       },
       // 일반 회원
-      // TODO!!! me 뒤에 :memberId 추가 필요
       {
         path: "me",
         element: (
@@ -89,7 +94,8 @@ const router = createBrowserRouter([
           },
           {
             path: "order",
-            element: <OrderPage />,
+            element: <OrderHistory />
+            // element: <OrderPage />,
           },
           {
             path: "order/new",
@@ -154,8 +160,6 @@ const router = createBrowserRouter([
       },
 
       // 점주
-      // 점주
-      // :storeId 붙여야 함.
       {
         path: "store",
         element: <StoreLayout />,

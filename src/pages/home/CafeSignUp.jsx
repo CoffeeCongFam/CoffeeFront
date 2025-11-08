@@ -318,26 +318,6 @@ function StoreForm() {
         gap: 3,
       }}
     >
-      {/* 헤더 영역 */}
-      <Chip
-        label="카페 사장님 전용"
-        size="small"
-        sx={{
-          alignSelf: "flex-start",
-          borderRadius: 999,
-          px: 1.4,
-          py: 0.2,
-          fontSize: "0.7rem",
-          fontWeight: 600,
-          borderColor: "primary.light",
-          color: "primary.main",
-          bgcolor: "primary.main",
-          backgroundImage:
-            "linear-gradient(135deg, rgba(248,250,252,0.95), rgba(219,234,254,0.95))",
-        }}
-        variant="outlined"
-      />
-
       <Box>
         <Typography
           variant="h5"

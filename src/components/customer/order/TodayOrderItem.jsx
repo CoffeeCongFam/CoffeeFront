@@ -9,10 +9,9 @@ import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
 import menuDummy from "../../../assets/menuDummy.jpg";
 import { Box } from "@mui/material";
-import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function TodayOrderItem({ order }) {
-  const { isAppLike } = useAppShellMode();
+  // const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   return (
@@ -39,15 +38,23 @@ function TodayOrderItem({ order }) {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: "12px",
+            width: "100%",
           }}
         >
-          <Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "1rem",
+            }}
+          >
             <CardMedia
               component="img"
               style={{ borderRadius: "8px" }}
               sx={{
-                width: isAppLike ? 40 : 100,
+                width: 100,
                 height: 70,
                 objectFit: "cover",
               }}
@@ -62,7 +69,7 @@ function TodayOrderItem({ order }) {
               }}
             >
               <Typography variant="subtitle1" fontWeight="bold">
-                {order.storeName}
+                {order.storeName} - {order.subscriptionName} 구독권
               </Typography>
               {order.menuList.map((menu) => (
                 <Typography variant="body2" color="text.secondary">
@@ -72,7 +79,20 @@ function TodayOrderItem({ order }) {
             </Box>
           </Box>
           {/* 오른쪽: 상태 버튼 */}
-          <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
+          <Box
+            sx={{
+              textAlign: "right",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
+            <Typography variant="body2" color="text.secondary">
+              {/* {order.createdAt.split("T")[0]}{" "} */}
+              {order.createdAt.split("T")[1].split(".")[0]}
+            </Typography>
+          </Box>
         </Box>
       </Card>
     </Box>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
 import Profile from './Profile';
@@ -10,7 +9,7 @@ import { handleLogout } from '../../utils/logout';
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
-import OrderHistory from "./OrderHistory";
+import OrderHistory from "./order/OrderHistory";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 function MyPage() {
@@ -19,16 +18,15 @@ function MyPage() {
   const { authUser, clearUser } = useUserStore();
   // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
-  const [activeMenu, setActiveMenu] = useState("구독권 관리");
+  const [activeMenu, setActiveMenu] = useState("구독권");
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
-    "구독권 관리",
-    "내 선물함",
-    "주문 내역",
+    "구독권",
+    "선물함",
     "결제 내역",
     "리뷰내역",
-    "내 정보",
+    "회원 정보",
   ];
 
   useEffect(() => {
@@ -46,17 +44,15 @@ function MyPage() {
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
   const renderDrawerContent = () => {
     switch (activeMenu) {
-      case "구독권 관리":
+      case "구독권":
         return <SubscriptionPage />;
-      case "내 선물함":
+      case "선물함":
         return <MyGiftPage />;
-      case "주문 내역":
-        return <OrderHistory />;
       case '결제 내역':
         return <PaymentHistory />;
       case "리뷰내역":
         return <ReviewPage />;
-      case "내 정보":
+      case "회원 정보":
         return <Profile />;
       default:
         return null;
@@ -101,30 +97,33 @@ function MyPage() {
         </Box>
 
         {/* 우측: 트렌디한 네비게이션 & 로그아웃 버튼 그룹 */}
-        <Box display="flex" alignItems="center" gap={1.5}>
-          <Button
-            onClick={() => navigate('/store/cafeMyPage')}
-            variant="contained"
-            sx={{
-              borderRadius: 999,
-              px: 2.2,
-              py: 0.8,
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              textTransform: 'none',
-              boxShadow: 'none',
-              background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
-              color: 'grey.900',
-              border: '1px solid rgba(0,0,0,0.05)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
-                boxShadow: 2,
-              },
-            }}
-          >
-            카페 사장님 페이지
-          </Button>
+        <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1.5}>
+          {authUser?.memberType == "STORE" && (
+            <Button
+              onClick={() => navigate('/store/cafeMyPage')}
+              variant="contained"
+              sx={{
+                borderRadius: 999,
+                px: 2.2,
+                py: 0.8,
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                textTransform: 'none',
+                boxShadow: 'none',
+                background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
+                color: 'grey.900',
+                border: '1px solid rgba(0,0,0,0.05)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
+                  boxShadow: 2,
+                },
+              }}
+            >
+              카페 사장님 페이지
+            </Button>
+          )}
 
+          {/* 우측: 트렌디한 로그아웃 버튼 */}
           <Button
             onClick={logout}
             variant="contained"
@@ -134,13 +133,13 @@ function MyPage() {
               px: 2.5,
               py: 1,
               fontWeight: 600,
-              fontSize: '0.9rem',
-              textTransform: 'none',
-              boxShadow: 'none',
-              bgcolor: 'grey.900',
-              color: 'common.white',
-              '&:hover': {
-                bgcolor: 'grey.800',
+              fontSize: "0.9rem",
+              textTransform: "none",
+              boxShadow: "none",
+              bgcolor: "grey.900",
+              color: "common.white",
+              "&:hover": {
+                bgcolor: "grey.800",
                 boxShadow: 3,
               },
             }}
@@ -148,30 +147,6 @@ function MyPage() {
             로그아웃
           </Button>
         </Box>
-
-        {/* 우측: 트렌디한 로그아웃 버튼 */}
-        <Button
-          onClick={logout}
-          variant="contained"
-          startIcon={<LogoutRoundedIcon />}
-          sx={{
-            borderRadius: 999,
-            px: 2.5,
-            py: 1,
-            fontWeight: 600,
-            fontSize: "0.9rem",
-            textTransform: "none",
-            boxShadow: "none",
-            bgcolor: "grey.900",
-            color: "common.white",
-            "&:hover": {
-              bgcolor: "grey.800",
-              boxShadow: 3,
-            },
-          }}
-        >
-          로그아웃
-        </Button>
       </Box>
       {/* 상단 메뉴 영역 */}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>

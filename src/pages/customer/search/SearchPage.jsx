@@ -33,6 +33,7 @@ import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx
 // import cafeMarkerIcon from "../../../assets/cafeMarker.png"; // 카페용 마커 아이콘
 import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
 import Loading from "../../../components/common/Loading.jsx";
+import getDistanceKm from "../../../utils/getDistanceKm";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -54,8 +55,16 @@ const Panel = styled(Paper)(({ theme }) => ({
   padding: "10px",
 }));
 
-// 패널 렌더링 부분은 이미 잘 되어 있습니다.
-// transform: openCafeList ? "translate(-50%, 0)" : "translate(-50%, 100%)",
+function formatDistance(distanceKm) {
+  if (distanceKm == null) return null;
+  const meters = distanceKm * 1000;
+  if (meters < 1000) {
+    return `${Math.round(meters)}m`;
+  }
+  return `${distanceKm.toFixed(1)}km`;
+}
+
+
 
 export default function SearchPage() {
   const { isAppLike } = useAppShellMode();
@@ -303,7 +312,24 @@ export default function SearchPage() {
 
   // 리스트 정렬
   const sortedCafes = useMemo(() => {
-    const arr = [...cafes];
+    const arr = cafes.map((cafe) => {
+      if (
+        currentLoc.xPoint &&
+        currentLoc.yPoint &&
+        cafe.yPoint &&
+        cafe.xPoint
+      ) {
+        const distanceKm = getDistanceKm(
+          currentLoc.yPoint,    // 내 위도
+          currentLoc.xPoint,    // 내 경도
+          cafe.yPoint,          // 카페 위도
+          cafe.xPoint           // 카페 경도
+        );
+        return { ...cafe, distanceKm };
+      }
+      return { ...cafe, distanceKm: null };
+    });
+    
     switch (sortOption) {
       case "latest":
         return arr.sort(
@@ -317,9 +343,14 @@ export default function SearchPage() {
         return arr.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
       case "distance":
       default:
-        return arr.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-    }
-  }, [cafes, sortOption]);
+        // distanceKm가 없는 애들은 뒤로
+        return arr.sort((a, b) => {
+          if (a.distanceKm == null) return 1;
+          if (b.distanceKm == null) return -1;
+          return a.distanceKm - b.distanceKm;
+        });
+      }
+  },  [cafes, sortOption, currentLoc]);
 
   const open = Boolean(currentLocRef); // 현재 위치
 
@@ -565,7 +596,10 @@ export default function SearchPage() {
                 flexDirection: "column",
               }}
             >
-              {sortedCafes.map((cafe) => (
+              {sortedCafes.map((cafe) => {
+                const distanceLabel = formatDistance(cafe.distanceKm);
+
+                return (
                 <Box
                   key={cafe._mmId ?? cafe.storeId}
                   onClick={() => handleSelectCafe(cafe)}
@@ -630,7 +664,7 @@ export default function SearchPage() {
                       color="text.secondary"
                       noWrap={false}
                     >
-                      {cafe.roadAddress || cafe.address || "주소 정보 없음"}
+                      {cafe.roadAddress || "주소 정보 없음"}  {cafe.detailAddress}
                     </Typography>
 
                     <Box
@@ -662,13 +696,15 @@ export default function SearchPage() {
                       width: { xs: "100%", sm: "auto" },
                     }}
                   >
-                    {!isAppLike && (
+                    {/* 여기 거리 표시 */}
+                    {distanceLabel && (
                       <Typography
                         variant="caption"
                         color="text.secondary"
+                        fontSize="0.8rem"
                         sx={{ whiteSpace: "nowrap" }}
                       >
-                        {cafe.distance ?? "454m"}
+                        {distanceLabel}
                       </Typography>
                     )}
 
@@ -707,8 +743,9 @@ export default function SearchPage() {
                       </Button>
                     )}
                   </Box>
-                </Box>
-              ))}
+
+                </Box> 
+              )})}
             </Box>
           </List>
         </Box>

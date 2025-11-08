@@ -7,17 +7,19 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import SubscriptionCard from "../../../components/customer/cafe/SubscriptionCard";
-
+import Loading from "../../../components/common/Loading";
+import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
 import {
   fetchCustomerSubscriptions,
   fetchNearbyCafes,
+  fetchTodayOrderList,
 } from "../../../apis/customerApi";
 import useUserStore from "../../../stores/useUserStore";
 import { TokenService } from "../../../utils/api";
 import LocalCafeImgList from "./LocalCafeImgList";
 import getDistanceKm from "../../../utils/getDistanceKm";
 import { SubscriptionDetailCard } from "../Subscription";
+import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
 // import api from "../../../utils/api";
 
 function CustomerHome() {
@@ -26,7 +28,8 @@ function CustomerHome() {
   const { authUser } = useUserStore();
 
   const { isAppLike } = useAppShellMode();
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
   const [subscriptions, setSubscriptions] = useState([]);
   const [today, setToday] = useState(null);
   const [nearbyCafes, setNearbyCafes] = useState([]);
@@ -36,7 +39,9 @@ function CustomerHome() {
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
+    loadOngoingOrders();  // 진행 중인 주문 조회
     loadSubscriptions(); // 보유 구독권 조회
+    
 
     // 위치 가져와서 근처 카페 요청
     if ("geolocation" in navigator) {
@@ -60,6 +65,19 @@ function CustomerHome() {
     const todayDate = new Date();
     setToday(todayDate.toISOString().split("T")[0]);
   }
+  const loadOngoingOrders = async () => {
+    try {
+      const list = await fetchTodayOrderList();   // 오늘 주문 불러오기 (혹은 전체 주문)
+      const filtered = (list || []).filter(
+        (o) => !["RECEIVED", "CANCELED", ].includes(o.orderStatus)
+        // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
+      );
+      setOngoingOrders(filtered);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
 
   const loadSubscriptions = async () => {
     try {
@@ -68,6 +86,8 @@ function CustomerHome() {
       console.log(data);
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -132,12 +152,26 @@ function CustomerHome() {
     });
   };
 
-  // const localScrollBy = (offset) => {
-  //   if (!localScrollRef.current) return;
-  //   localScrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
-  // };
-
-  return (
+  return isLoading ? (
+    <Box
+      sx={{
+        px: isAppLike ? 2 : 12,
+        py: isAppLike ? 2 : 5,
+        minHeight: "100%",
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: isAppLike ? "23px" : "30px",
+          fontWeight: "bold",
+          mb: 2,
+        }}
+      >
+        안녕하세요 {authUser?.name ?? "고객"} 님 👋
+      </Typography>
+      <Loading />
+    </Box>
+  ) : (
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
@@ -174,8 +208,36 @@ function CustomerHome() {
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
 
+       
+
+
+        
+      </Box>
+
+       {/* 오늘의 주문 내역 있으면 */}
+       {ongoingOrders.length > 0 && (
         <Box
-          style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
+          sx={{
+            width: "100%",
+            mb: 4,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "#fff7e6",
+            border: "1px solid #ffe0b2",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+            진행 중인 주문 {ongoingOrders.length}건
+          </Typography>
+
+          {ongoingOrders.map((order) => (
+            <TodayOrderItem key={order.orderId} order={order} />
+          ))}
+        </Box>
+      )}
+
+      {/* <Box
+          style={{float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
         >
           <IconButton onClick={() => scrollBy(-260)} size="small">
             <ArrowBackIosNewIcon fontSize="small" />
@@ -183,8 +245,8 @@ function CustomerHome() {
           <IconButton onClick={() => scrollBy(260)} size="small">
             <ArrowForwardIosIcon fontSize="small" />
           </IconButton>
-        </Box>
-      </Box>
+        </Box> */}
+
 
       {subscriptions.length <= 0 && (
         <Box
@@ -213,44 +275,68 @@ function CustomerHome() {
       )}
 
       {/* 구독권 캐러셀 */}
-      {subscriptions.length > 0 && (
+       {subscriptions.length > 0 && (
         <Box
-          ref={scrollRef}
           sx={{
-            display: "flex",
-            gap: 2,
-            overflowX: "auto",
-            scrollSnapType: "x mandatory",
+            position: "relative",
             mb: 10,
-            py: 2,
-            "&::-webkit-scrollbar": {
-              height: isAppLike ? 0 : 6,
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#ccc",
-              borderRadius: 8,
-            },
-            // backgroundColor: "#ccccccaf",
-            // borderRadius: "8px",
           }}
         >
-          {subscriptions.map((item) => (
-            <Box
-              key={item.purchaseId}
-              sx={{
-                scrollSnapAlign: "start",
-                px: isAppLike ? "8%" : 0,
-                flex: isAppLike ? "0 0 100%" : "0 0 auto",
-              }}
-            >
-              {/* <SubscriptionCard subscription={item} /> */}
-              <SubscriptionItem
-                today={today}
-                item={item}
-                handleOrderClick={handleOrderClick}
-              />
-            </Box>
-          ))}
+          {/* 오른쪽 위 네비 버튼 */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: -20,
+              right: 0,
+              zIndex: 1,
+              display: "flex",
+              gap: 0.5,
+            }}
+          >
+            <IconButton onClick={() => scrollBy(-260)} size="small">
+              <ArrowBackIosNewIcon fontSize="small" />
+            </IconButton>
+            <IconButton onClick={() => scrollBy(260)} size="small">
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          {/* 실제 캐러셀 영역 */}
+          <Box
+            ref={scrollRef}
+            sx={{
+              display: "flex",
+              gap: 2,
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              py: 2,
+              pr: 8, 
+              "&::-webkit-scrollbar": {
+                height: isAppLike ? 0 : 6,
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#ccc",
+                borderRadius: 8,
+              },
+            }}
+          >
+            {subscriptions.map((item) => (
+              <Box
+                key={item.purchaseId}
+                sx={{
+                  scrollSnapAlign: "start",
+                  px: isAppLike ? "8%" : 0,
+                  flex: isAppLike ? "0 0 100%" : "0 0 auto",
+                }}
+              >
+                <SubscriptionItem
+                  today={today}
+                  item={item}
+                  handleOrderClick={handleOrderClick}
+                />
+              </Box>
+            ))}
+          </Box>
         </Box>
       )}
 
@@ -268,70 +354,11 @@ function CustomerHome() {
           </Typography>
         )}
 
-        {/* <Box
-          style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
-        >
-          <IconButton onClick={() => localScrollBy(-260)} size="small">
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton onClick={() => localScrollBy(260)} size="small">
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <Box
-          ref={localScrollRef}
-          sx={{
-            display: "flex",
-            gap: 2,
-            overflowX: "auto",
-            scrollSnapType: "x mandatory",
-            mb: 5,
-            py: 2,
-            "&::-webkit-scrollbar": {
-              height: isAppLike ? 0 : 6,
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#ccc",
-              borderRadius: 8,
-            },
-            // backgroundColor: "#ccccccaf",
-            // borderRadius: "8px",
-          }}
-        >
-          {nearbyCafes.map((store) => (
-            <Box
-              key={store.id || store.storeId}
-              sx={{
-                scrollSnapAlign: "start",
-                px: isAppLike ? "8%" : 0,
-                flex: isAppLike ? "0 0 100%" : "0 0 auto",
-              }}
-            >
-              <LocalCafeCard store={store} key={store.id || store.storeId} />
-            </Box>
-          ))}
-        </Box> */}
-
-        {/* <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: isAppLike
-              ? "1fr"
-              : "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "10px",
-          }}
-        >
-          {nearbyCafes.map((store) => (
-            <LocalCafeCard store={store} key={store.id || store.storeId} />
-          ))}
-
-          {!locError && nearbyCafes.length === 0 && (
-            <Typography sx={{ color: "text.secondary" }}>
-              500m 안에 등록된 카페가 아직 없어요 ☕
-            </Typography>
-          )}
-        </Box> */}
+        {!locError && nearbyCafes.length === 0 && (
+          <Typography sx={{ color: "text.secondary" }}>
+            500m 안에 등록된 카페가 아직 없어요 ☕
+          </Typography>
+        )}
       </Box>
     </Box>
   );

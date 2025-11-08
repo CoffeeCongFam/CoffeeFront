@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import useAppShellMode from '../../hooks/useAppShellMode';
 
 import kakaoBtn from '../../assets/kakaoLoginIcon.png';
-import monkeyLogo from '../../assets/CoffeiensLogo.png';
+import monkeyLogo from '../../assets/coffeiensLogoTitle.png';
 import LoginIcon from '@mui/icons-material/Login';
 
 function Landing() {
