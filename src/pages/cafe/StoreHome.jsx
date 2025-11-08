@@ -346,23 +346,23 @@ function StoreHome() {
           const formattedMenuString = getFormattedMenuList(order.menuList);
 
           if (
-            ['REQUEST', 'INPROGRESS', 'COMPLETED'].includes(order.orderStatus)
+            ["REQUEST", "INPROGRESS", "COMPLETED"].includes(order.orderStatus)
           ) {
             return (
               <Grid item xs={12} sm={6} md={4} key={order.orderId}>
-                <Card sx={{ height: '100%', boxShadow: 2 }}>
+                <Card sx={{ height: "100%", boxShadow: 2 }}>
                   <Box sx={{ p: 2 }}>
                     <Typography
                       variant="caption"
                       sx={{
                         bgcolor: statusInfo.header,
-                        color: 'white',
-                        p: '2px 8px',
+                        color: "white",
+                        p: "2px 8px",
                       }}
                     >
                       {statusInfo.name}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
                       {/* 타입, 상세보기 버튼 */}
                       <Box sx={{ border: 1, padding: 1 }}>
                         {order.orderNumber}
@@ -370,7 +370,7 @@ function StoreHome() {
                       <Typography>
                         {getOrderTypeLabel(order.orderType)}
                       </Typography>
-                      <Box sx={{ mt: 1, textAlign: 'right' }}>
+                      <Box sx={{ mt: 1, textAlign: "right" }}>
                         {/* 상세보기 버튼 */}
                         <Button
                           onClick={() => handleModalOpen(order)}
@@ -396,7 +396,7 @@ function StoreHome() {
                       onClick={() =>
                         handleConfirmOpen(order.orderId, order.orderStatus)
                       }
-                      sx={{ bgcolor: statusInfo.action, color: 'white' }}
+                      sx={{ bgcolor: statusInfo.action, color: "white" }}
                     >
                       {actionDetails.label}
                     </Button>

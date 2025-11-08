@@ -80,7 +80,7 @@ function SignUp() {
           // }}
         >
           일반회원
-          <img src="../../assets/CoffeiensLogo.png" />
+          <img src="../../assets/coffeiensLogoTitle.png" />
         </Button>
         <Button
           variant="contained"

@@ -12,11 +12,13 @@ import {
   IconButton,
   MenuItem,
   Select,
-  FormControl, // 추가: Select를 감싸기 위해 사용
-  InputLabel, // 추가: Select의 라벨로 사용
+  FormControl, 
+  InputLabel,
 } from "@mui/material";
+
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import CloseIcon from "@mui/icons-material/Close";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ReviewItemCard from "./ReviewItemCard";
 import { fetchStoreReviewList } from "../../../apis/commonApi";
 import {
@@ -30,6 +32,7 @@ import { DeleteOutline } from "@mui/icons-material";
 
 function CafeReviewList({ storeName, storeId }) {
   const [localReviews, setLocalReviews] = useState([]);
+  const [sortOption, setSortOption] = useState("LATEST"); // 정렬 옵션) LATEST | RATING_DESC | RATING_ASC
   const [open, setOpen] = useState(false); // 리뷰 작성 모달
   // 현재 매장과 관련된 보유 구독권만 저장하는 상태
   const [storeSubscriptions, setStoreSubscriptions] = useState([]);
@@ -41,6 +44,14 @@ function CafeReviewList({ storeName, storeId }) {
 
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); 
+
+  useEffect(() => {
+    getReviewList();
+    loadUserSubscriptionsForStore(); // 컴포넌트 로드 시 구독권 목록도 로드
+  }, [storeId]);
+
 
   /**
    * 리뷰 목록을 새로 불러오는 함수 (삭제/작성 후 재사용)
@@ -55,7 +66,7 @@ function CafeReviewList({ storeName, storeId }) {
   }
 
   /**
-   * ✅ 현재 카페의 구독권만 필터링하여 로드하는 함수 (수정)
+   * 현재 카페의 구독권만 필터링하여 로드하는 함수 (수정)
    */
   async function loadUserSubscriptionsForStore() {
     try {
@@ -78,13 +89,30 @@ function CafeReviewList({ storeName, storeId }) {
     }
   }
 
-  useEffect(() => {
-    getReviewList();
-    loadUserSubscriptionsForStore(); // 컴포넌트 로드 시 구독권 목록도 로드
-  }, [storeId]);
+  /*
+    리뷰 목록 정렬 함수
+  */
+  const sortedReviews = useMemo(() => {
+    const arr = [...localReviews];
+
+    switch (sortOption) {
+      case "RATING_DESC": // 평점 높은 순
+        return arr.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      case "RATING_ASC": // 평점 낮은 순
+        return arr.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+      case "LATEST": // 최신순
+      default:
+        // createdAt 같은 날짜 필드가 있다면 그걸 기준으로 정렬
+        // 필드 이름이 다르면 여기를 실제 필드명으로 바꿔줘야 함 (ex. reviewDate, createdDate 등등)
+        return arr.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+  }, [localReviews, sortOption]);
+
 
   /**
-   * 리뷰 작성 버튼 클릭 핸들러 (수정)
+   * 리뷰 작성 버튼 클릭 핸들러 
    * 보유 구독권 여부 확인 후 모달 열기
    */
   function handleCreateReview() {
@@ -92,10 +120,12 @@ function CafeReviewList({ storeName, storeId }) {
       alert("해당 카페에 대한 구매 내역이 없어 리뷰를 작성하실 수 없습니다.");
       return;
     }
-    // 모달 열기 전에 상태 초기화 (선택된 구독권, 평점, 내용)
+    // 모달 열기 전에 상태 초기화
     setSelectedSub(null);
     setRating(0);
     setContent("");
+    setImageFile(null);      
+    setImagePreview(null);   
     handleOpen();
   }
 
@@ -104,6 +134,8 @@ function CafeReviewList({ storeName, storeId }) {
   }
   function handleClose() {
     setOpen(false);
+    setImageFile(null);
+    setImagePreview(null);
   }
 
   const handleSubmit = async () => {
@@ -111,12 +143,10 @@ function CafeReviewList({ storeName, storeId }) {
       alert("로그인이 필요합니다.");
       return;
     }
-    // ✅ 선택된 구독권 확인 로직 추가
     if (!selectedSub) {
       alert("리뷰를 작성할 구독권을 선택해주세요.");
       return;
     }
-    // 필수 필드 (reviewContent) 유효성 검사
     if (!content || content.trim().length === 0) {
       alert("리뷰 내용을 작성해주세요.");
       return;
@@ -126,20 +156,20 @@ function CafeReviewList({ storeName, storeId }) {
       return;
     }
 
-    console.log(selectedSub.subId);
     const payload = {
-      memberId, // 유저 id
+      memberId,                         
       partnerStoreId: Number(storeId),
-      subscriptionId: selectedSub.subId, // 선택된 구독권 ID
-      reviewContent: content, // 백엔드 필드 이름과 일치
-      rating,
-      reviewImg: "https://picsum.photos/400/400",
+      subscriptionId: selectedSub.subId,
+      reviewContent: content,
+      rating,                           
+      reviewImg: null,                  
     };
+
     console.log(payload);
 
     try {
       await createReview(payload);
-      await getReviewList(); // 리스트 새로고침
+      await getReviewList();
       handleClose();
       alert("리뷰 작성이 완료되었습니다.");
     } catch (e) {
@@ -147,6 +177,7 @@ function CafeReviewList({ storeName, storeId }) {
       alert("리뷰 작성에 실패했습니다. 서버 로그를 확인해주세요.");
     }
   };
+
 
   /**
    * 리뷰 삭제 처리 함수
@@ -170,14 +201,47 @@ function CafeReviewList({ storeName, storeId }) {
   }
 
   return (
-    <Box>
-      <Button variant="contained" onClick={handleCreateReview} sx={{ mb: 2 }}>
-        리뷰 작성
-      </Button>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+      <Box sx={{display: 'flex', flexDirection: "row", justifyContent: "space-between"}}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1, gap: 1 }}>
+         
 
-      {localReviews && localReviews.length > 0 ? (
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <Select
+              size="small" 
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              displayEmpty
+            >
+              <MenuItem value="LATEST">최신순</MenuItem>
+              <MenuItem value="RATING_DESC">평점 높은 순</MenuItem>
+              <MenuItem value="RATING_ASC">평점 낮은 순</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="subtitle2" sx={{ color: "text.secondary", }} >
+            리뷰 {localReviews.length}개
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          sx={{
+            justifyContent: "flex-end",
+            width: "fit-content",
+            float: "right",
+            mb: 2,
+          }}
+          onClick={handleCreateReview}
+        >
+          리뷰 작성
+        </Button>
+
+      </Box>
+
+      
+      {/* 정렬된 리뷰 목록을 렌더링 */}
+      {sortedReviews && sortedReviews.length > 0 ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          {localReviews.map((review, idx) => (
+          {sortedReviews.map((review, idx) => (
             <ReviewItemCard
               key={review.reviewId || idx}
               review={review}
@@ -276,6 +340,85 @@ function CafeReviewList({ storeName, storeId }) {
             sx={{ mb: 2 }}
             required
           />
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              사진 첨부 (선택)
+            </Typography>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              {/* 업로드 버튼 */}
+              <Button
+                variant="outlined"
+                startIcon={<PhotoCamera />}
+                component="label"
+                size="small"
+              >
+                사진 선택
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+
+                    setImageFile(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }}
+                />
+              </Button>
+
+              {/* 선택된 파일명 */}
+              {imageFile && (
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {imageFile.name}
+                </Typography>
+              )}
+            </Box>
+
+            {/* 미리보기 + 삭제 버튼 */}
+            {imagePreview && (
+              <Box
+                sx={{
+                  mt: 1.5,
+                  position: "relative",
+                  width: 120,
+                  height: 120,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: "1px solid #e0e0e0",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={imagePreview}
+                  alt="리뷰 이미지 미리보기"
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setImageFile(null);
+                    setImagePreview(null);
+                  }}
+                  sx={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    bgcolor: "rgba(0,0,0,0.5)",
+                    color: "white",
+                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                  }}
+                >
+                  <DeleteOutline fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+          </Box>
           <form id="review-form">
             <TextField
               autoFocus

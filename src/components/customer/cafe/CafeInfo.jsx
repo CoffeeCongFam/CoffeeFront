@@ -2,6 +2,7 @@ import { Box, Divider, Typography } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
 import React from "react";
+import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
 function CafeInfo({ store }) {
   const subTitleStyle = {
@@ -59,7 +60,7 @@ function CafeInfo({ store }) {
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {store.storeTel}
+            {formatPhoneNumber(store.storeTel)}
           </Typography>
         </Box>
       </Box>
