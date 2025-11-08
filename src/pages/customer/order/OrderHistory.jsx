@@ -88,7 +88,7 @@ async function fetchOrderHistoryApi({
 
   console.log(params);
 
-  const res = await api.get("/customer/orders", { params });
+  const res = await api.get("/me/orders", { params });
 
   // 응답 구조: { success, data: { ordersList, nextCursor, hasNext }, message }
   return res.data;
