@@ -22,7 +22,6 @@ import ShoppingBagTwoToneIcon from "@mui/icons-material/ShoppingBagTwoTone";
 import LocalCafeIcon from "@mui/icons-material/LocalCafeTwoTone";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import subList from "../../../data/customer/subList";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import {
   fetchUserSubscriptions,

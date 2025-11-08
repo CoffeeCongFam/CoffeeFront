@@ -320,10 +320,10 @@ export default function SearchPage() {
     });
 
     switch (sortOption) {
-      case "latest":
-        return arr.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+      // case "latest":
+      //   return arr.sort(
+      //     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      //   );
       case "subscribers":
         return arr.sort(
           (a, b) => (b.subscriberCount || 0) - (a.subscriberCount || 0)
@@ -564,7 +564,7 @@ export default function SearchPage() {
               sx={{ fontSize: "0.875rem", height: 32 }}
             >
               <MenuItem value="distance">거리순</MenuItem>
-              <MenuItem value="latest">최신순</MenuItem>
+              {/* <MenuItem value="latest">최신순</MenuItem> */}
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>

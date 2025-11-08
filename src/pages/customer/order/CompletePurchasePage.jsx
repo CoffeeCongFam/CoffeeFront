@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { fetchPurchaseInfo } from "../../../apis/customerApi";
-import { formatKoreanDateTime } from "../../../utils/dateUtil";
 import formatDate from "../../../utils/formatDate";
 
 function CompletePurchasePage() {

@@ -521,7 +521,7 @@ function OrderHistory() {
                 <Typography color="text.secondary">구독권명</Typography>
                 <Typography>
                   {handleSubscriptionType(
-                    selectedOrder.subscription.subscriptionType
+                    selectedOrder.subscription.subscriptionName
                   )}
                 </Typography>
               </Box>
