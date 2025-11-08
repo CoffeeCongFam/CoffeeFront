@@ -57,7 +57,7 @@ export default function MenuEditModal({
   // 🚩구독권 포함 여부 플래그 추충(백엔드에서 제공 가정)
   // 현재 판매 중인 구독권 중에 하나라도 포함되어 있으면 true
   // 이 메뉴가 어떤 구독권에도 포함되어 있지 않거나, 포함되어 있어도 그 구독권이 ONSALE 상태가 아닌 경우는 false
-  const isSubscriptionActive = editingMenu?.isSubscriptionActive ?? true;
+  const isSubscriptionActive = editingMenu?.isUpdatable ?? true;
 
   // 💡 핵심: editingMenu 값이 변경될 때마다 폼 상태를 업데이트
   useEffect(() => {

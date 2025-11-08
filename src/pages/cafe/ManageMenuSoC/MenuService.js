@@ -74,7 +74,6 @@ export const registerMenu = async (data, imageFile) => {
 export const updateMenu = async (menuId, updateData, imageFIle) => {
   // 🚩 [실제 axios 코드 - 주석 처리]
   const url = `${API_BASE_URL}/${menuId}`;
-  // 테스트용 MENU_ID
 
   // 이미지 파일이 없는 경우 (기존 이미지 유지하게끔)
   // if (!imageFIle) {
