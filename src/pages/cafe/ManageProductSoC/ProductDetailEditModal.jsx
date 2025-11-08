@@ -161,17 +161,17 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
               value={formData.subscriptionStatus || ''}
               onChange={handleChange}
               // 구독권 상태 변경이 허용되지 않은 경우 비활성화
-              disabled={!subscription.isStatusChangeAllowed}
+              disabled={!subscription.isUpdatable}
             >
               <MenuItem value="ONSALE">판매 중</MenuItem>
               <MenuItem value="SOLDOUT">품절</MenuItem>
               <MenuItem value="SUSPENDED">판매 중지</MenuItem>
             </Select>
             {/* 비활성화된 경우 메시지 표시 */}
-            {!subscription.isStatusChangeAllowed && (
+            {!subscription.updatable && (
               <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                아직 판매 중지/품절 처리가 불가능합니다. (허용일 :{' '}
-                {subscription.isStatusChangeAllowDate} 이후)
+                아직 판매 중지/품절 처리가 불가능합니다. (허용일 :
+                {subscription.expiredAt} 이후)
               </Typography>
             )}
           </FormControl>

@@ -141,13 +141,6 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
     // 5. 일일 최대 사용 횟수 (필수, 숫자, 1 이상)
     validateNumberField('maxDailyUsage', '일일 최대 사용 횟수', 1);
 
-    // 6. 이미지 파일 (필수)
-    if (!imageFile) {
-      tempErrors.imageFile =
-        '필수 항목입니다. 구독권 대표 이미지를 첨부해주세요.';
-      isValid = false;
-    }
-
     // 7. 메뉴 선택 (필수, 1개 이상)
     if (selectedMenuIds.length === 0) {
       tempErrors.selectedMenuIds =
@@ -216,7 +209,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
             }}
           >
             <Typography variant="subtitle1" gutterBottom>
-              구독권 대표 이미지
+              구독권 대표 이미지 (선택사항)
             </Typography>
             <input
               type="file"

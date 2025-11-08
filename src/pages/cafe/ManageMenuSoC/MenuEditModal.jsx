@@ -55,9 +55,10 @@ export default function MenuEditModal({
   const [errors, setErrors] = useState({});
 
   // 🚩구독권 포함 여부 플래그 추충(백엔드에서 제공 가정)
-  // 현재 판매 중인 구독권 중에 하나라도 포함되어 있으면 true
-  // 이 메뉴가 어떤 구독권에도 포함되어 있지 않거나, 포함되어 있어도 그 구독권이 ONSALE 상태가 아닌 경우는 false
-  const isSubscriptionActive = editingMenu?.isUpdatable ?? true;
+  // 현재 판매 중인 구독권 중에 하나라도 포함되어 있으면 false
+  // 이 메뉴가 어떤 구독권에도 포함되어 있지 않거나, 포함되어 있어도 그 구독권이 ONSALE 상태가 아닌 경우는 true
+  const isSubscriptionActive = editingMenu?.updatable;
+  const isBlocked = !isSubscriptionActive;
 
   // 💡 핵심: editingMenu 값이 변경될 때마다 폼 상태를 업데이트
   useEffect(() => {
@@ -194,7 +195,7 @@ export default function MenuEditModal({
       <DialogContent dividers sx={{ pt: 2 }}>
         {/* 폼 UI는 등록 모달과 거의 동일합니다. */}
 
-        {isSubscriptionActive && (
+        {isBlocked && (
           <Box
             sx={{
               mb: 2,
@@ -226,7 +227,7 @@ export default function MenuEditModal({
                 onChange={handleChange}
                 // 어떤 구독권에라도 포함되어 있으면 비활성화
                 // disabled={isSubscriptionActive}
-                disabled={isSubscriptionActive}
+                disabled={isBlocked}
               >
                 <MenuItem value="Y">ACTIVE (판매 중)</MenuItem>
                 <MenuItem value="N">INACTIVE (판매 중지)</MenuItem>
@@ -247,7 +248,7 @@ export default function MenuEditModal({
               onChange={handleChange}
               error={!!errors.menuName}
               helperText={errors.menuName}
-              disabled={isSubscriptionActive}
+              disabled={isBlocked}
               // 구독권에 포함되어 있으면 비활성화
             />
           </Grid>
@@ -277,7 +278,7 @@ export default function MenuEditModal({
                 value={formData.menuType}
                 label="메뉴 타입"
                 onChange={handleChange}
-                disabled={isSubscriptionActive}
+                disabled={isBlocked}
                 // 구독권에 포함되어 있으면 비활성화
               >
                 {MENU_TYPES.map((type) => (
