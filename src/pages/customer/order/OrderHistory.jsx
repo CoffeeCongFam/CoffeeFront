@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -11,14 +11,32 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
 import orderHistoryList  from '../../../data/customer/orderHistoryList'
-// import { TokenService } from "../../../utils/api"; // 프로젝트 스타일에 맞게 사용
 
-// type PeriodType = "1M" | "1Y" | "CUSTOM";
+// 기간 토글 변경 시 날짜 업데이트 함수
+function getPresetRange(period) {
+  const end = new Date();          // 오늘
+  const start = new Date(end);     // 복사
+
+  if (period === "1M") {
+    start.setMonth(start.getMonth() - 1);
+  } else if (period === "1Y") {
+    start.setFullYear(start.getFullYear() - 1);
+  }
+
+  const toYmd = (d) => d.toISOString().slice(0, 10); // yyyy-mm-dd
+
+  return {
+    startDate: toYmd(start),
+    endDate: toYmd(end),
+  };
+}
+
 
 
 function formatKoreanDateTime(dateStr) {
@@ -44,7 +62,6 @@ async function fetchOrderHistoryApi({ period, startDate, endDate, nextCursor }) 
     params.nextCursor = nextCursor;
   }
 
-  // baseURL 이 "/api" 이므로 여기서는 "/customer/orders" 만 적으면 됨
   const res = await api.get("/customer/orders", { params });
 
   // 응답 구조: { success, data: { ordersList, nextCursor, hasNext }, message }
@@ -66,9 +83,27 @@ function OrderHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMoreLoading, setIsMoreLoading] = useState(false);
 
-  // 1개월 / 1년 선택 시 자동 조회
+  const [sortOrder, setSortOrder] = useState("DESC"); // 정렬
+
+  // 정렬된 리스트 메모이제이션
+  const sortedOrders = useMemo(() => {
+    const copy = [...orders];
+    copy.sort((a, b) => {
+      const aTime = new Date(a.createdAt).getTime();
+      const bTime = new Date(b.createdAt).getTime();
+      return sortOrder === "DESC" ? bTime - aTime : aTime - bTime;
+    });
+    return copy;
+  }, [orders, sortOrder]);
+
+
+  // 1개월 / 1년 선택 시 자동 조회 + 날짜 자동 세팅
   useEffect(() => {
-    if (period === "CUSTOM") return; // 기간설정은 버튼 눌렀을 때만
+    if (period === "CUSTOM") return;
+
+    const { startDate, endDate } = getPresetRange(period);
+    setStartDate(startDate);
+    setEndDate(endDate);
 
     loadOrders({ reset: true, period });
   }, [period]);
@@ -105,14 +140,11 @@ function OrderHistory() {
       setNextCursor(newCursor || null);
       setHasNext(!!hasNext);
     } catch (err) {
-      console.error(err);
-      // alert("주문 내역을 불러오지 못했습니다.");
-
-      // setHasNext(false);
-    } finally {
-      // 더미
+      console.log(err)
       setOrders(orderHistoryList);
-
+      setNextCursor(null);
+      setHasNext(false);
+    } finally {
       setIsLoading(false);
       setIsMoreLoading(false);
     }
@@ -256,6 +288,35 @@ function OrderHistory() {
           </Button>
         </Box>
       </Box>
+        {/* 총 개수 + 정렬 영역 */}
+      {!isLoading && orders.length > 0 && (
+        <Box
+          sx={{
+            mb: 1.5,
+            pl: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            전체 {orders.length}건
+          </Typography>
+
+          <TextField
+            select
+            size="small"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            sx={{ width: 140 }}
+          >
+            <MenuItem value="DESC">최신순</MenuItem>
+            <MenuItem value="ASC">오래된 순</MenuItem>
+          </TextField>
+        </Box>
+      )}
+
+
 
       {/* 주문 리스트 영역 */}
       <Box>
@@ -283,7 +344,7 @@ function OrderHistory() {
         ) : (
           <>
             <List>
-              {orders.map((order) => (
+              {sortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
                   <ListItemButton
                     onClick={() => navigate(`/me/order/${order.orderId}`)}
