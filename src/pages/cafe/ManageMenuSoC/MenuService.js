@@ -59,6 +59,7 @@ export const registerMenu = async (data, imageFile) => {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data.success);
     return response.data.success; // data를 반환할 필요가 없고, 그냥 성공만 return하거나..
   } catch (error) {
     console.error('메뉴 등록 실패 :', error);

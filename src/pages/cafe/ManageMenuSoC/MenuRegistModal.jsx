@@ -89,14 +89,6 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
       isValid = false;
     }
 
-    // 메뉴 이미지 (등록 시 필수)
-    if (!selectedFile) {
-      // 이미지 첨부 관련 에러 메시지를 별도 필드(예: file)에 저장하여 UI에 표시할 수 있으나,
-      // 현재는 버튼 하단에 메시지를 보여줄 TextField가 없으므로 handleSubmit에서 처리
-      tempErrors.file = '필수 항목입니다. 메뉴 이미지를 첨부해주세요.';
-      isValid = false;
-    }
-
     setErrors(tempErrors);
     return isValid;
   };
@@ -169,6 +161,8 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
         // ⚠️ window.alert 대신 사용자 정의 모달이나 Snackbar를 사용하는 것이 좋습니다.
         alert('메뉴 등록에 실패했습니다. (API 오류)');
       }
+    } else {
+      console.log('등록 유효성 검사 통과 못하면 나오는 콘솔로그');
     }
   };
 
