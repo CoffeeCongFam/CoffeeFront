@@ -113,9 +113,6 @@ function PurchaseSubscriptionPage() {
     }
   }
 
-
-
-
   //   {
   //   isLoading ? <Loading></Loading> :
   // }
@@ -212,64 +209,15 @@ function PurchaseSubscriptionPage() {
         </Box>
       </Box>
 
-     {/* 결제 선택 패널 */}
-<Backdrop
-  open={payOpen}
-  sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-  onClick={() => setPayOpen(false)}
->
-  <Fade in={payOpen}>
-    <Box
-      onClick={(e) => e.stopPropagation()}
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        mx: "auto",
-        maxWidth: 820,
-        bgcolor: "#5e5e5e",
-        borderRadius: "24px 24px 0 0",
-        minHeight: 420,
-        px: 3,
-        pt: 3,
-      }}
-    >
-      {/* 상단 닫기 */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <IconButton onClick={() => setPayOpen(false)}>
-          <CloseIcon sx={{ color: "white" }} />
-        </IconButton>
-      </Box>
-
-      {/* 결제수단 선택 */}
-      <Typography
-        variant="subtitle1"
-        sx={{ color: "white", fontWeight: 600, mb: 2 }}
+      {/* 결제 선택 패널 */}
+      <Backdrop
+        open={payOpen}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        onClick={() => setPayOpen(false)}
       >
-        결제 수단을 선택하세요
-      </Typography>
-
-      {/* 카드들 (6개 grid) */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        {[
-          { label: "신용카드", pg: "danal_tpay" },
-          { label: "휴대폰결제", pg: "danal_tpay" },
-          { label: "카카오페이", pg: "kakaopay" },
-          { label: "스마일페이", pg: "smilepay" },
-          { label: "토스페이", pg: "tosspay" },
-          { label: "페이코", pg: "payco" },
-        ].map((method) => (
+        <Fade in={payOpen}>
           <Box
-            key={method.label}
-            onClick={() => confirmPayment(method.pg)} // ✅ 클릭 시 해당 PG로 결제
+            onClick={(e) => e.stopPropagation()}
             sx={{
               position: "fixed",
               bottom: 0,
@@ -320,35 +268,85 @@ function PurchaseSubscriptionPage() {
                   key={method.label}
                   onClick={() => confirmPayment(method.pg)} // ✅ 클릭 시 해당 PG로 결제
                   sx={{
-                    bgcolor: "#dcdcdc",
-                    border: "4px solid rgba(255,128,0,0.4)",
-                    borderRadius: 4,
-                    height: 100,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: "#555",
-                    cursor: "pointer",
-                    "&:hover": {
-                      bgcolor: "#eaeaea",
-                      transform: "scale(1.03)",
-                      transition: "all 0.2s ease",
-                    },
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    mx: "auto",
+                    maxWidth: 820,
+                    bgcolor: "#5e5e5e",
+                    borderRadius: "24px 24px 0 0",
+                    minHeight: 420,
+                    px: 3,
+                    pt: 3,
                   }}
                 >
-                  {method.label}
+                  {/* 상단 닫기 */}
+                  <Box
+                    sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
+                  >
+                    <IconButton onClick={() => setPayOpen(false)}>
+                      <CloseIcon sx={{ color: "white" }} />
+                    </IconButton>
+                  </Box>
+
+                  {/* 결제수단 선택 */}
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ color: "white", fontWeight: 600, mb: 2 }}
+                  >
+                    결제 수단을 선택하세요
+                  </Typography>
+
+                  {/* 카드들 (6개 grid) */}
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gap: 2,
+                      mb: 3,
+                    }}
+                  >
+                    {[
+                      { label: "신용카드", pg: "danal_tpay" },
+                      { label: "휴대폰결제", pg: "danal_tpay" },
+                      { label: "카카오페이", pg: "kakaopay" },
+                      { label: "스마일페이", pg: "smilepay" },
+                      { label: "토스페이", pg: "tosspay" },
+                      { label: "페이코", pg: "payco" },
+                    ].map((method) => (
+                      <Box
+                        key={method.label}
+                        onClick={() => confirmPayment(method.pg)} // ✅ 클릭 시 해당 PG로 결제
+                        sx={{
+                          bgcolor: "#dcdcdc",
+                          border: "4px solid rgba(255,128,0,0.4)",
+                          borderRadius: 4,
+                          height: 100,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 20,
+                          fontWeight: 700,
+                          color: "#555",
+                          cursor: "pointer",
+                          "&:hover": {
+                            bgcolor: "#eaeaea",
+                            transform: "scale(1.03)",
+                            transition: "all 0.2s ease",
+                          },
+                        }}
+                      >
+                        {method.label}
+                      </Box>
+                    ))}
+                  </Box>
                 </Box>
               ))}
             </Box>
           </Box>
-        ))}
-      </Box>
-    </Box>
-  </Fade>
-</Backdrop>
-
+        </Fade>
+      </Backdrop>
 
       {/* ✅ 결제 로딩 화면 */}
       <Backdrop
