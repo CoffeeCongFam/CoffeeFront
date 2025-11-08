@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { Outlet, useLocation, useNavigate  } from "react-router-dom";
-=======
 // src/App.jsx
-import { Outlet, useLocation } from "react-router-dom";
->>>>>>> origin/develop
+import { Outlet, useLocation, useNavigate  } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import api, { TokenService } from "./utils/api";
 import useUserStore from "./stores/useUserStore";
