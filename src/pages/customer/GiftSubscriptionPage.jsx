@@ -29,23 +29,18 @@ import axios from "axios";
 
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
-
   const authUser = useUserStore((state) => state.authUser);
-  console.log("authUser>> ", authUser);
-
   const { subId } = useParams();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
-  const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
+  const [isLoading, setIsLoading] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
 
-  const [keyword, setKeyword] = useState(""); // 유저 전화번호 검색
-  const [receiver, setReceiver] = useState(null); // 받는 사람
+  const [keyword, setKeyword] = useState("");
+  const [receiver, setReceiver] = useState(null);
   const [searchOpen, setSearchOpen] = useState(true);
-  const [searchResults, setSearchResults] = useState([]); // 검색 결과
-
-  // 선물 메시지 상태
+  const [searchResults, setSearchResults] = useState([]);
   const [giftMessage, setGiftMessage] = useState("");
 
   async function fetchSubData() {
@@ -56,33 +51,42 @@ function GiftSubscriptionPage() {
 
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
-    // 구독권 정보 가져오기
     fetchSubData();
   }, [subId]);
 
   function handleBack() {
-    // 뒤로 가기 이동
     navigate(-1);
   }
+
   async function confirmPayment(pg = "danal_tpay") {
+    // ✅ 받는 사람 유효성 검증 추가
+    if (!receiver) {
+      alert("받는 사람을 먼저 선택해 주세요.");
+      setPayOpen(false);
+      return;
+    }
+
     setIsLoading(true);
     setPayOpen(false);
 
     try {
-      // 서버에 주문(PENDING) 먼저 생성
       const payload = {
         subscriptionId: subscription.subscriptionId,
-        receiverMemberId: receiver.memberId, // 선택된 유저 id 사용
-        giftMessage: giftMessage?.trim() || "선물 드려요 ☕", // 입력한 메시지 사용
+        receiverMemberId: receiver.memberId,
+        giftMessage: giftMessage?.trim() || "선물 드려요 ☕",
       };
 
       const created = await requestPurchase(payload);
       const merchantUid = created.merchantUid;
 
       const { IMP } = window;
+
+      if (!IMP) {
+        throw new Error("PortOne SDK가 로드되지 않았습니다.");
+      }
+
       IMP.init("imp03140165");
 
-      // PortOne 결제 요청
       IMP.request_pay(
         {
           pg,
@@ -99,7 +103,6 @@ function GiftSubscriptionPage() {
             console.log("결제 성공:", response);
 
             try {
-              // 결제 검증 요청
               const validationRes = await axios.post(
                 "/api/payments/validation",
                 {
@@ -110,75 +113,32 @@ function GiftSubscriptionPage() {
               );
 
               console.log("검증 성공:", validationRes.data);
-
-              // 결제 검증 완료 → 결제 확정
               navigate(`/me/purchase/${created.purchaseId}/complete`);
             } catch (error) {
               console.error("결제 검증 실패:", error);
               alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
-              navigate("/");
             }
           } else {
-            // 결제 실패
             alert(`결제 실패: ${response.error_msg}`);
           }
+          setIsLoading(false); // ✅ 콜백 내부에서 로딩 해제
         }
       );
     } catch (error) {
       console.error("결제 요청 오류:", error);
       alert("결제 요청 중 문제가 발생했습니다.");
-    } finally {
       setIsLoading(false);
     }
   }
 
-  //결제 진행 함수 (로딩 + 완료 페이지 이동)
-  // async function confirmPayment() {
-  //   if (!receiver) {
-  //     alert("받는 사람을 먼저 선택해 주세요.");
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-  //   setPayOpen(false);
-
-  //   console.log("결제 진행 ----------------------------");
-
-  //   try {
-  //     const payload = {
-  //       subscriptionId: subscription.subscriptionId,
-  //       purchaseType: "CREDIT_CARD",
-  //       receiverMemberId: receiver.memberId, // 선택된 유저 id 사용
-  //       giftMessage: giftMessage?.trim() || "선물 드려요 ☕", // 입력한 메시지 사용
-  //     };
-
-  //     console.log("payload >>> ", payload);
-
-  //     const data = await requestPurchase(payload);
-
-  //     console.log("구매 완료!", data.purchaseId);
-
-  //     navigate(`/me/purchase/${data.purchaseId}/complete`);
-  //   } catch (error) {
-  //     console.error("결제 실패:", error);
-  //     alert("결제 처리 중 오류가 발생했습니다.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
-
   async function handleSearch(inputPhone) {
     console.log("검색할 전화번호", inputPhone);
     if (authUser.tel === inputPhone) {
-      alert("자기 자신에게 선물을 보낼 수는 없어요. ");
+      alert("자기 자신에게 선물을 보낼 수는 없어요.");
       return;
     }
-    const payload = {
-      tel: inputPhone,
-    };
-
+    const payload = { tel: inputPhone };
     const findMember = await findReceiver(payload);
-
     setReceiver(findMember);
   }
 
@@ -292,7 +252,6 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
-              {/* 선택된 사람 출력 */}
               {receiver && (
                 <Box
                   sx={{
@@ -330,7 +289,6 @@ function GiftSubscriptionPage() {
                 />
               )}
 
-              {/* 검색 결과 목록 */}
               {receiver === null && searchResults.length > 0 && (
                 <Box
                   sx={{
@@ -378,7 +336,7 @@ function GiftSubscriptionPage() {
             </Box>
           </Box>
 
-          {/* ✅ 선물 메시지 입력 영역 */}
+          {/* 선물 메시지 입력 영역 */}
           <Box sx={{ mt: 1, width: "100%", maxWidth: 900 }}>
             <Typography sx={{ fontWeight: "bold", mb: 1 }}>
               메시지 카드
@@ -390,9 +348,7 @@ function GiftSubscriptionPage() {
               maxRows={4}
               placeholder="선물과 함께 보낼 메시지를 입력하세요. (최대 100자)"
               value={giftMessage}
-              onChange={
-                (e) => setGiftMessage(e.target.value.slice(0, 100)) // 최대 100자 제한
-              }
+              onChange={(e) => setGiftMessage(e.target.value.slice(0, 100))}
             />
           </Box>
         </Box>
@@ -446,7 +402,13 @@ function GiftSubscriptionPage() {
           }}
         >
           <Button
-            onClick={() => setPayOpen(true)}
+            onClick={() => {
+              if (!receiver) {
+                alert("받는 사람을 먼저 선택해 주세요.");
+                return;
+              }
+              setPayOpen(true);
+            }}
             sx={{
               backgroundColor: "black",
               color: "white",
@@ -458,6 +420,8 @@ function GiftSubscriptionPage() {
           </Button>
         </Box>
       </Box>
+
+      {/* 결제 선택 패널 */}
       <Backdrop
         open={payOpen}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -480,14 +444,12 @@ function GiftSubscriptionPage() {
               pt: 3,
             }}
           >
-            {/* 상단 닫기 */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
               <IconButton onClick={() => setPayOpen(false)}>
                 <CloseIcon sx={{ color: "white" }} />
               </IconButton>
             </Box>
 
-            {/* 결제수단 선택 */}
             <Typography
               variant="subtitle1"
               sx={{ color: "white", fontWeight: 600, mb: 2 }}
@@ -495,7 +457,6 @@ function GiftSubscriptionPage() {
               결제 수단을 선택하세요
             </Typography>
 
-            {/* 카드들 (6개 grid) */}
             <Box
               sx={{
                 display: "grid",
@@ -514,7 +475,7 @@ function GiftSubscriptionPage() {
               ].map((method) => (
                 <Box
                   key={method.label}
-                  onClick={() => confirmPayment(method.pg)} // ✅ 클릭 시 해당 PG로 결제
+                  onClick={() => confirmPayment(method.pg)}
                   sx={{
                     bgcolor: "#dcdcdc",
                     border: "4px solid rgba(255,128,0,0.4)",
