@@ -12,11 +12,30 @@ import {
   ListItemText,
   Divider,
   MenuItem,
+  Dialog,
+  DialogContent,
+  Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
 import orderHistoryList  from '../../../data/customer/orderHistoryList'
+import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
+import { fetchOrderDetail } from "../../../apis/customerApi";
+
+
+function handleSubscriptionType(type) {
+  switch (type) {
+    case "STANDARD":
+      return "일반 구독권";
+    case "PREMIUM":
+      return "프리미엄 구독권";
+    // 실제 백엔드 enum에 맞게 수정해서 쓰면 됨
+    default:
+      return type || "구독권";
+  }
+}
+
 
 // 기간 토글 변경 시 날짜 업데이트 함수
 function getPresetRange(period) {
@@ -85,6 +104,11 @@ function OrderHistory() {
 
   const [sortOrder, setSortOrder] = useState("DESC"); // 정렬
 
+  // 모달 상태
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+
   // 정렬된 리스트 메모이제이션
   const sortedOrders = useMemo(() => {
     const copy = [...orders];
@@ -147,6 +171,27 @@ function OrderHistory() {
     } finally {
       setIsLoading(false);
       setIsMoreLoading(false);
+    }
+  }
+
+    async function handleClickOrder(order) {
+    try {
+      setIsDetailLoading(true);
+
+      const detail = await fetchOrderDetail(order.orderId);
+      if (!detail) {
+        alert("주문 상세를 불러오지 못했습니다.");
+        return;
+      }
+
+      setSelectedOrder(detail);
+      setDetailOpen(true);
+    } catch (e) {
+      console.error(e);
+      alert("주문 상세를 불러오지 못했습니다.");
+
+    } finally {
+      setIsDetailLoading(false);
     }
   }
 
@@ -347,12 +392,14 @@ function OrderHistory() {
               {sortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
                   <ListItemButton
-                    onClick={() => navigate(`/me/order/${order.orderId}`)}
+                    // 기존: onClick={() => navigate(`/me/order/${order.orderId}`)}
+                    onClick={() => handleClickOrder(order)}
                   >
                     <ListItemText
-                      primary={`주문번호 #${order.orderId}`}
+                      primary={`${order.storeName} ${order.subscriptionName}`}
                       secondary={formatKoreanDateTime(order.createdAt)}
                     />
+                    <OrderStatusButton status={order.orderStatus} />
                   </ListItemButton>
                   <Divider component="li" />
                 </React.Fragment>
@@ -381,6 +428,167 @@ function OrderHistory() {
           </>
         )}
       </Box>
+
+
+      {/* 주문 상세 모달 */}
+      <Dialog
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogContent sx={{ p: 0, 
+          // bgcolor: "#f5f5f5" 
+          }}>
+          {isDetailLoading || !selectedOrder ? (
+            <Box
+              sx={{
+                py: 4,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                mt: 0,
+                mx: "auto",
+                maxWidth: 420,
+                // backgroundColor: "white",
+                // borderRadius: 2,
+                p: 3,
+                // boxShadow: 1,
+              }}
+            >
+              {/* 제목 */}
+              <Typography
+                variant="h6"
+                textAlign="center"
+                mb={2}
+                fontWeight={"bold"}
+              >
+                주문 번호 {selectedOrder.orderNumber}번
+              </Typography>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* 주문 정보 섹션 */}
+              <Typography variant="subtitle2" gutterBottom>
+                주문 정보
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography color="text.secondary">카페명</Typography>
+                <Typography>{selectedOrder.store.storeName}</Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography color="text.secondary">주문 번호</Typography>
+                <Typography>{selectedOrder.orderNumber}</Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography color="text.secondary">구독권명</Typography>
+                <Typography>
+                  {handleSubscriptionType(
+                    selectedOrder.subscription.subscriptionType
+                  )}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography color="text.secondary">주문 일시</Typography>
+                <Typography>
+                  {new Date(selectedOrder.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+
+              {selectedOrder.orderStatus === "CANCELED" && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 2,
+                  }}
+                >
+                  <Typography color="text.secondary">취소 일시</Typography>
+                  <Typography>
+                    {new Date(selectedOrder.canceledAt).toLocaleString()}
+                  </Typography>
+                </Box>
+              )}
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* 주문 메뉴 섹션 */}
+              <Typography variant="subtitle2" gutterBottom>
+                주문 메뉴
+              </Typography>
+
+              {selectedOrder.menuList?.map((m) => (
+                <Box
+                  key={m.menuId}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
+                >
+                  <Typography>{m.menuName}</Typography>
+                  <Typography>{m.quantity} 잔</Typography>
+                </Box>
+              ))}
+
+              <Box sx={{ mt: 3, textAlign: "right" }}>
+                {selectedOrder.orderStatus === "CANCELED"
+                
+                &&
+                <Chip
+                  label={"주문 취소 완료"
+                  }
+                  disabled={selectedOrder.orderStatus !== "REQUEST"}
+                  sx={{
+                    width: "fit-content",
+                    bgcolor: "black",
+                    color: "white",
+                  }}
+                  // onClick={() => { /* 주문 취소 로직 추가 예정 */ }}
+                />
+                
+                }
+                
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
