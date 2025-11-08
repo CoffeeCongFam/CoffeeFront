@@ -49,6 +49,7 @@ function App() {
     "/customerSignUp",
     "/cafeSignUp",
     "/MemberSignUp",
+    "/withdrawal"
   ];
 
   // ✅ 서버에서 내 정보 가져오기 (쿠키 기반)

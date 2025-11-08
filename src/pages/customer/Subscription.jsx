@@ -72,7 +72,53 @@ export const SubscriptionDetailCard = ({
     refundedAt: cardRefundedAt,
     isRefunded: cardIsRefunded,
     usedAt,
+    subStart,
+    subEnd,
   } = subscriptionData;
+
+  // 구독 기간 및 남은 일 수 계산
+  const parseDate = (value) => {
+    if (!value) return null;
+    const d = new Date(value);
+    return isNaN(d) ? null : d;
+  };
+
+  const startDate = parseDate(subStart);
+  const endDate = parseDate(subEnd);
+
+  const formatDate = (d) => {
+    if (!d) return "-";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}.${m}.${day}`;
+  };
+
+  const subPeriodLabel =
+    startDate && endDate
+      ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
+      : startDate
+      ? `${formatDate(startDate)} ~ -`
+      : "-";
+
+  const today = new Date();
+  const todayMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  let remainingLabel = "-";
+  if (endDate) {
+    const diffMs = endDate.getTime() - todayMidnight.getTime();
+    const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (remainingDays <= 0) {
+      remainingLabel = "만료";
+    } else {
+      remainingLabel = `${remainingDays}일 남음`;
+    }
+  }
 
   const dailyRemainCount = subscriptionData.dailyRemainCount ?? 0;
   const isDailyUsedUp = dailyRemainCount <= 0;
@@ -187,6 +233,20 @@ export const SubscriptionDetailCard = ({
 
   const isUsageStatusExpired = subscriptionData?.usageStatus === "EXPIRED";
 
+  // 환불/거절 확인 다이얼로그 후 실행하는 핸들러
+  const handleClickRefund = () => {
+    const message =
+      giftType === "RECEIVED"
+        ? "정말 이 선물을 거절하시겠습니까?"
+        : "정말 결제를 취소하시겠습니까?";
+
+    const confirmed = window.confirm(message);
+    if (!confirmed) return;
+
+    // 사용자가 확인을 눌렀을 때만 기존 환불/거절 로직 실행
+    handleRefundOrDeny();
+  };
+
   // 환불/거절 처리 핸들러 (purchaseId를 성공 콜백에 전달)
   const handleRefundOrDeny = async () => {
     // prop으로 받은 purchaseId를 우선 사용하고, 없으면 subscriptionData의 값을 사용
@@ -227,7 +287,8 @@ export const SubscriptionDetailCard = ({
       elevation={3}
       sx={{
         position: "relative",
-        maxWidth: 400,
+        width:350,
+        maxWidth: 700,
         margin: "auto",
         padding: 2.5,
         borderRadius: "12px",
@@ -395,7 +456,11 @@ export const SubscriptionDetailCard = ({
 
             <Box sx={{ display: "flex", gap: 1, mt: 1, mb: 0.5 }}>
               <InfoBox title="금액" content={`${formattedPrice}원`} />
-              <InfoBox title="구독 기간" content={`1일`} />
+              <InfoBox
+                title="남은 일수"
+                content={subPeriodLabel}
+                subContent={remainingLabel}
+              />
               <InfoBox
                 title={dailyLabel}
                 content={`${resolvedMaxDaily ?? 0}잔`}
@@ -476,8 +541,8 @@ export const SubscriptionDetailCard = ({
                   제공메뉴
                 </MenuItem>
                 {menus.map((menu, index) => (
-                  <MenuItem key={index} value={menu}>
-                    {menu}
+                  <MenuItem key={index} value={menu.menuName}>
+                    {menu.menuName}
                   </MenuItem>
                 ))}
               </Select>
@@ -497,7 +562,7 @@ export const SubscriptionDetailCard = ({
                         color: "#757575",
                         fontWeight: "bold",
                       }}
-                      onClick={handleRefundOrDeny}
+                      onClick={handleClickRefund}
                     >
                       {giftType === "RECEIVED" ? "선물 거절" : "구독권 환불"}
                     </Button>
@@ -738,6 +803,7 @@ const adaptToCardData = (s) => {
     giverName: s?.sender,
     receiver: s?.receiver,
     subStart: s?.subStart,
+    subEnd: s?.subEnd,
     usageStatus: s?.usageStatus,
     purchaseId: s?.purchaseId,
     paymentStatus: s?.paymentStatus,
@@ -821,8 +887,13 @@ const SubscriptionPage = () => {
         // 사용 가능: isExpired 값이 "EXPIRED"가 아닌 모든 구독권
         // 만료: isExpired 값이 "EXPIRED"인 구독권만
         const norm = (v) => (v ?? "").toString().toUpperCase();
-        const avail = arr.filter((s) => norm(s?.isExpired) !== "EXPIRED");
-        const exp = arr.filter((s) => norm(s?.isExpired) === "EXPIRED");
+        const isExpired = (s) => norm(s?.isExpired) === "EXPIRED";
+        const hasRefundedAt = (s) => {
+          const v = s?.refundedAt;
+          return v != null && String(v).trim() !== "";
+        };
+        const avail = arr.filter((s) => !isExpired(s) && !hasRefundedAt(s));
+        const exp   = arr.filter((s) => isExpired(s) || hasRefundedAt(s));
         console.log(
           "[Subscription] available:",
           avail.length,
@@ -891,7 +962,7 @@ const SubscriptionPage = () => {
         }}
       >
         <Typography variant="h6" component="h2" fontWeight="bold">
-          나의 구독권
+          구독권
         </Typography>
       </Box>
       <Tabs

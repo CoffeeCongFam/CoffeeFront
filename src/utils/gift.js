@@ -3,7 +3,7 @@ import api from "./api";
 export async function getGiftData() {
   try {
     const response = await api.get("/me/purchase/gift");
-    console.log(response.data.data);
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
@@ -14,7 +14,7 @@ export async function getGiftData() {
 export async function getSendGiftData() {
   try {
     const response = await api.get("/me/purchase/gift/send");
-    console.log(response.data.data);
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
@@ -61,11 +61,9 @@ export async function getReceievGiftData() {
 // 보낸 선물 단일조회
 export async function getSendGift(purchaseId) {
   try {
-    console.log("보낸선물 단일 조회 요청됨!");
-    const response = await api.get(
-      `/me/purchase/gift/send?purchaseId=${purchaseId}`
-    );
-    console.log(response.data.data);
+    console.log("보낸선물 단일 조회 요청됨!")
+    const response = await api.get(`/me/purchase/gift/send?purchaseId=${purchaseId}`);
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
@@ -77,10 +75,8 @@ export async function getReceiveGift(memberSubscriptionId) {
   try {
     console.log("받은선물 단일 조회 요청됨!");
     console.log(memberSubscriptionId);
-    const response = await api.get(
-      `/me/purchase/gift/receive?memberSubscriptionId=${memberSubscriptionId}`
-    );
-    console.log(response.data.data);
+    const response = await api.get(`/me/purchase/gift/receive?memberSubscriptionId=${memberSubscriptionId}`);
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
