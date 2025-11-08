@@ -407,7 +407,13 @@ export default function CustomerLayout() {
 
         {/* 페이지 콘텐츠 */}
         <Box
-          sx={{ width: "100%", minHeight: "calc(100vh - 64px)", mt: 8, pb: 10 }}
+          sx={{
+            width: "100%",
+            minHeight: "calc(100vh - 64px)",
+            mt: 8,
+            pb: 10,
+            position: "relative",   // ✅ 추가
+          }}
         >
           <Outlet />
         </Box>

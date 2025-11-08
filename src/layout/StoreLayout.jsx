@@ -132,7 +132,7 @@ export default function StoreLayout() {
           (notificationType === "ORDER" || notificationType === "주문") &&
           targetId
         ) {
-          navigate(`/me/order/${targetId}`);
+          navigate(`/store/pastorders`);
           setNotifOpen(false); // 드로어 닫기
         }
   

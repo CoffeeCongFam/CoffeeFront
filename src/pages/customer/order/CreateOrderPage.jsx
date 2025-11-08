@@ -15,7 +15,11 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingBagTwoToneIcon from '@mui/icons-material/ShoppingBagTwoTone';
+// import LocalCafeIcon from '@mui/icons-material/LocalCafe';
+import LocalCafeIcon from '@mui/icons-material/LocalCafeTwoTone';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import subList from "../../../data/customer/subList";
@@ -182,7 +186,7 @@ function CreateOrderPage() {
 
     // 이번에 1잔 더 담으면 한도를 넘는지 체크
     if (currentTotal + 1 > maxCount) {
-      alert(`이번 주문에서는 최대 ${maxCount}잔까지 선택할 수 있어요.`);
+      alert(`해당 구독권은 한번에 최대 ${maxCount}잔까지 선택할 수 있어요.`);
       return;
     }
 
@@ -335,9 +339,9 @@ function CreateOrderPage() {
   }
 
   return (
-    <Box sx={{ px: isAppLike ? 2 : 6, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 2 : 15, py: 3, pb: 10 , height: "100vh - 64px", minHeight: "80%"}}>
       {/* 상단 헤더 */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
         <IconButton onClick={handleBack} sx={{ mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
@@ -345,6 +349,7 @@ function CreateOrderPage() {
           주문하기
         </Typography>
       </Box>
+      <Box sx={{ px: isAppLike? "" : 5}}>
 
       {/* 구독권 & 이용 타입 */}
       <Box
@@ -356,7 +361,7 @@ function CreateOrderPage() {
           alignItems: { xs: "stretch", md: "stretch" },
         }}
       >
-        <Box sx={{ flex: 2 }}>
+        <Box sx={{ flex : 3 }}>
           <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
             구독권 선택
           </Typography>
@@ -410,7 +415,7 @@ function CreateOrderPage() {
           </Select>
         </Box>
 
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
             이용 타입
           </Typography>
@@ -422,6 +427,7 @@ function CreateOrderPage() {
             aria-label="order-type"
             sx={{
               width: "100%",
+              // height: "100%",
               height: 74,
               "& .MuiToggleButton-root": {
                 flex: 1,
@@ -430,8 +436,12 @@ function CreateOrderPage() {
               },
             }}
           >
-            <ToggleButton value="IN">매장 이용</ToggleButton>
-            <ToggleButton value="OUT">포장 이용</ToggleButton>
+            <ToggleButton value="IN" sx={{display: 'flex', flexDirection: "row", gap: "0.3rem"}}>
+              매장 이용 <LocalCafeIcon /> 
+            </ToggleButton>
+            <ToggleButton value="OUT"  sx={{display: 'flex', flexDirection: "row", gap: "0.3rem"}}>
+              포장 이용 <ShoppingBagTwoToneIcon /> 
+            </ToggleButton>
           </ToggleButtonGroup>
         </Box>
       </Box>
@@ -442,12 +452,18 @@ function CreateOrderPage() {
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           gap: 3,
-          alignItems: "flex-start",
+          alignItems: "stretch",
         }}
       >
         {/* 메뉴 그리드 영역 */}
-
-        <Box sx={{ flex: 3, width: "100%" }}>
+        <Box
+          sx={{
+            flex: 3,
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {/* 카테고리 탭 */}
           <ToggleButtonGroup
             color="primary"
@@ -468,14 +484,18 @@ function CreateOrderPage() {
             <ToggleButton value="DESSERT">디저트</ToggleButton>
           </ToggleButtonGroup>
 
+          <Box sx={{ flex: 1 }}>
           {/* 메뉴 카드 그리드 */}
           {visibleMenus.length === 0 ? (
             <Box
               sx={{
                 bgcolor: "#f5f5f5",
                 borderRadius: 2,
-                p: 3,
+                height: "100%",      
+                justifyContent: "center",
+                alignItems: "center", 
                 textAlign: "center",
+                py: "1rem"
               }}
             >
               <Typography variant="body2" color="text.secondary">
@@ -525,7 +545,7 @@ function CreateOrderPage() {
                     >
                       <Box
                         component="img"
-                        src={menuDummy || menu.menuImg || menuDummy}
+                        src={menu.menuImg || menuDummy}
                         alt={menu.menuName || menu.name}
                         onError={(e) => {
                           e.currentTarget.onerror = null;
@@ -613,6 +633,7 @@ function CreateOrderPage() {
               })}
             </Box>
           )}
+          </Box>
         </Box>
 
         {/* 장바구니 영역 */}
@@ -620,15 +641,19 @@ function CreateOrderPage() {
           sx={{
             flex: 2,
             minWidth: { xs: "100%", md: 260 },
-            maxWidth: { md: 360 },
+            display: "flex",
           }}
         >
           <Box
             sx={{
+              flex: 1,
+              display: "flex",  
+              flexDirection: "column",
               bgcolor: "white",
               borderRadius: 2,
               boxShadow: "0 1px 6px rgba(0,0,0,0.12)",
               p: 2.5,
+              
             }}
           >
             <Box
@@ -654,7 +679,7 @@ function CreateOrderPage() {
                 </Button>
               )}
             </Box>
-
+            <Box sx={{ flex: 1 }}>
             {cartWithInfo.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
                 장바구니에 담긴 메뉴가 없습니다.
@@ -745,7 +770,9 @@ function CreateOrderPage() {
                 </Box>
               </Box>
             )}
+            </Box>
 
+            {/* 주문하기 버튼 항상 카드의 맨 아래에 위치 */}
             <Button
               fullWidth
               variant="contained"
@@ -786,6 +813,7 @@ function CreateOrderPage() {
           주문이 진행 중입니다 ...
         </Typography>
       </Backdrop>
+      </Box>
     </Box>
   );
 }

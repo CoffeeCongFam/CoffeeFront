@@ -38,6 +38,7 @@ import ManageMenu from "../pages/cafe/ManageMenu";
 import ManageProduct from "../pages/cafe/ManageProduct";
 import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 import CafeMyPage from "../pages/cafe/CafeMyPage";
+import OrderHistory from "../pages/customer/order/OrderHistory";
 
 const router = createBrowserRouter([
   {
@@ -88,7 +89,8 @@ const router = createBrowserRouter([
           },
           {
             path: "order",
-            element: <OrderPage />,
+            element: <OrderHistory />
+            // element: <OrderPage />,
           },
           {
             path: "order/new",

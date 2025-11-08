@@ -9,7 +9,6 @@ import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
 import menuDummy from "../../../assets/menuDummy.jpg";
 import { Box } from "@mui/material";
-import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function TodayOrderItem({ order }) {
   // const { isAppLike } = useAppShellMode();

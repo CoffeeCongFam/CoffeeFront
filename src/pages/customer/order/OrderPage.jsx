@@ -80,7 +80,7 @@ function OrderPage() {
             lineHeight: 1.1,
           }}
         >
-          오늘의 주문
+          주문 내역
           {/* 나의 주문 현황 */}
         </Typography>
 
@@ -152,7 +152,6 @@ function OrderPage() {
           <Tab label={`픽업 완료 (${completedOrders.length})`} />
           <Tab label={`취소 (${canceledOrders.length})`} />
         </Tabs>
-        <Button sx={{ padding: "0" }}>과거 주문 내역 보기</Button>
       </Box>
       {/* 리스트 영역 */}
       <Box
