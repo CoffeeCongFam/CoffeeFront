@@ -1,5 +1,6 @@
 // src/utils/api.js
 import axios from "axios";
+import useUserStore from "../stores/useUserStore";
 
 // 1. Vite 환경변수에서 호스트 읽기
 // ex) VITE_API_URL=http://localhost:8080  => 현재 port번호 8080
@@ -14,26 +15,17 @@ const BASE_URL = HOST ? `${HOST}/api` : "/api";
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 50000,
-  withCredentials: true, // HttpOnly 쿠키 사용 (브라우저가 자동으로 쿠키를 포함해서 요청을 보내줌.)
+  withCredentials: true, // HttpOnly 쿠키 자동 포함 (브라우저가 자동으로 쿠키를 포함해서 요청을 보내줌.)
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Access Token을 관리 헬퍼 함수 (localStorage 사용)
+// 유저 정보만 캐싱하는 용도로만 사용 (선택)
 export const TokenService = {
-  getLocalAccessToken: () => {
-    return localStorage.getItem("accessToken");
-  },
-  updateLocalAccessToken: (token) => {
-    localStorage.setItem("accessToken", token);
-  },
-  removeLocalAccessToken: () => {
-    localStorage.removeItem("accessToken");
-  },
-  // user 정보 관련 함수 => 근데 로컬 스토리지에 없을 텐데...
   getUser: () => {
-    return JSON.parse(localStorage.getItem("user"));
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
   },
   setUser: (user) => {
     localStorage.setItem("user", JSON.stringify(user));
@@ -43,55 +35,44 @@ export const TokenService = {
   },
 };
 
-// 요청 인터셉터: 모든 요청 헤더에 Access Token 추가
+// 요청 인터셉터
+// withCredentials: true 로 쿠키는 전부 자동으로 붙음
 api.interceptors.request.use(
-  (config) => {
-    const token = TokenService.getLocalAccessToken();
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (config) => config,
+  (error) => Promise.reject(error)
 );
 
-// 공통 에러 로깅 / 응답 인터셉터: Access Token 만료 시 재발급 처리
+
+// ✅ 응답 인터셉터: 401이면 “쿠키에 accessToken 없다/만료”라고 보고 처리
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
-    // 401 에러이고, 재시도 플래그가 없는 경우 (무한 루프 방지)
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    const status = error.response?.status;
 
+    if (status === 401) {
+      // 1) localStorage에 저장해둔 user 제거
+      TokenService.removeUser();
+
+      // 2) zustand store 비우기
       try {
-        // Refresh Token을 사용하여 새 Access Token 발급 요청
-        // Refresh Token은 `withCredentials: true` 설정으로 인해 쿠키에 담겨 자동으로 전송됩니다.
-        const BASE_URL = import.meta.env.VITE_API_URL;
-        const rs = await axios.post(`${BASE_URL}/auth/refresh-token`, null, {
-          withCredentials: true,
-        });
-
-        const { accessToken } = rs.data; // 서버 응답에 새 Access Token 필드명 확인 필요
-
-        // 새 Access Token 저장 및 헤더 업데이트
-        TokenService.updateLocalAccessToken(accessToken);
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-
-        // 이전 요청을 새 Access Token으로 재시도
-        return api(originalRequest);
-      } catch (_error) {
-        // Refresh Token 만료 등 토큰 재발급 실패 시
-        TokenService.removeLocalAccessToken();
-        TokenService.removeUser();
-        // 로그인 페이지로 리다이렉트 또는 로그아웃 처리
-        // window.location.href = '/login';
-        return Promise.reject(_error);
+        const userStore = useUserStore.getState();
+        userStore.clearUser();          // authUser = null
+        userStore.setPartnerStoreId(null); // 점주 매장 ID도 초기화
+      } catch (e) {
+        console.error("zustand user 초기화 실패:", e);
       }
+
+      // 3) 필요하면 서버 logout 호출 (선택)
+      const HOST = import.meta.env.VITE_API_URL;
+      try {
+        await axios.post(`${HOST}/auth/logout`, null, { withCredentials: true });
+      } catch (_) {}
+
+      // 4) 강제 홈(/)으로 이동
+      window.location.href = "/";
+      return; // 여기서 끝내기
     }
 
     return Promise.reject(error);

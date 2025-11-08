@@ -9,7 +9,7 @@ import { handleLogout } from '../../utils/logout';
 // TODO: 각 메뉴에 해당하는 컴포넌트를 임포트해야 합니다.
 import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
-import OrderHistory from "./OrderHistory";
+import OrderHistory from "./order/OrderHistory";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 function MyPage() {

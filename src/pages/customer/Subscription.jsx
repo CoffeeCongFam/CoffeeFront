@@ -127,8 +127,7 @@ export const SubscriptionDetailCard = ({
     : Array.isArray(menuList)
     ? menuList
     : [];
-  const resolvedMaxDaily =
-    maxDailyUsage ?? subscriptionData.dailyRemainCount;
+  const resolvedMaxDaily = maxDailyUsage ?? subscriptionData.dailyRemainCount;
   const dailyLabel =
     giftType === "RECEIVED" ? "일일 잔여" : "일일 사용가능 횟수";
 
@@ -142,9 +141,12 @@ export const SubscriptionDetailCard = ({
     : [];
   const refundedAt = cardRefundedAt ?? "";
   // prop으로 받은 isRefunded를 최우선으로 사용
-  const isRefunded = typeof isRefundedProp === 'boolean'
-    ? isRefundedProp
-    : (typeof cardIsRefunded === "boolean" ? cardIsRefunded : !!(refundedAt && String(refundedAt).trim() !== ""));
+  const isRefunded =
+    typeof isRefundedProp === "boolean"
+      ? isRefundedProp
+      : typeof cardIsRefunded === "boolean"
+      ? cardIsRefunded
+      : !!(refundedAt && String(refundedAt).trim() !== "");
   // const memberId = 1;
   let refundMessage = null;
   if (!isRefundable) {
@@ -229,8 +231,7 @@ export const SubscriptionDetailCard = ({
   // 요구사항: refundReasons === null 이면 환불 가능 → 버튼 보임, 그 외에는 버튼 숨김
   const shouldShowRefundButton = isRefundable;
 
-  const isUsageStatusExpired =
-    subscriptionData?.usageStatus === "EXPIRED";
+  const isUsageStatusExpired = subscriptionData?.usageStatus === "EXPIRED";
 
   // 환불/거절 확인 다이얼로그 후 실행하는 핸들러
   const handleClickRefund = () => {
@@ -261,12 +262,18 @@ export const SubscriptionDetailCard = ({
 
       if (res && res.success) {
         const refundedAtFromApi = res?.data?.refundedAt ?? null;
-        console.log("refundedAtFromApi: ", refundedAtFromApi)
+        console.log("refundedAtFromApi: ", refundedAtFromApi);
         if (typeof onRefundSuccess === "function") {
-          onRefundSuccess(pid, refundedAtFromApi, subscriptionData?.memberSubscriptionId);
+          onRefundSuccess(
+            pid,
+            refundedAtFromApi,
+            subscriptionData?.memberSubscriptionId
+          );
         }
       } else {
-        window.alert(res?.message || "환불처리에 실패했습니다. 다시 시도해주세요");
+        window.alert(
+          res?.message || "환불처리에 실패했습니다. 다시 시도해주세요"
+        );
       }
     } catch (e) {
       window.alert(
@@ -762,11 +769,12 @@ const normalizeUsageAndRefund = (raw) => {
     .map((u) => (u && u.usedAt ? u.usedAt : null))
     .filter(Boolean);
 
-  const usedAt = usedAtFromHistory.length > 0
-    ? usedAtFromHistory
-    : Array.isArray(raw.usedAt)
-    ? raw.usedAt
-    : [];
+  const usedAt =
+    usedAtFromHistory.length > 0
+      ? usedAtFromHistory
+      : Array.isArray(raw.usedAt)
+      ? raw.usedAt
+      : [];
 
   const refundReasons = raw.refundReasons ?? null;
   const refundedAt = raw.refundedAt ?? "";
@@ -780,7 +788,8 @@ const normalizeUsageAndRefund = (raw) => {
 
 // API 데이터를 카드 컴포넌트에서 쓰기 좋게 변환
 const adaptToCardData = (s) => {
-  const { usedAt, refundReasons, refundedAt, isRefunded } = normalizeUsageAndRefund(s);
+  const { usedAt, refundReasons, refundedAt, isRefunded } =
+    normalizeUsageAndRefund(s);
 
   return {
     storeName: s?.store?.storeName ?? "",
@@ -936,9 +945,7 @@ const SubscriptionPage = () => {
         paymentStatus: "REFUNDED",
         refundReasons: removed.refundReasons ?? null,
         refundedAt:
-          refundedAtFromApi ??
-          removed.refundedAt ??
-          new Date().toISOString(),
+          refundedAtFromApi ?? removed.refundedAt ?? new Date().toISOString(),
       };
       setExpiredList((prev) => [...prev, moved]);
     }
@@ -1053,14 +1060,14 @@ const SubscriptionPage = () => {
           </IconButton>
         </Box>
       ) : (
-         <Box sx={{ mt: 6, textAlign: "center" }}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                구독권 내역이 비어 있습니다.
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
-              </Typography>
-            </Box>
+        <Box sx={{ mt: 6, textAlign: "center" }}>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            구독권 내역이 비어 있습니다.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
+          </Typography>
+        </Box>
       )}
     </Container>
   );

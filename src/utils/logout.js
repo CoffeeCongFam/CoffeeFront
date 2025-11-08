@@ -9,7 +9,7 @@ export const handleLogout = () => {
     // 카카오 로그아웃
     const URI = `https://kauth.kakao.com/oauth/logout?client_id=${CLIENT_KEY}&logout_redirect_uri=${encodeURIComponent(
       REDIRECT_URI
-    )}/`;
+    )}`;
 
     window.location.href = URI;
 

@@ -23,14 +23,19 @@ function OrderPage() {
   const [tab, setTab] = useState(0);
 
   const inProgressOrders = todayOrders.filter(
-    (it) => it.orderStatus === "REQUEST" || it.orderStatus === "INPROGRESS"
+    (it) => it.orderStatus === "REQUEST" || it.orderStatus === "INPROGRESS" || it.orderStatus === "COMPLETED"
   );
   const completedOrders = todayOrders.filter(
-    (it) => it.orderStatus === "COMPLETED" || it.orderStatus === "RECEIVED"
+    (it) => it.orderStatus === "RECEIVED"
   );
+
+  // 취소 또는 매장 거부 내역 한 탭으로 보여주기
   const canceledOrders = todayOrders.filter(
-    (it) => it.orderStatus === "CANCELED"
+    (it) => it.orderStatus === "CANCELED" || it.orderStatus === "REJECTED"
   );
+  // const rejectedOrders = todayOrders.filter(
+  //   (it) => it.orderStatus === "REJECTED"
+  // );
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));
@@ -75,7 +80,7 @@ function OrderPage() {
             lineHeight: 1.1,
           }}
         >
-          오늘의 주문
+          주문 내역
           {/* 나의 주문 현황 */}
         </Typography>
 
@@ -147,7 +152,6 @@ function OrderPage() {
           <Tab label={`픽업 완료 (${completedOrders.length})`} />
           <Tab label={`취소 (${canceledOrders.length})`} />
         </Tabs>
-        <Button sx={{ padding: "0" }}>과거 주문 내역 보기</Button>
       </Box>
       {/* 리스트 영역 */}
       <Box

@@ -1,7 +1,6 @@
-// 로그인한 유저 정보 고나리 스토어
-import { create } from 'zustand';
+import { create } from "zustand";
 
-// Zustand Store 생성
+// 로그인한 유저 상태 관리
 const useUserStore = create((set, get) => ({
   authUser: null, // 초기 유저 정보 null
   partnerStoreId: null, //점주 매장id
@@ -13,7 +12,7 @@ const useUserStore = create((set, get) => ({
   // 유저 정보 초기화
   clearUser: () => set({ authUser: null }),
 
-  // 편의 getter
+  // 로그인 여부
   isLoggedIn: () => !!get().authUser,
 }));
 
