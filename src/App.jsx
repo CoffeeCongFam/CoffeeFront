@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Outlet, useLocation, useNavigate  } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import api, { TokenService } from "./utils/api";
 import useUserStore from "./stores/useUserStore";
@@ -44,13 +44,14 @@ function App() {
 
   // 로그인 없이 접근 가능한 경로
   const PUBLIC_PATHS = [
+    "/me",
     "/", // 랜딩
     "/signup",
     "/kakaoRedirect",
     "/customerSignUp",
     "/cafeSignUp",
     "/MemberSignUp",
-    "/withdrawal"
+    "/withdrawal",
   ];
 
   // ✅ 서버에서 내 정보 가져오기 (쿠키 기반)
@@ -110,7 +111,11 @@ function App() {
   // ✅ 라우트 변경 시 로그인 상태 동기화
   useEffect(() => {
     // 퍼블릭 페이지면 아무것도 안 함
-    if (PUBLIC_PATHS.includes(location.pathname)) {
+    const path = location.pathname;
+
+    const isPublic = PUBLIC_PATHS.includes(path) || path.startsWith("/me/"); // ✅ /me/로 시작하는 애들 전부 허용
+
+    if (isPublic) {
       return;
     }
 
@@ -135,20 +140,20 @@ function App() {
   // 로그인한 상태에서 '/' 접근 차단
   useEffect(() => {
     const storedUser = authUser || TokenService.getUser();
-      if (!storedUser) return;
+    if (!storedUser) return;
 
-      if (location.pathname === "/") {
-        if (storedUser.memberType === "STORE") {
-          console.log("점주 로그인 상태에서 '/' 접근 차단 →/store 이동");
-          alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
-          navigate("/store", { replace: true });
-        } else {
-          console.log("일반회원 로그인 상태에서 '/' 접근 차단 → /me 이동");
-          alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
-          navigate("/me", { replace: true });
-        }
+    if (location.pathname === "/") {
+      if (storedUser.memberType === "STORE") {
+        console.log("점주 로그인 상태에서 '/' 접근 차단 →/store 이동");
+        // alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
+        navigate("/store", { replace: true });
+      } else {
+        console.log("일반회원 로그인 상태에서 '/' 접근 차단 → /me 이동");
+        // alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
+        navigate("/me", { replace: true });
       }
-    }, [authUser, location.pathname, navigate]);
+    }
+  }, [authUser, location.pathname, navigate]);
 
   return (
     <div>

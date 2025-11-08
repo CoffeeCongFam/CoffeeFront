@@ -1,24 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 // 컴포넌트 이름을 역할에 맞게 변경하는 것을 권장합니다. (예: KakaoRedirect)
 function KakaoRedirect() {
-  const BASE_URL = import.meta.env.VITE_API_URL
+  const BASE_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+  const hasRunRef = useRef(false); // 실행 여부 플래그
+
   // 2. 인가 코드를 백엔드 서버로 전송하는 비동기 함수 정의
   const kakaoLoginHandler = async (code, role) => {
     try {
       // 백엔드 API 호출 (URL과 메소드는 백엔드 개발자와 협의된 대로 설정)
+      console.log(
+        "여기는 kakaoLoginHandler---------------------------------- "
+      );
       const res = await axios({
         method: "GET",
-                url: `${BASE_URL}/auth/kakao/callback?code=${code}`,
-                withCredentials: true,
-            });
+        url: `${BASE_URL}/auth/kakao/callback?code=${code}`,
+        withCredentials: true,
+      });
       if (res.status !== 200) {
         throw new Error(`Unexpected status: ${res.status}`);
       }
+      console.log("성공---------------------------------- ");
 
       // 3. 성공 응답 처리
       const ACCESS_TOKEN = res.data.accessToken;
@@ -41,12 +46,18 @@ function KakaoRedirect() {
       // 5. 에러 처리
       console.error("카카오 소셜 로그인 에러:", err);
       window.alert("로그인에 실패하셨습니다.");
-      navigate("/"); // 초기 페이지로 이동
+      // navigate("/"); // 초기 페이지로 이동
     }
   };
 
   // 1. 컴포넌트가 마운트될 때 인가 코드 파싱 및 로그인 함수 실행
   useEffect(() => {
+    if (hasRunRef.current) {
+      // ✅ StrictMode로 인한 두 번째 마운트에서 막기
+      console.log("KakaoRedirect effect already run. Skip.");
+      return;
+    }
+
     // 현재 URL의 쿼리 파라미터에서 'code' 값 추출
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");

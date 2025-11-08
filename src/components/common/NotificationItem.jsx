@@ -60,12 +60,23 @@ export default function NotificationItem({ noti, onClick }) {
         </Avatar>
       </ListItemAvatar>
       <Box sx={{ ml: 1 }}>
-        <IconButton aria-label="delete" size="small">
-          <ClearRoundedIcon fontSize="inherit" />
-        </IconButton>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-          {noti.notificationType}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+            {noti.notificationType}
+          </Typography>
+          <IconButton aria-label="delete" size="small">
+            <ClearRoundedIcon fontSize="inherit" />
+          </IconButton>
+        </Box>
+
         <Typography variant="body2" sx={{ color: "text.secondary", mb: 0.3 }}>
           {messageText}
         </Typography>

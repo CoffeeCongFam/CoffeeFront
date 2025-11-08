@@ -12,7 +12,7 @@ import {
   IconButton,
   MenuItem,
   Select,
-  FormControl, 
+  FormControl,
   InputLabel,
 } from "@mui/material";
 
@@ -45,13 +45,12 @@ function CafeReviewList({ storeName, storeId }) {
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null); 
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     getReviewList();
     loadUserSubscriptionsForStore(); // 컴포넌트 로드 시 구독권 목록도 로드
   }, [storeId]);
-
 
   /**
    * 리뷰 목록을 새로 불러오는 함수 (삭제/작성 후 재사용)
@@ -110,9 +109,8 @@ function CafeReviewList({ storeName, storeId }) {
     }
   }, [localReviews, sortOption]);
 
-
   /**
-   * 리뷰 작성 버튼 클릭 핸들러 
+   * 리뷰 작성 버튼 클릭 핸들러
    * 보유 구독권 여부 확인 후 모달 열기
    */
   function handleCreateReview() {
@@ -124,8 +122,8 @@ function CafeReviewList({ storeName, storeId }) {
     setSelectedSub(null);
     setRating(0);
     setContent("");
-    setImageFile(null);      
-    setImagePreview(null);   
+    setImageFile(null);
+    setImagePreview(null);
     handleOpen();
   }
 
@@ -157,12 +155,12 @@ function CafeReviewList({ storeName, storeId }) {
     }
 
     const payload = {
-      memberId,                         
+      memberId,
       partnerStoreId: Number(storeId),
       subscriptionId: selectedSub.subId,
       reviewContent: content,
-      rating,                           
-      reviewImg: null,                  
+      rating,
+      reviewImg: null,
     };
 
     console.log(payload);
@@ -177,7 +175,6 @@ function CafeReviewList({ storeName, storeId }) {
       alert("리뷰 작성에 실패했습니다. 서버 로그를 확인해주세요.");
     }
   };
-
 
   /**
    * 리뷰 삭제 처리 함수
@@ -202,13 +199,25 @@ function CafeReviewList({ storeName, storeId }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <Box sx={{display: 'flex', flexDirection: "row", justifyContent: "space-between"}}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1, gap: 1 }}>
-         
-
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 1,
+            gap: 1,
+          }}
+        >
           <FormControl size="small" sx={{ minWidth: 160 }}>
             <Select
-              size="small" 
+              size="small"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
               displayEmpty
@@ -218,7 +227,7 @@ function CafeReviewList({ storeName, storeId }) {
               <MenuItem value="RATING_ASC">평점 낮은 순</MenuItem>
             </Select>
           </FormControl>
-          <Typography variant="subtitle2" sx={{ color: "text.secondary", }} >
+          <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
             리뷰 {localReviews.length}개
           </Typography>
         </Box>
@@ -234,10 +243,8 @@ function CafeReviewList({ storeName, storeId }) {
         >
           리뷰 작성
         </Button>
-
       </Box>
 
-      
       {/* 정렬된 리뷰 목록을 렌더링 */}
       {sortedReviews && sortedReviews.length > 0 ? (
         <Box sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
