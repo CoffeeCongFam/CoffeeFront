@@ -132,21 +132,14 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
     // 2. 가격 (필수, 숫자, 0 초과)
     validateNumberField('price', '가격', 1);
 
-    // 3. 구독 기간 (필수, 숫자, 1 이상)
-    validateNumberField('subscriptionPeriod', '구독 기간', 1);
+    // 3. 구독 기간 (필수, 숫자, 1 이상 - 0은 시연 용도)
+    validateNumberField('subscriptionPeriod', '구독 기간', 0);
 
     // 4. 판매 수량 (필수, 숫자, 0 이상)
     validateNumberField('salesLimitQuantity', '판매 가능 수량', 0);
 
     // 5. 일일 최대 사용 횟수 (필수, 숫자, 1 이상)
     validateNumberField('maxDailyUsage', '일일 최대 사용 횟수', 1);
-
-    // 6. 이미지 파일 (필수)
-    if (!imageFile) {
-      tempErrors.imageFile =
-        '필수 항목입니다. 구독권 대표 이미지를 첨부해주세요.';
-      isValid = false;
-    }
 
     // 7. 메뉴 선택 (필수, 1개 이상)
     if (selectedMenuIds.length === 0) {
@@ -216,7 +209,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
             }}
           >
             <Typography variant="subtitle1" gutterBottom>
-              구독권 대표 이미지
+              구독권 대표 이미지 (선택사항)
             </Typography>
             <input
               type="file"

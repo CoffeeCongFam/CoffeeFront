@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_API_URL;
 const API_BASE_URL = `${BASE_URL}/api/stores/menus`;
 
@@ -19,13 +19,13 @@ export const fetchStoreMenus = async (partnerStoreId) => {
     // 테스트용 PARTNER_STORE_ID
     const response = await axios.get(url);
     console.log(
-      "✅ GET 성공, 데이터 로드 완료:",
+      '✅ GET 성공, 데이터 로드 완료:',
       response.data.data.length,
-      "개"
+      '개'
     );
     return response.data.data;
   } catch (error) {
-    console.error("메뉴 리스트 조회 실패 :", error);
+    console.error('메뉴 리스트 조회 실패 :', error);
     throw error;
   }
 };
@@ -44,24 +44,25 @@ export const registerMenu = async (data, imageFile) => {
 
   // 이미지 파일 추가 - ** 이건 경로인가?
   if (imageFile) {
-    formData.append("file", imageFile);
+    formData.append('file', imageFile);
   }
 
   // 메뉴 json 데이터 추가
   const menuJson = new Blob([JSON.stringify(data)], {
-    type: "application/json",
+    type: 'application/json',
   });
-  formData.append("data", menuJson);
+  formData.append('data', menuJson);
 
   try {
     const response = await axios.post(url, formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data.success);
     return response.data.success; // data를 반환할 필요가 없고, 그냥 성공만 return하거나..
   } catch (error) {
-    console.error("메뉴 등록 실패 :", error);
+    console.error('메뉴 등록 실패 :', error);
     throw error;
   }
 };
@@ -73,47 +74,48 @@ export const registerMenu = async (data, imageFile) => {
 export const updateMenu = async (menuId, updateData, imageFIle) => {
   // 🚩 [실제 axios 코드 - 주석 처리]
   const url = `${API_BASE_URL}/${menuId}`;
-  // 테스트용 MENU_ID
 
+  // 이미지 파일이 없는 경우 (기존 이미지 유지하게끔)
+  // if (!imageFIle) {
+  //   try {
+  //     const response = await axios.patch(url, updateData, {
+  //       // 기존 URL이 담긴 updateData
+  //       headers: {
+  //         'Content-Type': 'application/json', // JSON 타입 명시
+  //       },
+  //     });
+  //     console.log('메뉴 수정 성공(기존 이미지 유지)');
+  //     return response.data.success;
+  //   } catch (error) {
+  //     console.error('메뉴 수정 실패', error);
+  //     throw error;
+  //   }
+  // } else {
   const formData = new FormData();
 
   // 이미지 파일 추가
   if (imageFIle) {
-    formData.append("file", imageFIle);
+    formData.append('file', imageFIle);
   }
 
   // 메뉴 json 데이터 추가
   const menuJson = new Blob([JSON.stringify(updateData)], {
-    type: "application/json",
+    type: 'application/json',
   });
-  formData.append("data", menuJson);
+  formData.append('data', menuJson);
 
   try {
     // put 요청
     const response = await axios.patch(url, formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
+    console.log('메뉴 수정 완료');
     return response.data.success; // data를 반환할 필요가 없고, 그냥 성공만 return하거나..
   } catch (error) {
     console.error(`메뉴 수정 실패 (ID : ${menuId}:`, error);
     throw error;
   }
-};
-
-// 메뉴 정보 소프트 삭제 (DELETE) - 프론트에서 볼 수 없으나, 활성화 상태를 비활성화로 바꾼
-// Endpoint: DELETE /api/stores/menus/{menuId}
-//  * @param {string} menuId - 삭제할 메뉴 ID
-export const deleteMenu = async (menuId) => {
-  // 🚩 [실제 axios 코드 - 주석 처리]
-  try {
-    const url = `${API_BASE_URL}/${menuId}`;
-    // 테스트용 MENU_ID
-    const response = await axios.delete(url);
-    return response.data.data;
-  } catch (error) {
-    console.error(`메뉴 삭제 실패 (ID: ${menuId}):`, error);
-    throw error;
-  }
+  // }
 };

@@ -15,7 +15,6 @@ import useUserStore from '../../stores/useUserStore';
 import {
   fetchStoreMenus,
   registerMenu,
-  deleteMenu,
   updateMenu,
 } from './ManageMenuSoC/MenuService';
 
@@ -42,9 +41,11 @@ export default function ManageMenu() {
     try {
       // API 호출: 매장 메뉴 조회
       const data = await fetchStoreMenus(storeId);
-      setMenuList(data.filter((menu) => {
-        return (!menu.deletedAt);
-      }));
+      setMenuList(
+        data.filter((menu) => {
+          return !menu.deletedAt;
+        })
+      );
     } catch (error) {
       console.error('메뉴 리스트 로딩 실패:', error);
       // alert("메뉴 목록을 불러오지 못했습니다.");
@@ -80,25 +81,6 @@ export default function ManageMenu() {
   const handleEditClick = (menu) => {
     setEditingMenu(menu);
     setIsEditModalOpen(true);
-  };
-
-  // 4. 메뉴 삭제 (DELETE)
-  const handleDeleteClick = async (menuId) => {
-    if (!window.confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
-      return;
-    }
-
-    try {
-      // API 호출: 메뉴 소프트 삭제
-      await deleteMenu(menuId);
-
-      // 성공 시 리스트에서 해당 메뉴 제거 (또는 상태 업데이트)
-      setMenuList((prev) => prev.filter((menu) => menu.menuId !== menuId));
-      alert('메뉴 삭제 성공!');
-    } catch (error) {
-      console.error(`메뉴 삭제 실패 (ID: ${menuId}):`, error);
-      alert('메뉴 삭제에 실패했습니다.');
-    }
   };
 
   // 5. 메뉴 수정 완료 핸들러 (UPDATE - End)
@@ -151,7 +133,6 @@ export default function ManageMenu() {
       <MenuTable
         menuList={menuList}
         onEditClick={handleEditClick} // ⬅️ 수정 로직 연결
-        onDeleteClick={handleDeleteClick} // ⬅️ 삭제 로직 연결
       />
 
       {/* 🌟 신규 메뉴 등록 모달 */}

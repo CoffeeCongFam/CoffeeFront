@@ -133,7 +133,7 @@ export default function ManageProduct() {
 
   // 6. 수정 로직
   const handleUpdateSubscription = async (id, updatedData) => {
-    const confirmed = window.confirm("정말 이 구독권을 수정하시겠습니까?");
+    const confirmed = window.confirm('정말 이 구독권을 수정하시겠습니까?');
     if (!confirmed) return;
 
     setIsLoading(true);
