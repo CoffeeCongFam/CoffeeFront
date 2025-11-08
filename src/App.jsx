@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate  } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import api, { TokenService } from "./utils/api";
 import useUserStore from "./stores/useUserStore";
@@ -33,6 +33,7 @@ function App() {
   const { authUser, setUser, setPartnerStoreId } = useUserStore();
   const eventSourceRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const addNotification = useNotificationStore(
     (state) => state.addNotification
@@ -130,6 +131,24 @@ function App() {
     }
     // cachedUser , authUser 이미 둘 다 있으면 아무것도 안 함
   }, [location.pathname, authUser, setUser, setPartnerStoreId]);
+
+  // 로그인한 상태에서 '/' 접근 차단
+  useEffect(() => {
+    const storedUser = authUser || TokenService.getUser();
+      if (!storedUser) return;
+
+      if (location.pathname === "/") {
+        if (storedUser.memberType === "STORE") {
+          console.log("점주 로그인 상태에서 '/' 접근 차단 →/store 이동");
+          alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
+          navigate("/store", { replace: true });
+        } else {
+          console.log("일반회원 로그인 상태에서 '/' 접근 차단 → /me 이동");
+          alert("로그인 중엔 메인 화면으로 돌아갈 수 없습니다.");
+          navigate("/me", { replace: true });
+        }
+      }
+    }, [authUser, location.pathname, navigate]);
 
   return (
     <div>

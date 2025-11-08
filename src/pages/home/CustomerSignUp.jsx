@@ -5,6 +5,8 @@ import {
   Select,
   MenuItem,
   TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -21,6 +23,12 @@ function CustomerSignUp() {
   const [tel, setTel] = useState("");
   const [gender, setGender] = useState("남");
   const [initialEmail, setInitialEmail] = useState("");
+  
+// Snackbar 상태
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // success | error | warning | info
+
   // L_01 - 네비게이트 선언
   let navigate = useNavigate();
   useEffect(() => {
@@ -49,14 +57,6 @@ function CustomerSignUp() {
       }
     }
   }, [search]);
-
-  // // 전화번호를 000-0000-0000 형태로 포맷팅 (3-4-4)
-  // const formatTelNumber = (raw) => {
-  //   const digitsOnly = String(raw).replace(/\D/g, "").slice(0, 11);
-  //   if (digitsOnly.length <= 3) return digitsOnly;
-  //   if (digitsOnly.length <= 7) return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
-  //   return `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}-${digitsOnly.slice(7)}`;
-  // };
 
   // L_05 - zustand에서 setUser 불러오기
   const { setUser } = useUserStore.getState();
@@ -91,22 +91,39 @@ function CustomerSignUp() {
         // L_04 - zustand의 useUserStore를 사용해서 memberId 업데이트해서 cafeSignUp에서 사용가능하게 해주기
         setUser({ memberId });
 
-        const goToCafeSignUp = window.confirm(
-          "회원정보 등록이 완료되었습니다. 매장 등록을 진행하시겠습니까?"
-        );
 
-        if (goToCafeSignUp) {
-          // 등록하기 선택 시: 기존 로직대로 카페 상세정보 입력 페이지로 이동
-          navigate("/cafeSignUp");
-        } else {
-          // 건너뛰기 선택 시: 매장 목록 페이지로 이동
-          navigate("/store");
-        }
+        // Snackbar 메시지 표시
+        setSnackbarMsg("회원가입이 완료되었습니다 🎉 환영합니다!");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+
+      // 1.5초 뒤에 매장 등록 여부 alert
+      setTimeout(() => {
+          if (response.data.data.redirectUrl) {
+              const goToCafeSignUp = window.confirm(
+                "바로 매장 등록을 진행하시겠습니까?"
+              );
+      
+              if (goToCafeSignUp) {
+                // 등록하기 선택 시: 기존 로직대로 카페 상세정보 입력 페이지로 이동
+                navigate("/cafeSignUp");
+              } else {
+                // 건너뛰기 선택 시: 매장 목록 페이지로 이동
+                navigate("/store");
+              }
+          }
+      }, 2000);
       }
     } catch (err) {
       console.error("회원가입 실패:", err);
       alert("회원가입 중 오류가 발생했습니다.");
     }
+  };
+
+  // Snackbar 닫기 핸들러
+  const handleCloseSnackbar = (_, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbarOpen(false);
   };
 
   // 라벨 텍스트와 입력 필드를 포함하는 컨테이너의 스타일 정의
@@ -204,8 +221,11 @@ function CustomerSignUp() {
             <span style={labelTextStyle}>전화번호:</span>
             <TextField
               value={tel}
-              onChange={(e) => setTel(e.target.value)}
-              placeholder="000-0000-0000"
+              onChange={(e) => {
+                const onlyNumbers = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 남기기
+                setTel(onlyNumbers);
+              }}
+              placeholder="숫자만 입력"
               size="small"
               variant="outlined"
               sx={{ minWidth: 240 }}
@@ -245,6 +265,22 @@ function CustomerSignUp() {
           </Button>
         </form>
       </div>
+
+      {/* Snackbar 영역 */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
