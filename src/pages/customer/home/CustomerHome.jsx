@@ -39,9 +39,8 @@ function CustomerHome() {
 
   useEffect(() => {
     loadToday(); // 오늘 날짜
-    loadOngoingOrders();  // 진행 중인 주문 조회
+    loadOngoingOrders(); // 진행 중인 주문 조회
     loadSubscriptions(); // 보유 구독권 조회
-    
 
     // 위치 가져와서 근처 카페 요청
     if ("geolocation" in navigator) {
@@ -67,9 +66,9 @@ function CustomerHome() {
   }
   const loadOngoingOrders = async () => {
     try {
-      const list = await fetchTodayOrderList();   // 오늘 주문 불러오기 (혹은 전체 주문)
+      const list = await fetchTodayOrderList(); // 오늘 주문 불러오기 (혹은 전체 주문)
       const filtered = (list || []).filter(
-        (o) => !["RECEIVED", "CANCELED", ].includes(o.orderStatus)
+        (o) => !["RECEIVED", "CANCELED"].includes(o.orderStatus)
         // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
       );
       setOngoingOrders(filtered);
@@ -78,11 +77,10 @@ function CustomerHome() {
     }
   };
 
-
   const loadSubscriptions = async () => {
     try {
       const data = await fetchCustomerSubscriptions();
-      setSubscriptions(data || []);
+      setSubscriptions(data.filter((it) => it.refundedAt === "") || []);
       console.log(data);
     } catch (e) {
       console.log(e);
@@ -207,15 +205,10 @@ function CustomerHome() {
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
-
-       
-
-
-        
       </Box>
 
-       {/* 오늘의 주문 내역 있으면 */}
-       {ongoingOrders.length > 0 && (
+      {/* 오늘의 주문 내역 있으면 */}
+      {ongoingOrders.length > 0 && (
         <Box
           sx={{
             width: "100%",
@@ -224,6 +217,9 @@ function CustomerHome() {
             borderRadius: 2,
             bgcolor: "#fff7e6",
             border: "1px solid #ffe0b2",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.7rem",
           }}
         >
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
@@ -246,7 +242,6 @@ function CustomerHome() {
             <ArrowForwardIosIcon fontSize="small" />
           </IconButton>
         </Box> */}
-
 
       {subscriptions.length <= 0 && (
         <Box
@@ -275,7 +270,7 @@ function CustomerHome() {
       )}
 
       {/* 구독권 캐러셀 */}
-       {subscriptions.length > 0 && (
+      {subscriptions.length > 0 && (
         <Box
           sx={{
             position: "relative",
@@ -310,7 +305,7 @@ function CustomerHome() {
               overflowX: "auto",
               scrollSnapType: "x mandatory",
               py: 2,
-              pr: 8, 
+              pr: 8,
               "&::-webkit-scrollbar": {
                 height: isAppLike ? 0 : 6,
               },

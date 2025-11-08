@@ -6,7 +6,6 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import cafeList from "../../../data/customer/cafeList.js";
 import {
   Button,
   IconButton,
@@ -63,8 +62,6 @@ function formatDistance(distanceKm) {
   }
   return `${distanceKm.toFixed(1)}km`;
 }
-
-
 
 export default function SearchPage() {
   const { isAppLike } = useAppShellMode();
@@ -157,14 +154,6 @@ export default function SearchPage() {
         console.log(normalized);
       } catch (err) {
         console.error("현재 위치 또는 카페 API 실패:", err);
-        // 실패 시 샘플 데이터 사용
-        const normalized = cafeList.map((c, i) => ({
-          ...c,
-          xPoint: Number(c.xPoint ?? c.xpoint),
-          yPoint: Number(c.yPoint ?? c.ypoint),
-          _mmId: c.storeId ?? c.id ?? `idx-${i}`,
-        }));
-        setCafes(normalized);
       }
     })();
     return () => {
@@ -320,16 +309,16 @@ export default function SearchPage() {
         cafe.xPoint
       ) {
         const distanceKm = getDistanceKm(
-          currentLoc.yPoint,    // 내 위도
-          currentLoc.xPoint,    // 내 경도
-          cafe.yPoint,          // 카페 위도
-          cafe.xPoint           // 카페 경도
+          currentLoc.yPoint, // 내 위도
+          currentLoc.xPoint, // 내 경도
+          cafe.yPoint, // 카페 위도
+          cafe.xPoint // 카페 경도
         );
         return { ...cafe, distanceKm };
       }
       return { ...cafe, distanceKm: null };
     });
-    
+
     switch (sortOption) {
       case "latest":
         return arr.sort(
@@ -349,8 +338,8 @@ export default function SearchPage() {
           if (b.distanceKm == null) return -1;
           return a.distanceKm - b.distanceKm;
         });
-      }
-  },  [cafes, sortOption, currentLoc]);
+    }
+  }, [cafes, sortOption, currentLoc]);
 
   const open = Boolean(currentLocRef); // 현재 위치
 
@@ -600,152 +589,158 @@ export default function SearchPage() {
                 const distanceLabel = formatDistance(cafe.distanceKm);
 
                 return (
-                <Box
-                  key={cafe._mmId ?? cafe.storeId}
-                  onClick={() => handleSelectCafe(cafe)}
-                  sx={{
-                    bgcolor: "#f8f9fa",
-                    borderRadius: 2,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    p: isAppLike ? 2 : 4,
-                    mb: 2,
-                    display: "flex",
-                    gap: 2,
-                    alignItems: "stretch",
-                    cursor: "pointer",
-                    flexDirection: { xs: "column", sm: "row" },
-                  }}
-                >
-                  {/* 썸네일 */}
                   <Box
+                    key={cafe._mmId ?? cafe.storeId}
+                    onClick={() => handleSelectCafe(cafe)}
                     sx={{
-                      width: { xs: "100%", sm: "10%" },
-                      height: { xs: 140, sm: 100 },
-                      bgcolor: grey[100],
+                      bgcolor: "#f8f9fa",
                       borderRadius: 2,
-                      overflow: "hidden",
-                      flexShrink: 0,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      p: isAppLike ? 2 : 4,
+                      mb: 2,
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      gap: 2,
+                      alignItems: "stretch",
+                      cursor: "pointer",
+                      flexDirection: { xs: "column", sm: "row" },
                     }}
                   >
-                    <Avatar
-                      src={cafe.storeImage}
-                      alt={cafe.storeName}
-                      sx={{ width: "100%", height: "100%", borderRadius: 2 }}
-                      variant="rounded"
-                    />
-                  </Box>
+                    {/* 썸네일 */}
+                    <Box
+                      sx={{
+                        width: { xs: "100%", sm: "10%" },
+                        height: { xs: 140, sm: 100 },
+                        bgcolor: grey[100],
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Avatar
+                        src={cafe.storeImage}
+                        alt={cafe.storeName}
+                        sx={{ width: "100%", height: "100%", borderRadius: 2 }}
+                        variant="rounded"
+                      />
+                    </Box>
 
-                  {/* 정보 */}
-                  <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+                    {/* 정보 */}
+                    <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          mb: 0.5,
+                          gap: 1,
+                        }}
+                      >
+                        {/* 오타(stauts) → status 로 수정 */}
+                        <CafeStatusChip status={cafe.storeStatus} />
+                      </Box>
+
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}
+                      >
+                        {cafe.storeName}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        noWrap={false}
+                      >
+                        {cafe.roadAddress || "주소 정보 없음"}{" "}
+                        {cafe.detailAddress}
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 2,
+                          mt: 1,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{ display: "flex", gap: 0.5 }}
+                        >
+                          👥 {cafe.subscriberCount ?? 0}명 구독
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ display: "flex", gap: 0.5 }}
+                        >
+                          ⭐ {cafe.reviewCount ?? 0}개 리뷰
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* 우측 버튼 */}
                     <Box
                       sx={{
                         display: "flex",
+                        flexDirection: "column",
                         justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        mb: 0.5,
-                        gap: 1,
+                        alignItems: "flex-end",
+                        mt: { xs: 1.5, sm: 0 },
+                        width: { xs: "100%", sm: "auto" },
                       }}
                     >
-                      {/* 오타(stauts) → status 로 수정 */}
-                      <CafeStatusChip status={cafe.storeStatus} />
-                    </Box>
+                      {/* 여기 거리 표시 */}
+                      {distanceLabel && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          fontSize="0.8rem"
+                          sx={{ whiteSpace: "nowrap" }}
+                        >
+                          {distanceLabel}
+                        </Typography>
+                      )}
 
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}
-                    >
-                      {cafe.storeName}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      noWrap={false}
-                    >
-                      {cafe.roadAddress || "주소 정보 없음"}  {cafe.detailAddress}
-                    </Typography>
-
-                    <Box
-                      sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{ display: "flex", gap: 0.5 }}
-                      >
-                        👥 {cafe.subscriberCount ?? 0}명 구독
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ display: "flex", gap: 0.5 }}
-                      >
-                        ⭐ {cafe.reviewCount ?? 0}개 리뷰
-                      </Typography>
+                      {cafe.isSubscribed ? (
+                        <Button
+                          variant="outlined"
+                          size={isAppLike ? "small" : "medium"}
+                          startIcon={<span style={{ fontSize: 14 }}>✓</span>}
+                          sx={{
+                            borderRadius: 999,
+                            borderColor: grey[400],
+                            color: grey[800],
+                            px: 2,
+                            whiteSpace: "nowrap",
+                            width: { xs: "100%", sm: 150 },
+                          }}
+                        >
+                          구독 중인 카페
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          size={isAppLike ? "small" : "medium"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/me/store/${cafe.storeId}`);
+                          }}
+                          sx={{
+                            borderRadius: 999,
+                            "&:hover": { bgcolor: "#222", color: "#fff" },
+                            whiteSpace: "nowrap",
+                            width: { xs: "100%", sm: 150 },
+                          }}
+                        >
+                          자세히 보기
+                        </Button>
+                      )}
                     </Box>
                   </Box>
-
-                  {/* 우측 버튼 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      alignItems: "flex-end",
-                      mt: { xs: 1.5, sm: 0 },
-                      width: { xs: "100%", sm: "auto" },
-                    }}
-                  >
-                    {/* 여기 거리 표시 */}
-                    {distanceLabel && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontSize="0.8rem"
-                        sx={{ whiteSpace: "nowrap" }}
-                      >
-                        {distanceLabel}
-                      </Typography>
-                    )}
-
-                    {cafe.isSubscribed ? (
-                      <Button
-                        variant="outlined"
-                        size={isAppLike ? "small" : "medium"}
-                        startIcon={<span style={{ fontSize: 14 }}>✓</span>}
-                        sx={{
-                          borderRadius: 999,
-                          borderColor: grey[400],
-                          color: grey[800],
-                          px: 2,
-                          whiteSpace: "nowrap",
-                          width: { xs: "100%", sm: 150 },
-                        }}
-                      >
-                        구독 중인 카페
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        size={isAppLike ? "small" : "medium"}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/me/store/${cafe.storeId}`);
-                        }}
-                        sx={{
-                          borderRadius: 999,
-                          "&:hover": { bgcolor: "#222", color: "#fff" },
-                          whiteSpace: "nowrap",
-                          width: { xs: "100%", sm: 150 },
-                        }}
-                      >
-                        자세히 보기
-                      </Button>
-                    )}
-                  </Box>
-
-                </Box> 
-              )})}
+                );
+              })}
             </Box>
           </List>
         </Box>

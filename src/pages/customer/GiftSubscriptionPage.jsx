@@ -103,11 +103,14 @@ function GiftSubscriptionPage() {
             console.log("결제 성공:", response);
 
             try {
-              const validationRes = await axios.post("/api/payments/validation", {
-                purchaseId: created.purchaseId,
-                impUid: response.imp_uid,
-                merchantUid: response.merchant_uid,
-              });
+              const validationRes = await axios.post(
+                "/api/payments/validation",
+                {
+                  purchaseId: created.purchaseId,
+                  impUid: response.imp_uid,
+                  merchantUid: response.merchant_uid,
+                }
+              );
 
               console.log("검증 성공:", validationRes.data);
               navigate(`/me/purchase/${created.purchaseId}/complete`);

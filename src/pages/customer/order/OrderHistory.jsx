@@ -19,10 +19,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
-import orderHistoryList  from '../../../data/customer/orderHistoryList'
+import orderHistoryList from "../../../data/customer/orderHistoryList";
 import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
 import { fetchOrderDetail } from "../../../apis/customerApi";
-
 
 function handleSubscriptionType(type) {
   switch (type) {
@@ -36,11 +35,10 @@ function handleSubscriptionType(type) {
   }
 }
 
-
 // 기간 토글 변경 시 날짜 업데이트 함수
 function getPresetRange(period) {
-  const end = new Date();          // 오늘
-  const start = new Date(end);     // 복사
+  const end = new Date(); // 오늘
+  const start = new Date(end); // 복사
 
   if (period === "1M") {
     start.setMonth(start.getMonth() - 1);
@@ -56,8 +54,6 @@ function getPresetRange(period) {
   };
 }
 
-
-
 function formatKoreanDateTime(dateStr) {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return dateStr;
@@ -69,7 +65,16 @@ function formatKoreanDateTime(dateStr) {
   return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
 }
 
-async function fetchOrderHistoryApi({ period, startDate, endDate, nextCursor }) {
+// /api/customer/orders?period=1M -> 한달
+// /api/customer/orders?period=1Y -> 1년
+// /api/customer/orders?period=CUSTOM&startDate=2025-11-06&endDate=2025-11-07 -> 기간설정
+
+async function fetchOrderHistoryApi({
+  period,
+  startDate,
+  endDate,
+  nextCursor,
+}) {
   const params = { period };
 
   if (period === "CUSTOM") {
@@ -81,7 +86,9 @@ async function fetchOrderHistoryApi({ period, startDate, endDate, nextCursor }) 
     params.nextCursor = nextCursor;
   }
 
-  const res = await api.get("/customer/orders", { params });
+  console.log(params);
+
+  const res = await api.get("/me/orders", { params });
 
   // 응답 구조: { success, data: { ordersList, nextCursor, hasNext }, message }
   return res.data;
@@ -120,7 +127,6 @@ function OrderHistory() {
     return copy;
   }, [orders, sortOrder]);
 
-
   // 1개월 / 1년 선택 시 자동 조회 + 날짜 자동 세팅
   useEffect(() => {
     if (period === "CUSTOM") return;
@@ -144,6 +150,7 @@ function OrderHistory() {
       } else {
         setIsMoreLoading(true);
       }
+      console.log("주문 내역 조회");
 
       // 실제 API 조회
       const res = await fetchOrderHistoryApi({
@@ -155,6 +162,8 @@ function OrderHistory() {
 
       const { ordersList, nextCursor: newCursor, hasNext } = res.data;
 
+      console.log("주문 내역>>> ", res.data?.data);
+
       if (reset) {
         setOrders(ordersList || []);
       } else {
@@ -164,7 +173,7 @@ function OrderHistory() {
       setNextCursor(newCursor || null);
       setHasNext(!!hasNext);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setOrders(orderHistoryList);
       setNextCursor(null);
       setHasNext(false);
@@ -174,7 +183,7 @@ function OrderHistory() {
     }
   }
 
-    async function handleClickOrder(order) {
+  async function handleClickOrder(order) {
     try {
       setIsDetailLoading(true);
 
@@ -189,13 +198,12 @@ function OrderHistory() {
     } catch (e) {
       console.error(e);
       alert("주문 상세를 불러오지 못했습니다.");
-
     } finally {
       setIsDetailLoading(false);
     }
   }
 
- function handlePeriodChange(_event, value) {
+  function handlePeriodChange(_event, value) {
     if (!value) return;
     setPeriod(value);
   }
@@ -249,7 +257,6 @@ function OrderHistory() {
           {/* 나의 주문 현황 */}
         </Typography>
       </Box>
-     
 
       {/* 기간 선택 영역 */}
       <Box
@@ -258,13 +265,13 @@ function OrderHistory() {
           border: "1px solid #eee",
           p: 2,
           mb: 3,
-          width: "100%"
+          width: "100%",
         }}
       >
         {/* 상단 기간 버튼 */}
         <Box
           sx={{
-             width: "100%",  
+            width: "100%",
             display: "flex",
             gap: 1,
             mb: 5,
@@ -276,10 +283,10 @@ function OrderHistory() {
             exclusive
             onChange={handlePeriodChange}
             sx={{
-              flex: 1,                   
-              width: "100%",               
+              flex: 1,
+              width: "100%",
               "& .MuiToggleButton-root": {
-                flex: 1,                  
+                flex: 1,
               },
             }}
           >
@@ -309,7 +316,9 @@ function OrderHistory() {
             disabled={period !== "CUSTOM"}
             sx={{ flex: 1 }}
           />
-          <Typography sx={{ display: { xs: "none", sm: "block" } }}>~</Typography>
+          <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+            ~
+          </Typography>
           <TextField
             label="종료일"
             type="date"
@@ -333,7 +342,7 @@ function OrderHistory() {
           </Button>
         </Box>
       </Box>
-        {/* 총 개수 + 정렬 영역 */}
+      {/* 총 개수 + 정렬 영역 */}
       {!isLoading && orders.length > 0 && (
         <Box
           sx={{
@@ -360,8 +369,6 @@ function OrderHistory() {
           </TextField>
         </Box>
       )}
-
-
 
       {/* 주문 리스트 영역 */}
       <Box>
@@ -429,7 +436,6 @@ function OrderHistory() {
         )}
       </Box>
 
-
       {/* 주문 상세 모달 */}
       <Dialog
         open={detailOpen}
@@ -437,9 +443,12 @@ function OrderHistory() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogContent sx={{ p: 0, 
-          // bgcolor: "#f5f5f5" 
-          }}>
+        <DialogContent
+          sx={{
+            p: 0,
+            // bgcolor: "#f5f5f5"
+          }}
+        >
           {isDetailLoading || !selectedOrder ? (
             <Box
               sx={{
@@ -567,23 +576,18 @@ function OrderHistory() {
               ))}
 
               <Box sx={{ mt: 3, textAlign: "right" }}>
-                {selectedOrder.orderStatus === "CANCELED"
-                
-                &&
-                <Chip
-                  label={"주문 취소 완료"
-                  }
-                  disabled={selectedOrder.orderStatus !== "REQUEST"}
-                  sx={{
-                    width: "fit-content",
-                    bgcolor: "black",
-                    color: "white",
-                  }}
-                  // onClick={() => { /* 주문 취소 로직 추가 예정 */ }}
-                />
-                
-                }
-                
+                {selectedOrder.orderStatus === "CANCELED" && (
+                  <Chip
+                    label={"주문 취소 완료"}
+                    disabled={selectedOrder.orderStatus !== "REQUEST"}
+                    sx={{
+                      width: "fit-content",
+                      bgcolor: "black",
+                      color: "white",
+                    }}
+                    // onClick={() => { /* 주문 취소 로직 추가 예정 */ }}
+                  />
+                )}
               </Box>
             </Box>
           )}

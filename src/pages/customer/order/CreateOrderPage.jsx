@@ -15,11 +15,11 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ShoppingBagTwoToneIcon from '@mui/icons-material/ShoppingBagTwoTone';
+import ShoppingBagTwoToneIcon from "@mui/icons-material/ShoppingBagTwoTone";
 // import LocalCafeIcon from '@mui/icons-material/LocalCafe';
-import LocalCafeIcon from '@mui/icons-material/LocalCafeTwoTone';
+import LocalCafeIcon from "@mui/icons-material/LocalCafeTwoTone";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import subList from "../../../data/customer/subList";
@@ -35,7 +35,7 @@ function CreateOrderPage() {
   const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const subscription = state?.subscription;
+  const subscription = state?.subscription; // 홈화면 구독권 > 주문하기
 
   const { authUser } = useUserStore();
 
@@ -59,7 +59,7 @@ function CreateOrderPage() {
     (async () => {
       try {
         const res = await fetchUserSubscriptions();
-        const list = res || [];
+        const list = res.filter((sub) => sub.remainingCount > 0) || [];
         setInventoryList(list);
 
         let defaultInventory = null;
@@ -74,31 +74,15 @@ function CreateOrderPage() {
         }
 
         // 2) 없으면 남은 잔수 > 0 인 구독권 중 첫 번째
-        if (!defaultInventory) {
-          defaultInventory =
-            list.find((it) => it.remainingCount > 0) || list[0] || null;
-        }
+        // if (!defaultInventory) {
+        //   defaultInventory =
+        //     list.find((it) => it.remainingCount > 0) || list[0] || null;
+        // }
 
         // setSelectedInventory(defaultInventory || null);
-        setSelectedInventory(null);
+        setSelectedInventory(defaultInventory || null);
       } catch (err) {
         console.error("구독권 목록 조회 실패: ", err);
-
-        // 실패 시 더미 데이터 사용
-        setInventoryList(subList);
-        let defaultInventory = null;
-
-        if (subscription?.memberSubscriptionId) {
-          defaultInventory = subList.find(
-            (it) =>
-              Number(it.memberSubscriptionId) ===
-              Number(subscription.memberSubscriptionId)
-          );
-        } else if (subList.length > 0) {
-          defaultInventory = subList[0];
-        }
-
-        setSelectedInventory(defaultInventory || null);
       }
     })();
   }, [subscription]);
@@ -339,7 +323,15 @@ function CreateOrderPage() {
   }
 
   return (
-    <Box sx={{ px: isAppLike ? 2 : 15, py: 3, pb: 10 , height: "100vh - 64px", minHeight: "80%"}}>
+    <Box
+      sx={{
+        px: isAppLike ? 2 : 15,
+        py: 3,
+        pb: 10,
+        height: "100vh - 64px",
+        minHeight: "80%",
+      }}
+    >
       {/* 상단 헤더 */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
         <IconButton onClick={handleBack} sx={{ mr: 1 }}>
@@ -349,470 +341,479 @@ function CreateOrderPage() {
           주문하기
         </Typography>
       </Box>
-      <Box sx={{ px: isAppLike? "" : 5}}>
-
-      {/* 구독권 & 이용 타입 */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          mb: 3,
-          alignItems: { xs: "stretch", md: "stretch" },
-        }}
-      >
-        <Box sx={{ flex : 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
-            구독권 선택
-          </Typography>
-          <Select
-            id="order-target-store"
-            value={selectedInventory?.memberSubscriptionId || ""}
-            onChange={(e) => handleSelectInventory(e.target.value)}
-            fullWidth
-            displayEmpty
-          >
-            {/* placeholder 역할 */}
-            <MenuItem value="" disabled>
-              구독권을 선택해주세요.
-            </MenuItem>
-            {inventoryList.length === 0 && (
-              <MenuItem value="">
-                <em>사용 가능한 구독권이 없습니다.</em>
-              </MenuItem>
-            )}
-            {inventoryList.map((inventory) => (
-              <MenuItem
-                key={inventory.memberSubscriptionId}
-                value={inventory.memberSubscriptionId}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Avatar
-                    src={menuDummy || inventory.store?.storeImg || menuDummy}
-                    alt={inventory.store?.storeName}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = menuDummy;
-                    }}
-                  />
-                  <Box>
-                    <Typography variant="body2">
-                      {inventory.store?.storeName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {inventory.subName}
-                      {typeof inventory.remainingCount === "number"
-                        ? ` · 남은잔 ${inventory.remainingCount}잔`
-                        : null}
-                      {inventory.isGift === "Y"
-                        ? ` 🎁 ${inventory.sender}님에게 받은 선물`
-                        : ""}
-                    </Typography>
-                  </Box>
-                </Box>
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-
-        <Box sx={{ flex: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
-            이용 타입
-          </Typography>
-          <ToggleButtonGroup
-            color="primary"
-            value={orderType}
-            exclusive
-            onChange={(e, v) => v && setOrderType(v)}
-            aria-label="order-type"
-            sx={{
-              width: "100%",
-              // height: "100%",
-              height: 74,
-              "& .MuiToggleButton-root": {
-                flex: 1,
-                height: "100%",
-                borderRadius: 0,
-              },
-            }}
-          >
-            <ToggleButton value="IN" sx={{display: 'flex', flexDirection: "row", gap: "0.3rem"}}>
-              매장 이용 <LocalCafeIcon /> 
-            </ToggleButton>
-            <ToggleButton value="OUT"  sx={{display: 'flex', flexDirection: "row", gap: "0.3rem"}}>
-              포장 이용 <ShoppingBagTwoToneIcon /> 
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-      </Box>
-
-      {/* 본문: 메뉴 그리드 + 장바구니 */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: 3,
-          alignItems: "stretch",
-        }}
-      >
-        {/* 메뉴 그리드 영역 */}
+      <Box sx={{ px: isAppLike ? "" : 5 }}>
+        {/* 구독권 & 이용 타입 */}
         <Box
           sx={{
-            flex: 3,
-            width: "100%",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 2,
+            mb: 3,
+            alignItems: { xs: "stretch", md: "stretch" },
           }}
         >
-          {/* 카테고리 탭 */}
-          <ToggleButtonGroup
-            color="primary"
-            value={activeTab}
-            exclusive
-            onChange={(e, v) => v && setActiveTab(v)}
+          <Box sx={{ flex: 3 }}>
+            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+              구독권 선택
+            </Typography>
+            <Select
+              id="order-target-store"
+              value={selectedInventory?.memberSubscriptionId || ""}
+              onChange={(e) => handleSelectInventory(e.target.value)}
+              fullWidth
+              displayEmpty
+            >
+              {/* placeholder 역할 */}
+              <MenuItem value="" disabled>
+                구독권을 선택해주세요.
+              </MenuItem>
+              {inventoryList.length === 0 && (
+                <MenuItem value="">
+                  <em>사용 가능한 구독권이 없습니다.</em>
+                </MenuItem>
+              )}
+              {inventoryList.map((inventory) => (
+                <MenuItem
+                  key={inventory.memberSubscriptionId}
+                  value={inventory.memberSubscriptionId}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Avatar
+                      src={menuDummy || inventory.store?.storeImg || menuDummy}
+                      alt={inventory.store?.storeName}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = menuDummy;
+                      }}
+                    />
+                    <Box>
+                      <Typography variant="body2">
+                        {inventory.store?.storeName}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {inventory.subName}
+                        {typeof inventory.remainingCount === "number"
+                          ? ` · 남은잔 ${inventory.remainingCount}잔`
+                          : null}
+                        {inventory.isGift === "Y"
+                          ? ` 🎁 ${inventory.sender}님에게 받은 선물`
+                          : ""}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+
+          <Box sx={{ flex: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+              이용 타입
+            </Typography>
+            <ToggleButtonGroup
+              color="primary"
+              value={orderType}
+              exclusive
+              onChange={(e, v) => v && setOrderType(v)}
+              aria-label="order-type"
+              sx={{
+                width: "100%",
+                // height: "100%",
+                height: 74,
+                "& .MuiToggleButton-root": {
+                  flex: 1,
+                  height: "100%",
+                  borderRadius: 0,
+                },
+              }}
+            >
+              <ToggleButton
+                value="IN"
+                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+              >
+                매장 이용 <LocalCafeIcon />
+              </ToggleButton>
+              <ToggleButton
+                value="OUT"
+                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+              >
+                포장 이용 <ShoppingBagTwoToneIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </Box>
+
+        {/* 본문: 메뉴 그리드 + 장바구니 */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 3,
+            alignItems: "stretch",
+          }}
+        >
+          {/* 메뉴 그리드 영역 */}
+          <Box
             sx={{
-              mb: 2,
-              "& .MuiToggleButton-root": {
-                textTransform: "none",
-                fontWeight: 600,
-                px: 2,
-              },
+              flex: 3,
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <ToggleButton value="ALL">전체</ToggleButton>
-            <ToggleButton value="BEVERAGE">음료</ToggleButton>
-            <ToggleButton value="DESSERT">디저트</ToggleButton>
-          </ToggleButtonGroup>
-
-          <Box sx={{ flex: 1 }}>
-          {/* 메뉴 카드 그리드 */}
-          {visibleMenus.length === 0 ? (
-            <Box
+            {/* 카테고리 탭 */}
+            <ToggleButtonGroup
+              color="primary"
+              value={activeTab}
+              exclusive
+              onChange={(e, v) => v && setActiveTab(v)}
               sx={{
-                bgcolor: "#f5f5f5",
-                borderRadius: 2,
-                height: "100%",      
-                justifyContent: "center",
-                alignItems: "center", 
-                textAlign: "center",
-                py: "1rem"
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                선택한 구독권에서 주문 가능한 메뉴가 없습니다.
-              </Typography>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "repeat(3, minmax(0, 1fr))",
-                  md: "repeat(3, minmax(0, 1fr))",
+                mb: 2,
+                "& .MuiToggleButton-root": {
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 2,
                 },
-                gap: 2,
               }}
             >
-              {visibleMenus.map((menu) => {
-                const cartItem = cartItems.find(
-                  (ci) => ci.menuId === menu.menuId
-                );
-                const isBeverage = menu.menuType === "BEVERAGE";
+              <ToggleButton value="ALL">전체</ToggleButton>
+              <ToggleButton value="BEVERAGE">음료</ToggleButton>
+              <ToggleButton value="DESSERT">디저트</ToggleButton>
+            </ToggleButtonGroup>
 
-                return (
-                  <Box
-                    key={menu.menuId}
-                    sx={{
-                      borderRadius: 2,
-                      bgcolor: "white",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                      p: 2,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "stretch",
-                      height: "100%",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: "100%",
-                        pb: "75%",
-                        position: "relative",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        mb: 1.5,
-                      }}
-                    >
+            <Box sx={{ flex: 1 }}>
+              {/* 메뉴 카드 그리드 */}
+              {visibleMenus.length === 0 ? (
+                <Box
+                  sx={{
+                    bgcolor: "#f5f5f5",
+                    borderRadius: 2,
+                    height: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                    py: "1rem",
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    선택한 구독권에서 주문 가능한 메뉴가 없습니다.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "repeat(3, minmax(0, 1fr))",
+                      md: "repeat(3, minmax(0, 1fr))",
+                    },
+                    gap: 2,
+                  }}
+                >
+                  {visibleMenus.map((menu) => {
+                    const cartItem = cartItems.find(
+                      (ci) => ci.menuId === menu.menuId
+                    );
+                    const isBeverage = menu.menuType === "BEVERAGE";
+
+                    return (
                       <Box
-                        component="img"
-                        src={menu.menuImg || menuDummy}
-                        alt={menu.menuName || menu.name}
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = menuDummy;
-                        }}
+                        key={menu.menuId}
                         sx={{
-                          position: "absolute",
-                          inset: 0,
-                          width: "100%",
+                          borderRadius: 2,
+                          bgcolor: "white",
+                          boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                          p: 2,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "stretch",
                           height: "100%",
-                          objectFit: "cover",
                         }}
-                      />
-                    </Box>
+                      >
+                        <Box
+                          sx={{
+                            width: "100%",
+                            pb: "75%",
+                            position: "relative",
+                            borderRadius: 2,
+                            overflow: "hidden",
+                            mb: 1.5,
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={menu.menuImg || menuDummy}
+                            alt={menu.menuName || menu.name}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = menuDummy;
+                            }}
+                            sx={{
+                              position: "absolute",
+                              inset: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </Box>
 
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 600, mb: 0.5 }}
-                    >
-                      {menu.menuName || menu.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
-                      {menu.price.toLocaleString()}원
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1, flexGrow: 1 }}
-                    >
-                      {isBeverage ? "음료" : "디저트"}
-                    </Typography>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 0.5 }}
+                        >
+                          {menu.menuName || menu.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 1 }}
+                        >
+                          {menu.price.toLocaleString()}원
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1, flexGrow: 1 }}
+                        >
+                          {isBeverage ? "음료" : "디저트"}
+                        </Typography>
 
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        alignItems: "center",
-                        mt: "auto",
-                      }}
-                    >
-                      {cartItem ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center",
+                            mt: "auto",
+                          }}
+                        >
+                          {cartItem ? (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  handleDecreaseFromCart(menu.menuId)
+                                }
+                              >
+                                <RemoveIcon fontSize="small" />
+                              </IconButton>
+                              <Typography>{cartItem.qty}</Typography>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleAddToCart(menu.menuId)}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                          ) : (
+                            <Button
+                              size="small"
+                              variant="contained"
+                              startIcon={<AddIcon />}
+                              onClick={() => handleAddToCart(menu.menuId)}
+                              sx={{
+                                borderRadius: 999,
+                                textTransform: "none",
+                                fontSize: "0.8rem",
+                              }}
+                            >
+                              담기
+                            </Button>
+                          )}
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          {/* 장바구니 영역 */}
+          <Box
+            sx={{
+              flex: 2,
+              minWidth: { xs: "100%", md: 260 },
+              display: "flex",
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                bgcolor: "white",
+                borderRadius: 2,
+                boxShadow: "0 1px 6px rgba(0,0,0,0.12)",
+                p: 2.5,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 2,
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <ShoppingCartIcon />
+                  <Typography fontWeight="bold">장바구니</Typography>
+                </Box>
+                {cartItems.length > 0 && (
+                  <Button
+                    size="small"
+                    color="inherit"
+                    onClick={() => setCartItems([])}
+                    sx={{ textTransform: "none", fontSize: "0.75rem" }}
+                  >
+                    전체 비우기
+                  </Button>
+                )}
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                {cartWithInfo.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    장바구니에 담긴 메뉴가 없습니다.
+                  </Typography>
+                ) : (
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
+                    {cartWithInfo.map((item) => (
+                      <Box
+                        key={item.menuId}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 1,
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {item.menu?.menuName || item.menu?.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {(item.menu?.price || 0).toLocaleString()}원
+                          </Typography>
+                        </Box>
+
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 1,
+                            gap: 0.5,
                           }}
                         >
                           <IconButton
                             size="small"
-                            onClick={() => handleDecreaseFromCart(menu.menuId)}
+                            onClick={() => handleDecreaseFromCart(item.menuId)}
                           >
                             <RemoveIcon fontSize="small" />
                           </IconButton>
-                          <Typography>{cartItem.qty}</Typography>
+                          <Typography variant="body2">{item.qty}</Typography>
                           <IconButton
                             size="small"
-                            onClick={() => handleAddToCart(menu.menuId)}
+                            onClick={() => handleAddToCart(item.menuId)}
                           >
                             <AddIcon fontSize="small" />
                           </IconButton>
                         </Box>
-                      ) : (
-                        <Button
-                          size="small"
-                          variant="contained"
-                          startIcon={<AddIcon />}
-                          onClick={() => handleAddToCart(menu.menuId)}
-                          sx={{
-                            borderRadius: 999,
-                            textTransform: "none",
-                            fontSize: "0.8rem",
-                          }}
-                        >
-                          담기
-                        </Button>
-                      )}
-                    </Box>
-                  </Box>
-                );
-              })}
-            </Box>
-          )}
-          </Box>
-        </Box>
 
-        {/* 장바구니 영역 */}
-        <Box
-          sx={{
-            flex: 2,
-            minWidth: { xs: "100%", md: 260 },
-            display: "flex",
-          }}
-        >
-          <Box
-            sx={{
-              flex: 1,
-              display: "flex",  
-              flexDirection: "column",
-              bgcolor: "white",
-              borderRadius: 2,
-              boxShadow: "0 1px 6px rgba(0,0,0,0.12)",
-              p: 2.5,
-              
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mb: 2,
-                alignItems: "center",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <ShoppingCartIcon />
-                <Typography fontWeight="bold">장바구니</Typography>
-              </Box>
-              {cartItems.length > 0 && (
-                <Button
-                  size="small"
-                  color="inherit"
-                  onClick={() => setCartItems([])}
-                  sx={{ textTransform: "none", fontSize: "0.75rem" }}
-                >
-                  전체 비우기
-                </Button>
-              )}
-            </Box>
-            <Box sx={{ flex: 1 }}>
-            {cartWithInfo.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
-                장바구니에 담긴 메뉴가 없습니다.
-              </Typography>
-            ) : (
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {cartWithInfo.map((item) => (
-                  <Box
-                    key={item.menuId}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 1,
-                    }}
-                  >
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography
-                        variant="body2"
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveItem(item.menuId)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+
+                    <Box sx={{ borderTop: "1px solid #eee", mt: 2, pt: 2 }}>
+                      <Box
                         sx={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 0.5,
                         }}
                       >
-                        {item.menu?.menuName || item.menu?.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {(item.menu?.price || 0).toLocaleString()}원
-                      </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          합계
+                        </Typography>
+                        <Typography fontWeight="bold">
+                          {subtotal.toLocaleString()}원
+                        </Typography>
+                      </Box>
+                      {requiredTypes.includes("BEVERAGE") &&
+                        !hasBeverageInCart && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ mt: 0.5, display: "block" }}
+                          >
+                            음료를 최소 1잔 이상 선택해야 주문이 가능합니다.
+                          </Typography>
+                        )}
                     </Box>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                      }}
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDecreaseFromCart(item.menuId)}
-                      >
-                        <RemoveIcon fontSize="small" />
-                      </IconButton>
-                      <Typography variant="body2">{item.qty}</Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleAddToCart(item.menuId)}
-                      >
-                        <AddIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-
-                    <IconButton
-                      size="small"
-                      onClick={() => handleRemoveItem(item.menuId)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
                   </Box>
-                ))}
-
-                <Box sx={{ borderTop: "1px solid #eee", mt: 2, pt: 2 }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mb: 0.5,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      합계
-                    </Typography>
-                    <Typography fontWeight="bold">
-                      {subtotal.toLocaleString()}원
-                    </Typography>
-                  </Box>
-                  {requiredTypes.includes("BEVERAGE") && !hasBeverageInCart && (
-                    <Typography
-                      variant="caption"
-                      color="error"
-                      sx={{ mt: 0.5, display: "block" }}
-                    >
-                      음료를 최소 1잔 이상 선택해야 주문이 가능합니다.
-                    </Typography>
-                  )}
-                </Box>
+                )}
               </Box>
-            )}
-            </Box>
 
-            {/* 주문하기 버튼 항상 카드의 맨 아래에 위치 */}
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 2,
-                bgcolor: "black",
-                "&:hover": { bgcolor: "#222" },
-                textTransform: "none",
-              }}
-              onClick={requestOrder}
-              disabled={
-                isLoading || cartItems.length === 0 || !hasBeverageInCart
-              }
-            >
-              {isLoading ? (
-                <CircularProgress size={18} sx={{ color: "white" }} />
-              ) : (
-                "주문하기"
-              )}
-            </Button>
+              {/* 주문하기 버튼 항상 카드의 맨 아래에 위치 */}
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  bgcolor: "black",
+                  "&:hover": { bgcolor: "#222" },
+                  textTransform: "none",
+                }}
+                onClick={requestOrder}
+                disabled={
+                  isLoading || cartItems.length === 0 || !hasBeverageInCart
+                }
+              >
+                {isLoading ? (
+                  <CircularProgress size={18} sx={{ color: "white" }} />
+                ) : (
+                  "주문하기"
+                )}
+              </Button>
+            </Box>
           </Box>
         </Box>
-      </Box>
 
-      {/* 주문 처리 중 Backdrop */}
-      <Backdrop
-        open={isLoading}
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.modal + 2,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <CircularProgress color="inherit" />
-        <Typography variant="body1" sx={{ mt: 1 }}>
-          주문이 진행 중입니다 ...
-        </Typography>
-      </Backdrop>
+        {/* 주문 처리 중 Backdrop */}
+        <Backdrop
+          open={isLoading}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.modal + 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <CircularProgress color="inherit" />
+          <Typography variant="body1" sx={{ mt: 1 }}>
+            주문이 진행 중입니다 ...
+          </Typography>
+        </Backdrop>
       </Box>
     </Box>
   );

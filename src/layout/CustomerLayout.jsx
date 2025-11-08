@@ -37,33 +37,29 @@ import NotificationItem from "../components/common/NotificationItem";
 const drawerWidth = 240;
 
 const links = [
-    { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
-    { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
-    {
-      to: "/me/order/new",
-      label: "주문하기",
-      icon: <ShoppingCartIcon />,
-      end: true,
-    },
-    {
-      to: "/me/order",
-      label: "주문 내역",
-      icon: <ReceiptLongIcon />,
-      end: true,
-    },
-    { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
+  { to: "/me", label: "Home", icon: <HomeIcon />, end: true },
+  { to: "/me/search", label: "매장 탐색", icon: <SearchIcon /> },
+  {
+    to: "/me/order/new",
+    label: "주문하기",
+    icon: <ShoppingCartIcon />,
+    end: true,
+  },
+  {
+    to: "/me/order",
+    label: "주문 내역",
+    icon: <ReceiptLongIcon />,
+    end: true,
+  },
+  { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
 ];
 
 export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
-  const {
-    notifications,
-    unreadCount,
-    markAsRead,
-    deleteAllNotifications,
-  } = useNotificationStore();
+  const { notifications, unreadCount, markAsRead, deleteAllNotifications } =
+    useNotificationStore();
   const { isAppLike } = useAppShellMode(); // 모바일 여부
   const [bottomValue, setBottomValue] = useState(location.pathname);
 
@@ -97,17 +93,15 @@ export default function CustomerLayout() {
 
       // 프론트 상태 비우기
       deleteAllNotifications();
-
     } catch (e) {
       console.error("전체 알림 삭제 실패:", e);
       alert("알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
-
   }
 
   // 특정 알림 읽음 처리  + 페이지 이동
   async function handleNotificationClick(noti) {
-    const { notificationId, notificationType, notificationContent } = noti;
+    const { notificationId, notificationType } = noti;
 
     console.log("📨 클릭된 알림:", noti);
 
@@ -115,7 +109,7 @@ export default function CustomerLayout() {
     if (!noti.readAt && !noti.isRead) {
       try {
         await readNotification(notificationId); // PATCH 요청
-        markAsRead(notificationId);             // Zustand 상태 업데이트
+        markAsRead(notificationId); // Zustand 상태 업데이트
       } catch (e) {
         console.error("알림 읽음 처리 실패:", e);
       }
@@ -123,23 +117,23 @@ export default function CustomerLayout() {
 
     // 타입별 네비게이션
     try {
+      console.log("이동");
       // notificationContent 가 { message, targetId } 형태라고 가정
-      const content = notificationContent;
-      const targetId =
-        content && typeof content === "object" ? content.targetId : null;
+      const targetId = noti.targetId;
+      // content && typeof content === "object" ? content.targetId : null;
 
       // ORDER(주문) 타입 + targetId 있으면 주문 상세로 이동
-      if (
-        (notificationType === "ORDER" || notificationType === "주문") &&
-        targetId
-      ) {
+      if (notificationType === "ORDER" && targetId) {
         navigate(`/me/order/${targetId}`);
+        setNotifOpen(false); // 드로어 닫기
+      } else if (notificationType === "GIFT") {
+        // 선물 보내기
+        navigate(`/me/mypage`);
         setNotifOpen(false); // 드로어 닫기
       }
 
       // 다른 타입들도 나중에 추가 가능
       // else if (notificationType === "GIFT" || notificationType === "선물") { ... }
-
     } catch (e) {
       console.error("알림 클릭 후 이동 처리 중 오류:", e);
     }
@@ -158,8 +152,7 @@ export default function CustomerLayout() {
   //     console.log("✅ 이미 읽은 알림입니다. 요청 생략.");
   //     return;
   //   }
-    
-    
+
   //    try {
   //     await readNotification(notificationId); // PATCH 요청
   //     markAsRead(notificationId); // 상태 업데이트
@@ -268,7 +261,7 @@ export default function CustomerLayout() {
               <Button onClick={handleCloseNotif} color="gray">
                 닫기
               </Button>
-          </Box>
+            </Box>
           </Box>
           <Divider />
           <List sx={{ p: 0 }}>
@@ -412,7 +405,7 @@ export default function CustomerLayout() {
             minHeight: "calc(100vh - 64px)",
             mt: 8,
             pb: 10,
-            position: "relative",   // ✅ 추가
+            position: "relative", // ✅ 추가
           }}
         >
           <Outlet />
