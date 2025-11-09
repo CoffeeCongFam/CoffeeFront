@@ -528,7 +528,7 @@ export const SubscriptionDetailCard = ({
                               textOverflow: "ellipsis",
                             }}
                           >
-                            💌 선물 메시지
+                            💌
                           </Typography>
                         </Box>
                         <Popover
