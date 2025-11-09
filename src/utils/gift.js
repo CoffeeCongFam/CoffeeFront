@@ -3,7 +3,7 @@ import api from "./api";
 export async function getGiftData() {
   try {
     const response = await api.get("/me/purchase/gift");
-    console.log(response.data.data)
+    console.log("선물 전체 탭: ", response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
@@ -14,7 +14,7 @@ export async function getGiftData() {
 export async function getSendGiftData() {
   try {
     const response = await api.get("/me/purchase/gift/send");
-    console.log(response.data.data)
+    console.log("보낸선물 전체 : ",response.data.data)
     return response.data.data;
   } catch (error) {
     console.error("Error fetching gift data:", error);
@@ -35,6 +35,7 @@ export async function getReceievGiftData() {
               return data;
             }
           }
+          console.log("받은 선물 전체 조회: ", data)
           return data;
         },
       ],

@@ -18,7 +18,6 @@ import useUserStore from "../../../stores/useUserStore";
 import { TokenService } from "../../../utils/api";
 import LocalCafeImgList from "./LocalCafeImgList";
 import getDistanceKm from "../../../utils/getDistanceKm";
-import { SubscriptionDetailCard } from "../Subscription";
 import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
 // import api from "../../../utils/api";
 

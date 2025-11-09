@@ -1,12 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Card, CardContent, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 function Withdrawal() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // 현재 페이지를 히스토리 스택에 추가하여 뒤로가기 시도를 감지할 수 있도록 합니다.
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = (event) => {
+      // 사용자가 뒤로가기를 시도하면 홈으로 보냅니다.
+      navigate('/', { replace: true });
+    };
+    
+    // popstate 이벤트 리스너를 추가합니다.
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState); // 컴포넌트 언마운트 시 리스너 제거
+    };
+  }, [navigate]);
+
   const handleGoodbyeConfirm = () => {
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   return (

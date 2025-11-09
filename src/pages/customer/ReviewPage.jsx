@@ -31,7 +31,7 @@ export default function ReviewPage({ reviewList: propReviews }) {
   const [sortOrder, setSortOrder] = useState("desc"); // 'desc' 최신순, 'asc' 오래된순
   const [deletingId, setDeletingId] = useState(null);
   const hasPropData = Array.isArray(propReviews) && propReviews.length > 0;
-
+  
   // 간단한 날짜 파서/포맷터 (ISO 또는 yyyy-MM-dd HH:mm:ss 형태 가정)
   const toDate = (v) => (v ? new Date(v) : new Date(0)); // created_at|createdAt|updatedAt 모두 지원
   const fmt = (d) =>
@@ -62,6 +62,7 @@ export default function ReviewPage({ reviewList: propReviews }) {
           return;
         }
         const res = await getReview();
+        console.log("리뷰 시간 확인해라!: ",res)
         const arr = Array.isArray(res) ? res : res?.data ?? [];
         console.log("[ReviewPage] resolved reviews:", arr.length, arr);
         if (!ignore) setLocalReviews(sortReviews(arr, sortOrder));
@@ -84,6 +85,13 @@ export default function ReviewPage({ reviewList: propReviews }) {
       alert("리뷰 ID를 찾을 수 없습니다.");
       return;
     }
+
+    // 삭제 전 사용자 확인
+    const ok = window.confirm("정말 이 리뷰를 삭제하시겠습니까?");
+    if (!ok) {
+      return;
+    }
+
     try {
       setDeletingId(reviewId);
       const res = await deleteReview({ reviewId });
@@ -235,7 +243,7 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
                 variant="caption"
                 sx={{ color: "text.secondary", ml: "auto" }}
               >
-                {createdVal ? fmt(new Date(createdVal)) : "-"}
+                {review.updatedAt ? review.updatedAt : "-"}
               </Typography>
               <Box
                 sx={{
