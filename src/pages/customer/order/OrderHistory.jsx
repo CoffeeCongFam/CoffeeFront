@@ -16,7 +16,6 @@ import {
   DialogContent,
   Chip,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
 import orderHistoryList from "../../../data/customer/orderHistoryList";
@@ -69,6 +68,18 @@ function formatKoreanDateTime(dateStr) {
 // /api/customer/orders?period=1Y -> 1년
 // /api/customer/orders?period=CUSTOM&startDate=2025-11-06&endDate=2025-11-07 -> 기간설정
 
+
+// 주문 상태 필터링용
+const STATUS_OPTIONS = [
+  { value: "ALL", label: "전체" },
+  { value: "REQUEST", label: "주문 요청" },
+  { value: "INPROGRESS", label: "제조 중" },
+  { value: "COMPLETED", label: "완료" },
+  { value: "CANCELED", label: "주문 취소" },
+  { value: "REJECTED", label: "매장 취소" },
+];
+
+
 async function fetchOrderHistoryApi({
   period,
   startDate,
@@ -95,8 +106,13 @@ async function fetchOrderHistoryApi({
 }
 
 function OrderHistory() {
-  const navigate = useNavigate();
   const { isAppLike } = useAppShellMode();
+
+  // 오늘 날짜
+  const todayStr = useMemo(
+    () => new Date().toISOString().slice(0, 10),
+    []
+  );
 
   const [period, setPeriod] = useState("1M");
   const [startDate, setStartDate] = useState("");
@@ -110,6 +126,7 @@ function OrderHistory() {
   const [isMoreLoading, setIsMoreLoading] = useState(false);
 
   const [sortOrder, setSortOrder] = useState("DESC"); // 정렬
+  const [statusFilter, setStatusFilter] = useState("ALL");  // 주문 상태 필터링
 
   // 모달 상태
   const [detailOpen, setDetailOpen] = useState(false);
@@ -117,15 +134,34 @@ function OrderHistory() {
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   // 정렬된 리스트 메모이제이션
-  const sortedOrders = useMemo(() => {
-    const copy = [...orders];
+  // const sortedOrders = useMemo(() => {
+  //   const copy = [...orders];
+  //   copy.sort((a, b) => {
+  //     const aTime = new Date(a.createdAt).getTime();
+  //     const bTime = new Date(b.createdAt).getTime();
+  //     return sortOrder === "DESC" ? bTime - aTime : aTime - bTime;
+  //   });
+  //   return copy;
+  // }, [orders, sortOrder]);
+
+  // 정렬 + 필터링 적용된 리스트
+  const filteredAndSortedOrders = useMemo(() => {
+    // 1) 상태 필터
+    const filtered =
+      statusFilter === "ALL"
+        ? orders
+        : orders.filter((o) => o.orderStatus === statusFilter);
+
+    // 2) 정렬
+    const copy = [...filtered];
     copy.sort((a, b) => {
       const aTime = new Date(a.createdAt).getTime();
       const bTime = new Date(b.createdAt).getTime();
       return sortOrder === "DESC" ? bTime - aTime : aTime - bTime;
     });
     return copy;
-  }, [orders, sortOrder]);
+  }, [orders, sortOrder, statusFilter]);
+
 
   // 1개월 / 1년 선택 시 자동 조회 + 날짜 자동 세팅
   useEffect(() => {
@@ -152,7 +188,7 @@ function OrderHistory() {
       }
       console.log("주문 내역 조회");
 
-      // 실제 API 조회
+      // 주문 내역 조회
       const res = await fetchOrderHistoryApi({
         period: selectedPeriod,
         startDate: selectedPeriod === "CUSTOM" ? startDate : undefined,
@@ -161,8 +197,6 @@ function OrderHistory() {
       });
 
       const { ordersList, nextCursor: newCursor, hasNext } = res.data;
-
-      console.log("주문 내역>>> ", res.data?.data);
 
       if (reset) {
         setOrders(ordersList || []);
@@ -217,6 +251,11 @@ function OrderHistory() {
       alert("시작일이 종료일보다 클 수 없습니다.");
       return;
     }
+    if (endDate > todayStr || startDate > todayStr) {
+      alert("미래 날짜는 선택할 수 없습니다.");
+      return;
+    }
+
     // CUSTOM 기준으로 새로 조회
     loadOrders({ reset: true, period: "CUSTOM" });
   }
@@ -315,6 +354,7 @@ function OrderHistory() {
             InputLabelProps={{ shrink: true }}
             disabled={period !== "CUSTOM"}
             sx={{ flex: 1 }}
+            inputProps={{ max: todayStr }}
           />
           <Typography sx={{ display: { xs: "none", sm: "block" } }}>
             ~
@@ -328,6 +368,7 @@ function OrderHistory() {
             InputLabelProps={{ shrink: true }}
             disabled={period !== "CUSTOM"}
             sx={{ flex: 1 }}
+            inputProps={{ max: todayStr }}
           />
 
           <Button
@@ -351,22 +392,42 @@ function OrderHistory() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: 2,
           }}
         >
           <Typography variant="body2" color="text.secondary">
             전체 {orders.length}건
+            {statusFilter !== "ALL" && ` · 필터된 ${filteredAndSortedOrders.length}건`}
           </Typography>
 
-          <TextField
-            select
-            size="small"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            sx={{ width: 140 }}
-          >
-            <MenuItem value="DESC">최신순</MenuItem>
-            <MenuItem value="ASC">오래된 순</MenuItem>
-          </TextField>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {/* ✅ 상태 필터 */}
+            <TextField
+              select
+              size="small"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ width: 140 }}
+            >
+              {STATUS_OPTIONS.map((opt) => (
+                <MenuItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            {/* 기존 정렬 드롭다운 */}
+            <TextField
+              select
+              size="small"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              sx={{ width: 140 }}
+            >
+              <MenuItem value="DESC">최신순</MenuItem>
+              <MenuItem value="ASC">오래된 순</MenuItem>
+            </TextField>
+          </Box>
         </Box>
       )}
 
@@ -396,7 +457,7 @@ function OrderHistory() {
         ) : (
           <>
             <List>
-              {sortedOrders.map((order) => (
+              {filteredAndSortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
                   <ListItemButton
                     // 기존: onClick={() => navigate(`/me/order/${order.orderId}`)}
@@ -521,7 +582,7 @@ function OrderHistory() {
                 <Typography color="text.secondary">구독권명</Typography>
                 <Typography>
                   {handleSubscriptionType(
-                    selectedOrder.subscription.subscriptionType
+                    selectedOrder.subscription.subscriptionName
                   )}
                 </Typography>
               </Box>

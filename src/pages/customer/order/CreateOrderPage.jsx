@@ -22,7 +22,6 @@ import ShoppingBagTwoToneIcon from "@mui/icons-material/ShoppingBagTwoTone";
 import LocalCafeIcon from "@mui/icons-material/LocalCafeTwoTone";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import subList from "../../../data/customer/subList";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import {
   fetchUserSubscriptions,
@@ -317,31 +316,58 @@ function CreateOrderPage() {
     }
   }
 
-  // 뒤로가기
-  function handleBack() {
-    navigate(-1);
-  }
-
   return (
     <Box
       sx={{
-        px: isAppLike ? 2 : 15,
-        py: 3,
+        px: isAppLike ? 2 : 12,
+        py: isAppLike ? 2 : 5,
         pb: 10,
-        height: "100vh - 64px",
-        minHeight: "80%",
+        boxSizing: "border-box",
+        overflow: "hidden",  
+        display: "flex", 
+        flexDirection: "column",
+        // height: "calc(100vh - 64px)", 
+        ...(isAppLike
+          ? {
+              minHeight: "calc(100vh - 64px)",
+            }
+          : {
+              height: "calc(100vh - 64px)",
+              overflow: "hidden",
+            }),
       }}
     >
-      {/* 상단 헤더 */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-        <IconButton onClick={handleBack} sx={{ mr: 1 }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant={isAppLike ? "h6" : "h5"} fontWeight="bold">
-          주문하기
-        </Typography>
-      </Box>
-      <Box sx={{ px: isAppLike ? "" : 5 }}>
+       <Box
+               sx={{
+                 display: "flex",
+                 flexDirection: "column", // 데스크탑도 무조건 column
+                 gap: 1.5,
+                 mb: 2,
+               }}
+             >
+               {/* 제목 */}
+               <Typography
+                 sx={{
+                   fontSize: { xs: "1.5rem", md: "1.9rem" },
+                   fontWeight: "bold",
+                   lineHeight: 1.1,
+                   mb: "2%",
+                 }}
+               >
+                주문하기
+               </Typography>
+             </Box>
+
+      {/* 헤더 아래 메인 콘텐츠 영역 */}
+      <Box 
+        sx={{
+          // px: isAppLike ? 0 : 5,
+          flex: 1,                   //  남은 영역 모두 차지
+          minHeight: 0,              //  자식이 flex 안에서 스크롤 가능하도록
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {/* 구독권 & 이용 타입 */}
         <Box
           sx={{
@@ -350,6 +376,7 @@ function CreateOrderPage() {
             gap: 2,
             mb: 3,
             alignItems: { xs: "stretch", md: "stretch" },
+            flexShrink: 0,  // 위 영역은 고정 높이
           }}
         >
           <Box sx={{ flex: 3 }}>
@@ -450,6 +477,8 @@ function CreateOrderPage() {
             flexDirection: { xs: "column", md: "row" },
             gap: 3,
             alignItems: "stretch",
+            flex: 1,    
+            minHeight: 0,  
           }}
         >
           {/* 메뉴 그리드 영역 */}
@@ -459,6 +488,7 @@ function CreateOrderPage() {
               width: "100%",
               display: "flex",
               flexDirection: "column",
+              minHeight: 0,    
             }}
           >
             {/* 카테고리 탭 */}
@@ -481,7 +511,15 @@ function CreateOrderPage() {
               <ToggleButton value="DESSERT">디저트</ToggleButton>
             </ToggleButtonGroup>
 
-            <Box sx={{ flex: 1 }}>
+            <Box 
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: "auto",
+                pr: 1,
+                pb: 1,
+              }}
+            >
               {/* 메뉴 카드 그리드 */}
               {visibleMenus.length === 0 ? (
                 <Box
@@ -638,9 +676,10 @@ function CreateOrderPage() {
           {/* 장바구니 영역 */}
           <Box
             sx={{
-              flex: 2,
+              flex: { xs: "0 0 auto", md: 2 },
               minWidth: { xs: "100%", md: 260 },
               display: "flex",
+              mt: { xs: 2, md: 0 },         
             }}
           >
             <Box

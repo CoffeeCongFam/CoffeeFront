@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/common/Loading";
+import { Box } from "@mui/material";
 
 function KakaoRedirectProd() {
 	const BASE_URL = import.meta.env.VITE_API_URL;
@@ -74,10 +76,10 @@ function KakaoRedirectProd() {
 	}, []);
 
 	return (
-		<div>
-			<h1>카카오 로그인 처리 중...</h1>
-			<p>잠시만 기다려 주세요.</p>
-		</div>
+		<Box sx={{width: "100vw" , height: "100vh"}}>
+		<Loading message={"COFFEIENS에 오신 걸 환영해요 ☕️"} title={"로그인 중입니다."} />
+
+		</Box>
 	);
 }
 

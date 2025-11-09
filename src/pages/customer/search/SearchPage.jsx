@@ -20,6 +20,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
+import SearchOffRoundedIcon from '@mui/icons-material/SearchOffRounded';
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SearchCafeInput from "../../../components/customer/search/SearchCafeInput.jsx";
@@ -33,6 +35,7 @@ import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx
 import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
 import Loading from "../../../components/common/Loading.jsx";
 import getDistanceKm from "../../../utils/getDistanceKm";
+import storeDummy from '../../../assets/cafeInfoDummy.png';
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -42,6 +45,7 @@ const Panel = styled(Paper)(({ theme }) => ({
   transform: "translate(-50%, 100%)",
   width: "100%",
   maxHeight: "80vh",
+  minHeight: "80vh",
   borderTopLeftRadius: 16,
   borderTopRightRadius: 16,
   boxShadow: "0 -4px 20px rgba(0,0,0,0.2)",
@@ -86,7 +90,10 @@ export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
   const [cafes, setCafes] = useState([]);
-  const [sortOption, setSortOption] = useState("distance");
+  const [sortOption, setSortOption] = useState("distance");   // 정렬
+  const [statusFilter, setStatusFilter] = useState("ALL");    // 필터링 (전체 / 영업중 / 영업종료 / 휴무일)
+
+
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
 
@@ -301,7 +308,16 @@ export default function SearchPage() {
 
   // 리스트 정렬
   const sortedCafes = useMemo(() => {
-    const arr = cafes.map((cafe) => {
+    // 상태 핕터링 적용
+    const filtered = cafes.filter((cafe) => {
+      if(statusFilter === "ALL") return true;
+
+      return cafe.storeStatus === statusFilter;   // "OPEN" / "CLOSED" / "HOLIDAY"
+    })
+
+    // 거리 계산
+    // const arr = cafes.map((cafe) => {
+    const arr = filtered.map((cafe) => {
       if (
         currentLoc.xPoint &&
         currentLoc.yPoint &&
@@ -320,10 +336,6 @@ export default function SearchPage() {
     });
 
     switch (sortOption) {
-      case "latest":
-        return arr.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
       case "subscribers":
         return arr.sort(
           (a, b) => (b.subscriberCount || 0) - (a.subscriberCount || 0)
@@ -339,7 +351,7 @@ export default function SearchPage() {
           return a.distanceKm - b.distanceKm;
         });
     }
-  }, [cafes, sortOption, currentLoc]);
+  }, [cafes, sortOption, currentLoc, statusFilter]);
 
   const open = Boolean(currentLocRef); // 현재 위치
 
@@ -557,6 +569,20 @@ export default function SearchPage() {
         >
           <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+
+            {/* 영업 상태 필터 */}
+            <Select
+              size="small"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ fontSize: "0.875rem", height: 32 }}
+            >
+              <MenuItem value="ALL">전체</MenuItem>
+              <MenuItem value="OPEN">영업중</MenuItem>
+              <MenuItem value="CLOSED">영업 종료</MenuItem>
+              <MenuItem value="HOLIDAY">휴무일</MenuItem>
+            </Select>
+            {/* 정렬 */}
             <Select
               size="small"
               value={sortOption}
@@ -564,7 +590,6 @@ export default function SearchPage() {
               sx={{ fontSize: "0.875rem", height: 32 }}
             >
               <MenuItem value="distance">거리순</MenuItem>
-              <MenuItem value="latest">최신순</MenuItem>
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
@@ -585,6 +610,18 @@ export default function SearchPage() {
                 flexDirection: "column",
               }}
             >
+              {
+                sortedCafes.length === 0 &&
+                <Box sx={{flex: 1, display: "flex", flexDirection: "column", gap: "0.7rem", px: 2, py: 3, bgcolor: "#f8f9fa", textAlign: "center"}}>
+                  <SearchOffRoundedIcon sx={{ fontSize: 40, mb: 1, opacity: 0.6 }} />
+                  <Typography color="text.secondary">
+                    조건에 맞는 카페가 없습니다.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    필터를 변경하거나 다른 지역을 검색해보세요 ☕
+                  </Typography>
+                </Box>
+              }
               {sortedCafes.map((cafe) => {
                 const distanceLabel = formatDistance(cafe.distanceKm);
 
@@ -603,7 +640,14 @@ export default function SearchPage() {
                       alignItems: "stretch",
                       cursor: "pointer",
                       flexDirection: { xs: "column", sm: "row" },
+                      "&:hover": {
+                        filter: "brightness(0.97)",
+                        // transform: "translateY(-3px)",
+                        // boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                      }
                     }}
+                    
+                    
                   >
                     {/* 썸네일 */}
                     <Box
@@ -620,7 +664,7 @@ export default function SearchPage() {
                       }}
                     >
                       <Avatar
-                        src={cafe.storeImage}
+                        src={cafe.storeImage || storeDummy}
                         alt={cafe.storeName}
                         sx={{ width: "100%", height: "100%", borderRadius: 2 }}
                         variant="rounded"
@@ -638,7 +682,6 @@ export default function SearchPage() {
                           gap: 1,
                         }}
                       >
-                        {/* 오타(stauts) → status 로 수정 */}
                         <CafeStatusChip status={cafe.storeStatus} />
                       </Box>
 

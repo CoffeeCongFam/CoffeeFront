@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography, Divider, Chip } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { Box, Tabs, Tab, Typography, Divider, Chip, IconButton } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CafeInfo from "../../../components/customer/cafe/CafeInfo.jsx";
 import CafeMenuList from "../../../components/customer/cafe/CafeMenuList.jsx";
 import CafeSubscriptionList from "../../../components/customer/cafe/CafeSubscriptionList.jsx";
@@ -34,10 +35,12 @@ function a11yProps(index) {
   };
 }
 
+
 // 매장 상세 정보 페이지
 function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
   const [store, setStore] = useState({});
@@ -45,9 +48,7 @@ function StoreDetailPage() {
 
   const [tab, setTab] = useState(0);
 
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-  };
+
 
   useEffect(() => {
     let mounted = true; // 언마운트 후 setState 방지용
@@ -80,6 +81,15 @@ function StoreDetailPage() {
     };
   }, [storeId]);
 
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+  };
+  
+  function handleBack() {
+    navigate(-1);
+  }
+
   return isLoading ? (
     <Box
       sx={{
@@ -99,8 +109,31 @@ function StoreDetailPage() {
         maxWidth: isAppLike ? "100%" : "50%", // 데스크탑에서만 가운데로
         mx: "auto",
         pb: isAppLike ? "15%" : 0,
+        position: "relative",
       }}
     >
+
+                {/* 뒤로가기 버튼: 왼쪽 고정 */}
+                <IconButton
+                  onClick={handleBack}
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    zIndex: 2,
+                    bgcolor: "rgba(0,0,0,0.45)",
+                    color: "white",
+                    "&:hover": {
+                      bgcolor: "rgba(0,0,0,0.65)",
+                    },
+                  }}
+                  aria-label="뒤로가기"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+      
+              
+      
       {/* 상단 대표 이미지 */}
       <Box
         sx={{

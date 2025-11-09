@@ -1,69 +1,90 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
+import {
+  Box,
+  Button,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+} from "@mui/material";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "fit-content",
-  minWidth: "360px",
-  height: "200px",
-  bgcolor: "background.paper",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "space-between",
-};
-
-export default function OrderCancleCheckModal({ open, setOpen, setIsCancel }) {
+export default function OrderCancelCheckDialog({ open, setOpen, setIsCancel }) {
   const handleClose = () => setOpen(false);
 
   return (
-    <Modal
+    <Dialog
       open={open}
       onClose={handleClose}
-      sx={{
-        display: "flex",
-        p: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      maxWidth="xs"
+      fullWidth
+      aria-labelledby="order-cancel-dialog-title"
+      aria-describedby="order-cancel-dialog-description"
     >
-      <Box sx={style}>
-        <Box>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            주문을 취소하시겠습니까?
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            이미 제조가 시작된 경우, 취소가 어려울 수 있습니다.
-          </Typography>
-        </Box>
+      {/* 타이틀 + 닫기 아이콘 */}
+      <DialogTitle
+        id="order-cancel-dialog-title"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pr: 1.5,
+        }}
+      >
+        <Typography variant="h6" component="span">
+          주문을 취소하시겠어요? 
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={handleClose}
+          aria-label="닫기"
+        >
+          <ClearRoundedIcon />
+        </IconButton>
+      </DialogTitle>
 
-        {/* 하단 오른쪽 버튼 */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            sx={{
-              color: "white",
-              backgroundColor: "black",
-              "&:hover": { backgroundColor: "#333" },
-            }}
-            onClick={() => {
-              setIsCancel();
-              setOpen(false);
-            }}
-          >
-            취소 확인
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+      {/* 내용 */}
+      <DialogContent
+        dividers
+        sx={{
+          py: 2,
+        }}
+      >
+        <Typography
+          id="order-cancel-dialog-description"
+          variant="body2"
+          color="text.secondary"
+        >
+          이미 제조가 시작된 경우, 취소가 어려울 수 있습니다.
+        </Typography>
+      </DialogContent>
+
+      {/* 하단 버튼 */}
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+        }}
+      >
+        {/* 필요하면 “돌아가기” 버튼도 추가 가능 */}
+        {/* <Button onClick={handleClose}>돌아가기</Button> */}
+
+        <Button
+          sx={{
+            color: "white",
+            backgroundColor: "black",
+            "&:hover": { backgroundColor: "#333" },
+          }}
+          onClick={() => {
+            setIsCancel();
+            setOpen(false);
+          }}
+        >
+          취소 확인
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

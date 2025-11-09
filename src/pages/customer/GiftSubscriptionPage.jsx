@@ -27,6 +27,33 @@ import {
 import useUserStore from "../../stores/useUserStore";
 import axios from "axios";
 
+function formatPhoneInput(value) {
+  // 숫자만 추출
+  const digits = (value || "").replace(/\D/g, "").slice(0, 11); // 최대 11자리(010 포함)
+
+  if (digits.length < 4) return digits;
+  if (digits.length < 8) {
+    // 3-그 나머지 (예: 010-1234)
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+  // 3-4-4 (예: 010-1234-5678)
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
+
+const personBoxSx = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1.5,
+  backgroundColor: "#f6f6f6ff",
+  borderRadius: "10px",
+  px: 3,
+  py: 2,
+  minHeight: 64, // 원하는 높이
+};
+
+
+
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
   const authUser = useUserStore((state) => state.authUser);
@@ -132,13 +159,22 @@ function GiftSubscriptionPage() {
   }
 
   async function handleSearch(inputPhone) {
+    const onlyNumber = (inputPhone || "").replace(/\D/g, "");
+    const myTelDigits = (authUser.tel || "").replace(/\D/g, "");
+
+    console.log("검색할 전화번호(숫자만)", onlyNumber);
+
     console.log("검색할 전화번호", inputPhone);
-    if (authUser.tel === inputPhone) {
+     if (myTelDigits && myTelDigits === onlyNumber) {
       alert("자기 자신에게 선물을 보낼 수는 없어요.");
       return;
     }
-    const payload = { tel: inputPhone };
+    const payload = { tel: onlyNumber };
     const findMember = await findReceiver(payload);
+    console.log(findMember);
+    if(findMember === null){
+      alert("존재하지 않는 회원입니다.")
+    }
     setReceiver(findMember);
   }
 
@@ -158,24 +194,37 @@ function GiftSubscriptionPage() {
           alignItems: "center",
         }}
       >
-        {/* 뒤로가기 */}
+        {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
         <Box
           sx={{
+            position: "relative",
             display: "flex",
             alignItems: "center",
+            justifyContent: "center", // 제목을 중앙 기준으로 배치
             width: "100%",
             maxWidth: 900,
+            mb: isAppLike ? 1 : 5,
+            height: 48, // 버튼 높이 확보
           }}
         >
-          <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+          {/* 뒤로가기 버튼: 왼쪽 고정 */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              position: "absolute",
+              left: 0,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
+
+          {/* 제목: 중앙 정렬 */}
+          <Typography variant="h6" sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}>
+            선물하기
+          </Typography>
         </Box>
 
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2, width: "100%", maxWidth: 900 }}>
-          <Typography variant="h6">선물하기</Typography>
-        </Box>
+
 
         {/* 선택한 구독권 */}
         <Box
@@ -214,19 +263,9 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>보내는 사람</Typography>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  backgroundColor: "#f6f6f6ff",
-                  borderRadius: "10px",
-                  height: "fit-content",
-                  padding: "15px 25px",
-                }}
-              >
+              <Box sx={personBoxSx}>
                 <AccountCircleIcon />
-                {authUser?.name}
+                <Typography>{authUser?.name}</Typography>
               </Box>
             </Box>
 
@@ -252,22 +291,14 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
-              {receiver && (
+               {receiver && (
                 <Box
                   sx={{
-                    mt: 1,
-                    p: 1.2,
-                    borderRadius: 1,
-                    backgroundColor: "#f4f4f4",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 2,
-                    height: "fit-content",
-                    padding: "15px 25px",
+                    ...personBoxSx,
+                    justifyContent: "space-between", // 오른쪽에 검색 버튼
                   }}
                 >
-                  <Box sx={{ display: "flex", gap: "10px" }}>
+                  <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
                     <AccountCircleIcon />
                     <Typography>{receiver.name}</Typography>
                   </Box>
@@ -276,15 +307,17 @@ function GiftSubscriptionPage() {
                       setSearchOpen(true);
                       setReceiver(null);
                     }}
+                    sx={{ padding: 0}}
                   >
-                    <SearchIcon />
+                    <SearchIcon/>
                   </IconButton>
                 </Box>
               )}
+
               {receiver === null && searchOpen && (
                 <SearchGiftReceiver
                   keyword={keyword}
-                  setKeyword={setKeyword}
+                  setKeyword={(raw) => setKeyword(formatPhoneInput(raw))}
                   handleSearch={handleSearch}
                 />
               )}

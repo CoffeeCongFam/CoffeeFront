@@ -9,7 +9,8 @@ function SubTypeChip({ type }) {
   switch (type) {
     case "BASIC":
       emoji = "☕";
-      label = "베이직";
+      // label = "베이직";
+      label = "BASIC";
       style = {
         backgroundColor: "#e0e0e0", // 연회색
         color: "#424242", // 진한 회색 텍스트
@@ -19,7 +20,8 @@ function SubTypeChip({ type }) {
 
     case "STANDARD":
       emoji = "🍃";
-      label = "스탠다드";
+      // label = "스탠다드";
+      label = "STANDARD";
       style = {
         backgroundColor: "#c8e6c9", // 그린톤 (연초록)
         color: "#1b5e20", // 짙은 초록 텍스트
@@ -29,7 +31,8 @@ function SubTypeChip({ type }) {
 
     case "PREMIUM":
       emoji = "👑";
-      label = "프리미엄";
+      label = "PREMIUM";
+      // label = "프리미엄";
       style = {
         background: "linear-gradient(135deg, #FFD700 0%, #FFF8DC 100%)", // 금색 그라데이션
         color: "#6d4c00", // 황금 갈색 텍스트

@@ -4,17 +4,19 @@ import { Box, Typography, Chip } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function SubscriptionItem({ subscription }) {
   console.log("ITEM에서 받음", subscription);
   if (!subscription || !subscription.subscriptionId) return null;
 
+
   const typeLabel =
     subscription.subscriptionType === "PREMIUM"
-      ? "프리미엄"
+      ? "PREMIUM"
       : subscription.subscriptionType === "STANDARD"
-      ? "스탠다드"
-      : "베이직";
+      ? "STANDARD"
+      : "BASIC";
 
   return (
     <Box

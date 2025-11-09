@@ -19,6 +19,7 @@ import { TokenService } from "../../../utils/api";
 import LocalCafeImgList from "./LocalCafeImgList";
 import getDistanceKm from "../../../utils/getDistanceKm";
 import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
+import { formatKoreanDateTime } from "../../../utils/dateUtil";
 // import api from "../../../utils/api";
 
 function CustomerHome() {
@@ -28,6 +29,8 @@ function CustomerHome() {
 
   const { isAppLike } = useAppShellMode();
   const [isLoading, setIsLoading] = useState(true);
+
+  const [todayDate, setTodayDate] = useState(null);
   const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
   const [subscriptions, setSubscriptions] = useState([]);
   const [today, setToday] = useState(null);
@@ -37,6 +40,7 @@ function CustomerHome() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
+    setTodayDate(formatKoreanDateTime(new Date()));
     loadToday(); // 오늘 날짜
     loadOngoingOrders(); // 진행 중인 주문 조회
     loadSubscriptions(); // 보유 구독권 조회
@@ -45,7 +49,6 @@ function CustomerHome() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
-          console.log("근처 카페 요청");
           loadNearbyCafes(coords);
         },
         (err) => {
@@ -79,7 +82,19 @@ function CustomerHome() {
   const loadSubscriptions = async () => {
     try {
       const data = await fetchCustomerSubscriptions();
-      setSubscriptions(data.filter((it) => it.refundedAt === "") || []);
+
+      // 환불 안 된 구독권만 남기기
+      const activeSubs =
+      (data || []).filter((it) => it.refundedAt === "") || [];
+
+      // remainingCount 기준 내림차순 정렬 (주문 잔 수 많은 것 먼저)
+      activeSubs.sort((a, b) => {
+        const aRemain = a.remainingCount ?? 0;
+        const bRemain = b.remainingCount ?? 0;
+        return bRemain - aRemain; 
+      });
+
+      setSubscriptions(activeSubs);
       console.log(data);
     } catch (e) {
       console.log(e);
@@ -91,13 +106,11 @@ function CustomerHome() {
   //
   const loadNearbyCafes = async (coords) => {
     try {
-      console.log("LOAD NEAR BY CAFES");
       const data = await fetchNearbyCafes(
         coords.longitude, // 경도 (xpoint)
         coords.latitude, // 위도 (ypoint)
         500
       );
-      console.log("LOCAL CAFES>> ", data);
 
       // 각 카페에 distanceKm 필드 추가 (현재 위치 기준 거리)
       const enriched = (data || []).map((store) => {
@@ -222,25 +235,14 @@ function CustomerHome() {
           }}
         >
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-            진행 중인 주문 {ongoingOrders.length}건
+            {todayDate} 진행 중인 주문 {ongoingOrders.length}건
           </Typography>
 
-          {ongoingOrders.map((order) => (
-            <TodayOrderItem key={order.orderId} order={order} />
+          {ongoingOrders.map((order, idx) => (
+            <TodayOrderItem key={idx} order={order} />
           ))}
         </Box>
       )}
-
-      {/* <Box
-          style={{float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}
-        >
-          <IconButton onClick={() => scrollBy(-260)} size="small">
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton onClick={() => scrollBy(260)} size="small">
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
-        </Box> */}
 
       {subscriptions.length <= 0 && (
         <Box
@@ -300,11 +302,11 @@ function CustomerHome() {
             ref={scrollRef}
             sx={{
               display: "flex",
-              gap: 2,
+              gap: isAppLike ? 0 : 2,    
               overflowX: "auto",
               scrollSnapType: "x mandatory",
               py: 2,
-              pr: 8,
+              pr: isAppLike ? 0 : 8,   
               "&::-webkit-scrollbar": {
                 height: isAppLike ? 0 : 6,
               },
@@ -319,8 +321,8 @@ function CustomerHome() {
                 key={item.purchaseId}
                 sx={{
                   scrollSnapAlign: "start",
-                  px: isAppLike ? "8%" : 0,
                   flex: isAppLike ? "0 0 100%" : "0 0 auto",
+                  px: isAppLike ? 0 : 0,  
                 }}
               >
                 <SubscriptionItem

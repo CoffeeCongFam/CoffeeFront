@@ -258,7 +258,9 @@ function CafeReviewList({ storeName, storeId }) {
           ))}
         </Box>
       ) : (
-        <Box sx={{ minHeight: "200px", backgroundColor: "#f2f2f2", p: "1rem" }}>
+        <Box sx={{ minHeight: "200px", 
+          // backgroundColor: "#f2f2f2", 
+        p: "1rem" }}>
           <Typography variant="body2" color="text.secondary">
             아직 등록된 리뷰가 없습니다.
           </Typography>
