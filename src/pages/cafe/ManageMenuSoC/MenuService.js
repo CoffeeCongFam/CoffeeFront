@@ -93,7 +93,7 @@ export const updateMenu = async (menuId, updateData, imageFIle) => {
   // } else {
   const formData = new FormData();
 
-  // 이미지 파일 추가
+  // 이미지 파일 추가 - 문제 : 새 파일이 없으면 file 키 자체가 formData에 없음
   if (imageFIle) {
     formData.append('file', imageFIle);
   }

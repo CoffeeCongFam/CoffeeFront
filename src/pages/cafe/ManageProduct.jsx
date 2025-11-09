@@ -161,7 +161,7 @@ export default function ManageProduct() {
         alignItems="center"
       >
         <Typography variant="h4" component="h1" fontWeight="bold">
-          [구독권] 관리
+          구독권 관리
         </Typography>
         <Button
           variant="contained"

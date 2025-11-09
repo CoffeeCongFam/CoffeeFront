@@ -167,9 +167,27 @@ export default function MenuEditModal({
 
     if (validate()) {
       try {
+        // 서버 전송을 위한 데이터 객체 생성(formData를 복사해 사용)
+        const dataToUpdate = {
+          ...formData,
+        };
+
+        // 프론트 이미지 필드(menuImg)를 백엔드 필드(imageUrl)로 매핑해야 기존 걸 유지
+        if (dataToUpdate.menuImg !== undefined) {
+          dataToUpdate.imageUrl = dataToUpdate.menuImg;
+          delete dataToUpdate.menuImg;
+        }
+
+        // 400 에러 방지 핵심 로직 : 수정 금지된 필드 제거해서 보내야함 (백엔드도 그렇게 작성되어있어서)
+        if (isBlocked) {
+          delete dataToUpdate.menuName; // 메뉴명 삭제
+          delete dataToUpdate.menuType; // 메뉴 타입 삭제
+          delete dataToUpdate.menuStatus; // 메뉴 상태 삭제
+        }
+
         // 부모 컴포넌트의 onUpdate 함수 호출
         // ID, 메뉴 데이터(DB URL 포함), 새 파일(선택 사항) 전송
-        await onUpdate(editingMenu.menuId, formData, selectedFile);
+        await onUpdate(editingMenu.menuId, dataToUpdate, selectedFile);
 
         // 성공 시 모달 닫기 (onUpdate 성공 후 부모 컴포넌트에서 리스트 업데이트됨)
         resetFormAndClose();
