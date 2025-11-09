@@ -87,7 +87,10 @@ export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
   const [cafes, setCafes] = useState([]);
-  const [sortOption, setSortOption] = useState("distance");
+  const [sortOption, setSortOption] = useState("distance");   // 정렬
+  const [statusFilter, setStatusFilter] = useState("ALL");    // 필터링 (전체 / 영업중 / 영업종료 / 휴무일)
+
+
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
 
@@ -302,7 +305,16 @@ export default function SearchPage() {
 
   // 리스트 정렬
   const sortedCafes = useMemo(() => {
-    const arr = cafes.map((cafe) => {
+    // 상태 핕터링 적용
+    const filtered = cafes.filter((cafe) => {
+      if(statusFilter === "ALL") return true;
+
+      return cafe.storeStatus === statusFilter;   // "OPEN" / "CLOSED" / "HOLIDAY"
+    })
+
+    // 거리 계산
+    // const arr = cafes.map((cafe) => {
+    const arr = filtered.map((cafe) => {
       if (
         currentLoc.xPoint &&
         currentLoc.yPoint &&
@@ -321,10 +333,6 @@ export default function SearchPage() {
     });
 
     switch (sortOption) {
-      // case "latest":
-      //   return arr.sort(
-      //     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      //   );
       case "subscribers":
         return arr.sort(
           (a, b) => (b.subscriberCount || 0) - (a.subscriberCount || 0)
@@ -340,7 +348,7 @@ export default function SearchPage() {
           return a.distanceKm - b.distanceKm;
         });
     }
-  }, [cafes, sortOption, currentLoc]);
+  }, [cafes, sortOption, currentLoc, statusFilter]);
 
   const open = Boolean(currentLocRef); // 현재 위치
 
@@ -558,6 +566,20 @@ export default function SearchPage() {
         >
           <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+
+            {/* 영업 상태 필터 */}
+            <Select
+              size="small"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              sx={{ fontSize: "0.875rem", height: 32 }}
+            >
+              <MenuItem value="ALL">전체</MenuItem>
+              <MenuItem value="OPEN">영업중</MenuItem>
+              <MenuItem value="CLOSED">영업 종료</MenuItem>
+              <MenuItem value="HOLIDAY">휴무일</MenuItem>
+            </Select>
+            {/* 정렬 */}
             <Select
               size="small"
               value={sortOption}
