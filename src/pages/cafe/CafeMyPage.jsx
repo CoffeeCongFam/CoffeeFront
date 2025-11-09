@@ -36,11 +36,11 @@ function CafeMyPage() {
   };
 
   // ✅ 매장 정보 동기화
-  const syncStoreInfo = async (partnerStoreId) => {
+  const syncStoreInfo = async () => {
     try {
       setIsLoadingStore(true);
 
-      const data = await getStoreInfo(partnerStoreId);
+      const data = await getStoreInfo();
       console.log("📡 받아온 매장 정보:", data);
 
       if (data) {
@@ -72,7 +72,7 @@ function CafeMyPage() {
       return;
     }
 
-    syncStoreInfo(authUser.partnerStoreId);
+    syncStoreInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.partnerStoreId]);
 
@@ -84,7 +84,7 @@ function CafeMyPage() {
   const renderDrawerContent = () => {
     switch (activeMenu) {
       case "매장 정보":
-        return <ManageStoreInfo storeInfo={storeInfo} />;
+        return <ManageStoreInfo storeInfo={storeInfo} syncStoreInfo={syncStoreInfo} />;
       case "매장 등록":
         return <StoreForm />;
       case "내 정보":
