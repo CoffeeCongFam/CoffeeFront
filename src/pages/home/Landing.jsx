@@ -9,14 +9,17 @@ import {
 import { Element, Link } from "react-scroll";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../hooks/useAppShellMode";
+import useUserStore from "../../stores/useUserStore";
 
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/coffeiensLogoTitle.png";
 import LoginIcon from "@mui/icons-material/Login";
+import { TokenService } from "../../utils/api";
 
 function Landing() {
   const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
+  const { authUser, setUser } = useUserStore();
   const [active, setActive] = useState("hero");
   const isMobile = useMediaQuery("(max-width:900px)");
 
@@ -56,6 +59,24 @@ function Landing() {
     const URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code`;
     window.location.href = URI;
   };
+
+    // 로그인 상태 확인용 로그
+    useEffect(() => {
+    if (!authUser) {
+      const cachedUser = TokenService.getUser();
+      if (cachedUser) {
+        setUser(cachedUser);
+      }
+    }
+  }, [authUser, setUser]);
+  
+    const handleGoHome = () => {
+      if (authUser?.memberType === "GENERAL") {
+        navigate("/me");
+      } else if (authUser?.memberType === "STORE") {
+        navigate("/store");
+      }
+    };
 
   return (
     <Box
@@ -176,44 +197,62 @@ function Landing() {
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 6 }}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#c84436",
-                  textTransform: "none",
-                  borderRadius: "9999px",
-                  px: 6,
-                  "&:hover": { backgroundColor: "#b0382b" },
-                }}
-                onClick={() => navigate("/signup")}
-              >
-                회원가입
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{
-                  borderColor: "#4a3426",
-                  color: "#4a3426",
-                  textTransform: "none",
-                  borderRadius: "9999px",
-                  px: 5,
-                  display: "flex",
-                  gap: 1,
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  "&:hover": {
-                    borderColor: "#4a3426",
-                    backgroundColor: "rgba(74,52,38,0.05)",
-                  },
-                }}
-                endIcon={<LoginIcon />}
-                onClick={kakaoLogin}
-                // onClick={() =>
-                //   scroller.scrollTo("cta", { smooth: true, duration: 500 })
-                // }
-              >
-                로그인
-              </Button>
+              {/* 로그인 여부에 따라 버튼 다르게 표시 */}
+              {!authUser ? (
+                <>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#c84436",
+                      textTransform: "none",
+                      borderRadius: "9999px",
+                      px: 6,
+                      "&:hover": { backgroundColor: "#b0382b" },
+                    }}
+                    onClick={() => navigate("/signup")}
+                  >
+                    회원가입
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      borderColor: "#4a3426",
+                      color: "#4a3426",
+                      textTransform: "none",
+                      borderRadius: "9999px",
+                      px: 5,
+                      display: "flex",
+                      gap: 1,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      "&:hover": {
+                        borderColor: "#4a3426",
+                        backgroundColor: "rgba(74,52,38,0.05)",
+                      },
+                    }}
+                    endIcon={<LoginIcon />}
+                    onClick={kakaoLogin}
+                  >
+                    로그인
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#c84436",
+                    textTransform: "none",
+                    borderRadius: "9999px",
+                    px: 6,
+                    "&:hover": { backgroundColor: "#b0382b" },
+                  }}
+                  onClick={handleGoHome}
+                >
+                  {authUser.memberType === "GENERAL"
+                    ? "회원 홈으로"
+                    : "점주 홈으로"}
+                </Button>
+              )}
             </Box>
 
             {/* 다음으로 내려가는 버튼 */}
