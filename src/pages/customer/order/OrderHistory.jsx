@@ -95,7 +95,6 @@ async function fetchOrderHistoryApi({
 }
 
 function OrderHistory() {
-  const navigate = useNavigate();
   const { isAppLike } = useAppShellMode();
 
   const [period, setPeriod] = useState("1M");

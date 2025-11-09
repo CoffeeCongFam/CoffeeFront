@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../components/common/Loading";
 
 // 컴포넌트 이름을 역할에 맞게 변경하는 것을 권장합니다. (예: KakaoRedirect)
 function KakaoRedirect() {
@@ -74,10 +75,7 @@ function KakaoRedirect() {
   }, []); // 빈 배열은 마운트 시 한 번만 실행됨을 의미
 
   return (
-    <div>
-      <h1>카카오 로그인 처리 중...</h1>
-      <p>잠시만 기다려 주세요.</p>
-    </div>
+    <h1>구버전 카카오 리다이렉트</h1>
   );
 }
 
