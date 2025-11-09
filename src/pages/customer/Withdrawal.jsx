@@ -1,11 +1,35 @@
 import React, { useEffect } from "react";
 import { Box, Card, CardContent, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import useUserStore from "../../stores/useUserStore";
 
 function Withdrawal() {
   const navigate = useNavigate();
+  const { clearUser } = useUserStore();
 
   useEffect(() => {
+    // 1. Zustand 스토어 초기화
+    if (typeof clearUser === "function") {
+      clearUser();
+    }
+
+    // 2. localStorage 초기화
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.clear();
+    }
+
+    // 3. sessionStorage 초기화 (필요 시)
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      window.sessionStorage.clear();
+    }
+
+    // 4. 쿠키 삭제
+    if (typeof document !== "undefined" && document.cookie) {
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+      });
+    }
+
     // 현재 페이지를 히스토리 스택에 추가하여 뒤로가기 시도를 감지할 수 있도록 합니다.
     window.history.pushState(null, '', window.location.href);
 
@@ -20,7 +44,7 @@ function Withdrawal() {
     return () => {
       window.removeEventListener('popstate', handlePopState); // 컴포넌트 언마운트 시 리스너 제거
     };
-  }, [navigate]);
+  }, [navigate, clearUser]);
 
   const handleGoodbyeConfirm = () => {
     navigate('/', { replace: true });

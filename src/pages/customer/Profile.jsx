@@ -65,38 +65,7 @@ function Profile() {
     setWithdrawInput("");
   };
   const handleGoodbyeConfirm = () => {
-    // 1) 주스텐드 유저 정보 초기화
-    try {
-      if (typeof clearUser === "function") {
-        clearUser();
-      }
-    } catch (e) {
-      console.error("clearUser 오류:", e);
-    }
-
-    // 2) 로컬스토리지 초기화
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        window.localStorage.clear();
-      }
-    } catch (e) {
-      console.error("localStorage 초기화 오류:", e);
-    }
-
-    // 3) 쿠키 삭제
-    try {
-      if (typeof document !== "undefined" && document.cookie) {
-        document.cookie.split(";").forEach((cookie) => {
-          const eqPos = cookie.indexOf("=");
-          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-          document.cookie =
-            name.trim() +
-            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-        });
-      }
-    } catch (e) {
-      console.error("쿠키 삭제 오류:", e);
-    }
+    // 이 함수의 내용은 Withdrawal.jsx 로 이전되었습니다.
   };
   const handleCloseWithdraw = () => {
     setIsWithdrawOpen(false);
@@ -128,7 +97,6 @@ function Profile() {
       console.log("withdrawal 결과:", success);
       if (success) {
         // 탈퇴 완료: 탈퇴 모달 닫고, Withdrawal 페이지로 이동
-        handleGoodbyeConfirm();
         setIsWithdrawOpen(false);
         setIsWithdrawCompleted(true);
         navigate("/withdrawal", { replace: true });
