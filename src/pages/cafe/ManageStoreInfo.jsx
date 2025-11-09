@@ -65,8 +65,7 @@ const loadKakaoMapsSdk = () =>
     document.body.appendChild(script);
   });
 
-export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
-  // Props로 받은 initialStoreInfo가 없을 경우 빈 객체로 초기화하여 오류 방지
+export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStoreInfo }) {
   const [storeInfo, setStoreInfo] = useState(initialStoreInfo || {});
   const [originalStoreInfo, setOriginalStoreInfo] = useState(
     initialStoreInfo || {}
@@ -82,8 +81,12 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setImagePreview(initialStoreInfo?.storeImg || null);
-  }, [initialStoreInfo?.storeImg]);
+    if (initialStoreInfo) {
+      setStoreInfo(initialStoreInfo);
+      setOriginalStoreInfo(initialStoreInfo);
+      setImagePreview(initialStoreInfo?.storeImg || null);
+    }
+  }, [initialStoreInfo]);
 
   const handleClickAddressSearch = async () => {
     try {
@@ -374,6 +377,10 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
       setSuccessMessage("매장 정보가 성공적으로 수정되었습니다.");
       setIsEditingStoreInfo(false);
       setOriginalStoreInfo(storeInfo);
+
+      if (syncStoreInfo) {
+        await syncStoreInfo();
+      }
     } catch (err) {
       console.error("매장 정보 수정 실패 :", err);
       setError("정보 수정에 실패. 다시 시도해주세요");
@@ -469,6 +476,10 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
 
       setSuccessMessage("영업시간 및 휴무일 정보가 저장되었습니다.");
       setIsEditingHours(false);
+
+      if (syncStoreInfo) {
+        await syncStoreInfo();
+      }
     } catch (err) {
       console.error("영업시간 정보 저장 실패 :", err);
       setError("영업시간 저장에 실패했습니다. 다시 시도해주세요.");
@@ -1508,32 +1519,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo }) {
             })}
           </Grid>
         </Box>
-
-        {/* 매장 정보 저장 버튼 */}
-        {isEditingStoreInfo && (
-          <Box mt={4} display="flex" justifyContent="flex-end">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSaveStoreInfo}
-              size="large"
-              sx={{
-                borderRadius: 999,
-                px: 4,
-                py: 1.2,
-                fontWeight: 700,
-                textTransform: "none",
-                background:
-                  "linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #0ea5e9 100%)",
-                "&:hover": {
-                  transform: "translateY(-1px)",
-                },
-              }}
-            >
-              매장 정보 저장
-            </Button>
-          </Box>
-        )}
         </Paper>
       </Box>
     </Box>
