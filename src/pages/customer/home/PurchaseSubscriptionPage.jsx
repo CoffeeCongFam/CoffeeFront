@@ -20,10 +20,12 @@ import {
 } from "../../../apis/customerApi";
 import axios from "axios";
 import useUserStore from "../../../stores/useUserStore";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
@@ -113,17 +115,43 @@ function PurchaseSubscriptionPage() {
 
   return (
     <>
-      <Box sx={{ p: 3, pb: 10 }}>
-        {/* 뒤로가기 */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+      <Box
+              sx={{
+                p: 3,
+                pb: isAppLike ? "100px" : 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+       {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center", // 제목을 중앙 기준으로 배치
+            width: "100%",
+            maxWidth: 900,
+            mb: isAppLike ? 1 : 5,
+            height: 48, // 버튼 높이 확보
+          }}
+        >
+          {/* 뒤로가기 버튼: 왼쪽 고정 */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              position: "absolute",
+              left: 0,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
-        </Box>
 
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography variant="h6">구독하기</Typography>
+          {/* 제목: 중앙 정렬 */}
+          <Typography variant="h6" sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}>
+            구독하기
+          </Typography>
         </Box>
 
         {/* 선택한 구독권 */}
