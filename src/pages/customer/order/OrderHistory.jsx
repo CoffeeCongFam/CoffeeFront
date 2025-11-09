@@ -16,7 +16,6 @@ import {
   DialogContent,
   Chip,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
 import orderHistoryList from "../../../data/customer/orderHistoryList";
@@ -151,7 +150,7 @@ function OrderHistory() {
       }
       console.log("주문 내역 조회");
 
-      // 실제 API 조회
+      // 주문 내역 조회
       const res = await fetchOrderHistoryApi({
         period: selectedPeriod,
         startDate: selectedPeriod === "CUSTOM" ? startDate : undefined,
@@ -160,8 +159,6 @@ function OrderHistory() {
       });
 
       const { ordersList, nextCursor: newCursor, hasNext } = res.data;
-
-      console.log("주문 내역>>> ", res.data?.data);
 
       if (reset) {
         setOrders(ordersList || []);

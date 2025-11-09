@@ -8,7 +8,6 @@ export default function SubscriptionCard({ subscription }) {
   if (!subscription) return null;
 
   const {
-    store,
     subscriptionName,
     subscriptionType,
     price,

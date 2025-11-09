@@ -33,6 +33,7 @@ import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx
 import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
 import Loading from "../../../components/common/Loading.jsx";
 import getDistanceKm from "../../../utils/getDistanceKm";
+import storeDummy from '../../../assets/cafeInfoDummy.png';
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -564,7 +565,6 @@ export default function SearchPage() {
               sx={{ fontSize: "0.875rem", height: 32 }}
             >
               <MenuItem value="distance">거리순</MenuItem>
-              {/* <MenuItem value="latest">최신순</MenuItem> */}
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
@@ -603,7 +603,14 @@ export default function SearchPage() {
                       alignItems: "stretch",
                       cursor: "pointer",
                       flexDirection: { xs: "column", sm: "row" },
+                      "&:hover": {
+                        filter: "brightness(0.97)",
+                        // transform: "translateY(-3px)",
+                        // boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                      }
                     }}
+                    
+                    
                   >
                     {/* 썸네일 */}
                     <Box
@@ -620,7 +627,7 @@ export default function SearchPage() {
                       }}
                     >
                       <Avatar
-                        src={cafe.storeImage}
+                        src={cafe.storeImage || storeDummy}
                         alt={cafe.storeName}
                         sx={{ width: "100%", height: "100%", borderRadius: 2 }}
                         variant="rounded"
@@ -638,7 +645,6 @@ export default function SearchPage() {
                           gap: 1,
                         }}
                       >
-                        {/* 오타(stauts) → status 로 수정 */}
                         <CafeStatusChip status={cafe.storeStatus} />
                       </Box>
 
