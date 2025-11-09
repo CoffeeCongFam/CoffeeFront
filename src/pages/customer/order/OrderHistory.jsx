@@ -311,6 +311,7 @@ function OrderHistory() {
             InputLabelProps={{ shrink: true }}
             disabled={period !== "CUSTOM"}
             sx={{ flex: 1 }}
+            disabledFuture
           />
           <Typography sx={{ display: { xs: "none", sm: "block" } }}>
             ~
