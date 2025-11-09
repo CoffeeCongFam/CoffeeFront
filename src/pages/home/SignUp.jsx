@@ -70,17 +70,8 @@ function SignUp() {
             window.location.href = buildKakaoUrl("member");
           }}
           sx={userTypeBoxStyle}
-          // sx={{
-          //   backgroundColor: "black",
-          //   "&:hover": { backgroundColor: "#111" },
-          //   borderRadius: "12px",
-          //   fontSize: "20px",
-          //   fontWeight: "bold",
-          //   textTransform: "none",
-          // }}
         >
           일반회원
-          <img src="../../assets/coffeiensLogoTitle.png" />
         </Button>
         <Button
           variant="contained"
@@ -88,14 +79,6 @@ function SignUp() {
             window.location.href = buildKakaoUrl("customer");
           }}
           sx={userTypeBoxStyle}
-          // sx={{
-          //   backgroundColor: "black",
-          //   "&:hover": { backgroundColor: "#111" },
-          //   borderRadius: "12px",
-          //   fontSize: "20px",
-          //   fontWeight: "bold",
-          //   textTransform: "none",
-          // }}
         >
           점주회원
         </Button>
