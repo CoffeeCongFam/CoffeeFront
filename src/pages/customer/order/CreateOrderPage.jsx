@@ -316,16 +316,11 @@ function CreateOrderPage() {
     }
   }
 
-  // 뒤로가기
-  function handleBack() {
-    navigate(-1);
-  }
-
   return (
     <Box
       sx={{
-        px: isAppLike ? 2 : 15,
-        py: 3,
+        px: isAppLike ? 2 : 12,
+        py: isAppLike ? 2 : 5,
         pb: 10,
         boxSizing: "border-box",
         overflow: "hidden",  
@@ -342,20 +337,31 @@ function CreateOrderPage() {
             }),
       }}
     >
-      {/* 상단 헤더 */}
-      <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-        <IconButton onClick={handleBack} sx={{ mr: 1 }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant={isAppLike ? "h6" : "h5"} fontWeight="bold">
-          주문하기
-        </Typography>
-      </Box>
+       <Box
+               sx={{
+                 display: "flex",
+                 flexDirection: "column", // 데스크탑도 무조건 column
+                 gap: 1.5,
+                 mb: 2,
+               }}
+             >
+               {/* 제목 */}
+               <Typography
+                 sx={{
+                   fontSize: { xs: "1.5rem", md: "1.9rem" },
+                   fontWeight: "bold",
+                   lineHeight: 1.1,
+                   mb: "2%",
+                 }}
+               >
+                주문하기
+               </Typography>
+             </Box>
 
       {/* 헤더 아래 메인 콘텐츠 영역 */}
       <Box 
         sx={{
-          px: isAppLike ? 0 : 5,
+          // px: isAppLike ? 0 : 5,
           flex: 1,                   //  남은 영역 모두 차지
           minHeight: 0,              //  자식이 flex 안에서 스크롤 가능하도록
           display: "flex",
