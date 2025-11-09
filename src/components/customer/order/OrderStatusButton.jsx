@@ -23,12 +23,16 @@ const STATUS_STYLES = {
     bg: "#efebe9",
   },
   REJECTED: {
-    label: "주문 거부",
+    label: "매장 취소",
     color: "#d32f2f", // 빨강
     bg: "#ffebee",
   },
+  CANCELED: {
+    label: "주문 취소",
+    color: "#ff9b29ff", // 회색
+    bg: "#fffab9ff",
+  },
 };
-
 
 function OrderStatusButton({ status, onClick }) {
   const style = STATUS_STYLES[status] || {
@@ -47,7 +51,7 @@ function OrderStatusButton({ status, onClick }) {
         color: style.color,
         backgroundColor: style.bg,
         border: "none",
-        fontSize: "0.9rem"
+        fontSize: "0.9rem",
       }}
     />
   );

@@ -6,6 +6,7 @@ import {
   Backdrop,
   Button,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -18,124 +19,212 @@ import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../components/customer/purchase/SubscriptionItem";
 import SearchGiftReceiver from "../../components/customer/purchase/SearchGiftReceiver";
 import useAppShellMode from "../../hooks/useAppShellMode";
+import {
+  fetchSubscriptionInfo,
+  findReceiver,
+  requestPurchase,
+} from "../../apis/customerApi";
+import useUserStore from "../../stores/useUserStore";
+import axios from "axios";
+
+function formatPhoneInput(value) {
+  // 숫자만 추출
+  const digits = (value || "").replace(/\D/g, "").slice(0, 11); // 최대 11자리(010 포함)
+
+  if (digits.length < 4) return digits;
+  if (digits.length < 8) {
+    // 3-그 나머지 (예: 010-1234)
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+  // 3-4-4 (예: 010-1234-5678)
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
+
+const personBoxSx = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1.5,
+  backgroundColor: "#f6f6f6ff",
+  borderRadius: "10px",
+  px: 3,
+  py: 2,
+  minHeight: 64, // 원하는 높이
+};
+
+
 
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
+  const authUser = useUserStore((state) => state.authUser);
   const { subId } = useParams();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // 결제 처리 로딩 상태
-  const [payOpen, setPayOpen] = useState(false); // 결제 패널 열림/닫힘
+  const [isLoading, setIsLoading] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
 
-  const [keyword, setKeyword] = useState(""); // 유저 전화번호 검색
-  const [receiver, setReceiver] = useState(null); // 받는 사람
+  const [keyword, setKeyword] = useState("");
+  const [receiver, setReceiver] = useState(null);
   const [searchOpen, setSearchOpen] = useState(true);
-  const [searchResults, setSearchResults] = useState([]); // 검색 결과
+  const [searchResults, setSearchResults] = useState([]);
+  const [giftMessage, setGiftMessage] = useState("");
+
+  async function fetchSubData() {
+    const subData = await fetchSubscriptionInfo(subId);
+    console.log(subData);
+    setSubscription(subData);
+  }
 
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
-    // TODO: 실제 API 호출
-    setSubscription({
-      subId: 3,
-      store: {
-        storeId: 1,
-        storeName: "카페 모나카",
-        storeImage: "https://picsum.photos/400/400",
-      },
-      price: 19900,
-      subImage:
-        "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
-      subName: "프리미엄 구독권",
-      subType: "PREMIUM",
-      isExpired: "N",
-      limitEntity: 10,
-      stock: 10,
-      description: "구독권에 대한 간단한 설명",
-      isGift: "Y",
-      maxDailyUsage: 2, // 일일 사용 가능 횟수
-      isSubscribed: "Y",
-    });
+    fetchSubData();
   }, [subId]);
 
   function handleBack() {
-    // 뒤로 가기 이동
     navigate(-1);
   }
 
-  async function confirmPayment() {
-    // 결제 진행
+  async function confirmPayment(pg = "danal_tpay") {
+    // ✅ 받는 사람 유효성 검증 추가
+    if (!receiver) {
+      alert("받는 사람을 먼저 선택해 주세요.");
+      setPayOpen(false);
+      return;
+    }
+
     setIsLoading(true);
     setPayOpen(false);
 
     try {
-      // TODO: 실제 결제 처리 API 호출 (예: await api.purchase(subscription.subId))
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 대기 (로딩 효과)
+      const payload = {
+        subscriptionId: subscription.subscriptionId,
+        receiverMemberId: receiver.memberId,
+        giftMessage: giftMessage?.trim() || "선물 드려요 ☕",
+      };
 
-      const purchaseId = 1; // 실제 purchaseId 받아오기
-      navigate(`/me/purchase/${purchaseId}/complete`);
+      const created = await requestPurchase(payload);
+      const merchantUid = created.merchantUid;
+
+      const { IMP } = window;
+
+      if (!IMP) {
+        throw new Error("PortOne SDK가 로드되지 않았습니다.");
+      }
+
+      IMP.init("imp03140165");
+
+      IMP.request_pay(
+        {
+          pg,
+          pay_method: "card",
+          amount: subscription.price,
+          name: subscription.subscriptionName,
+          merchant_uid: merchantUid,
+          buyer_name: authUser.name,
+          buyer_email: authUser.email,
+          buyer_tel: authUser.tel,
+        },
+        async (response) => {
+          if (response.success) {
+            console.log("결제 성공:", response);
+
+            try {
+              const validationRes = await axios.post(
+                "/api/payments/validation",
+                {
+                  purchaseId: created.purchaseId,
+                  impUid: response.imp_uid,
+                  merchantUid: response.merchant_uid,
+                }
+              );
+
+              console.log("검증 성공:", validationRes.data);
+              navigate(`/me/purchase/${created.purchaseId}/complete`);
+            } catch (error) {
+              console.error("결제 검증 실패:", error);
+              alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
+            }
+          } else {
+            alert(`결제 실패: ${response.error_msg}`);
+          }
+          setIsLoading(false); // ✅ 콜백 내부에서 로딩 해제
+        }
+      );
     } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제 처리 중 오류가 발생했습니다.");
-    } finally {
+      console.error("결제 요청 오류:", error);
+      alert("결제 요청 중 문제가 발생했습니다.");
       setIsLoading(false);
     }
   }
 
-  function handleSearch(phone) {
-    console.log("검색할 전화번호", phone);
+  async function handleSearch(inputPhone) {
+    const onlyNumber = (inputPhone || "").replace(/\D/g, "");
+    const myTelDigits = (authUser.tel || "").replace(/\D/g, "");
 
-    // TODO: 실제 API 호출로 교체
-    // 여기선 더미로 필터된 목록처럼 만들게요
-    const dummyMembers = [
-      { id: 1, name: "김민지", phone: "010-1111-2222" },
-      { id: 2, name: "박지현", phone: "010-1111-3333" },
-      { id: 3, name: "정민선", phone: "010-9999-0000" },
-    ];
+    console.log("검색할 전화번호(숫자만)", onlyNumber);
 
-    const filtered = dummyMembers.filter(
-      (m) =>
-        m.phone.includes(phone.replaceAll("-", "")) || m.phone.includes(phone)
-    );
-
-    setSearchResults(filtered);
+    console.log("검색할 전화번호", inputPhone);
+     if (myTelDigits && myTelDigits === onlyNumber) {
+      alert("자기 자신에게 선물을 보낼 수는 없어요.");
+      return;
+    }
+    const payload = { tel: onlyNumber };
+    const findMember = await findReceiver(payload);
+    console.log(findMember);
+    if(findMember === null){
+      alert("존재하지 않는 회원입니다.")
+    }
+    setReceiver(findMember);
   }
 
   function handleSelectReceiver(member) {
     setReceiver(member);
-    searchOpen(false);
-    // 선택 후 리스트 닫고 싶으면 비워도 됨
-    // setSearchResults([]);
+    setSearchOpen(false);
   }
+
   return (
     <>
       <Box
         sx={{
           p: 3,
-          pb:  isAppLike ? "100px" : 10,
+          pb: isAppLike ? "100px" : 10,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        {/* 뒤로가기 */}
+        {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
         <Box
           sx={{
+            position: "relative",
             display: "flex",
             alignItems: "center",
+            justifyContent: "center", // 제목을 중앙 기준으로 배치
             width: "100%",
             maxWidth: 900,
+            mb: isAppLike ? 1 : 5,
+            height: 48, // 버튼 높이 확보
           }}
         >
-          <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+          {/* 뒤로가기 버튼: 왼쪽 고정 */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              position: "absolute",
+              left: 0,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
+
+          {/* 제목: 중앙 정렬 */}
+          <Typography variant="h6" sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}>
+            선물하기
+          </Typography>
         </Box>
 
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2, width: "100%", maxWidth: 900 }}>
-          <Typography variant="h6">선물하기</Typography>
-        </Box>
+
 
         {/* 선택한 구독권 */}
         <Box
@@ -174,20 +263,9 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>보내는 사람</Typography>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  backgroundColor: "#f6f6f6ff",
-                  borderRadius: "10px",
-                  // height: "100%",
-                  height: "fit-content",
-                  padding: "15px 25px",
-                }}
-              >
+              <Box sx={personBoxSx}>
                 <AccountCircleIcon />
-                {"보내는 유저 이름"}
+                <Typography>{authUser?.name}</Typography>
               </Box>
             </Box>
 
@@ -213,46 +291,37 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
-              {/* 선택된 사람 출력 */}
-              {receiver && (
+               {receiver && (
                 <Box
                   sx={{
-                    mt: 1,
-                    p: 1.2,
-                    borderRadius: 1,
-                    backgroundColor: "#f4f4f4",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 2,
-                    // height: "100%",
-                    height: "fit-content",
-                    padding: "15px 25px",
+                    ...personBoxSx,
+                    justifyContent: "space-between", // 오른쪽에 검색 버튼
                   }}
                 >
-                  <Box sx={{ display: 'flex', gap: "10px"}}>
-                  <AccountCircleIcon />
-                  <Typography>{receiver.name}</Typography>
+                  <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+                    <AccountCircleIcon />
+                    <Typography>{receiver.name}</Typography>
                   </Box>
                   <IconButton
                     onClick={() => {
                       setSearchOpen(true);
                       setReceiver(null);
                     }}
+                    sx={{ padding: 0}}
                   >
-                    <SearchIcon />
+                    <SearchIcon/>
                   </IconButton>
                 </Box>
               )}
+
               {receiver === null && searchOpen && (
                 <SearchGiftReceiver
                   keyword={keyword}
-                  setKeyword={setKeyword}
+                  setKeyword={(raw) => setKeyword(formatPhoneInput(raw))}
                   handleSearch={handleSearch}
                 />
               )}
 
-              {/* 검색 결과 목록 */}
               {receiver === null && searchResults.length > 0 && (
                 <Box
                   sx={{
@@ -299,6 +368,22 @@ function GiftSubscriptionPage() {
               )}
             </Box>
           </Box>
+
+          {/* 선물 메시지 입력 영역 */}
+          <Box sx={{ mt: 1, width: "100%", maxWidth: 900 }}>
+            <Typography sx={{ fontWeight: "bold", mb: 1 }}>
+              메시지 카드
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              maxRows={4}
+              placeholder="선물과 함께 보낼 메시지를 입력하세요. (최대 100자)"
+              value={giftMessage}
+              onChange={(e) => setGiftMessage(e.target.value.slice(0, 100))}
+            />
+          </Box>
         </Box>
 
         {/* 유의사항 */}
@@ -312,7 +397,7 @@ function GiftSubscriptionPage() {
             borderRadius: 2,
             py: 2,
             px: 5,
-            textAlign: "left", // ✅ 내용은 왼쪽 정렬 유지 (가독성)
+            textAlign: "left",
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -350,7 +435,13 @@ function GiftSubscriptionPage() {
           }}
         >
           <Button
-            onClick={() => setPayOpen(true)}
+            onClick={() => {
+              if (!receiver) {
+                alert("받는 사람을 먼저 선택해 주세요.");
+                return;
+              }
+              setPayOpen(true);
+            }}
             sx={{
               backgroundColor: "black",
               color: "white",
@@ -363,7 +454,7 @@ function GiftSubscriptionPage() {
         </Box>
       </Box>
 
-      {/* ✅ 결제 선택 패널 */}
+      {/* 결제 선택 패널 */}
       <Backdrop
         open={payOpen}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -381,53 +472,65 @@ function GiftSubscriptionPage() {
               maxWidth: 820,
               bgcolor: "#5e5e5e",
               borderRadius: "24px 24px 0 0",
-              minHeight: 320,
+              minHeight: 420,
               px: 3,
+              pt: 3,
             }}
           >
-            {/* 상단 닫기 */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
               <IconButton onClick={() => setPayOpen(false)}>
                 <CloseIcon sx={{ color: "white" }} />
               </IconButton>
             </Box>
 
-            {/* 카드 선택 영역 (더미) */}
+            <Typography
+              variant="subtitle1"
+              sx={{ color: "white", fontWeight: 600, mb: 2 }}
+            >
+              결제 수단을 선택하세요
+            </Typography>
+
             <Box
               sx={{
-                bgcolor: "#dcdcdc",
-                border: "4px solid rgba(255,128,0,0.4)",
-                borderRadius: 4,
-                height: 180,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 28,
-                fontWeight: 700,
-                color: "#666",
-                mb: 2,
-                cursor: "pointer",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                mb: 3,
               }}
             >
-              신한 카드
-            </Box>
-
-            {/* 밑에 실제 결제 버튼 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end", pb: isAppLike ? 11 : 0 }}>
-              <Box
-                sx={{
-                  bgcolor: "white",
-                  color: "black",
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={confirmPayment}
-              >
-                결제 진행
-              </Box>
+              {[
+                { label: "신용카드", pg: "danal_tpay" },
+                { label: "휴대폰결제", pg: "danal_tpay" },
+                { label: "카카오페이", pg: "kakaopay" },
+                { label: "스마일페이", pg: "smilepay" },
+                { label: "토스페이", pg: "tosspay" },
+                { label: "페이코", pg: "payco" },
+              ].map((method) => (
+                <Box
+                  key={method.label}
+                  onClick={() => confirmPayment(method.pg)}
+                  sx={{
+                    bgcolor: "#dcdcdc",
+                    border: "4px solid rgba(255,128,0,0.4)",
+                    borderRadius: 4,
+                    height: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: "#555",
+                    cursor: "pointer",
+                    "&:hover": {
+                      bgcolor: "#eaeaea",
+                      transform: "scale(1.03)",
+                      transition: "all 0.2s ease",
+                    },
+                  }}
+                >
+                  {method.label}
+                </Box>
+              ))}
             </Box>
           </Box>
         </Fade>

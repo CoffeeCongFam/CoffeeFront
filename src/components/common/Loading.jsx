@@ -1,11 +1,15 @@
-import React from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import React from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
-function Loading({ title = "잠시만 기다려주세요", message = "따뜻한 커피를 준비 중이에요 ☕️" }) {
+function Loading({
+  title = "잠시만 기다려주세요",
+  message = "따뜻한 커피를 준비 중이에요 ☕️",
+}) {
   return (
     <Box
       sx={{
-        height: "100vh",
+        width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -28,7 +32,10 @@ function Loading({ title = "잠시만 기다려주세요", message = "따뜻한 
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           {title}
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1, whiteSpace: "pre-line", color: "text.secondary" }}>
+        <Typography
+          variant="body2"
+          sx={{ mt: 1, whiteSpace: "pre-line", color: "text.secondary" }}
+        >
           {message}
         </Typography>
       </Box>

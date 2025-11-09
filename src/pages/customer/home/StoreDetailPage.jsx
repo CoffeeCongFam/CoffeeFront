@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography, Divider, Chip } from "@mui/material";
-import { useParams } from "react-router-dom";
-import storeDetail from "../../../data/customer/storeDetail.js";
+import { Box, Tabs, Tab, Typography, Divider, Chip, IconButton } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CafeInfo from "../../../components/customer/cafe/CafeInfo.jsx";
 import CafeMenuList from "../../../components/customer/cafe/CafeMenuList.jsx";
 import CafeSubscriptionList from "../../../components/customer/cafe/CafeSubscriptionList.jsx";
 import CafeReviewList from "../../../components/customer/cafe/CafeReviewList.jsx";
 import useAppShellMode from "../../../hooks/useAppShellMode.js";
+import getStoreStatusByDate from "../../../utils/getStoreStatusByDate.js";
+import { fetchStoreDetail } from "../../../apis/customerApi.js";
+import dummyImg from "./../../../assets/cafeInfoDummy.png";
+import Loading from "../../../components/common/Loading.jsx";
+import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx";
 
 // 공통 탭 패널 컴포넌트
 function TabPanel({ children, value, index, ...other }) {
@@ -30,62 +35,120 @@ function a11yProps(index) {
   };
 }
 
-function StoreDetailPage() {
 
+// 매장 상세 정보 페이지
+function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
   const { storeId } = useParams();
+  const navigate = useNavigate();
 
-  const [store, setStore] = useState({
-    storeId: null,
-    storeName: "",
-    storeStatus: "",
-    summary: "",
-    address: "",
-    phone: "",
-    storeHours: [],
-    menus: [], // 메뉴 탭용
-    subscriptions: [], // 구독권 탭용
-    reviews: [], // 리뷰 탭용
-    storeImage: "https://picsum.photos/400/400",
-    maxDailyUsage: 0,
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [store, setStore] = useState({});
+  const [storeStatus, setStoreStatus] = useState("OPEN"); // OPEN || CLOSED || HOLIDAY
 
   const [tab, setTab] = useState(0);
+
+
+
+  useEffect(() => {
+    let mounted = true; // 언마운트 후 setState 방지용
+
+    const init = async () => {
+      console.log("카페 페이지 로딩 시작");
+      setIsLoading(true);
+
+      try {
+        const data = await fetchStoreDetail(storeId);
+        if (!mounted) return;
+
+        setStore(data);
+        setStoreStatus(getStoreStatusByDate(data.storeHours));
+      } catch (err) {
+        console.log("카페 상세 정보 요청 실패: ", err);
+        alert("카페 상세 정보 조회에 실패했어요. 다시 시도해주세요.");
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+          console.log("카페 페이지 로딩 완료");
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      mounted = false;
+    };
+  }, [storeId]);
+
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
+  
+  function handleBack() {
+    navigate(-1);
+  }
 
-  useEffect(() => {
-    // TODO: storeId로 실제 api 호출한다고 가정
-    // 지금은 더미 데이터 주입
-    setStore(storeDetail);
-  }, [storeId]);
-
-  return (
-    <Box 
+  return isLoading ? (
+    <Box
       sx={{
         width: "100%",
-        maxWidth: isAppLike ? "100%" : "1100px", // 데스크탑에서만 가운데로
-        mx: "auto",
-        pb: isAppLike ?  "15%" : 0
+        height: "100vh",
       }}
     >
-      {/* 상단 대표 이미지 */}
+      <Loading
+        title={"☕ 잠시만요, 카페로 향하는 중이에요"}
+        message={"매장 정보를 불러오는 중이에요."}
+      />
+    </Box>
+  ) : (
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: isAppLike ? "100%" : "50%", // 데스크탑에서만 가운데로
+        mx: "auto",
+        pb: isAppLike ? "15%" : 0,
+        position: "relative",
+      }}
+    >
 
+                {/* 뒤로가기 버튼: 왼쪽 고정 */}
+                <IconButton
+                  onClick={handleBack}
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    zIndex: 2,
+                    bgcolor: "rgba(0,0,0,0.45)",
+                    color: "white",
+                    "&:hover": {
+                      bgcolor: "rgba(0,0,0,0.65)",
+                    },
+                  }}
+                  aria-label="뒤로가기"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+      
+              
+      
+      {/* 상단 대표 이미지 */}
       <Box
         sx={{
           width: "100%",
+          justifyContent: "center",
+          alignContent: "center",
           height: { xs: 240, sm: 240, md: 300 },
-          // borderRadius: 2,
           overflow: "hidden",
           mb: 2,
         }}
       >
         <img
-          src={store.storeImage || "https://picsum.photos/400/400"}
+          src={store.storeImg || dummyImg}
           alt={store.storeName}
-          style={{
+          sx={{
             width: "100%",
             height: "100%",
             objectFit: "cover",
@@ -93,36 +156,25 @@ function StoreDetailPage() {
           }}
         />
       </Box>
-        
+
       <Box sx={{ px: 2 }}>
         {/* 상단 기본 정보 */}
         <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "flex-start", sm: "center" },
-          gap: 1,
-          mb: 1.5,
-        }}
-      >
-        {store.storeStatus && (
-          <Chip
-              label={store.storeStatus}
-              size="small"
-              color={
-                store.storeStatus === "OPEN"
-                  ? "success"
-                  : store.storeStatus === "HOLIDAY"
-                  ? "warning"
-                  : "default"
-              }
-            />
-          )}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: 1,
+            mb: 1.5,
+            mt: 3,
+          }}
+        >
+          {storeStatus && <CafeStatusChip status={storeStatus} />}
           <Typography
             variant={isAppLike ? "h5" : "h4"}
             sx={{ fontWeight: 700 }}
           >
-            {store.storeName || "카페 이름"}
+            {store?.storeName || "카페 이름"}
           </Typography>
         </Box>
 
@@ -154,16 +206,18 @@ function StoreDetailPage() {
 
         {/* 2. 구독권 탭 */}
         <TabPanel value={tab} index={2}>
-          <CafeSubscriptionList subscriptions={store.subscriptions} />
+          <CafeSubscriptionList
+            subscriptions={store.subscriptions.filter(
+              (sub) => sub.subscriptionStatus === "ONSALE" || sub.subscriptionStatus === "SOLDOUT"
+            )}
+          />
         </TabPanel>
 
         {/* 3. 리뷰 탭 */}
         <TabPanel value={tab} index={3}>
-          <CafeReviewList store={store} />
+          <CafeReviewList storeName={store.storeName} storeId={storeId} />
         </TabPanel>
-
       </Box>
-      
     </Box>
   );
 }

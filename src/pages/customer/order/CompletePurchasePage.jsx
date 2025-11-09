@@ -3,7 +3,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import WalletIcon from "@mui/icons-material/Wallet";
+import { fetchPurchaseInfo } from "../../../apis/customerApi";
+import formatDate from "../../../utils/formatDate";
 
 function CompletePurchasePage() {
   const { purchaseId } = useParams();
@@ -11,26 +14,18 @@ function CompletePurchasePage() {
 
   const [purchase, setPurchase] = useState(null);
 
+  async function getPurchaseInfo() {
+    const data = await fetchPurchaseInfo(purchaseId);
+    setPurchase(data);
+  }
+
   useEffect(() => {
     // TODO: purchaseId 로 실제 결제 완료 내역 조회
-    // 예시 더미 데이터
-    setPurchase({
-      purchaseId,
-      storeName: "카페 모나카",
-      subName: "스탠다드",
-      amount: 19900,
-      cycle: "1개월",
-      nextBillingDate: "2025.10.26",
-      paidAt: "2025.10.26 13:28",
-      approvalNo: "2342389819",
-      payMethod: "[신한] 카드",
-      isGift: "Y", // "N"
-    });
+    getPurchaseInfo();
   }, [purchaseId]);
 
   function handleBack() {
-    // 결제 완료 후에는 그냥 내 구독 목록 /me/subscriptions 로 보내도 됨
-    navigate("/me/subscriptions");
+    navigate(-1);
   }
 
   if (!purchase) return null;
@@ -50,7 +45,7 @@ function CompletePurchasePage() {
             ? "선물이 전달되었습니다."
             : "결제가 완료되었습니다."}
         </Typography>
-        <CardGiftcardIcon />
+        {purchase.isGift === "Y" ? <CardGiftcardIcon /> : <WalletIcon />}
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -66,14 +61,24 @@ function CompletePurchasePage() {
         }}
       >
         {/* 상단 매장명 */}
-        {/* <Typography variant="h5" sx={{ fontWeight: 700, color: "#555", mb: 4 }}>
-          {purchase.storeName}
-        </Typography> */}
-        {purchase.isGift === "Y" && 
-          <Box sx={{display: "flex", flex: 1, justifyContent: "space-around", mb: 3, }}>
-            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+        {purchase.isGift === "Y" && (
+          <Box
+            sx={{
+              display: "flex",
+              flex: 1,
+              justifyContent: "space-around",
+              mb: 3,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
               <Typography fontWeight={"bold"}>보내는 사람</Typography>
-              <Typography>아무개</Typography>
+              <Typography>{purchase?.sender}</Typography>
             </Box>
             <Box
               sx={{
@@ -85,12 +90,31 @@ function CompletePurchasePage() {
             >
               <ForwardIcon />
             </Box>
-            <Box sx={{display:"flex", flexDirection: "column", textAlign: "center"}}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "center",
+              }}
+            >
               <Typography fontWeight={"bold"}>받는 사람</Typography>
-              <Typography>아무개</Typography>
+              <Typography>{purchase?.receiver}</Typography>
             </Box>
           </Box>
-        }
+        )}
+        {purchase?.isGift === "Y" && (
+          <Box
+            sx={{
+              textAlign: "center",
+              backgroundColor: "#fff48dd7",
+              px: "1rem",
+              py: "1rem",
+              borderRadius: "1rem",
+            }}
+          >
+            <Typography>{purchase.giftMessage}</Typography>
+          </Box>
+        )}
         <Divider sx={{ my: 3 }} />
 
         {/* 구독 정보 */}
@@ -99,9 +123,12 @@ function CompletePurchasePage() {
         </Typography>
 
         <Row label="카페명" value={purchase.storeName} />
-        <Row label="구독권명" value={purchase.subName} />
-        <Row label="금액" value={`${purchase.amount.toLocaleString()} 원`} />
-        <Row label="결제 주기" value={purchase.cycle} />
+        <Row label="구독권명" value={purchase.subscriptionName} />
+        {/* <Row
+          label="금액"
+          value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
+        /> */}
+        {/* <Row label="결제 주기" value={purchase.cycle} /> */}
         <Row label="다음 결제 예정일" value={purchase.nextBillingDate} />
 
         <Divider sx={{ my: 3 }} />
@@ -111,13 +138,9 @@ function CompletePurchasePage() {
           결제 정보
         </Typography>
 
-        <Row
-          label="결제 금액"
-          value={`${purchase.amount.toLocaleString()} 원`}
-        />
-        <Row label="승인 일시" value={purchase.paidAt} />
-        <Row label="승인 번호" value={purchase.approvalNo} />
-        <Row label="결제 수단" value={purchase.payMethod} />
+        <Row label="승인 일시" value={formatDate(purchase.paidAt)} />
+        <Row label="승인 번호" value={purchase.purchaseId} />
+        <Row label="결제 수단" value={purchase.paymentStatus} />
       </Box>
 
       {/* 하단 확인 버튼 영역 */}

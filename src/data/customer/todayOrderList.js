@@ -69,5 +69,3 @@ const todayOrderList = {
 };
 
 export default todayOrderList;
-
-

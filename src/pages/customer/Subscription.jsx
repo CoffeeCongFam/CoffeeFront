@@ -1,175 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   Container,
   Box,
   Typography,
-  Paper,
-  Grid,
   Button,
-  Divider,
-  MenuItem,
-  Select,
-  FormControl,
+  Tabs,
+  Tab,
   IconButton,
-} from '@mui/material';
-import StandardTag from '../../components/customer/subcription/StandardTag';
-import subscriptionList from '../../data/customer/subscriptionList';
+} from "@mui/material";
+import { getSubscription } from "../../utils/subscription";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import useUserStore from "../../stores/useUserStore";
+import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 
 // 구독권 상세 정보 컴포넌트
-const SubscriptionDetailCard = ({ subscriptionData }) => {
-  const [selectedMenu, setSelectedMenu] = useState('');
 
-  const {
-    storeName,
-    subscriptionType,
-    price,
-    maxDailyUsage,
-    subscriptionDesc,
-    menuNameList,
-  } = subscriptionData;
-  
-  // subscriptionPeriod는 InfoBox 내부에서 1개월로 고정 사용해도 무방하지만,
-  // 더미 데이터의 subscriptionPeriod를 활용하려면 아래와 같이 사용 가능합니다.
-  // const subscriptionPeriod = subscriptionData.subscriptionPeriod;
+// 공통: 사용 내역 & 환불 정보 정규화
+const normalizeUsageAndRefund = (raw) => {
+  if (!raw || typeof raw !== "object") {
+    return {
+      usedAt: [],
+      refundReasons: null,
+      refundedAt: "",
+      isRefunded: false,
+    };
+  }
 
-  const formattedPrice = price.toLocaleString();
+  const usageHistoryList = Array.isArray(raw.usageHistoryList)
+    ? raw.usageHistoryList
+    : [];
 
-  // 금액 정보를 보여주는 박스 서브 컴포넌트
-  const InfoBox = ({ title, content, subContent = null }) => (
-    <Box
-      sx={{
-        flexGrow: 1,
-        padding: 1,
-        backgroundColor: '#FFFFFF',
-        borderRadius: '8px',
-        minHeight: '70px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        border: '1px solid #E0E0E0',
-        marginRight: 1,
-      }}
-    >
-      <Typography variant="caption" color="textSecondary" fontWeight="bold" sx={{ mb: 0.25 }}>
-        {title}
-      </Typography>
-      <Typography variant="body2" fontWeight="bold">
-        {content}
-      </Typography>
-      {subContent && (
-        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-          {subContent}
-        </Typography>
-      )}
-    </Box>
-  );
+  const usedAtFromHistory = usageHistoryList
+    .map((u) => (u && u.usedAt ? u.usedAt : null))
+    .filter(Boolean);
 
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        maxWidth: 400,
-        margin: 'auto',
-        padding: 2.5,
-        borderRadius: '12px',
-        height: '430px', // 정사각형에 가까운 높이 설정
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between', // 내부 요소들의 간격을 균등하게 배분
-      }}>
-      
-      <Box sx={{ textAlign: 'center' }}>
-        <StandardTag type={subscriptionType} />
-        <Typography variant="h6" fontWeight="bold" sx={{ mt: 1, color: '#333' }}>
-          {storeName}
-        </Typography>
-        <Typography variant="body1" fontWeight="light" sx={{ mt: 1, color: '#333' }}>
-          <span style={{ fontWeight: 'bold' }}>₩{formattedPrice}</span>/월
-        </Typography>
-      </Box>
+  const usedAt =
+    usedAtFromHistory.length > 0
+      ? usedAtFromHistory
+      : Array.isArray(raw.usedAt)
+      ? raw.usedAt
+      : [];
 
-      <Grid container spacing={1}>
-        <Grid item xs={4}>
-          <InfoBox
-            title="금액"
-            content={`월 ${formattedPrice}원`}
-            isPrice
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <InfoBox
-            title="구독 주기"
-            content={`1개월`} // 사진에 맞춰 1개월로 고정
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <InfoBox
-            title="일일 사용가능 횟수"
-            content={`매일, 하루 ${maxDailyUsage}잔`}
-          />
-        </Grid>
-      </Grid>
+  const refundReasons = raw.refundReasons ?? null;
+  const refundedAt = raw.refundedAt ?? "";
+  const isRefunded =
+    typeof raw.isRefunded === "boolean"
+      ? raw.isRefunded
+      : !!(refundedAt && String(refundedAt).trim() !== "");
 
-      <Box>
-        <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{ mb: 1 }}>
-          상세설명
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
-          {subscriptionDesc}
-        </Typography>
-      </Box>
+  return { usedAt, refundReasons, refundedAt, isRefunded };
+};
 
-      <FormControl fullWidth variant="outlined">
-        <Select
-          value={selectedMenu}
-          onChange={(e) => setSelectedMenu(e.target.value)}
-          displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-          size="small"
-        >
-          <MenuItem value="" disabled>
-            제공메뉴
-          </MenuItem>
-          {menuNameList.map((menu, index) => (
-            <MenuItem key={index} value={menu}>
-              {menu}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+// API 데이터를 카드 컴포넌트에서 쓰기 좋게 변환
+const adaptToCardData = (s) => {
+  const { usedAt, refundReasons, refundedAt, isRefunded } =
+    normalizeUsageAndRefund(s);
 
-      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-        <Button
-          variant="outlined"
-          sx={{
-            flex: 1, // padding: '12px 0',
-            borderColor: '#E0E0E0',
-            color: '#757575',
-            fontWeight: 'bold',
-          }}
-        >
-          결제 취소
-        </Button>
-        <Button
-          variant="contained"
-          sx={{
-            flex: 1,
-            backgroundColor: '#424242',
-            '&:hover': {
-              backgroundColor: '#616161',
-            },
-          }}
-        >
-          사용 내역
-        </Button>
-      </Box>
-    </Paper>
-  );
+  return {
+    storeName: s?.store?.storeName ?? "",
+    storeImg: s?.store?.storeImg ?? "",
+    subscriptionType: s?.subscriptionType ?? "STANDARD",
+    price: Number(s?.price ?? 0),
+    subscriptionDesc: s?.subName ?? "",
+    menuList: Array.isArray(s?.menu) ? s.menu : [],
+    dailyRemainCount: s?.remainingCount ?? 0,
+    maxDailyUsage: s?.maxDailyUsage ?? s?.remainingCount ?? 0,
+    giverName: s?.sender,
+    receiver: s?.receiver,
+    subStart: s?.subStart,
+    subEnd: s?.subEnd,
+    usageStatus: s?.usageStatus,
+    purchaseId: s?.purchaseId,
+    paymentStatus: s?.paymentStatus,
+    refundReasons,
+    refundedAt,
+    usedAt,
+    isRefunded,
+    giftMessage: s?.giftMessage ?? "",
+    // --- forward receiverId, senderId, memberId if present ---
+    receiverId: s?.receiverId,
+    senderId: s?.senderId,
+    memberId: s?.memberId,
+  };
 };
 
 // 커스텀 다음 화살표 컴포넌트
@@ -179,17 +95,15 @@ function NextArrow(props) {
     <IconButton
       onClick={onClick}
       sx={{
-        position: 'absolute',
-        top: '50%',
-        right: '-40px', // 캐러셀 바깥으로 위치 조정
-        transform: 'translateY(-50%)',
+        position: "absolute",
+        top: "50%",
+        right: 0,
+        transform: "translateY(-50%)",
         zIndex: 2,
-        color: 'black',
-        backgroundColor: 'white',
+        color: "black",
+        backgroundColor: "white",
         boxShadow: 3,
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.8)'
-        }
+        "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
       }}
     >
       <ArrowForwardIosIcon fontSize="small" />
@@ -204,17 +118,15 @@ function PrevArrow(props) {
     <IconButton
       onClick={onClick}
       sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '-40px', // 캐러셀 바깥으로 위치 조정
-        transform: 'translateY(-50%)',
+        position: "absolute",
+        top: "50%",
+        left: 0,
+        transform: "translateY(-50%)",
         zIndex: 2,
-        color: 'black',
-        backgroundColor: 'white',
+        color: "black",
+        backgroundColor: "white",
         boxShadow: 3,
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.8)'
-        }
+        "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
       }}
     >
       <ArrowBackIosNewIcon fontSize="small" />
@@ -224,51 +136,208 @@ function PrevArrow(props) {
 
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
+  const { authUser } = useUserStore();
+  const CURRENT_MEMBER_ID = authUser?.memberId ?? 1;
+  const sliderRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("all"); // 'all' | 'expired'
+  const [availableList, setAvailableList] = useState([]); // 사용 가능한 구독권
+  const [expiredList, setExpiredList] = useState([]); // 만료/비활성 구독권 (NOT_ACTIVATED 포함)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await getSubscription(); // API 호출
+        // API가 { success, data, message }를 반환하므로 .data를 붙여서 사용
+        const arr = Array.isArray(res?.data) ? res.data : [];
+        // 조건 정정:
+        // 사용 가능: isExpired 값이 "EXPIRED"가 아닌 모든 구독권
+        // 만료: isExpired 값이 "EXPIRED"인 구독권만
+        const norm = (v) => (v ?? "").toString().toUpperCase();
+        const isExpired = (s) => norm(s?.isExpired) === "EXPIRED";
+        const hasRefundedAt = (s) => {
+          const v = s?.refundedAt;
+          return v != null && String(v).trim() !== "";
+        };
+        const avail = arr.filter((s) => !isExpired(s) && !hasRefundedAt(s));
+        const exp   = arr.filter((s) => isExpired(s) || hasRefundedAt(s));
+        console.log(
+          "[Subscription] available:",
+          avail.length,
+          "expired:",
+          exp.length,
+          { raw: res, list: arr }
+        );
+        if (mounted) {
+          setAvailableList(avail);
+          setExpiredList(exp);
+        }
+      } catch (e) {
+        if (mounted) setError(e?.message || "구독권 조회에 실패했습니다.");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const currentList = activeTab === "all" ? availableList : expiredList;
   const settings = {
     dots: true,
-    infinite: subscriptionList.length > 2, // 아이템이 2개 초과일 때만 무한으로 슬라이드
-    speed: 500, // 넘어가는 속도
-    slidesToShow: 2, // 한 번에 보여줄 슬라이드 수
+    infinite: currentList.length > 1,
+    speed: 500,
+    slidesToShow: 1,
     slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    responsive: [
-      {
-        breakpoint: 600, // 600px 이하에서는
-        settings: {
-          slidesToShow: 1,
-        }
-      }
-    ]
+    responsive: [{ breakpoint: 600, settings: { slidesToShow: 1 } }],
+  };
+
+  // 환불 성공시: 사용가능 목록에서 제거하고 만료 목록에 추가
+  const handleRefundSuccess = (pid, refundedAtFromApi) => {
+    const pidStr = String(pid);
+    let removed = null;
+
+    setAvailableList((prev) => {
+      const idx = prev.findIndex((s) => String(s?.purchaseId) === pidStr);
+      if (idx === -1) return prev;
+      removed = prev[idx];
+      return prev.filter((_, i) => i !== idx);
+    });
+
+    if (removed) {
+      const moved = {
+        ...removed,
+        isExpired: "CANCELLED",
+        paymentStatus: "REFUNDED",
+        refundReasons: removed.refundReasons ?? null,
+        refundedAt:
+          refundedAtFromApi ?? removed.refundedAt ?? new Date().toISOString(),
+      };
+      setExpiredList((prev) => [...prev, moved]);
+    }
   };
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-        나의 구독권
-      </Typography>
-      {subscriptionList.length > 0 ? (
-        <Box sx={{
-          position: 'relative',
-          padding: '0 20px 72px', // 아래 여백을 더 늘려 점과 카드 사이 간격 확보
-          '& .slick-list': {
-            overflow: 'visible',       // 카드 그림자/하단이 잘리지 않도록
-            paddingBottom: '24px',     // 리스트 자체에 하단 여백 추가
-          },
-          '& .slick-dots': {
-            bottom: '-36px',           // 점 위치 조금 더 아래
-          },
-        }}>
-          <Slider {...settings}>
-            {subscriptionList.map((subscription, index) => (
-              <Box key={index} sx={{ padding: '0 8px' }}>
-                <SubscriptionDetailCard subscriptionData={subscription} />
-              </Box>
-            ))}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 1.5,
+        }}
+      >
+        <Typography variant="h6" component="h2" fontWeight="bold">
+          구독권
+        </Typography>
+      </Box>
+      <Tabs
+        value={activeTab}
+        onChange={(_, v) => setActiveTab(v)}
+        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 3 }}
+      >
+        <Tab value="all" label="사용 가능한 구독권" />
+        <Tab value="expired" label="만료된 구독권" />
+      </Tabs>
+      {loading ? (
+        <Typography>불러오는 중…</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : currentList.length > 0 ? (
+        <Box
+          sx={{
+            position: "relative",
+            padding: "0 44px 72px",
+            "& .slick-list": { overflow: "hidden", paddingBottom: "24px" },
+            "& .slick-dots": { bottom: "-36px" },
+          }}
+        >
+          <Slider ref={sliderRef} {...settings}>
+            {currentList.map((s, index) => {
+              const cardData = adaptToCardData(s);
+              // Gift/ownership classification rules
+              const rid = s?.receiverId;
+              const sid = s?.senderId;
+              const mid = s?.memberId ?? CURRENT_MEMBER_ID;
+
+              let giftType;
+              let isGifted = false;
+              if (mid === rid && mid === sid) {
+                // 본인 구매
+                giftType = undefined; // OWNED
+                isGifted = false;
+              } else if (mid === rid && mid !== sid) {
+                // 받은 선물
+                giftType = "RECEIVED";
+                isGifted = true;
+              } else if (mid !== rid && mid === sid) {
+                // 보낸 선물
+                giftType = "SENT";
+                isGifted = true;
+              } else {
+                // 불명확: 기본값
+                giftType = undefined;
+                isGifted = false;
+              }
+              return (
+                <Box key={s.subId ?? index} sx={{ padding: "0 8px" }}>
+                  <SubscriptionDetailCard
+                    subscriptionData={cardData}
+                    isGifted={isGifted}
+                    isExpired={activeTab === "expired"}
+                    giftType={giftType}
+                    onRefundSuccess={handleRefundSuccess}
+                  />
+                </Box>
+              );
+            })}
           </Slider>
+          <IconButton
+            onClick={() => sliderRef.current?.slickPrev()}
+            sx={{
+              position: "absolute",
+              top: "40%",
+              left: 0,
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              color: "black",
+              backgroundColor: "white",
+              boxShadow: 3,
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
+            }}
+          >
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            onClick={() => sliderRef.current?.slickNext()}
+            sx={{
+              position: "absolute",
+              top: "40%",
+              right: 0,
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              color: "black",
+              backgroundColor: "white",
+              boxShadow: 3,
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
+            }}
+          >
+            <ArrowForwardIosIcon fontSize="small" />
+          </IconButton>
         </Box>
       ) : (
-        <Typography>보유한 구독권이 없습니다.</Typography>
+        <Box sx={{ mt: 6, textAlign: "center" }}>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            구독권 내역이 비어 있습니다.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
+          </Typography>
+        </Box>
       )}
     </Container>
   );

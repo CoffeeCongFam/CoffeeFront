@@ -12,76 +12,146 @@ import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import SubscriptItem from "../../../components/customer/purchase/SubscriptionItem";
+import {
+  fetchSubscriptionInfo,
+  requestPurchase,
+} from "../../../apis/customerApi";
+import axios from "axios";
+import useUserStore from "../../../stores/useUserStore";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
+  const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // ✅ 결제 처리 로딩 상태
-  const [payOpen, setPayOpen] = useState(false); // ✅ 결제 패널 열림/닫힘
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPurchaseLoading, setIsPurchaseLoading] = useState(false);
+  const [payOpen, setPayOpen] = useState(false);
+
+  async function fetchSubData() {
+    const subData = await fetchSubscriptionInfo(subId);
+    console.log(subData);
+    setSubscription(subData);
+    setIsLoading(false); // ✅ 로딩 완료
+  }
 
   useEffect(() => {
     console.log(subId + "로 구독권 정보 가져오기");
-    // TODO: 실제 API 호출
-    setSubscription({
-      subId: 3,
-      store: {
-        storeId: 1,
-        storeName: "카페 모나카",
-        storeImage: "https://picsum.photos/400/400",
-      },
-      price: 19900,
-      subImage:
-        "https://images.unsplash.com/photo-1603025014859-2aa06fae7a08?w=600&q=80",
-      subName: "프리미엄 구독권",
-      subType: "PREMIUM",
-      isExpired: "N",
-      limitEntity: 10,
-      stock: 10,
-      description: "구독권에 대한 간단한 설명",
-      isGift: "Y",
-      isSubscribed: "Y",
-    });
+    fetchSubData();
   }, [subId]);
 
   function handleBack() {
     navigate(-1);
   }
 
-  // ✅ 결제 진행 함수 (로딩 + 완료 페이지 이동)
-  async function confirmPayment() {
-    setIsLoading(true);
+  async function confirmPayment(pg = "danal_tpay") {
+    setIsPurchaseLoading(true); // ✅ 결제 로딩 시작
     setPayOpen(false);
 
     try {
-      // TODO: 실제 결제 처리 API 호출 (예: await api.purchase(subscription.subId))
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 2초 대기 (로딩 효과)
+      const payload = {
+        subscriptionId: subscription.subscriptionId,
+      };
 
-      const purchaseId = 1; // 실제 purchaseId 받아오기
-      navigate(`/me/purchase/${purchaseId}/complete`);
+      const created = await requestPurchase(payload);
+      const merchantUid = created.merchantUid;
+
+      const { IMP } = window;
+
+      if (!IMP) {
+        throw new Error("PortOne SDK가 로드되지 않았습니다.");
+      }
+
+      IMP.init("imp03140165");
+
+      IMP.request_pay(
+        {
+          pg,
+          pay_method: "card",
+          amount: subscription.price,
+          name: subscription.subscriptionName,
+          merchant_uid: merchantUid,
+          buyer_name: authUser.name,
+          buyer_email: authUser.email,
+          buyer_tel: authUser.tel,
+        },
+        async (response) => {
+          if (response.success) {
+            console.log("결제 성공:", response);
+
+            try {
+              const validationRes = await axios.post(
+                "/api/payments/validation",
+                {
+                  purchaseId: created.purchaseId,
+                  impUid: response.imp_uid,
+                  merchantUid: response.merchant_uid,
+                }
+              );
+
+              console.log("검증 성공:", validationRes.data);
+              navigate(`/me/purchase/${created.purchaseId}/complete`);
+            } catch (error) {
+              console.error("결제 검증 실패:", error);
+              alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
+            }
+          } else {
+            alert(`결제 실패: ${response.error_msg}`);
+          }
+          setIsPurchaseLoading(false); // ✅ 결제 완료 후 로딩 해제
+        }
+      );
     } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제 처리 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
+      console.error("결제 요청 오류:", error);
+      alert("결제 요청 중 문제가 발생했습니다.");
+      setIsPurchaseLoading(false); // ✅ 에러 시에도 로딩 해제
     }
   }
 
   return (
     <>
-      <Box sx={{ p: 3, pb: 10 }}>
-        {/* 뒤로가기 */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+      <Box
+              sx={{
+                p: 3,
+                pb: isAppLike ? "100px" : 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+       {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center", // 제목을 중앙 기준으로 배치
+            width: "100%",
+            maxWidth: 900,
+            mb: isAppLike ? 1 : 5,
+            height: 48, // 버튼 높이 확보
+          }}
+        >
+          {/* 뒤로가기 버튼: 왼쪽 고정 */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              position: "absolute",
+              left: 0,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
-        </Box>
 
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography variant="h6">구독하기</Typography>
+          {/* 제목: 중앙 정렬 */}
+          <Typography variant="h6" sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}>
+            구독하기
+          </Typography>
         </Box>
 
         {/* 선택한 구독권 */}
@@ -161,7 +231,7 @@ function PurchaseSubscriptionPage() {
         </Box>
       </Box>
 
-      {/* ✅ 결제 선택 패널 */}
+      {/* ✅ 결제 선택 패널 (수정됨) */}
       <Backdrop
         open={payOpen}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -179,8 +249,9 @@ function PurchaseSubscriptionPage() {
               maxWidth: 820,
               bgcolor: "#5e5e5e",
               borderRadius: "24px 24px 0 0",
-              minHeight: 320,
+              minHeight: 420,
               px: 3,
+              pt: 3,
             }}
           >
             {/* 상단 닫기 */}
@@ -190,42 +261,56 @@ function PurchaseSubscriptionPage() {
               </IconButton>
             </Box>
 
-            {/* 카드 선택 영역 (더미) */}
+            {/* 결제수단 선택 */}
+            <Typography
+              variant="subtitle1"
+              sx={{ color: "white", fontWeight: 600, mb: 2 }}
+            >
+              결제 수단을 선택하세요
+            </Typography>
+
+            {/* ✅ 카드들 (6개 grid) - 올바른 구조 */}
             <Box
               sx={{
-                bgcolor: "#dcdcdc",
-                border: "4px solid rgba(255,128,0,0.4)",
-                borderRadius: 4,
-                height: 180,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 28,
-                fontWeight: 700,
-                color: "#666",
-                mb: 2,
-                cursor: "pointer",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 2,
+                mb: 3,
               }}
             >
-              신한 카드
-            </Box>
-
-            {/* 밑에 실제 결제 버튼 */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Box
-                sx={{
-                  bgcolor: "white",
-                  color: "black",
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={confirmPayment}
-              >
-                결제 진행
-              </Box>
+              {[
+                { label: "신용카드", pg: "danal_tpay" },
+                { label: "휴대폰결제", pg: "danal_tpay" },
+                { label: "카카오페이", pg: "kakaopay" },
+                { label: "스마일페이", pg: "smilepay" },
+                { label: "토스페이", pg: "tosspay" },
+                { label: "페이코", pg: "payco" },
+              ].map((method) => (
+                <Box
+                  key={method.label}
+                  onClick={() => confirmPayment(method.pg)}
+                  sx={{
+                    bgcolor: "#dcdcdc",
+                    border: "4px solid rgba(255,128,0,0.4)",
+                    borderRadius: 4,
+                    height: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: "#555",
+                    cursor: "pointer",
+                    "&:hover": {
+                      bgcolor: "#eaeaea",
+                      transform: "scale(1.03)",
+                      transition: "all 0.2s ease",
+                    },
+                  }}
+                >
+                  {method.label}
+                </Box>
+              ))}
             </Box>
           </Box>
         </Fade>
@@ -233,7 +318,7 @@ function PurchaseSubscriptionPage() {
 
       {/* ✅ 결제 로딩 화면 */}
       <Backdrop
-        open={isLoading}
+        open={isPurchaseLoading}
         sx={{
           color: "#fff",
           zIndex: (theme) => theme.zIndex.modal + 2,

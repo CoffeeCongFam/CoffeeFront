@@ -7,13 +7,15 @@ import Button from "@mui/material/Button";
 import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
-
+import menuDummy from "../../../assets/menuDummy.jpg";
+import { Box } from "@mui/material";
 
 function TodayOrderItem({ order }) {
+  // const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   return (
-    <div>
+    <Box>
       <Card
         key={order.orderId}
         style={{
@@ -24,47 +26,76 @@ function TodayOrderItem({ order }) {
           padding: "16px",
           borderRadius: "12px",
           cursor: "pointer",
-          backgroundColor: order.orderStatus==="COMPLETED" ? "#e5e5e5a5" : "white"
+          backgroundColor:
+            order.orderStatus === "COMPLETED" ? "#e5e5e5a5" : "white",
         }}
         onClick={() => {
           navigate(`/me/order/${order.orderId}`);
         }}
       >
-        <div
+        <Box
           style={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: "12px",
+            width: "100%",
           }}
         >
-          <CardMedia
-            component="img"
-            style={{ borderRadius: "8px" }}
-            sx={{ width: 100, height: 70, objectFit: "cover" }}
-            image={order.storeImg}
-            alt={order.storeName}
-          />
-          <div
-            style={{
+          <Box
+            sx={{
               display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
+              flexDirection: "row",
+              gap: "1rem",
             }}
           >
-            <Typography variant="subtitle1" fontWeight="bold">
-              {order.storeName}
-            </Typography>
+            <CardMedia
+              component="img"
+              style={{ borderRadius: "8px" }}
+              sx={{
+                width: 100,
+                height: 70,
+                objectFit: "cover",
+              }}
+              image={order.storeImg || menuDummy}
+              alt={order.storeName}
+            />
+            <Box
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                {order.storeName} - {order.subscriptionName} 구독권
+              </Typography>
+              {order.menuList.map((menu) => (
+                <Typography variant="body2" color="text.secondary">
+                  {menu.menuName} x {menu.quantity}
+                </Typography>
+              ))}
+            </Box>
+          </Box>
+          {/* 오른쪽: 상태 버튼 */}
+          <Box
+            sx={{
+              textAlign: "right",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
             <Typography variant="body2" color="text.secondary">
-              {order.orderMenu[0].menuName} × {order.orderMenu[0].quantity}
+              {/* {order.createdAt.split("T")[0]}{" "} */}
+              {order.createdAt.split("T")[1].split(".")[0]}
             </Typography>
-          </div>
-        </div>
-
-        {/* 오른쪽: 상태 버튼 */}
-        <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
+          </Box>
+        </Box>
       </Card>
-    </div>
+    </Box>
   );
 }
 

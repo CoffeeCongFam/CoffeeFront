@@ -1,19 +1,37 @@
 import React, { useEffect, useState, useRef } from "react";
 import SubscriptionItem from "../../../components/customer/home/SubscriptionItem";
-import subList from "../../../data/customer/subList";
-import cafeList from "../../../data/customer/cafeList";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocalCafeCard from "../../../components/customer/home/LocalCafeCard";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-import { fetchCustomerSubscriptions, fetchNearbyCafes } from "../../../apis/customerApi";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import Loading from "../../../components/common/Loading";
+import TodayOrderItem from "../../../components/customer/order/TodayOrderItem";
+import {
+  fetchCustomerSubscriptions,
+  fetchNearbyCafes,
+  fetchTodayOrderList,
+} from "../../../apis/customerApi";
+import useUserStore from "../../../stores/useUserStore";
+import { TokenService } from "../../../utils/api";
+import LocalCafeImgList from "./LocalCafeImgList";
+import getDistanceKm from "../../../utils/getDistanceKm";
+import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
+import { formatKoreanDateTime } from "../../../utils/dateUtil";
+// import api from "../../../utils/api";
 
 function CustomerHome() {
   const navigate = useNavigate();
+
+  const { authUser } = useUserStore();
+
   const { isAppLike } = useAppShellMode();
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [todayDate, setTodayDate] = useState(null);
+  const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
   const [subscriptions, setSubscriptions] = useState([]);
   const [today, setToday] = useState(null);
   const [nearbyCafes, setNearbyCafes] = useState([]);
@@ -22,8 +40,10 @@ function CustomerHome() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    loadToday();
-    loadSubscriptions();
+    setTodayDate(formatKoreanDateTime(new Date()));
+    loadToday(); // 오늘 날짜
+    loadOngoingOrders(); // 진행 중인 주문 조회
+    loadSubscriptions(); // 보유 구독권 조회
 
     // 위치 가져와서 근처 카페 요청
     if ("geolocation" in navigator) {
@@ -46,30 +66,85 @@ function CustomerHome() {
     const todayDate = new Date();
     setToday(todayDate.toISOString().split("T")[0]);
   }
+  const loadOngoingOrders = async () => {
+    try {
+      const list = await fetchTodayOrderList(); // 오늘 주문 불러오기 (혹은 전체 주문)
+      const filtered = (list || []).filter(
+        (o) => !["RECEIVED", "CANCELED"].includes(o.orderStatus)
+        // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
+      );
+      setOngoingOrders(filtered);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const loadSubscriptions = async () => {
     try {
       const data = await fetchCustomerSubscriptions();
-      setSubscriptions(data);
+
+      // 환불 안 된 구독권만 남기기
+      const activeSubs =
+      (data || []).filter((it) => it.refundedAt === "") || [];
+
+      // remainingCount 기준 내림차순 정렬 (주문 잔 수 많은 것 먼저)
+      activeSubs.sort((a, b) => {
+        const aRemain = a.remainingCount ?? 0;
+        const bRemain = b.remainingCount ?? 0;
+        return bRemain - aRemain; 
+      });
+
+      setSubscriptions(activeSubs);
+      console.log(data);
     } catch (e) {
       console.log(e);
-      setSubscriptions(subList); // 실패 시 목데이터
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ⬇⬇⬇ 여기서만 실제 API 호출
+  //
   const loadNearbyCafes = async (coords) => {
     try {
-      const data = await fetchNearbyCafes({
-        lat: coords.latitude,
-        lng: coords.longitude,
-        radius: 500,
+      const data = await fetchNearbyCafes(
+        coords.longitude, // 경도 (xpoint)
+        coords.latitude, // 위도 (ypoint)
+        500
+      );
+
+      // 각 카페에 distanceKm 필드 추가 (현재 위치 기준 거리)
+      const enriched = (data || []).map((store) => {
+        // 백엔드에서 내려주는 좌표 이름: xpoint(경도), ypoint(위도) 라고 가정
+        const storeLat = store.ypoint;
+        const storeLng = store.xpoint;
+
+        let distanceKm = null;
+        if (typeof storeLat === "number" && typeof storeLng === "number") {
+          distanceKm = getDistanceKm(
+            coords.latitude,
+            coords.longitude,
+            storeLat,
+            storeLng
+          );
+        }
+
+        return {
+          ...store,
+          distanceKm,
+        };
       });
-      setNearbyCafes(data);
+
+      // 거리순 정렬까지 하고 싶으면
+      enriched.sort((a, b) => {
+        if (a.distanceKm == null) return 1;
+        if (b.distanceKm == null) return -1;
+        return a.distanceKm - b.distanceKm;
+      });
+
+      setNearbyCafes(enriched);
     } catch (e) {
       console.error(e);
-      setNearbyCafes(cafeList); // 개발 중엔 더미
-      setLocError("주변 카페를 불러오는 데 실패했어요.");
+      // setLocError("주변 카페를 불러오는 데 실패했어요.");
     }
   };
 
@@ -87,7 +162,26 @@ function CustomerHome() {
     });
   };
 
-  return (
+  return isLoading ? (
+    <Box
+      sx={{
+        px: isAppLike ? 2 : 12,
+        py: isAppLike ? 2 : 5,
+        minHeight: "100%",
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: isAppLike ? "23px" : "30px",
+          fontWeight: "bold",
+          mb: 2,
+        }}
+      >
+        안녕하세요 {authUser?.name ?? "고객"} 님 👋
+      </Typography>
+      <Loading />
+    </Box>
+  ) : (
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
@@ -107,61 +201,148 @@ function CustomerHome() {
           mb: 1.5,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px", mb: "2%" }}>
-          <Typography sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}>
-            유저 님, {isAppLike && <br />} 오늘도 한 잔의 여유를 즐겨보세요.
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            mb: "2%",
+          }}
+        >
+          <Typography
+            sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
+          >
+            안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
+            잔의 여유를 즐겨보세요.
           </Typography>
           <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
-
-        <Box style={{ float: "right", alignSelf: isAppLike ? "flex-end" : "auto" }}>
-          <IconButton onClick={() => scrollBy(-260)} size="small">
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton onClick={() => scrollBy(260)} size="small">
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
-        </Box>
       </Box>
+
+      {/* 오늘의 주문 내역 있으면 */}
+      {ongoingOrders.length > 0 && (
+        <Box
+          sx={{
+            width: "100%",
+            mb: 4,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "#fff7e6",
+            border: "1px solid #ffe0b2",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.7rem",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+            {todayDate} 진행 중인 주문 {ongoingOrders.length}건
+          </Typography>
+
+          {ongoingOrders.map((order, idx) => (
+            <TodayOrderItem key={idx} order={order} />
+          ))}
+        </Box>
+      )}
+
+      {subscriptions.length <= 0 && (
+        <Box
+          sx={{
+            backgroundColor: "#f0f0f0c9",
+            px: "1rem",
+            py: "1.5rem",
+            borderRadius: "8px",
+            mb: 5,
+            display: "flex",
+            gap: isAppLike ? "0.8rem" : "2rem",
+            flexDirection: isAppLike ? "column" : "row",
+            alignItems: "center",
+          }}
+        >
+          <Typography>
+            보유 구독권이 없습니다. 구독권을 구매해주세요!
+          </Typography>
+          <Button
+            endIcon={<OpenInNewIcon />}
+            onClick={() => navigate("/me/search")}
+          >
+            구독권 구매하러 가기
+          </Button>
+        </Box>
+      )}
 
       {/* 구독권 캐러셀 */}
-      <Box
-        ref={scrollRef}
-        sx={{
-          display: "flex",
-          gap: 2,
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          mb: 5,
-          py: 1,
-          "&::-webkit-scrollbar": {
-            height: isAppLike ? 0 : 6,
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#ccc",
-            borderRadius: 8,
-          },
-        }}
-      >
-        {subscriptions.map((item) => (
+      {subscriptions.length > 0 && (
+        <Box
+          sx={{
+            position: "relative",
+            mb: 10,
+          }}
+        >
+          {/* 오른쪽 위 네비 버튼 */}
           <Box
-            key={item.subId}
             sx={{
-              scrollSnapAlign: "start",
-              px: isAppLike ? "8%" : 0,
-              flex: isAppLike ? "0 0 100%" : "0 0 auto",
+              position: "absolute",
+              top: -20,
+              right: 0,
+              zIndex: 1,
+              display: "flex",
+              gap: 0.5,
             }}
           >
-            <SubscriptionItem today={today} item={item} handleOrderClick={handleOrderClick} />
+            <IconButton onClick={() => scrollBy(-260)} size="small">
+              <ArrowBackIosNewIcon fontSize="small" />
+            </IconButton>
+            <IconButton onClick={() => scrollBy(260)} size="small">
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
           </Box>
-        ))}
-      </Box>
+
+          {/* 실제 캐러셀 영역 */}
+          <Box
+            ref={scrollRef}
+            sx={{
+              display: "flex",
+              gap: isAppLike ? 0 : 2,    
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              py: 2,
+              pr: isAppLike ? 0 : 8,   
+              "&::-webkit-scrollbar": {
+                height: isAppLike ? 0 : 6,
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#ccc",
+                borderRadius: 8,
+              },
+            }}
+          >
+            {subscriptions.map((item) => (
+              <Box
+                key={item.purchaseId}
+                sx={{
+                  scrollSnapAlign: "start",
+                  flex: isAppLike ? "0 0 100%" : "0 0 auto",
+                  px: isAppLike ? 0 : 0,  
+                }}
+              >
+                <SubscriptionItem
+                  today={today}
+                  item={item}
+                  handleOrderClick={handleOrderClick}
+                />
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
 
       {/* 내 근처 카페 */}
-      <Box>
+      <Box style={{ px: "1rem" }}>
         <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>
+
+        <LocalCafeImgList list={nearbyCafes} />
 
         {locError && (
           <Typography color="error" sx={{ mb: 1 }}>
@@ -169,23 +350,11 @@ function CustomerHome() {
           </Typography>
         )}
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: isAppLike ? "1fr" : "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "10px",
-          }}
-        >
-          {nearbyCafes.map((store) => (
-            <LocalCafeCard store={store} key={store.id || store.storeId} />
-          ))}
-
-          {!locError && nearbyCafes.length === 0 && (
-            <Typography sx={{ color: "text.secondary" }}>
-              500m 안에 등록된 카페가 아직 없어요 ☕
-            </Typography>
-          )}
-        </Box>
+        {!locError && nearbyCafes.length === 0 && (
+          <Typography sx={{ color: "text.secondary" }}>
+            500m 안에 등록된 카페가 아직 없어요 ☕
+          </Typography>
+        )}
       </Box>
     </Box>
   );
