@@ -197,7 +197,7 @@ function Landing() {
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 6 }}>
-              {/* ✅ 로그인 여부에 따라 버튼 다르게 표시 */}
+              {/* 로그인 여부에 따라 버튼 다르게 표시 */}
               {!authUser ? (
                 <>
                   <Button
@@ -249,7 +249,7 @@ function Landing() {
                   onClick={handleGoHome}
                 >
                   {authUser.memberType === "GENERAL"
-                    ? "일반회원 홈으로"
+                    ? "회원 홈으로"
                     : "점주 홈으로"}
                 </Button>
               )}
