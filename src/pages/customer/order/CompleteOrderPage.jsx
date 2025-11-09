@@ -196,7 +196,7 @@ function CompleteOrderPage() {
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
-              <Typography color="text.secondary">카페명</Typography>
+              <Typography color="text.secondary" onClick={() => ""}>카페명</Typography>
               <Typography>{orderInfo.store.storeName}</Typography>
             </Box>
             <Box
