@@ -48,7 +48,7 @@ const links = [
   { to: '/store/manageMenu', label: '메뉴 관리', icon: <LocalCafe /> },
   {
     to: '/store/manageproduct',
-    label: '상품 관리',
+    label: '구독권 관리',
     icon: <CardGiftcard />,
   },
   {

@@ -26,6 +26,33 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
   const [formData, setFormData] = useState(subscription);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const formatDateTime = (isoString) => {
+    if (!isoString) return '아직 구매한 사람이 없음';
+
+    try {
+      // ISO 문자열을 Date 객체로
+      const date = new Date(isoString);
+
+      // 날짜 (년-월-일) 포맷 설정
+      const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      const datePart = new Intl.DateTimeFormat('ko-KR', dateOptions).format(
+        date
+      );
+
+      // 시간(오전/오후 시:분)
+      const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+      const timePart = new Intl.DateTimeFormat('ko-KR', timeOptions).format(
+        date
+      );
+
+      // 두 부분을 합쳐서
+      return `${datePart.replace(/\. /g, '-').replace(/\.$/, '')} ${timePart}`;
+    } catch (e) {
+      console.error('날짜 포맷 오류 :', e);
+      return isoString;
+    }
+  };
+
   useEffect(() => {
     if (subscription) {
       setFormData(subscription);
@@ -161,7 +188,11 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
               value={formData.subscriptionStatus || ''}
               onChange={handleChange}
               // 구독권 상태 변경이 허용되지 않은 경우 비활성화
-              disabled={!subscription.isUpdatable}
+              disabled={
+                (!subscription.updatable &&
+                  subscription.subscriptionStatus === 'ONSALE') ||
+                subscription.subscriptionStatus === 'SOLDOUT'
+              }
             >
               <MenuItem value="ONSALE">판매 중</MenuItem>
               <MenuItem value="SOLDOUT">품절</MenuItem>
@@ -170,8 +201,8 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
             {/* 비활성화된 경우 메시지 표시 */}
             {!subscription.updatable && (
               <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                아직 판매 중지/품절 처리가 불가능합니다. (허용일 :
-                {subscription.expiredAt} 이후)
+                아직 '판매 중지' 처리가 불가능합니다. (허용일 :
+                {formatDateTime(subscription.expiredAt)})
               </Typography>
             )}
           </FormControl>
@@ -191,7 +222,12 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting || // 저장 중이면 무조건 비활성화
+                (!subscription.updatable && // 수정 불가능하고
+                  subscription.subscriptionStatus === 'ONSALE') ||
+                subscription.subscriptionStatus === 'SOLDOUT' // 현재 상태가 ONSALE일 때만 비활성화 유지
+              } // 저장중 or 상태 변경 가능한지
               variant="contained"
               color="primary"
             >

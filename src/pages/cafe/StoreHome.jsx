@@ -9,8 +9,8 @@ import {
   DialogTitle,
   Grid,
   Typography,
-} from "@mui/material";
-import api, { TokenService } from "../../utils/api";
+} from '@mui/material';
+import api, { TokenService } from '../../utils/api';
 import React, { useEffect, useState } from 'react';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
@@ -42,17 +42,17 @@ const ConfirmDialog = ({ open, onClose, onConfirm, title, content }) => {
 
 const getOrderTypeLabel = (typeCode) => {
   switch (typeCode) {
-    case "IN":
-      return "매장 내 이용";
-    case "OUT":
-      return "테이크아웃";
+    case 'IN':
+      return '매장 내 이용';
+    case 'OUT':
+      return '테이크아웃';
     default:
-      return "정보 없음";
+      return '정보 없음';
   }
 };
 
 const getFormattedMenuList = (menuList) => {
-  if (!menuList || menuList.length === 0) return "메뉴 없음";
+  if (!menuList || menuList.length === 0) return '메뉴 없음';
 
   // 메뉴 이름과 수량을 조합하여 문자열 배열 생성: ['아메리카노 (2개)', '브라우니 (1개)']
   const formattedItems = menuList.map((menu) => {
@@ -60,7 +60,7 @@ const getFormattedMenuList = (menuList) => {
   });
 
   // 쉼표와 공백으로 연결
-  return formattedItems.join(", ");
+  return formattedItems.join(', ');
 };
 
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
@@ -74,8 +74,8 @@ function StoreHome() {
     open: false,
     orderId: null,
     nextStatus: null,
-    title: "",
-    content: "",
+    title: '',
+    content: '',
   });
 
   // 모달 상태 정의
@@ -100,7 +100,7 @@ function StoreHome() {
         // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
         if (!partnerStoreId || partnerStoreId <= 0) {
           console.log(
-            "⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:",
+            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
             partnerStoreId
           );
           return;
@@ -114,16 +114,16 @@ function StoreHome() {
         if (response.data && response.data.data) {
           setOrders(response.data.data);
           console.log(
-            "✅ GET 성공, 데이터 로드 완료:",
+            '✅ GET 성공, 데이터 로드 완료:',
             response.data.data.length,
-            "개"
+            '개'
           );
         } else {
           setOrders(response.data.data || []);
-          console.log("✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.");
+          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
         }
       } catch (error) {
-        console.error("오늘의 주문 목록 로딩 실패:", error);
+        console.error('오늘의 주문 목록 로딩 실패:', error);
       }
     };
     fetchOrders();
@@ -131,11 +131,7 @@ function StoreHome() {
 
   // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
   // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.
-  const handleModalOrderReject = async (
-    orderId,
-    nextStatus,
-    rejectedReasonText
-  ) => {
+  const handleModalOrderReject = async (orderId, rejectedReasonText) => {
     try {
       // nextStatus는 'REJECTED'
 
@@ -151,7 +147,7 @@ function StoreHome() {
             order.orderId === orderId
               ? {
                   ...order,
-                  orderStatus: "REJECTED",
+                  orderStatus: 'REJECTED',
                   rejectedReason: rejectedReasonText,
                 }
               : order
@@ -172,12 +168,35 @@ function StoreHome() {
     const actionDetails = getNextActionAndState(currentStatus);
     if (!actionDetails) return; // 버튼 없는 상태(픽업완료 RECEIVED, 거부 REJECTED)는 팝업 띄울 필요 없음
 
+    // 팝업 메시지
+    let newTitle = '';
+    let newContent = '';
+
+    switch (actionDetails.nextStatus) {
+      case 'INPROGRESS':
+        newTitle = '주문 접수 확인';
+        newContent = `주문번호 ${orderId}를 접수하시고, 제조를 시작하시겠습니까?`;
+        break;
+      case 'COMPLETED':
+        newTitle = '제조 완료 알림 확인';
+        newContent = `주문번호 ${orderId}의 제조가 완료되었습니다.`;
+        break;
+      case 'RECEIVED':
+        newTitle = '수령 완료 처리 확인';
+        newContent = `주문번호 ${orderId}을 고객에게 전달했습니다. 수령 완료 처리하고 주문을 마감하시겠습니까?`;
+        break;
+      default:
+        newTitle = actionDetails.title; // 기본값
+        newContent = `주문 번호 ${orderId}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`;
+        break;
+    }
+
     setConfirmState({
       open: true,
       orderId: orderId,
       nextStatus: actionDetails.nextStatus,
-      title: `주문 상태 변경 확인 (${actionDetails.label})`,
-      content: `주문 번호 ${orderId}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`,
+      title: newTitle,
+      content: newContent,
     });
   };
 
@@ -187,8 +206,8 @@ function StoreHome() {
       open: false,
       orderId: null,
       nextStatus: null,
-      title: "",
-      content: "",
+      title: '',
+      content: '',
     });
   };
 
@@ -232,27 +251,27 @@ function StoreHome() {
   // 현재 주문 상태를 기반으로 다음 수행 동작과 다음 상태를 결정하는 함수
   const getNextActionAndState = (currentStatus) => {
     switch (currentStatus) {
-      case "REQUEST":
+      case 'REQUEST':
         return {
-          label: "주문 접수하기",
-          nextStatus: "INPROGRESS", // 접수 후 -> 제조중으로
-          color: "#FF9800",
+          label: '주문 접수하기',
+          nextStatus: 'INPROGRESS', // 접수 후 -> 제조중으로
+          color: '#FF9800',
         };
 
-      case "INPROGRESS":
+      case 'INPROGRESS':
         return {
-          label: "제조 완료",
-          nextStatus: "COMPLETED", // 제조중 -> 제조 완료
-          color: "#1976D2",
+          label: '제조 완료',
+          nextStatus: 'COMPLETED', // 제조중 -> 제조 완료
+          color: '#1976D2',
         };
 
-      case "COMPLETED":
+      case 'COMPLETED':
         // 제조 완료 상태에는 고객이 오고, 고객의 주문 번호만 확인하고 건네준다.
         // 따라서 수령 완료 버튼을 표시하고 수령 완료로 처리하려면 점주만 '수령 완료 처리' 버튼을 누르게 정의
         return {
-          label: "수령 완료 처리",
-          nextStatus: "RECEIVED", // 제조 완료 -> 수령 완료
-          color: "#388E3C",
+          label: '수령 완료 처리',
+          nextStatus: 'RECEIVED', // 제조 완료 -> 수령 완료
+          color: '#388E3C',
         };
 
       default:
@@ -265,45 +284,45 @@ function StoreHome() {
     // 🔴 높은 우선순위 (급함)
     REQUEST: {
       // 접수중
-      header: "#FFC107", // 배경색 (밝게)
-      action: "#FF9800", // 버튼색 (주황 계열)
-      name: "접수중",
+      header: '#FFC107', // 배경색 (밝게)
+      action: '#FF9800', // 버튼색 (주황 계열)
+      name: '접수중',
       priority: 1, // 가장 앞
     },
     REJECTED: {
       // 주문 거부(점주가)
-      header: "#F44336", // 배경색 (경고/빨강)
-      action: "#D32F2F", // 버튼색 (빨강 계열)
-      name: "주문 거부",
+      header: '#F44336', // 배경색 (경고/빨강)
+      action: '#D32F2F', // 버튼색 (빨강 계열)
+      name: '주문 거부',
     },
     // 🟠 중간 우선순위 (진행 중)
     INPROGRESS: {
       // 제조중
-      header: "#2196F3", // 배경색 (파랑)
-      action: "#1976D2", // 버튼색 (진한 파랑)
-      name: "제조중",
+      header: '#2196F3', // 배경색 (파랑)
+      action: '#1976D2', // 버튼색 (진한 파랑)
+      name: '제조중',
       priority: 2,
     },
     // 🟢 낮은 우선순위 (픽업 대기)
     COMPLETED: {
       // 제조완료
-      header: "#4CAF50", // 배경색 (초록)
-      action: "#388E3C", // 버튼색 (진한 초록)
-      name: "제조 완료",
+      header: '#4CAF50', // 배경색 (초록)
+      action: '#388E3C', // 버튼색 (진한 초록)
+      name: '제조 완료',
       priority: 3,
     },
     // ⚫️ 매우 낮은 우선순위 (종료/처리 완료)
     RECEIVED: {
       // 수령완료
-      header: "#616161", // 배경색 (짙은 회색)
-      action: "#424242", // 버튼색 (아주 짙은 회색)
-      name: "수령 완료",
+      header: '#616161', // 배경색 (짙은 회색)
+      action: '#424242', // 버튼색 (아주 짙은 회색)
+      name: '수령 완료',
     },
     CANCELED: {
       // 주문 취소(고객이)
-      header: "#9E9E9E", // 배경색 (차분한 회색)
-      action: "#757575", // 버튼색 (중간 회색)
-      name: "주문 취소",
+      header: '#9E9E9E', // 배경색 (차분한 회색)
+      action: '#757575', // 버튼색 (중간 회색)
+      name: '주문 취소',
     },
   };
 
@@ -336,7 +355,7 @@ function StoreHome() {
       <Grid container spacing={2}>
         {sortedOrders.map((order) => {
           const statusInfo =
-            STATUS_COLORS[order.orderStatus] || STATUS_COLORS["CANCELED"];
+            STATUS_COLORS[order.orderStatus] || STATUS_COLORS['CANCELED'];
           console.log(order.orderStatus);
 
           // 현재 상태에 따른 액션 정보 가져오기
@@ -346,23 +365,23 @@ function StoreHome() {
           const formattedMenuString = getFormattedMenuList(order.menuList);
 
           if (
-            ["REQUEST", "INPROGRESS", "COMPLETED"].includes(order.orderStatus)
+            ['REQUEST', 'INPROGRESS', 'COMPLETED'].includes(order.orderStatus)
           ) {
             return (
               <Grid item xs={12} sm={6} md={4} key={order.orderId}>
-                <Card sx={{ height: "100%", boxShadow: 2 }}>
+                <Card sx={{ height: '100%', boxShadow: 2 }}>
                   <Box sx={{ p: 2 }}>
                     <Typography
                       variant="caption"
                       sx={{
                         bgcolor: statusInfo.header,
-                        color: "white",
-                        p: "2px 8px",
+                        color: 'white',
+                        p: '2px 8px',
                       }}
                     >
                       {statusInfo.name}
                     </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {/* 타입, 상세보기 버튼 */}
                       <Box sx={{ border: 1, padding: 1 }}>
                         {order.orderNumber}
@@ -370,7 +389,7 @@ function StoreHome() {
                       <Typography>
                         {getOrderTypeLabel(order.orderType)}
                       </Typography>
-                      <Box sx={{ mt: 1, textAlign: "right" }}>
+                      <Box sx={{ mt: 1, textAlign: 'right' }}>
                         {/* 상세보기 버튼 */}
                         <Button
                           onClick={() => handleModalOpen(order)}
@@ -396,7 +415,7 @@ function StoreHome() {
                       onClick={() =>
                         handleConfirmOpen(order.orderId, order.orderStatus)
                       }
-                      sx={{ bgcolor: statusInfo.action, color: "white" }}
+                      sx={{ bgcolor: statusInfo.action, color: 'white' }}
                     >
                       {actionDetails.label}
                     </Button>
