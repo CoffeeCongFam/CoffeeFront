@@ -24,23 +24,43 @@ function connectSSE(addNotification) {
   const url = `${BASE_URL}/api/common/connect`;
   const source = new EventSource(url, { withCredentials: true });
 
-  source.addEventListener("notification", (event) => {
+  // SSE 연결 성공 로그
+  source.onopen = () => {
+    console.log("✅ SSE connection opened");
+  };
+
+  // onmessage 와 addEventListner 이중으로 잡기 => onmessage를 메인으로 쓰고, addEventListener('notification')은 보조로
+
+  // 기본 message 이벤트 (event: 라벨 없는 경우)
+  source.onmessage = (event) => {
+    console.log("🌐 SSE default message:", event.data);
     try {
-      console.log("🔔 Custom Notification Event Received");
-      console.log(event.data);
       const newNotification = JSON.parse(event.data);
       addNotification(newNotification);
     } catch (e) {
-      console.log("FAILED TO PARSE SSE MESSAGE", e);
+      console.error("❌ Failed to parse SSE message", e);
+    }
+  };
+
+  // 커스텀 이벤트 (event: notification) 지원
+  source.addEventListener("notification", (event) => {
+    console.log("🔔 SSE [notification] event:", event.data);
+    try {
+      const newNotification = JSON.parse(event.data);
+      addNotification(newNotification);
+    } catch (e) {
+      console.error("❌ Failed to parse SSE notification", e);
     }
   });
 
+  // 에러 핸들링
   source.onerror = (error) => {
     console.error("SSE connection error:", error);
   };
 
   return source;
 }
+
 
 function App() {
   const { authUser, setUser, setPartnerStoreId } = useUserStore();

@@ -129,7 +129,7 @@ function CompletePurchasePage() {
           value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
         /> */}
         {/* <Row label="결제 주기" value={purchase.cycle} /> */}
-        <Row label="다음 결제 예정일" value={purchase.nextBillingDate} />
+        {/* <Row label="다음 결제 예정일" value={purchase.nextBillingDate} /> */}
 
         <Divider sx={{ my: 3 }} />
 

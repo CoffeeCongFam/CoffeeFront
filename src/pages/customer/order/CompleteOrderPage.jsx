@@ -248,7 +248,7 @@ function CompleteOrderPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
                 <Typography>{m.menuName}</Typography>
-                <Typography>{m.quantity} 잔</Typography>
+                <Typography>{m.quantity} 개</Typography>
               </Box>
             ))}
 

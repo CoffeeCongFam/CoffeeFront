@@ -632,7 +632,7 @@ function OrderHistory() {
                   }}
                 >
                   <Typography>{m.menuName}</Typography>
-                  <Typography>{m.quantity} 잔</Typography>
+                  <Typography>{m.quantity} 개</Typography>
                 </Box>
               ))}
 

@@ -4,12 +4,6 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import React from "react";
 import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
-function CafeInfo({ store }) {
-  const subTitleStyle = {
-    fontWeight: "bold",
-    fontSize: "18px",
-  };
-
   // 🔹 요일 매핑 테이블
   const dayMap = {
     MON: "월요일",
@@ -20,6 +14,21 @@ function CafeInfo({ store }) {
     SAT: "토요일",
     SUN: "일요일",
   };
+
+function formatTime(timeStr) {
+  if (!timeStr) return "";
+  // 혹시 "900"처럼 앞자리가 빠진 경우 4자리 맞추기
+  const padded = timeStr.toString().padStart(4, "0");
+  return `${padded.slice(0, 2)}:${padded.slice(2, 4)}`;
+}
+
+
+function CafeInfo({ store }) {
+  const subTitleStyle = {
+    fontWeight: "bold",
+    fontSize: "18px",
+  };
+
 
   return (
     <Box
@@ -100,7 +109,7 @@ function CafeInfo({ store }) {
                 <Typography style={{ fontSize: "15px" }}>
                   {day.isClosed === "Y"
                     ? "휴무일"
-                    : `${day.openTime} ~ ${day.closeTime}`}
+                    : `${formatTime(day.openTime)} ~ ${formatTime(day.closeTime)}`}
                 </Typography>
               </Box>
             ))
