@@ -5,6 +5,7 @@ import {
   Chip,
   IconButton,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
@@ -138,6 +139,9 @@ function CompleteOrderPage() {
       navigate(-1);
     }
   }
+  function handleGoHome(){
+    navigate("/me")
+  }
 
   return (
     <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
@@ -264,6 +268,35 @@ function CompleteOrderPage() {
                 }}
               />
             </Box>
+          </Box>
+          <Box
+            sx={{
+              mt: 4,
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 1.5,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/me/order")}
+              sx={{ minWidth: 180 }}
+            >
+              주문 내역 보기
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleGoHome}
+              sx={{
+                minWidth: 180,
+                bgcolor: "black",
+                "&:hover": { bgcolor: "#222" },
+              }}
+            >
+              홈으로 가기
+            </Button>
           </Box>
         </>
       ) : (
