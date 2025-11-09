@@ -135,7 +135,7 @@ function CompleteOrderPage() {
     if (orderInfo.orderStatus === "CANCELED") {
       navigate("/me");
     } else {
-      navigate("/me/order");
+      navigate(-1);
     }
   }
 
