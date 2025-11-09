@@ -81,7 +81,7 @@ import {
   getSendGift,
   getReceiveGift,
 } from "../../utils/gift";
-import { SubscriptionDetailCard } from "./Subscription";
+import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 import useUserStore from "../../stores/useUserStore";
 
 function MyGift() {
@@ -141,6 +141,7 @@ function MyGift() {
           usedAt,
           isRefunded,
           maxDailyUsage: it.maxDailyUsage ?? it.dailyRemainCount ?? 0,
+          paidAt: it.paidAt, // ✅ paidAt 필드 추가
           menuList: normalizeMenuList(it),
         };
       });
@@ -353,11 +354,13 @@ function MyGift() {
 
   // (pickSendGiftForRow, findReceivedForAllRow: 제거됨)
 
-  // 메뉴 리스트에서 실제 메뉴 이름만 추출
+  // 메뉴 리스트에서 실제 메뉴 이름만 추출 (menuList: [{ menuId, menuName }])
   const extractMenuNames = (menuList) => {
     if (!Array.isArray(menuList)) return [];
     return menuList
-      .map((m) => (typeof m === "string" ? m : m?.menuName))
+      .map((m) =>
+        m.menuName
+      )
       .filter(Boolean);
   };
 
@@ -460,6 +463,8 @@ function MyGift() {
                       refundedAt: item.refundedAt,
                       isRefunded: item.isRefunded,
                       purchaseId: item.purchaseId,
+                      paidAt: item.paidAt,
+                      giftMessage: item.giftMessage,
                     }}
                     purchaseId={item.purchaseId}
                     subscriptionType={item.subscriptionType}
@@ -550,6 +555,7 @@ function MyGift() {
                       usageStatus: item.usageStatus,
                       refundedAt: item.refundedAt,
                       isRefunded: item.isRefunded,
+                      giftMessage: item.giftMessage,
                       purchaseId: item.purchaseId,
                     }}
                     purchaseId={item.purchaseId}
@@ -562,30 +568,6 @@ function MyGift() {
                     refundedAt={item.refundedAt}
                     isRefunded={item.isRefunded}
                     hideCancel={item.usageStatus === "ACTIVE"}
-                    headerExtra={
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        {(() => {
-                          const color =
-                            item.usageStatus === "ACTIVE"
-                              ? "success"
-                              : item.usageStatus === "NOT_ACTIVATED"
-                              ? "default"
-                              : "warning";
-                          return (
-                            <Chip
-                              size="small"
-                              color={color}
-                              label={item.usageStatus}
-                            />
-                          );
-                        })()}
-                      </Stack>
-                    }
                     onRefundSuccess={(pid, refundedAtFromApi) => {
                       setReceivedGiftList((prev) =>
                         prev.map((g) =>
@@ -691,6 +673,8 @@ function MyGift() {
                             refundedAt: detail.refundedAt,
                             isRefunded: detail.isRefunded,
                             purchaseId: detail.purchaseId,
+                            paidAt: detail.paidAt, // ✅ paidAt 필드 추가
+                            giftMessage: detail.giftMessage,
                           }}
                           purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
                           subscriptionType={detail.subscriptionType}
@@ -778,6 +762,7 @@ function MyGift() {
                             refundedAt: detail.refundedAt,
                             isRefunded: detail.isRefunded,
                             purchaseId: detail.purchaseId,
+                            giftMessage: detail.giftMessage,
                           }}
                           purchaseId={item.purchaseId} // 목록에서 받은 purchaseId 사용
                           subscriptionType={detail.subscriptionType}
@@ -789,30 +774,6 @@ function MyGift() {
                           refundedAt={detail.refundedAt}
                           isRefunded={item.isRefunded} // detail 대신 list item의 isRefunded를 직접 사용
                           hideCancel={detail.usageStatus === "ACTIVE"}
-                          headerExtra={
-                            <Stack
-                              direction="row"
-                              spacing={1}
-                              alignItems="center"
-                              justifyContent="center"
-                            >
-                              {(() => {
-                                const color =
-                                  detail.usageStatus === "ACTIVE"
-                                    ? "success"
-                                    : detail.usageStatus === "NOT_ACTIVATED"
-                                    ? "default"
-                                    : "warning";
-                                return (
-                                  <Chip
-                                    size="small"
-                                    color={color}
-                                    label={detail.usageStatus}
-                                  />
-                                );
-                              })()}
-                            </Stack>
-                          }
                           onRefundSuccess={(pid, refundedAtFromApi) => {
                             // 모든 상태 업데이트를 giftList(원본 데이터) 기준으로 단일화
                             const updateItem = (g) => {

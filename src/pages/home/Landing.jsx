@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -19,6 +19,21 @@ function Landing() {
   const navigate = useNavigate();
   const [active, setActive] = useState("hero");
   const isMobile = useMediaQuery("(max-width:900px)");
+
+  useEffect(() => {
+    // 현재 페이지를 히스토리 스택에 추가하여 뒤로가기 시도를 감지합니다.
+    window.history.pushState(null, "", window.location.href);
+
+    const handlePopState = () => {
+      // 뒤로가기 시도가 감지되면 다시 현재 페이지의 히스토리를 추가하여
+      // 페이지 전환을 막습니다.
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const sections = ["hero", "customer", "store", "cta"];
   const containerRef = (React.useRef < HTMLDivElement) | (null > null);

@@ -352,7 +352,13 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                     variant="outlined"
                     color="inherit"
                     size="small"
-                    onClick={() => onRefund(purchaseId, item.rowKey)}
+                    onClick={() => {
+                      const confirmed = window.confirm(
+                        "정말 환불하시겠습니까? 환불 처리 후에는 되돌릴 수 없습니다."
+                      );
+                      if (!confirmed) return;
+                      onRefund(purchaseId, item.rowKey);
+                    }}
                   >
                     결제 취소
                   </Button>
@@ -380,7 +386,7 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
             </Stack>
 
             {/* 환불 가/부 표시 및 액션 */}
-            {!refundable && refundMessage && (
+            {!refundable && !isRefundedDisplay && refundMessage && (
               <Box sx={{ mt: 1 }}>
                 <Typography variant="caption" color="text.secondary">
                   <b>환불 불가 사유 :</b> {refundMessage}
