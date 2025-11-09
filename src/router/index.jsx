@@ -40,169 +40,174 @@ import ManageStoreInfo from "../pages/cafe/ManageStoreInfo";
 import CafeMyPage from "../pages/cafe/CafeMyPage";
 import Withdrawal from "../pages/customer/Withdrawal";
 import OrderHistory from "../pages/customer/order/OrderHistory";
+import KakaoRedirectProd from "../pages/home/KakaoRedirectProd";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <LandingPage />,
-      },
-      {
-        path: "withdrawal",
-        element: <Withdrawal />,
-      },
-      {
-        path: "signup",
-        element: <SignUp />,
-      },
-      {
-        path: "kakaoRedirect",
-        element: <KakaoRedirect />,
-      },
-      {
-        path: "customerSignUp",
-        element: <CustomerSignUp />,
-      },
-      {
-        path: "cafeSignUp",
-        element: <CafeSignUp />,
-      },
-      {
-        path: "MemberSignUp",
-        element: <MemberSignUp />,
-      },
-      // 일반 회원
-      {
-        path: "me",
-        element: (
-          // <RequireMemberType allow={["GENERAL"]}>
-          <CustomerLayout />
-          // </RequireMemberType>
-        ),
-        children: [
-          {
-            index: true,
-            element: <CustomerHome />,
-          },
-          {
-            path: "search",
-            element: <SearchPage />,
-          },
-          {
-            path: "order",
-            element: <OrderHistory />
-            // element: <OrderPage />,
-          },
-          {
-            path: "order/new",
-            element: <CreateOrderPage />,
-          },
-          {
-            path: "order/:orderId",
-            element: <CompleteOrderPage />,
-          },
-          {
-            path: "mypage",
-            element: <MyPage />,
-          },
-          {
-            path: "store/:storeId",
-            element: <StoreDetailPage />,
-          },
+	{
+		path: "/",
+		element: <App />,
+		errorElement: <ErrorPage />,
+		children: [
+			{
+				index: true,
+				element: <LandingPage />,
+			},
+			{
+				path: "withdrawal",
+				element: <Withdrawal />,
+			},
+			{
+				path: "signup",
+				element: <SignUp />,
+			},
+			{
+				path: "kakaoRedirect",
+				element: <KakaoRedirect />,
+			},
+			{
+				path: "customerSignUp",
+				element: <CustomerSignUp />,
+			},
+			{
+				path: "cafeSignUp",
+				element: <CafeSignUp />,
+			},
+			{
+				path: "memberSignUp",
+				element: <MemberSignUp />,
+			},
+			{
+				path: "auth/kakao/callback",
+				element: <KakaoRedirectProd />,
+			},
+			// 일반 회원
+			{
+				path: "me",
+				element: (
+					// <RequireMemberType allow={["GENERAL"]}>
+					<CustomerLayout />
+					// </RequireMemberType>
+				),
+				children: [
+					{
+						index: true,
+						element: <CustomerHome />,
+					},
+					{
+						path: "search",
+						element: <SearchPage />,
+					},
+					{
+						path: "order",
+						element: <OrderHistory />,
+						// element: <OrderPage />,
+					},
+					{
+						path: "order/new",
+						element: <CreateOrderPage />,
+					},
+					{
+						path: "order/:orderId",
+						element: <CompleteOrderPage />,
+					},
+					{
+						path: "mypage",
+						element: <MyPage />,
+					},
+					{
+						path: "store/:storeId",
+						element: <StoreDetailPage />,
+					},
 
-          // 구독권 구매
-          {
-            path: "subscriptions/:subId/purchase",
-            element: <PurchaseSubscriptionPage />,
-          },
-          //
-          {
-            path: "purchase/:purchaseId/complete",
-            element: <CompletePurchasePage />,
-          },
-          {
-            path: "subscriptions/:subId/gift",
-            element: <GiftSubscriptionPage />,
-          },
-          {
-            path: "subscription",
-            element: <Subscription />,
-          },
-          {
-            path: "gift",
-            element: <Gift />,
-          },
-          {
-            path: "mygift",
-            element: <MyGift />,
-          },
-          {
-            path: "paymentHistory",
-            element: <PaymentHistory />,
-          },
-          {
-            path: "subscription",
-            element: <Subscription />,
-          },
-          {
-            path: "gift",
-            element: <Gift />,
-          },
-          {
-            path: "mygift",
-            element: <MyGift />,
-          },
-        ],
-      },
+					// 구독권 구매
+					{
+						path: "subscriptions/:subId/purchase",
+						element: <PurchaseSubscriptionPage />,
+					},
+					//
+					{
+						path: "purchase/:purchaseId/complete",
+						element: <CompletePurchasePage />,
+					},
+					{
+						path: "subscriptions/:subId/gift",
+						element: <GiftSubscriptionPage />,
+					},
+					{
+						path: "subscription",
+						element: <Subscription />,
+					},
+					{
+						path: "gift",
+						element: <Gift />,
+					},
+					{
+						path: "mygift",
+						element: <MyGift />,
+					},
+					{
+						path: "paymentHistory",
+						element: <PaymentHistory />,
+					},
+					{
+						path: "subscription",
+						element: <Subscription />,
+					},
+					{
+						path: "gift",
+						element: <Gift />,
+					},
+					{
+						path: "mygift",
+						element: <MyGift />,
+					},
+				],
+			},
 
-      // 점주
-      {
-        path: "store",
-        element: <StoreLayout />,
-        children: [
-          {
-            index: true,
-            element: <StoreHome />,
-          },
-          {
-            path: "pastOrders",
-            element: <PastOrders />,
-          },
-          {
-            path: "cafeMyPage",
-            element: <CafeMyPage />,
-          },
-          {
-            path: "manageMenu",
-            element: <ManageMenu />,
-          },
-          {
-            path: "manageProduct",
-            element: <ManageProduct />,
-          },
-          {
-            path: "manageStoreInfo",
-            element: <ManageStoreInfo />,
-          },
-        ],
-      },
-      // 관리자
-      {
-        path: "admin",
-        element: <AdminLayout />,
-        children: [
-          {
-            index: true,
-            element: <AdminHome />,
-          },
-        ],
-      },
-    ],
-  },
+			// 점주
+			{
+				path: "store",
+				element: <StoreLayout />,
+				children: [
+					{
+						index: true,
+						element: <StoreHome />,
+					},
+					{
+						path: "pastOrders",
+						element: <PastOrders />,
+					},
+					{
+						path: "cafeMyPage",
+						element: <CafeMyPage />,
+					},
+					{
+						path: "manageMenu",
+						element: <ManageMenu />,
+					},
+					{
+						path: "manageProduct",
+						element: <ManageProduct />,
+					},
+					{
+						path: "manageStoreInfo",
+						element: <ManageStoreInfo />,
+					},
+				],
+			},
+			// 관리자
+			{
+				path: "admin",
+				element: <AdminLayout />,
+				children: [
+					{
+						index: true,
+						element: <AdminHome />,
+					},
+				],
+			},
+		],
+	},
 ]);
 
 export default router;
