@@ -33,8 +33,9 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
   return (
     <Card
       sx={{
-        width: isAppLike ? "100%" : "250px",
-        minWidth: "250px",
+        width: "100%",  
+        maxWidth: isAppLike ? "100%" : 250,    
+        minWidth: isAppLike ? "auto" : 250, 
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -122,16 +123,25 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             <Typography
               variant="subtitle1"
               fontWeight="700"
-              noWrap
+              noWrap={!isAppLike}   // 데스크탑에서만 한 줄로
               sx={{
                 flex: 1,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
                 cursor: "default",
+                ...(isAppLike
+                  ? {
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,        // 모바일: 최대 2줄까지
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }
+                  : {
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }),
               }}
             >
-              {item.store.storeName} {item.subName}
+              {item.store.storeName} - {item.subName}
             </Typography>
           </Tooltip>
         </Box>

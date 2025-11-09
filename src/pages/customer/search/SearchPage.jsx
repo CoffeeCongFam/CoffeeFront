@@ -20,6 +20,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
+import SearchOffRoundedIcon from '@mui/icons-material/SearchOffRounded';
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SearchCafeInput from "../../../components/customer/search/SearchCafeInput.jsx";
@@ -43,6 +45,7 @@ const Panel = styled(Paper)(({ theme }) => ({
   transform: "translate(-50%, 100%)",
   width: "100%",
   maxHeight: "80vh",
+  minHeight: "80vh",
   borderTopLeftRadius: 16,
   borderTopRightRadius: 16,
   boxShadow: "0 -4px 20px rgba(0,0,0,0.2)",
@@ -607,6 +610,18 @@ export default function SearchPage() {
                 flexDirection: "column",
               }}
             >
+              {
+                sortedCafes.length === 0 &&
+                <Box sx={{flex: 1, display: "flex", flexDirection: "column", gap: "0.7rem", px: 2, py: 3, bgcolor: "#f8f9fa", textAlign: "center"}}>
+                  <SearchOffRoundedIcon sx={{ fontSize: 40, mb: 1, opacity: 0.6 }} />
+                  <Typography color="text.secondary">
+                    조건에 맞는 카페가 없습니다.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    필터를 변경하거나 다른 지역을 검색해보세요 ☕
+                  </Typography>
+                </Box>
+              }
               {sortedCafes.map((cafe) => {
                 const distanceLabel = formatDistance(cafe.distanceKm);
 

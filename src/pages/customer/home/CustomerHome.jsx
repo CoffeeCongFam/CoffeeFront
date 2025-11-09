@@ -41,7 +41,7 @@ function CustomerHome() {
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));
-    // loadToday(); // 오늘 날짜
+    loadToday(); // 오늘 날짜
     loadOngoingOrders(); // 진행 중인 주문 조회
     loadSubscriptions(); // 보유 구독권 조회
 
@@ -62,10 +62,10 @@ function CustomerHome() {
     }
   }, []);
 
-  // function loadToday() {
-  //   const todayDate = new Date();
-  //   setToday(todayDate.toISOString().split("T")[0]);
-  // }
+  function loadToday() {
+    const todayDate = new Date();
+    setToday(todayDate.toISOString().split("T")[0]);
+  }
   const loadOngoingOrders = async () => {
     try {
       const list = await fetchTodayOrderList(); // 오늘 주문 불러오기 (혹은 전체 주문)
@@ -238,8 +238,8 @@ function CustomerHome() {
             {todayDate} 진행 중인 주문 {ongoingOrders.length}건
           </Typography>
 
-          {ongoingOrders.map((order) => (
-            <TodayOrderItem key={order.orderId} order={order} />
+          {ongoingOrders.map((order, idx) => (
+            <TodayOrderItem key={idx} order={order} />
           ))}
         </Box>
       )}
@@ -302,11 +302,11 @@ function CustomerHome() {
             ref={scrollRef}
             sx={{
               display: "flex",
-              gap: 2,
+              gap: isAppLike ? 0 : 2,    
               overflowX: "auto",
               scrollSnapType: "x mandatory",
               py: 2,
-              pr: 8,
+              pr: isAppLike ? 0 : 8,   
               "&::-webkit-scrollbar": {
                 height: isAppLike ? 0 : 6,
               },
@@ -321,8 +321,8 @@ function CustomerHome() {
                 key={item.purchaseId}
                 sx={{
                   scrollSnapAlign: "start",
-                  px: isAppLike ? "8%" : 0,
                   flex: isAppLike ? "0 0 100%" : "0 0 auto",
+                  px: isAppLike ? 0 : 0,  
                 }}
               >
                 <SubscriptionItem
