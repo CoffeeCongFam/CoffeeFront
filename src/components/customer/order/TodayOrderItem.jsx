@@ -22,7 +22,7 @@ function TodayOrderItem({ order }) {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "center", // 🔹 세로 중앙 정렬
+          alignItems: "center", // 세로 중앙 정렬
           padding: "16px",
           borderRadius: "12px",
           cursor: "pointer",

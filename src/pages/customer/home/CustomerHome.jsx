@@ -342,8 +342,11 @@ function CustomerHome() {
           내 근처 동네 카페
         </Typography>
 
-        <LocalCafeImgList list={nearbyCafes} />
-
+        {
+          nearbyCafes && nearbyCafes.length > 0 &&
+          <LocalCafeImgList list={nearbyCafes} />
+        }
+      
         {locError && (
           <Typography color="error" sx={{ mb: 1 }}>
             {locError}
@@ -351,9 +354,12 @@ function CustomerHome() {
         )}
 
         {!locError && nearbyCafes.length === 0 && (
-          <Typography sx={{ color: "text.secondary" }}>
-            500m 안에 등록된 카페가 아직 없어요 ☕
-          </Typography>
+          <Box sx={{ px: 1, py : 1.5}}>
+            <Typography sx={{ color: "text.secondary" }}>
+              500m 안에 등록된 카페가 아직 없어요 ☕
+            </Typography> 
+          </Box>
+       
         )}
       </Box>
     </Box>

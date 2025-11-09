@@ -612,7 +612,21 @@ export default function SearchPage() {
             >
               {
                 sortedCafes.length === 0 &&
-                <Box sx={{flex: 1, display: "flex", flexDirection: "column", gap: "0.7rem", px: 2, py: 3, bgcolor: "#f8f9fa", textAlign: "center"}}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    gap: "0.7rem",
+                    px: 2,
+                    pt : 6,
+                    pb: 3,
+                    // bgcolor: "#f8f9fa",
+                    textAlign: "center",
+                  }}
+                >
                   <SearchOffRoundedIcon sx={{ fontSize: 40, mb: 1, opacity: 0.6 }} />
                   <Typography color="text.secondary">
                     조건에 맞는 카페가 없습니다.
