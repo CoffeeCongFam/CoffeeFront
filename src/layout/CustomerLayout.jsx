@@ -404,7 +404,7 @@ export default function CustomerLayout() {
             width: "100%",
             minHeight: "calc(100vh - 64px)",
             mt: 8,
-            pb: 10,
+            pb: isAppLike ? 10 : 0,
             position: "relative", // ✅ 추가
           }}
         >

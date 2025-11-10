@@ -78,7 +78,7 @@ function ReviewItemCard({ review, handleDelete }) {
               flexWrap="wrap"
             >
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {storeLabel} {review.subscriptionName}
+                {storeLabel} 
               </Typography>
               {subscriptionName && (
                 <Chip label={subscriptionName} size="small" />

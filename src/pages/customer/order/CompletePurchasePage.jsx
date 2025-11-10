@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { fetchPurchaseInfo } from "../../../apis/customerApi";
-import { formatKoreanDateTime } from "../../../utils/dateUtil";
 import formatDate from "../../../utils/formatDate";
 
 function CompletePurchasePage() {
@@ -130,7 +129,7 @@ function CompletePurchasePage() {
           value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
         /> */}
         {/* <Row label="결제 주기" value={purchase.cycle} /> */}
-        <Row label="다음 결제 예정일" value={purchase.nextBillingDate} />
+        {/* <Row label="다음 결제 예정일" value={purchase.nextBillingDate} /> */}
 
         <Divider sx={{ my: 3 }} />
 

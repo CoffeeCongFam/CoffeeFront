@@ -25,6 +25,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ImageIcon from "@mui/icons-material/Image";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import CommonAlert from "../../common/CommonAlert";
 
 // 구독권 상세 정보 컴포넌트
 export const SubscriptionDetailCard = ({
@@ -51,6 +52,13 @@ export const SubscriptionDetailCard = ({
   const openGiftPopover = Boolean(giftAnchorEl);
   const handleOpenGiftPopover = (e) => setGiftAnchorEl(e.currentTarget);
   const handleCloseGiftPopover = () => setGiftAnchorEl(null);
+
+  // 경고창
+  const [alert, setAlert] = useState({
+      open: false,
+      message: "",
+      severity: "info",
+  });
 
   const {
     storeName,
@@ -292,7 +300,8 @@ export const SubscriptionDetailCard = ({
     const pid = purchaseId ?? subscriptionData?.purchaseId;
 
     if (!pid) {
-      window.alert("환불에 필요한 purchaseId가 없습니다.");
+      handleShowAlert("warning", "환불에 필요한 구매 id 가 없습니다.")
+      // window.alert("환불에 필요한 purchaseId가 없습니다.");
       return;
     }
 
@@ -309,15 +318,28 @@ export const SubscriptionDetailCard = ({
           );
         }
       } else {
-        window.alert(
-          res?.message || "환불처리에 실패했습니다. 다시 시도해주세요"
-        );
+        handleShowAlert("error", "환불처리에 실패했습니다. 다시 시도해주세요");
+        // window.alert(
+        //   res?.message || "환불처리에 실패했습니다. 다시 시도해주세요"
+        // );
       }
     } catch (e) {
-      window.alert(
-        e?.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요"
-      );
+      const message = e.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요"
+      handleShowAlert("error", message);
+
+      // window.alert(
+      //   e?.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요"
+      // );
     }
+  };
+
+  // 경고창
+   const handleShowAlert = (type, message) => {
+    setAlert({
+      open: true,
+      message: message,
+      severity: type,
+    });
   };
 
   return (
@@ -339,6 +361,12 @@ export const SubscriptionDetailCard = ({
         border: "1px solid #e5e8ef",
       }}
     >
+             <CommonAlert
+              open={alert.open}
+              onClose={() => setAlert({ ...alert, open: false })}
+              severity={alert.severity}
+              message={alert.message}
+            />
       <Box
         sx={{
           position: "relative",
@@ -987,5 +1015,6 @@ export const SubscriptionDetailCard = ({
         </Box>
       )}
     </Paper>
+    
   );
 };

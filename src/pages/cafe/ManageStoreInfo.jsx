@@ -377,10 +377,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
       setSuccessMessage("매장 정보가 성공적으로 수정되었습니다.");
       setIsEditingStoreInfo(false);
       setOriginalStoreInfo(storeInfo);
-
-      if (syncStoreInfo) {
-        await syncStoreInfo();
-      }
     } catch (err) {
       console.error("매장 정보 수정 실패 :", err);
       setError("정보 수정에 실패. 다시 시도해주세요");
@@ -476,10 +472,6 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
 
       setSuccessMessage("영업시간 및 휴무일 정보가 저장되었습니다.");
       setIsEditingHours(false);
-
-      if (syncStoreInfo) {
-        await syncStoreInfo();
-      }
     } catch (err) {
       console.error("영업시간 정보 저장 실패 :", err);
       setError("영업시간 저장에 실패했습니다. 다시 시도해주세요.");

@@ -11,14 +11,16 @@ import MyGiftPage from "./MyGift";
 import useUserStore from "../../stores/useUserStore";
 import OrderHistory from "./order/OrderHistory";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import Loading from '../../components/common/Loading';
 
 function MyPage() {
   let navigate = useNavigate();
 
   const { authUser, clearUser } = useUserStore();
-  // const userName = "커피콩빵"; // 하드코딩된 유저 이름
 
   const [activeMenu, setActiveMenu] = useState("구독권");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
@@ -33,12 +35,20 @@ function MyPage() {
     console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
 
-  const logout = () => {
-    // userStore 초기화
-    clearUser();
+  const logout = async () => {
+    setIsLoggingOut(true);
+    try{
+      // userStore 초기화
+      clearUser();
 
-    // 로그아웃 처리
-    handleLogout();
+      // 로그아웃 처리
+      // handleLogout();
+      await Promise.resolve(handleLogout());
+
+    } finally {
+      setIsLoggingOut(false);
+    }
+    
   };
 
   // Drawer에 표시할 컨텐츠를 렌더링하는 함수
@@ -79,6 +89,18 @@ function MyPage() {
       </Grid>
     ));
   };
+
+  if (isLoggingOut) {
+    return (
+      <Box sx={{ height: "100vh" }}>
+        <Loading
+          title="로그아웃 중입니다"
+          message={"잠시만 기다려주세요 ☕\n안전하게 로그아웃 처리 중이에요."}
+        />
+      </Box>
+    );
+  }
+
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
