@@ -17,6 +17,7 @@ const PUBLIC_PATHS = [
   "/cafeSignUp",
   "/MemberSignUp",
   "/withdrawal",
+  "/relanding",
 ];
 
 function connectSSE(addNotification) {

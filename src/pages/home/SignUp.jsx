@@ -51,7 +51,7 @@ function SignUp() {
     // role 예: 'CUSTOMER', 'OWNER' -> 백엔드랑 맞춰서 사용
     const encodedState = encodeURIComponent(role);
 
-    return `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code&state=${encodedState}`;
+    return `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code&state=${encodedState}&prompt=login`;
   };
 
   const handleKakaoLogin = () => {
