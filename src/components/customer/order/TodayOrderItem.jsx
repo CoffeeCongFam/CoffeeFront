@@ -8,7 +8,6 @@ import CardMedia from "@mui/material/CardMedia";
 import OrderStatusButton from "./OrderStatusButton";
 import { useNavigate } from "react-router-dom";
 import menuDummy from "../../../assets/menuDummy.jpg";
-import KeyboardDoubleArrowRightRoundedIcon from "@mui/icons-material/KeyboardDoubleArrowRightRounded";
 import { Box } from "@mui/material";
 
 function TodayOrderItem({ order, isAppLike }) {
@@ -17,110 +16,85 @@ function TodayOrderItem({ order, isAppLike }) {
 
   return (
     <Box>
-      {isAppLike ? (
-        <Card
-          key={order.orderId}
-          sx={{
-            borderRadius: "10rem",
+      <Card
+        key={order.orderId}
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center", // 세로 중앙 정렬
+          padding: "16px",
+          borderRadius: "12px",
+          cursor: "pointer",
+          backgroundColor:
+            order.orderStatus === "COMPLETED" ? "#e5e5e5a5" : "white",
+        }}
+        onClick={() => {
+          navigate(`/me/order/${order.orderId}`);
+        }}
+      >
+        <Box
+          style={{
             display: "flex",
             flexDirection: "row",
-            px: 2,
-            py: 2,
-          }}
-        >
-          <CardMedia
-            component="img"
-            style={{ borderRadius: "5rem" }}
-            sx={{
-              width: "3rem",
-              objectFit: "cover",
-            }}
-            image={order.storeImg || menuDummy}
-            alt={order.storeName}
-          />
-          <KeyboardDoubleArrowRightRoundedIcon />
-        </Card>
-      ) : (
-        <Card
-          key={order.orderId}
-          sx={{
-            display: "flex",
-            flexDirection: "row",
+            alignItems: "center",
             justifyContent: "space-between",
-            alignItems: "center", // 세로 중앙 정렬
-            padding: "16px",
-            borderRadius: "12px",
-            cursor: "pointer",
-            backgroundColor:
-              order.orderStatus === "COMPLETED" ? "#e5e5e5a5" : "white",
-          }}
-          onClick={() => {
-            navigate(`/me/order/${order.orderId}`);
+            gap: "12px",
+            width: "100%",
           }}
         >
           <Box
-            style={{
+            sx={{
               display: "flex",
               flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "12px",
-              width: "100%",
+              gap: "1rem",
             }}
           >
-            <Box
+            <CardMedia
+              component="img"
+              style={{ borderRadius: "8px" }}
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1rem",
+                width: isAppLike ? 70 : 100,
+                height: 70,
+                objectFit: "cover",
               }}
-            >
-              <CardMedia
-                component="img"
-                style={{ borderRadius: "8px" }}
-                sx={{
-                  width: isAppLike ? 70 : 100,
-                  height: 70,
-                  objectFit: "cover",
-                }}
-                image={order.storeImg || menuDummy}
-                alt={order.storeName}
-              />
-              <Box
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {order.storeName} - {order.subscriptionName} 구독권
-                </Typography>
-                {order.menuList.map((menu) => (
-                  <Typography variant="body2" color="text.secondary">
-                    {menu.menuName} x {menu.quantity}
-                  </Typography>
-                ))}
-              </Box>
-            </Box>
-            {/* 오른쪽: 상태 버튼 */}
+              image={order.storeImg || menuDummy}
+              alt={order.storeName}
+            />
             <Box
-              sx={{
-                textAlign: "right",
+              style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "1rem",
+                justifyContent: "center",
               }}
             >
-              <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
-              <Typography variant="body2" color="text.secondary">
-                {/* {order.createdAt.split("T")[0]}{" "} */}
-                {order.createdAt.split("T")[1].split(".")[0]}
+              <Typography variant="subtitle1" fontWeight="bold">
+                {order.storeName} - {order.subscriptionName} 구독권
               </Typography>
+              {order.menuList.map((menu) => (
+                <Typography variant="body2" color="text.secondary">
+                  {menu.menuName} x {menu.quantity}
+                </Typography>
+              ))}
             </Box>
           </Box>
-        </Card>
-      )}
+          {/* 오른쪽: 상태 버튼 */}
+          <Box
+            sx={{
+              textAlign: "right",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
+            <Typography variant="body2" color="text.secondary">
+              {/* {order.createdAt.split("T")[0]}{" "} */}
+              {order.createdAt.split("T")[1].split(".")[0]}
+            </Typography>
+          </Box>
+        </Box>
+      </Card>
     </Box>
   );
 }

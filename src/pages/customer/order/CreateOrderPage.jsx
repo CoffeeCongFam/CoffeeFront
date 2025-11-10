@@ -542,7 +542,7 @@ function CreateOrderPage() {
                   sx={{
                     display: "grid",
                     gridTemplateColumns: {
-                      // xs: "repeat(1, minmax(0, 1fr))",
+                      xs: "repeat(3, minmax(0, 1fr))",
                       md: "repeat(3, minmax(0, 1fr))",
                     },
                     gap: 2,
@@ -563,7 +563,7 @@ function CreateOrderPage() {
                           boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                           p: 2,
                           display: "flex",
-                          flexDirection: isAppLike ? "row" : "column",
+                          flexDirection: "column",
                           alignItems: "stretch",
                           height: "100%",
                         }}
@@ -656,10 +656,9 @@ function CreateOrderPage() {
                               startIcon={<AddIcon />}
                               onClick={() => handleAddToCart(menu.menuId)}
                               sx={{
-                                width: isAppLike ? "" : "",
                                 borderRadius: 999,
                                 textTransform: "none",
-                                fontSize: isAppLike ? "0.5rem" : "0.8rem",
+                                fontSize: "0.8rem",
                               }}
                             >
                               담기
