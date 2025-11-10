@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -19,7 +20,7 @@ const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
-function StoreForm() {
+function StoreForm({ onSuccess }) {
 
   // 상태 관리
   const [formState, setFormState] = useState({
@@ -294,10 +295,16 @@ function StoreForm() {
         data.append("file", formState.storeImage);
       }
       const result = await postCafe(data);
-       if (result) {
+      if (result) {
         alert("매장 등록 완료!");
-        // 부모로 성공 이벤트 전달
-        window.location.reload();
+        // ✅ 컨텍스트별로 후처리 분기:
+        // - CafeSignUp에서 사용 시: /store로 이동 (onSuccess 전달)
+        // - CafeMyPage에서 사용 시: 기본 동작으로 새로고침
+        if (typeof onSuccess === "function") {
+          onSuccess();
+        } else {
+          window.location.reload();
+        }
       } else {
         alert("매장 등록 실패!");
       }
@@ -689,6 +696,12 @@ function StoreForm() {
 }
 
 function CafeSignUp() {
+  const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    navigate("/store");
+  };
+
   return (
     <div
       style={{
@@ -716,7 +729,7 @@ function CafeSignUp() {
           backgroundColor: "#fff",
         }}
       >
-        <StoreForm />
+        <StoreForm onSuccess={handleSuccess} />
       </div>
     </div>
   );
