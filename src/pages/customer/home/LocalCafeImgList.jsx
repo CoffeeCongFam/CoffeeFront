@@ -5,7 +5,7 @@ import ImageListItemBar from "@mui/material/ImageListItemBar";
 import IconButton from "@mui/material/IconButton";
 import LocationOnIcon from "@mui/icons-material/LocationOn"; // ✅ LocationPinIcon 대신 권장
 import { Box } from "@mui/material";
-import menuDummy from "../../../assets/menuDummy.jpg";
+// import menuDummy from "../../../assets/menuDummy.jpg";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 
@@ -29,7 +29,9 @@ export default function LocalCafeImgList({ list = [] }) {
           >
             {/* 썸네일 이미지 */}
             <img
-              src={menuDummy}
+              src={
+                item.storeImg || `https://picsum.photos/400/300?random=${index}`
+              }
               alt={item.storeName}
               loading="lazy"
               style={{
