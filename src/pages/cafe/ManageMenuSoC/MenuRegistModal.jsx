@@ -206,6 +206,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.menuName}
               helperText={errors.menuName}
+              required
             />
           </Grid>
 
@@ -222,6 +223,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.price}
               helperText={errors.price}
+              required
             />
           </Grid>
 
@@ -257,6 +259,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.menuDesc}
               helperText={errors.menuDesc}
+              required
             />
           </Grid>
 
