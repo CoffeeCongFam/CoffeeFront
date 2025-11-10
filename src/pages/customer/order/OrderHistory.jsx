@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
-import orderHistoryList from "../../../data/customer/orderHistoryList";
+// import orderHistoryList from "../../../data/customer/orderHistoryList";
 import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
 import { fetchOrderDetail } from "../../../apis/customerApi";
 
@@ -68,7 +68,6 @@ function formatKoreanDateTime(dateStr) {
 // /api/customer/orders?period=1Y -> 1년
 // /api/customer/orders?period=CUSTOM&startDate=2025-11-06&endDate=2025-11-07 -> 기간설정
 
-
 // 주문 상태 필터링용
 const STATUS_OPTIONS = [
   { value: "ALL", label: "전체" },
@@ -78,7 +77,6 @@ const STATUS_OPTIONS = [
   { value: "CANCELED", label: "주문 취소" },
   { value: "REJECTED", label: "매장 취소" },
 ];
-
 
 async function fetchOrderHistoryApi({
   period,
@@ -109,10 +107,7 @@ function OrderHistory() {
   const { isAppLike } = useAppShellMode();
 
   // 오늘 날짜
-  const todayStr = useMemo(
-    () => new Date().toISOString().slice(0, 10),
-    []
-  );
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const [period, setPeriod] = useState("1M");
   const [startDate, setStartDate] = useState("");
@@ -126,7 +121,7 @@ function OrderHistory() {
   const [isMoreLoading, setIsMoreLoading] = useState(false);
 
   const [sortOrder, setSortOrder] = useState("DESC"); // 정렬
-  const [statusFilter, setStatusFilter] = useState("ALL");  // 주문 상태 필터링
+  const [statusFilter, setStatusFilter] = useState("ALL"); // 주문 상태 필터링
 
   // 모달 상태
   const [detailOpen, setDetailOpen] = useState(false);
@@ -161,7 +156,6 @@ function OrderHistory() {
     });
     return copy;
   }, [orders, sortOrder, statusFilter]);
-
 
   // 1개월 / 1년 선택 시 자동 조회 + 날짜 자동 세팅
   useEffect(() => {
@@ -208,7 +202,6 @@ function OrderHistory() {
       setHasNext(!!hasNext);
     } catch (err) {
       console.log(err);
-      setOrders(orderHistoryList);
       setNextCursor(null);
       setHasNext(false);
     } finally {
@@ -397,7 +390,8 @@ function OrderHistory() {
         >
           <Typography variant="body2" color="text.secondary">
             전체 {orders.length}건
-            {statusFilter !== "ALL" && ` · 필터된 ${filteredAndSortedOrders.length}건`}
+            {statusFilter !== "ALL" &&
+              ` · 필터된 ${filteredAndSortedOrders.length}건`}
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -443,7 +437,7 @@ function OrderHistory() {
           >
             <CircularProgress />
           </Box>
-        ) : orders.length === 0 ? (
+        ) : filteredAndSortedOrders.length === 0 ? (
           <Box
             sx={{
               bgcolor: "#f5f5f5",

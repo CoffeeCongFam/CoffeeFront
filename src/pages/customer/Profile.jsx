@@ -51,7 +51,6 @@ function Profile() {
     }));
   }, [authUser]);
 
-  
   const [isWithdrawCompleted, setIsWithdrawCompleted] = useState(false);
 
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -110,7 +109,6 @@ function Profile() {
     }
   };
 
-
   if (isWithdrawCompleted) {
     return (
       <Box
@@ -167,7 +165,7 @@ function Profile() {
               <br />
               언젠가 다시, 당신의 하루를 깨우는 커피 한 잔이 필요해질 때
               <br />
-              COFFEIENS가 여기에서 기다리고 있을게요.
+              COFFIENS 여기에서 기다리고 있을게요.
             </Typography>
 
             <Button
@@ -220,7 +218,13 @@ function Profile() {
             gap: 2,
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               {user.name}
             </Typography>
@@ -311,7 +315,7 @@ function Profile() {
                 </ListItemIcon>
                 <ListItemText
                   primary="성별"
-                  secondary={user.gender === 'M' ? "남자" : "여자"}
+                  secondary={user.gender === "M" ? "남자" : "여자"}
                   primaryTypographyProps={{
                     variant: "caption",
                     color: "text.secondary",
@@ -339,7 +343,7 @@ function Profile() {
                   secondary={user.email}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary"
+                    color: "text.secondary",
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -442,8 +446,8 @@ function Profile() {
                   정말 떠나시겠어요?
                 </Typography>
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게 만들었던 
-                    그 커피 구독 혜택을 다시 한번 생각해 주세요
+                  사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게
+                  만들었던 그 커피 구독 혜택을 다시 한번 생각해 주세요
                 </Typography>
               </>
             )}
@@ -456,11 +460,11 @@ function Profile() {
                   variant="body2"
                   sx={{ color: "text.secondary", mb: 2 }}
                 >
-                  탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두
-                  삭제되며 복구가 불가능합니다.
+                  탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두 삭제되며
+                  복구가 불가능합니다.
                   <br />
-                  특히 자주 가는 동네 카페의 구독권 혜택을 더 이상
-                  이용하실 수 없습니다.
+                  특히 자주 가는 동네 카페의 구독권 혜택을 더 이상 이용하실 수
+                  없습니다.
                 </Typography>
                 <Typography
                   variant="body2"
@@ -520,10 +524,7 @@ function Profile() {
             </Box>
 
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                onClick={handlePrevStep}
-                disabled={withdrawStep === 1}
-              >
+              <Button onClick={handlePrevStep} disabled={withdrawStep === 1}>
                 이전
               </Button>
               {withdrawStep < 2 ? (

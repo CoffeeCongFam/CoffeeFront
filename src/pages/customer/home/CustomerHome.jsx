@@ -29,6 +29,7 @@ function CustomerHome() {
 
   const { isAppLike } = useAppShellMode();
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnboarding, setIsOnboarding] = useState(false); // 온보딩
 
   const [todayDate, setTodayDate] = useState(null);
   const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
@@ -37,7 +38,9 @@ function CustomerHome() {
   const [nearbyCafes, setNearbyCafes] = useState([]);
   const [locError, setLocError] = useState("");
 
+  // ref
   const scrollRef = useRef(null);
+  const subscriptionRef = useRef(null);
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));
@@ -73,7 +76,9 @@ function CustomerHome() {
         (o) => !["RECEIVED", "CANCELED", "COMPLETED"].includes(o.orderStatus)
         // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
       );
-      setOngoingOrders(filtered);
+      setOngoingOrders(
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      );
     } catch (e) {
       console.error(e);
     }
@@ -227,6 +232,66 @@ function CustomerHome() {
         <Box
           sx={{
             width: "100%",
+            mb: 6,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "#fff7e6",
+            border: "1px solid #ffe0b2",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.7rem",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1 }}>
+            {todayDate} {isAppLike && <br />} 진행 중인 주문{" "}
+            {ongoingOrders.length}건
+          </Typography>
+
+          {isAppLike ? (
+            // ✅ 모바일: 가로 캐러셀
+            <Box
+              sx={{
+                display: "flex",
+                overflowX: "auto",
+                gap: 2,
+                py: 1,
+                scrollSnapType: "x mandatory",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
+              {ongoingOrders.map((order, idx) => (
+                <Box
+                  key={order.orderId ?? idx}
+                  sx={{
+                    flex: "0 0 100%", // 한 화면에 한 장씩 꽉 차게
+                    scrollSnapAlign: "start",
+                  }}
+                >
+                  <TodayOrderItem order={order} isAppLike={isAppLike} />
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            // 💻 데스크탑: 기존 세로 리스트
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {ongoingOrders.map((order, idx) => (
+                <TodayOrderItem
+                  key={order.orderId ?? idx}
+                  order={order}
+                  isAppLike={isAppLike}
+                />
+              ))}
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* {ongoingOrders.length > 0 && (
+        <Box
+          sx={{
+            width: "100%",
             mb: 4,
             p: 2,
             borderRadius: 2,
@@ -246,8 +311,9 @@ function CustomerHome() {
             <TodayOrderItem key={idx} order={order} isAppLike={isAppLike} />
           ))}
         </Box>
-      )}
+      )} */}
 
+      {/* 보유 구독권 목록 */}
       {subscriptions.length <= 0 && (
         <Box
           sx={{
@@ -261,6 +327,10 @@ function CustomerHome() {
             flexDirection: isAppLike ? "column" : "row",
             alignItems: "center",
           }}
+          ref={subscriptionRef}
+          data-step="2" // 툴팁 순서
+          data-intro="이곳에서 사용 가능한 **구독권 잔여 횟수**를 확인하고 바로 주문할 수 있어요." // 툴팁 내용
+          data-position="bottom" // 툴팁 위치
         >
           <Typography>
             보유 구독권이 없습니다. 구독권을 구매해주세요!
@@ -320,8 +390,9 @@ function CustomerHome() {
               },
             }}
           >
-            {subscriptions.map((item) => (
+            {subscriptions.map((item, index) => (
               <Box
+                ref={index === 0 ? subscriptionRef : null}
                 key={item.purchaseId}
                 sx={{
                   scrollSnapAlign: "start",
@@ -341,7 +412,12 @@ function CustomerHome() {
       )}
 
       {/* 내 근처 카페 */}
-      <Box style={{ px: "1rem" }}>
+      <Box
+        sx={{ px: "1rem" }}
+        data-step="4"
+        data-intro="GPS 정보를 기반으로 **500m 내에 있는 근처 카페**들을 보여드려요. 새로운 단골 매장을 찾아보세요!"
+        data-position="top"
+      >
         <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>

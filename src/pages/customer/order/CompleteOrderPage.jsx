@@ -215,10 +215,14 @@ function CompleteOrderPage() {
             </Typography> */}
 
             <Box sx={{ textAlign: "center", pb: 1 }}>
-              {(orderInfo.orderStatus === "REJECTED" ||
-                orderInfo.orderStatus === "CANCELED") && (
-                <Typography variant="subtitle2" gutterBottom>
-                  취소된 주문입니다.
+              {orderInfo.orderStatus === "REJECTED" && (
+                <Typography color="warning" gutterBottom>
+                  매장에 의해 취소된 주문입니다.
+                </Typography>
+              )}
+              {orderInfo.orderStatus === "CANCELED" && (
+                <Typography variant="subtitle2" color="warning" gutterBottom>
+                  취소한 주문입니다.
                 </Typography>
               )}
             </Box>

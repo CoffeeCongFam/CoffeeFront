@@ -66,6 +66,7 @@ export default function CustomerLayout() {
     removeNotification,
   } = useNotificationStore();
   const { isAppLike } = useAppShellMode(); // 모바일 여부
+
   const [bottomValue, setBottomValue] = useState(location.pathname);
 
   const [notifOpen, setNotifOpen] = useState(false); // 알림 토글
@@ -178,7 +179,7 @@ export default function CustomerLayout() {
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/me")}
             >
-              COFFEIENS
+              COFFIENS
             </Typography>
             <IconButton
               color="inherit"

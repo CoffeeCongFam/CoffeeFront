@@ -30,6 +30,9 @@ function CompletePurchasePage() {
 
   if (!purchase) return null;
 
+  const fmtPrice = (n) =>
+    typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -140,7 +143,7 @@ function CompletePurchasePage() {
 
         <Row label="승인 일시" value={formatDate(purchase.paidAt)} />
         <Row label="승인 번호" value={purchase.merchantUid} />
-        <Row label="결제 금액" value={purchase.paymentAmount} />
+        <Row label="결제 금액" value={fmtPrice(purchase.paymentAmount)} />
         <Row label="결제 수단" value={purchase.purchaseType} />
       </Box>
 
