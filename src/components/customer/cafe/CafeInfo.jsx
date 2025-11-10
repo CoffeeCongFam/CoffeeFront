@@ -4,16 +4,16 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import React from "react";
 import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
-  // 🔹 요일 매핑 테이블
-  const dayMap = {
-    MON: "월요일",
-    TUE: "화요일",
-    WED: "수요일",
-    THU: "목요일",
-    FRI: "금요일",
-    SAT: "토요일",
-    SUN: "일요일",
-  };
+// 🔹 요일 매핑 테이블
+const dayMap = {
+  MON: "월요일",
+  TUE: "화요일",
+  WED: "수요일",
+  THU: "목요일",
+  FRI: "금요일",
+  SAT: "토요일",
+  SUN: "일요일",
+};
 
 function formatTime(timeStr) {
   if (!timeStr) return "";
@@ -22,13 +22,11 @@ function formatTime(timeStr) {
   return `${padded.slice(0, 2)}:${padded.slice(2, 4)}`;
 }
 
-
 function CafeInfo({ store }) {
   const subTitleStyle = {
     fontWeight: "bold",
     fontSize: "18px",
   };
-
 
   return (
     <Box
@@ -61,7 +59,7 @@ function CafeInfo({ store }) {
             sx={{ mr: 1, color: "text.secondary" }}
           />
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {store.roadAddress}  {store.detailAddress}
+            {store.roadAddress} {store.detailAddress}
           </Typography>
         </Box>
 
@@ -109,7 +107,8 @@ function CafeInfo({ store }) {
                 <Typography style={{ fontSize: "15px" }}>
                   {day.isClosed === "Y"
                     ? "휴무일"
-                    : `${formatTime(day.openTime)} ~ ${formatTime(day.closeTime)}`}
+                    : // : `${formatTime(day.openTime)} ~ ${formatTime(day.closeTime)}`}
+                      `${day.openTime} ~ ${day.closeTime}`}
                 </Typography>
               </Box>
             ))
