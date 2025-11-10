@@ -26,6 +26,8 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
   const [formData, setFormData] = useState(subscription);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isUpdatable, setIsUpdatable] = useState(true);
+
   const formatDateTime = (isoString) => {
     if (!isoString) return '아직 구매한 사람이 없음';
 
@@ -53,11 +55,52 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
     }
   };
 
+  // 구독권 상태 변경이 가능 한지 여부
   useEffect(() => {
     if (subscription) {
       setFormData(subscription);
+
+      // expired 기준으로 isUpdatable 계산
+      const checkUpdatable = () => {
+        // expired 값이 null이면, 언제든지 수정 가능 true
+        if (!subscription.expiredAt) {
+          return true;
+        }
+
+        const expiredDate = new Date(subscription.expiredAt);
+        const now = new Date();
+
+        // expiredAt이 유효한 날짜가 아니면, 기본적으로 false 처리하거나,
+        // 2. expiredAt이 유효한 날짜가 아니면 (파싱 오류 등) 기본적으로 false 처리하거나,
+        // 현재는 안전하게 true로 가정하고 넘어갑니다. (백엔드 데이터 신뢰 가정)
+        if (isNaN(expiredDate.getTime())) {
+          console.warn(
+            'ExpiredAt 날짜 형식이 유효하지 않습니다:',
+            subscription.expiredAt
+          );
+          return true; // 안전하게 true를 반환하거나 false로 설정할 수 있습니다.
+        }
+
+        // 3. expiredAt이 현재 시간보다 미래면 (아직 기간이 안 지남) 수정 불가능 (false)
+        // expiredDate > now : 미래
+        if (expiredDate.getTime() > now.getTime()) {
+          return false;
+        }
+
+        // 4. expiredAt이 현재 시간보다 과거 시간이면 수정 가능 (true)
+        // expiredDate <= now : 과거 또는 현재
+        return true;
+      };
+
+      const result = checkUpdatable();
+      setIsUpdatable(result);
+
+      // console.log('--- 현재 구독권 데이터 (디버깅) ---');
+      // console.log('expiredAt 값:', subscription.expiredAt);
+      // console.log('계산된 isUpdatable 값:', result); // ⬅️ 계산 결과 확인
+      // console.log('------------------------------------');
     }
-  }, [subscription]);
+  }, [subscription]); // subscription 객체가 바뀔 때마다 재계산
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -188,18 +231,14 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
               value={formData.subscriptionStatus || ''}
               onChange={handleChange}
               // 구독권 상태 변경이 허용되지 않은 경우 비활성화
-              disabled={
-                (!subscription.updatable &&
-                  subscription.subscriptionStatus === 'ONSALE') ||
-                subscription.subscriptionStatus === 'SOLDOUT'
-              }
+              disabled={!isUpdatable}
             >
               <MenuItem value="ONSALE">판매 중</MenuItem>
               <MenuItem value="SOLDOUT">품절</MenuItem>
               <MenuItem value="SUSPENDED">판매 중지</MenuItem>
             </Select>
             {/* 비활성화된 경우 메시지 표시 */}
-            {!subscription.updatable && (
+            {!isUpdatable && (
               <Typography variant="caption" color="error" sx={{ mt: 1 }}>
                 아직 '판매 중지' 처리가 불가능합니다. (허용일 :
                 {formatDateTime(subscription.expiredAt)})
@@ -224,9 +263,7 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
               onClick={handleSubmit}
               disabled={
                 isSubmitting || // 저장 중이면 무조건 비활성화
-                (!subscription.updatable && // 수정 불가능하고
-                  subscription.subscriptionStatus === 'ONSALE') ||
-                subscription.subscriptionStatus === 'SOLDOUT' // 현재 상태가 ONSALE일 때만 비활성화 유지
+                !isUpdatable
               } // 저장중 or 상태 변경 가능한지
               variant="contained"
               color="primary"
