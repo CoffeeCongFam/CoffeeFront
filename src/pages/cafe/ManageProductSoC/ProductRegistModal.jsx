@@ -270,7 +270,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
               </Select>
             </FormControl>
             <TextField
-              label="구독 기간 (일) *"
+              label="구독 기간 (일)"
               name="subscriptionPeriod"
               type="number"
               value={formData.subscriptionPeriod}
@@ -304,7 +304,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
 
           {/* 5. 가격 */}
           <TextField
-            label="가격 (원) *"
+            label="가격 (원)"
             name="price"
             type="number"
             value={formData.price}
@@ -343,7 +343,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
             </FormControl>
 
             <TextField
-              label="판매 가능 수량 *"
+              label="판매 가능 수량"
               name="salesLimitQuantity"
               type="number"
               value={formData.salesLimitQuantity}
@@ -357,7 +357,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
 
           {/* 8. 일일 최대 사용 횟수 */}
           <TextField
-            label="일일 최대 사용 횟수 *"
+            label="일일 최대 사용 횟수"
             name="maxDailyUsage"
             type="number"
             value={formData.maxDailyUsage}
