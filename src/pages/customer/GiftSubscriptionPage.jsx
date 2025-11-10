@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
   TextField,
+  Divider,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -14,6 +15,8 @@ import ForwardIcon from "@mui/icons-material/Forward";
 import ErrorIcon from "@mui/icons-material/Error";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SubscriptItem from "../../components/customer/purchase/SubscriptionItem";
@@ -27,19 +30,21 @@ import {
 import useUserStore from "../../stores/useUserStore";
 import axios from "axios";
 
+// ✅ 결제수단 로고 이미지 import
+import kakaopayImg from "../../assets/kakaopay.png";
+import tosspayImg from "../../assets/tosspay.png";
+import naverpayImg from "../../assets/naverpay.png";
+import paycoImg from "../../assets/payco.png";
+
 function formatPhoneInput(value) {
-  // 숫자만 추출
-  const digits = (value || "").replace(/\D/g, "").slice(0, 11); // 최대 11자리(010 포함)
+  const digits = (value || "").replace(/\D/g, "").slice(0, 11);
 
   if (digits.length < 4) return digits;
   if (digits.length < 8) {
-    // 3-그 나머지 (예: 010-1234)
     return `${digits.slice(0, 3)}-${digits.slice(3)}`;
   }
-  // 3-4-4 (예: 010-1234-5678)
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 }
-
 
 const personBoxSx = {
   display: "flex",
@@ -49,10 +54,8 @@ const personBoxSx = {
   borderRadius: "10px",
   px: 3,
   py: 2,
-  minHeight: 64, // 원하는 높이
+  minHeight: 64,
 };
-
-
 
 function GiftSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
@@ -69,6 +72,7 @@ function GiftSubscriptionPage() {
   const [searchOpen, setSearchOpen] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [giftMessage, setGiftMessage] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState(null);
 
   async function fetchSubData() {
     const subData = await fetchSubscriptionInfo(subId);
@@ -86,7 +90,6 @@ function GiftSubscriptionPage() {
   }
 
   async function confirmPayment(pg = "danal_tpay") {
-    // ✅ 받는 사람 유효성 검증 추가
     if (!receiver) {
       alert("받는 사람을 먼저 선택해 주세요.");
       setPayOpen(false);
@@ -148,7 +151,7 @@ function GiftSubscriptionPage() {
           } else {
             alert(`결제 실패: ${response.error_msg}`);
           }
-          setIsLoading(false); // ✅ 콜백 내부에서 로딩 해제
+          setIsLoading(false);
         }
       );
     } catch (error) {
@@ -165,15 +168,15 @@ function GiftSubscriptionPage() {
     console.log("검색할 전화번호(숫자만)", onlyNumber);
 
     console.log("검색할 전화번호", inputPhone);
-     if (myTelDigits && myTelDigits === onlyNumber) {
+    if (myTelDigits && myTelDigits === onlyNumber) {
       alert("자기 자신에게 선물을 보낼 수는 없어요.");
       return;
     }
     const payload = { tel: onlyNumber };
     const findMember = await findReceiver(payload);
     console.log(findMember);
-    if(findMember === null){
-      alert("존재하지 않는 회원입니다.")
+    if (findMember === null) {
+      alert("존재하지 않는 회원입니다.");
     }
     setReceiver(findMember);
   }
@@ -182,6 +185,57 @@ function GiftSubscriptionPage() {
     setReceiver(member);
     setSearchOpen(false);
   }
+
+  // ✅ 결제 수단 정보 (디자인 강화)
+  const paymentMethods = [
+    {
+      label: "신용/체크카드",
+      pg: "danal_tpay",
+      icon: <CreditCardIcon sx={{ fontSize: 28 }} />,
+      color: "#4A90E2",
+      bgColor: "#E8F4FF",
+    },
+    {
+      label: "휴대폰 결제",
+      pg: "danal_tpay",
+      icon: <PhoneAndroidIcon sx={{ fontSize: 28 }} />,
+      color: "#7B68EE",
+      bgColor: "#F0EDFF",
+    },
+    {
+      label: "카카오페이",
+      pg: "kakaopay",
+      icon: kakaopayImg,
+      color: "#FEE500",
+      bgColor: "#FFF9C4",
+      textColor: "#3C1E1E",
+      imgStyle: { width: 100, height: "auto" },
+    },
+    {
+      label: "토스페이",
+      pg: "tosspay",
+      icon: tosspayImg,
+      color: "#0064FF",
+      bgColor: "#F4F8FF",
+      imgStyle: { width: 120, height: "auto" },
+    },
+    {
+      label: "네이버페이",
+      pg: "naverco",
+      icon: naverpayImg,
+      color: "#03C75A",
+      bgColor: "#E8F9F0",
+      imgStyle: { width: 70, height: "auto" },
+    },
+    {
+      label: "페이코",
+      pg: "payco",
+      icon: paycoImg,
+      color: "#FF5046",
+      bgColor: "#FFEAE8",
+      imgStyle: { width: 200, height: "auto" },
+    },
+  ];
 
   return (
     <>
@@ -200,11 +254,11 @@ function GiftSubscriptionPage() {
             position: "relative",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center", // 제목을 중앙 기준으로 배치
+            justifyContent: "center",
             width: "100%",
             maxWidth: 900,
             mb: isAppLike ? 1 : 5,
-            height: 48, // 버튼 높이 확보
+            height: 48,
           }}
         >
           {/* 뒤로가기 버튼: 왼쪽 고정 */}
@@ -219,12 +273,13 @@ function GiftSubscriptionPage() {
           </IconButton>
 
           {/* 제목: 중앙 정렬 */}
-          <Typography variant="h6" sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}>
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
+          >
             선물하기
           </Typography>
         </Box>
-
-
 
         {/* 선택한 구독권 */}
         <Box
@@ -291,11 +346,11 @@ function GiftSubscriptionPage() {
               }}
             >
               <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
-               {receiver && (
+              {receiver && (
                 <Box
                   sx={{
                     ...personBoxSx,
-                    justifyContent: "space-between", // 오른쪽에 검색 버튼
+                    justifyContent: "space-between",
                   }}
                 >
                   <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
@@ -307,9 +362,9 @@ function GiftSubscriptionPage() {
                       setSearchOpen(true);
                       setReceiver(null);
                     }}
-                    sx={{ padding: 0}}
+                    sx={{ padding: 0 }}
                   >
-                    <SearchIcon/>
+                    <SearchIcon />
                   </IconButton>
                 </Box>
               )}
@@ -454,7 +509,7 @@ function GiftSubscriptionPage() {
         </Box>
       </Box>
 
-      {/* 결제 선택 패널 */}
+      {/* ✅ 결제수단 선택 패널 */}
       <Backdrop
         open={payOpen}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -470,73 +525,151 @@ function GiftSubscriptionPage() {
               right: 0,
               mx: "auto",
               maxWidth: 820,
-              bgcolor: "#5e5e5e",
+              bgcolor: "white",
               borderRadius: "24px 24px 0 0",
-              minHeight: 420,
+              boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
               px: 3,
-              pt: 3,
+              pt: 2,
+              pb: 4,
             }}
           >
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-              <IconButton onClick={() => setPayOpen(false)}>
-                <CloseIcon sx={{ color: "white" }} />
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                bgcolor: "#E0E0E0",
+                borderRadius: 2,
+                mx: "auto",
+                mb: 2,
+              }}
+            />
+
+            {/* 닫기 */}
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+              <IconButton
+                onClick={() => setPayOpen(false)}
+                size="small"
+                sx={{
+                  color: "#666",
+                  "&:hover": { bgcolor: "#f5f5f5" },
+                }}
+              >
+                <CloseIcon />
               </IconButton>
             </Box>
 
-            <Typography
-              variant="subtitle1"
-              sx={{ color: "white", fontWeight: 600, mb: 2 }}
-            >
-              결제 수단을 선택하세요
-            </Typography>
+            {/* 안내 */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                결제 수단 선택
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                안전하고 편리한 결제 수단을 선택하세요
+              </Typography>
+            </Box>
 
+            <Divider sx={{ mb: 3 }} />
+
+            {/* ✅ 결제 수단 그리드 */}
             <Box
               sx={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 2,
-                mb: 3,
+                gap: 1.5,
               }}
             >
-              {[
-                { label: "신용카드", pg: "danal_tpay" },
-                { label: "휴대폰결제", pg: "danal_tpay" },
-                { label: "카카오페이", pg: "kakaopay" },
-                { label: "스마일페이", pg: "smilepay" },
-                { label: "토스페이", pg: "tosspay" },
-                { label: "페이코", pg: "payco" },
-              ].map((method) => (
+              {paymentMethods.map((method) => (
                 <Box
                   key={method.label}
-                  onClick={() => confirmPayment(method.pg)}
+                  onClick={() => {
+                    setSelectedMethod(method.label);
+                    setTimeout(() => confirmPayment(method.pg), 200);
+                  }}
                   sx={{
-                    bgcolor: "#dcdcdc",
-                    border: "4px solid rgba(255,128,0,0.4)",
-                    borderRadius: 4,
-                    height: 100,
+                    bgcolor: method.bgColor,
+                    border: `2px solid ${
+                      selectedMethod === method.label
+                        ? method.color
+                        : "transparent"
+                    }`,
+                    borderRadius: 3,
+                    height: 110,
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: "#555",
+                    gap: 1,
                     cursor: "pointer",
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                      bgcolor: "#eaeaea",
-                      transform: "scale(1.03)",
-                      transition: "all 0.2s ease",
+                      boxShadow: `0 4px 12px ${method.color}40`,
+                      borderColor: method.color,
+                      transform: "translateY(-3px)",
                     },
                   }}
                 >
-                  {method.label}
+                  {/* 아이콘 */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: 40,
+                    }}
+                  >
+                    {React.isValidElement(method.icon) ? (
+                      method.icon
+                    ) : (
+                      <img
+                        src={method.icon}
+                        alt={method.label}
+                        style={{
+                          ...method.imgStyle,
+                          objectFit: "contain",
+                          filter:
+                            method.label === "토스페이"
+                              ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
+                              : "none",
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      color: method.textColor || "#333",
+                      fontSize: 13,
+                    }}
+                  >
+                    {method.label}
+                  </Typography>
                 </Box>
               ))}
+            </Box>
+
+            <Box
+              sx={{
+                bgcolor: "#F8F9FA",
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", lineHeight: 1.5 }}
+              >
+                🔒 모든 결제는 안전하게 암호화되어 처리됩니다
+              </Typography>
             </Box>
           </Box>
         </Fade>
       </Backdrop>
 
-      {/* 결제 로딩 화면 */}
+      {/* ✅ 결제 로딩 화면 */}
       <Backdrop
         open={isLoading}
         sx={{
