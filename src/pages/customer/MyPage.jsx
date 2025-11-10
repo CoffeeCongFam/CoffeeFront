@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Container, Box, Typography, Paper, Grid, Button, useMediaQuery, useTheme } from '@mui/material';
 import Profile from './Profile';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,9 @@ function MyPage() {
   const [activeMenu, setActiveMenu] = useState("구독권");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const tabContainerRef = useRef(null);
+  const tabRefs = useRef({});
+
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
   const finalMenus = [
@@ -37,6 +40,27 @@ function MyPage() {
   useEffect(() => {
     console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const container = tabContainerRef.current;
+    const activeEl = tabRefs.current[activeMenu];
+    if (!container || !activeEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeEl.getBoundingClientRect();
+
+    const offset =
+      activeRect.left -
+      containerRect.left -
+      containerRect.width / 2 +
+      activeRect.width / 2;
+
+    container.scrollTo({
+      left: container.scrollLeft + offset,
+      behavior: "smooth",
+    });
+  }, [activeMenu, isDesktop]);
 
   const logout = async () => {
     setIsLoggingOut(true);
@@ -70,6 +94,81 @@ function MyPage() {
       default:
         return null;
     }
+  };
+
+  // 상단 메뉴 바 렌더링 함수 (데스크탑 / 모바일 분리)
+  const renderMenuBar = () => {
+    // 데스크탑: 기존 Grid 기반 UI 유지
+    if (isDesktop) {
+      return (
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+          <Grid container spacing={1} justifyContent="flex-start">
+            {renderGridItems(finalMenus)}
+          </Grid>
+        </Paper>
+      );
+    }
+
+    // 모바일: 가로 스크롤 가능한 필 탭 스타일
+    return (
+      <Paper
+        elevation={0}
+        sx={{
+          px: 1,
+          py: 0.8,
+          borderRadius: 0,
+          bgcolor: "transparent",
+          borderBottom: "1px solid rgba(0,0,0,0.04)",
+        }}
+      >
+        <Box
+          ref={tabContainerRef}
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 0.75,
+            "::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          {finalMenus.map((menu) => {
+            const isActive = activeMenu === menu;
+            return (
+              <Button
+                key={menu}
+                ref={(el) => {
+                  if (el) tabRefs.current[menu] = el;
+                }}
+                onClick={() => setActiveMenu(menu)}
+                variant="text"
+                sx={{
+                  flexShrink: 0,
+                  borderRadius: 999,
+                  px: 1.6,
+                  py: 0.55,
+                  fontSize: "0.8rem",
+                  fontWeight: isActive ? 700 : 500,
+                  textTransform: "none",
+                  boxShadow: "none",
+                  border: isActive
+                    ? "1px solid rgba(0,0,0,0.08)"
+                    : "1px solid transparent",
+                  bgcolor: isActive ? "rgba(0,0,0,0.04)" : "transparent",
+                  color: isActive ? "text.primary" : "text.secondary",
+                  "&:hover": {
+                    bgcolor: isActive
+                      ? "rgba(0,0,0,0.06)"
+                      : "rgba(0,0,0,0.03)",
+                    boxShadow: "none",
+                  },
+                }}
+              >
+                {menu}
+              </Button>
+            );
+          })}
+        </Box>
+      </Paper>
+    );
   };
 
   // 최종 메뉴 배열을 Grid Item으로 변환하는 함수
@@ -180,11 +279,7 @@ function MyPage() {
         </Box>
       </Box>
       {/* 상단 메뉴 영역 */}
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Grid container spacing={1} justifyContent="flex-start">
-          {renderGridItems(finalMenus)}
-        </Grid>
-      </Paper>
+      {renderMenuBar()}
 
       {/* 선택된 메뉴 컨텐츠 영역 */}
       <Box sx={{ mt: 3 }}>{renderDrawerContent()}</Box>
