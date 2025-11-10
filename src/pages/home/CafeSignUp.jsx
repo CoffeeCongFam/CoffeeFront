@@ -21,7 +21,6 @@ const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
 function StoreForm({ onSuccess }) {
-
   // 상태 관리
   const [formState, setFormState] = useState({
     businessNumber: "", // 사업자번호
@@ -31,7 +30,7 @@ function StoreForm({ onSuccess }) {
     postcode: "", // 우편번호
     extraInfo: "", // 가게 상세정보
     storePhone: "", // 매장 번호
-    storeImage: null, // 매장 이미지
+    storeImg: null, // 매장 이미지
     xPoint: "", // X좌표(경도)
     yPoint: "", // Y좌표(위도)
     imagePreviewUrl: "",
@@ -243,12 +242,12 @@ function StoreForm({ onSuccess }) {
     if (!file) {
       setFormState((prev) => ({
         ...prev,
-        storeImage: null,
+        storeImg: null,
         imagePreviewUrl: "",
       }));
       return;
     }
-    setFormState((prev) => ({ ...prev, storeImage: file }));
+    setFormState((prev) => ({ ...prev, storeImg: file }));
 
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -259,7 +258,6 @@ function StoreForm({ onSuccess }) {
     };
     reader.readAsDataURL(file);
   };
-
 
   // 모든 필수 필드가 채워졌는지 확인하는 변수
   const isFormValid =
@@ -291,8 +289,8 @@ function StoreForm({ onSuccess }) {
       data.append("data", jsonBlob);
 
       // 이미지 파일 (선택한 경우에만)
-      if (formState.storeImage) {
-        data.append("file", formState.storeImage);
+      if (formState.storeImg) {
+        data.append("file", formState.storeImg);
       }
       const result = await postCafe(data);
       if (result) {
@@ -417,8 +415,7 @@ function StoreForm({ onSuccess }) {
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   textTransform: "none",
-                  backgroundImage:
-                    "linear-gradient(135deg, #111827, #4b5563)",
+                  backgroundImage: "linear-gradient(135deg, #111827, #4b5563)",
                   boxShadow: "0 6px 16px rgba(15,23,42,0.35)",
                   "&:disabled": {
                     backgroundImage: "none",
@@ -652,11 +649,7 @@ function StoreForm({ onSuccess }) {
 
           {/* 안내 메시지 */}
           {!formState.isBusinessVerified && (
-            <Typography
-              variant="caption"
-              color="error.main"
-              sx={{ mt: -0.5 }}
-            >
+            <Typography variant="caption" color="error.main" sx={{ mt: -0.5 }}>
               사업자 인증을 먼저 진행해주세요.
             </Typography>
           )}

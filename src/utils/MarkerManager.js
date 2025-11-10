@@ -58,7 +58,7 @@ export default class MarkerManager {
 
     // 카페 더미 데이터
     const thumbnailSrc =
-      cafe.storeImage && cafe.storeImage.trim() ? cafe.storeImage : cafeDummy;
+      cafe.storeImg && cafe.storeImg.trim() ? cafe.storeImg : cafeDummy;
     // "../assets/cafeInfoDummy.png"
 
     // const actionButton = cafe.isSubscribed

@@ -34,7 +34,7 @@ function LocalCafeCard({ store }) {
         }}
       >
         <img
-          src={store?.storeImage}
+          src={store?.storeImg}
           alt={store?.storeName}
           style={{
             width: "100%",

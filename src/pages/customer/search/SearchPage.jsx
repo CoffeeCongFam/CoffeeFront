@@ -457,7 +457,7 @@ export default function SearchPage() {
                   }}
                 >
                   <Avatar
-                    src={cafe.storeImage}
+                    src={cafe.storeImg}
                     alt={cafe.storeName}
                     sx={{ width: 40, height: 40 }}
                   />
@@ -653,7 +653,7 @@ export default function SearchPage() {
                       }}
                     >
                       <Avatar
-                        src={cafe.storeImage || storeDummy}
+                        src={cafe.storeImg || storeDummy}
                         alt={cafe.storeName}
                         sx={{ width: "100%", height: "100%", borderRadius: 2 }}
                         variant="rounded"
