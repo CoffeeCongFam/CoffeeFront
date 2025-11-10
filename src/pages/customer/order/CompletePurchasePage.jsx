@@ -139,8 +139,9 @@ function CompletePurchasePage() {
         </Typography>
 
         <Row label="승인 일시" value={formatDate(purchase.paidAt)} />
-        <Row label="승인 번호" value={purchase.purchaseId} />
-        <Row label="결제 수단" value={purchase.paymentStatus} />
+        <Row label="승인 번호" value={purchase.merchantUid} />
+        <Row label="결제 금액" value={purchase.paymentAmount} />
+        <Row label="결제 수단" value={purchase.purchaseType} />
       </Box>
 
       {/* 하단 확인 버튼 영역 */}
