@@ -54,7 +54,6 @@ function CafeReviewList({ storeName, storeId }) {
     message: "",
     severity: "info",
   });
-  
 
   useEffect(() => {
     getReviewList();
@@ -108,7 +107,10 @@ function CafeReviewList({ storeName, storeId }) {
       }
 
       setStoreSubscriptions(filteredSubs);
-      console.log(`카페 ${storeId}의 보유 구독권 목록 (작성 가능만) > `, filteredSubs);
+      console.log(
+        `카페 ${storeId}의 보유 구독권 목록 (작성 가능만) > `,
+        filteredSubs
+      );
 
       return filteredSubs;
     } catch (e) {
@@ -145,7 +147,10 @@ function CafeReviewList({ storeName, storeId }) {
    */
   function handleCreateReview() {
     if (storeSubscriptions.length === 0) {
-      handleShowAlert("error", "해당 카페에서 리뷰를 작성할 수 있는 구독권이 없습니다.")
+      handleShowAlert(
+        "error",
+        "해당 카페에서 리뷰를 작성할 수 있는 구독권이 없습니다."
+      );
       // alert("해당 카페에 대한 구매 내역이 없어 리뷰를 작성하실 수 없습니다.");
       return;
     }
@@ -170,24 +175,24 @@ function CafeReviewList({ storeName, storeId }) {
   const handleSubmit = async () => {
     if (!memberId) {
       // alert("로그인이 필요합니다.");
-      handleShowAlert("error", "로그인이 필요합니다.")
+      handleShowAlert("error", "로그인이 필요합니다.");
       return;
     }
     if (!selectedSub) {
       // alert("리뷰를 작성할 구독권을 선택해주세요.");
-      handleShowAlert("info", "리뷰를 작성할 구독권을 선택해주세요.")
+      handleShowAlert("info", "리뷰를 작성할 구독권을 선택해주세요.");
 
       return;
     }
     if (!content || content.trim().length === 0) {
-      handleShowAlert("info", "리뷰 내용을 작성해주세요.")
+      handleShowAlert("info", "리뷰 내용을 작성해주세요.");
 
       // alert("리뷰 내용을 작성해주세요.");
       return;
     }
     if (rating === 0) {
       // alert("별점을 선택해주세요.");
-      handleShowAlert("info", "평점을 입력해주세요.")
+      handleShowAlert("info", "평점을 입력해주세요.");
       return;
     }
 
@@ -206,7 +211,7 @@ function CafeReviewList({ storeName, storeId }) {
       await createReview(payload);
       await getReviewList();
       handleClose();
-      handleShowAlert("info", "리뷰 작성이 완료되었습니다.")
+      handleShowAlert("info", "리뷰 작성이 완료되었습니다.");
       // alert("리뷰 작성이 완료되었습니다.");
     } catch (e) {
       console.error("리뷰 작성 실패: ", e);
@@ -227,12 +232,15 @@ function CafeReviewList({ storeName, storeId }) {
 
     try {
       await deleteReview(reviewId);
-      handleShowAlert("success", "리뷰가 성공적으로 삭제되었습니다.")
+      handleShowAlert("success", "리뷰가 성공적으로 삭제되었습니다.");
       // alert("리뷰가 성공적으로 삭제되었습니다.");
       await getReviewList(); // 리뷰 목록 리로딩
     } catch (error) {
       console.error("리뷰 삭제 실패:", error);
-      handleShowAlert("error", "리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.")
+      handleShowAlert(
+        "error",
+        "리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
       // alert("리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   }
@@ -240,14 +248,13 @@ function CafeReviewList({ storeName, storeId }) {
   /*
     경고창
   */
- const handleShowAlert = (type, message) => {
+  const handleShowAlert = (type, message) => {
     setAlert({
       open: true,
       message: message,
       severity: type,
     });
   };
-
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -310,9 +317,13 @@ function CafeReviewList({ storeName, storeId }) {
           ))}
         </Box>
       ) : (
-        <Box sx={{ minHeight: "200px", 
-          // backgroundColor: "#f2f2f2", 
-        p: "1rem" }}>
+        <Box
+          sx={{
+            minHeight: "200px",
+            // backgroundColor: "#f2f2f2",
+            p: "1rem",
+          }}
+        >
           <Typography variant="body2" color="text.secondary">
             아직 등록된 리뷰가 없습니다.
           </Typography>
@@ -329,11 +340,19 @@ function CafeReviewList({ storeName, storeId }) {
           "& .MuiDialog-paper": {
             borderRadius: 3,
             px: 2,
-            py: 3
+            py: 3,
           },
         }}
       >
-        <DialogTitle sx={{ m: 0, p: 2 , textAlign: "center", fontSize: "1.5rem", fontWeight: "bold"}}>
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 2,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+          }}
+        >
           리뷰 작성하기
           <IconButton
             aria-label="close"
@@ -350,8 +369,19 @@ function CafeReviewList({ storeName, storeId }) {
         </DialogTitle>
 
         <DialogContent sx={{ pt: 1 }}>
-          <DialogContentText sx={{ mb: 2 , backgroundColor: "#f0f0f0ee", py: 2, px: 3, borderRadius: "0.5rem"}}>
-            <span><strong>{storeName}</strong></span>은 어떠셨나요? <br />
+          <DialogContentText
+            sx={{
+              mb: 2,
+              backgroundColor: "#f0f0f0ee",
+              py: 2,
+              px: 3,
+              borderRadius: "0.5rem",
+            }}
+          >
+            <span>
+              <strong>{storeName}</strong>
+            </span>
+            은 어떠셨나요? <br />
             리뷰를 작성할 구독권을 선택하고 평가를 남겨주세요.
           </DialogContentText>
 
@@ -378,7 +408,10 @@ function CafeReviewList({ storeName, storeId }) {
                   (review) => review.subscriptionId === selected.subId
                 );
                 if (isReviewed) {
-                  handleShowAlert("warning", "이미 리뷰를 작성한 구독권입니다.");
+                  handleShowAlert(
+                    "warning",
+                    "이미 리뷰를 작성한 구독권입니다."
+                  );
                   // alert("이미 리뷰를 작성한 구독권입니다.");
                   return;
                 }
@@ -409,7 +442,14 @@ function CafeReviewList({ storeName, storeId }) {
               사진 첨부 (선택)
             </Typography>
 
-            <Box sx={{ display: "flex", flexDirection:"row", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 2,
+              }}
+            >
               {/* 업로드 버튼 */}
               <Button
                 variant="outlined"
@@ -517,7 +557,6 @@ function CafeReviewList({ storeName, storeId }) {
         severity={alert.severity}
         message={alert.message}
       />
-
     </Box>
   );
 }
