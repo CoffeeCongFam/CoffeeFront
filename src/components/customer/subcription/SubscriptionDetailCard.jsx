@@ -21,6 +21,7 @@ import {
 import { postRefund } from "../../../utils/payments";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import HistoryIcon from "@mui/icons-material/History";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ImageIcon from "@mui/icons-material/Image";
@@ -39,6 +40,7 @@ export const SubscriptionDetailCard = ({
   purchaseId,
   hideCancel = false,
   headerExtra = null,
+  size = "default",
 }) => {
   const [selectedMenu, setSelectedMenu] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
@@ -60,6 +62,14 @@ export const SubscriptionDetailCard = ({
       severity: "info",
   });
 
+  // 모바일용 "제공 메뉴" 메시지 Popover
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const openMenuPopover = Boolean(menuAnchorEl);
+  const handleOpenMenuPopover = (e) => setMenuAnchorEl(e.currentTarget);
+  const handleCloseMenuPopover = () => setMenuAnchorEl(null);
+  // 모바일 상세 정보 확장 여부
+  const [isMobileDetailExpanded, setIsMobileDetailExpanded] = useState(false);
+  const isCompact = size === "compact";
   const {
     storeName,
     subscriptionType,
@@ -95,9 +105,9 @@ export const SubscriptionDetailCard = ({
 
   const formatDate = (d) => {
     if (!d) return "-";
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
     return `${y}.${m}.${day}`;
   };
 
@@ -263,7 +273,7 @@ export const SubscriptionDetailCard = ({
     dates.forEach((iso) => {
       const d = new Date(iso);
       if (isNaN(d)) return;
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(
         2,
         "0"
       )}`;
@@ -348,11 +358,11 @@ export const SubscriptionDetailCard = ({
       sx={{
         position: "relative",
         width: "100%",
-        maxWidth: 760,
+        maxWidth: { xs: 320, sm: 760 },
         margin: "auto",
-        padding: 2.5,
-        borderRadius: "18px",
-        height: 460,
+        p: { xs: 2, sm: 2.5 },
+        borderRadius: { xs: "16px", sm: "18px" },
+        height: { xs: 480, sm: 460 },
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
@@ -417,7 +427,8 @@ export const SubscriptionDetailCard = ({
               <Box
                 sx={{
                   display: "flex",
-                  gap: 2,
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 1.5, sm: 2 },
                   mt: 1,
                   minHeight: 0,
                 }}
@@ -425,13 +436,13 @@ export const SubscriptionDetailCard = ({
                 {/* LEFT STRIP: 이미지 + 타입 + 선물 정보 */}
                 <Box
                   sx={{
-                    flexBasis: "32%",
-                    maxWidth: "32%",
+                    flexBasis: { xs: "100%", sm: "32%" },
+                    maxWidth: { xs: "100%", sm: "32%" },
                     minWidth: 0,
                     borderRadius: 2,
                     bgcolor: "#111827",
                     color: "#f9fafb",
-                    p: 1.5,
+                    p: { xs: 1.25, sm: 1.5 },
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -444,11 +455,11 @@ export const SubscriptionDetailCard = ({
                       borderRadius: 2,
                       overflow: "hidden",
                       bgcolor: "#1f2933",
-                      border: "1px solid rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.08)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      mb: 1.5,
+                      mb: { xs: 1.25, sm: 1.5 },
                       aspectRatio: "3 / 4",
                       position: "relative",
                     }}
@@ -577,6 +588,280 @@ export const SubscriptionDetailCard = ({
                         </Popover>
                       </>
                     )}
+                    {/* 모바일 전용: 이미지 위에 겹쳐지는 요약 정보 카드 (확장/축소) */}
+                    <Box
+                      sx={{
+                        display: { xs: "flex", sm: "none" },
+                        position: "absolute",
+                        left: 8,
+                        right: 8,
+                        bottom: 8,
+                        top: isMobileDetailExpanded ? 8 : "auto",
+                        borderRadius: 2,
+                        bgcolor: "rgba(15, 23, 42, 0.92)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
+                        px: 1.25,
+                        py: 0.75,
+                        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.6)",
+                        displayPrint: "none",
+                        flexDirection: "column",
+                        gap: 0.25,
+                        maxHeight: "100%",
+                        overflowY: "auto",
+                      }}
+                    >
+                      {/* 상단: 타입 + 위로 펼침 버튼 + 잔여/일일 사용 횟수 */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "rgba(209,213,219,0.9)",
+                            textTransform: "uppercase",
+                            letterSpacing: 0.8,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {subscriptionType || "Subscription"}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            setIsMobileDetailExpanded((prev) => !prev)
+                          }
+                          sx={{
+                            bgcolor: "rgba(15,23,42,0.85)",
+                            borderRadius: 999,
+                            padding: 0.25,
+                            "&:hover": {
+                              bgcolor: "rgba(31,41,55,0.95)",
+                            },
+                          }}
+                        >
+                          {isMobileDetailExpanded ? (
+                            <ExpandMoreIcon
+                              sx={{ fontSize: 18, color: "#e5e7eb" }}
+                            />
+                          ) : (
+                            <ExpandLessIcon
+                              sx={{ fontSize: 18, color: "#e5e7eb" }}
+                            />
+                          )}
+                        </IconButton>
+                        <Box
+                          sx={{
+                            px: 1,
+                            py: 0.2,
+                            borderRadius: 999,
+                            bgcolor: "rgba(31, 41, 55, 0.95)",
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: "#e5e7eb",
+                              fontWeight: 600,
+                              fontSize: "0.7rem",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {dailyContent}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      {/* 매장 이름 */}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#f9fafb",
+                          fontWeight: 700,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          mt: 0.25,
+                        }}
+                      >
+                        {storeName}
+                      </Typography>
+                      {/* 가격 + 구독 기간 요약 */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "rgba(209,213,219,0.9)",
+                          fontWeight: 500,
+                          mt: 0.25,
+                        }}
+                      >
+                        ₩{formattedPrice}/월
+                        {periodSubLabel && (
+                          <>
+                            {" \u2022 "}
+                            {periodSubLabel}
+                          </>
+                        )}
+                      </Typography>
+                      {/* 확장 상태에서만 추가 상세정보 표시 */}
+                      {isMobileDetailExpanded && (
+                        <Box
+                          sx={{
+                            mt: 0.75,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.5,
+                          }}
+                        >
+                          {/* 구독/선물 정보 요약 */}
+                          <Box>
+                            {giftType === "SENT" ? (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: "rgba(156,163,175,0.95)",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  구독 기간
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ color: "#e5e7eb", display: "block" }}
+                                >
+                                  {sentGiftPeriodLabel}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: "rgba(156,163,175,0.95)",
+                                    fontWeight: 600,
+                                    mt: 0.5,
+                                  }}
+                                >
+                                  선물 보낸 날짜
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ color: "#e5e7eb", display: "block" }}
+                                >
+                                  {formattedPaidDate}
+                                </Typography>
+                              </>
+                            ) : (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: "rgba(156,163,175,0.95)",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  구독 기간
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ color: "#e5e7eb", display: "block" }}
+                                >
+                                  {periodRangeLabel || "-"}
+                                </Typography>
+                                {remainingDaysLabel && (
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      color: "#e5e7eb",
+                                      opacity: 0.85,
+                                    }}
+                                  >
+                                    {remainingDaysLabel}
+                                  </Typography>
+                                )}
+                              </>
+                            )}
+                          </Box>
+                          {/* 상세설명 */}
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "rgba(156,163,175,0.95)",
+                                fontWeight: 600,
+                              }}
+                            >
+                              상세설명
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "#e5e7eb",
+                                display: "block",
+                                mt: 0.25,
+                                whiteSpace: "pre-line",
+                              }}
+                            >
+                              {subscriptionDesc || "-"}
+                            </Typography>
+                          </Box>
+                          {/* 환불 불가 정보 */}
+                          {!isRefundable && refundMessage && (
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "#fecaca", fontWeight: 700 }}
+                              >
+                                환불 불가
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: "#fecaca",
+                                  display: "block",
+                                  mt: 0.25,
+                                }}
+                              >
+                                {refundMessage}
+                              </Typography>
+                            </Box>
+                          )}
+                          {/* 제공 메뉴 리스트 */}
+                          {normalizedMenus.length > 0 && (
+                            <Box>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: "rgba(156,163,175,0.95)",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                제공 메뉴
+                              </Typography>
+                              <Box sx={{ mt: 0.25 }}>
+                                {normalizedMenus.map((menuName, idx) => (
+                                  <Typography
+                                    key={idx}
+                                    variant="caption"
+                                    sx={{
+                                      color: "#e5e7eb",
+                                      display: "block",
+                                      whiteSpace: "nowrap",
+                                      textOverflow: "ellipsis",
+                                      overflow: "hidden",
+                                    }}
+                                  >
+                                    • {menuName}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
                   </Box>
 
                   {subscriptionType && (
@@ -588,6 +873,7 @@ export const SubscriptionDetailCard = ({
                         bgcolor: "rgba(15, 23, 42, 0.9)",
                         border: "1px solid rgba(148, 163, 184, 0.5)",
                         mb: 1,
+                        display: { xs: "none", sm: "inline-flex" },
                       }}
                     >
                       <Typography
@@ -619,13 +905,14 @@ export const SubscriptionDetailCard = ({
                   sx={{
                     flex: 1,
                     minWidth: 0,
-                    display: "flex",
+                    display: { xs: "none", sm: "flex" },
                     flexDirection: "column",
+                    mt: { xs: 1, md: 0 },
                   }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
+                      display: { xs: "none", sm: "flex" },
                       alignItems: "center",
                       justifyContent: "space-between",
                       mb: 1,
@@ -679,12 +966,15 @@ export const SubscriptionDetailCard = ({
                   <Box
                     sx={{
                       mt: 1.5,
-                      p: 1.5,
+                      p: { xs: 1.25, sm: 1.5 },
                       borderRadius: 2,
                       bgcolor: "#FFFFFF",
                       border: "1px solid #E0E0E0",
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gridTemplateColumns: {
+                        xs: "1fr",
+                        sm: "repeat(2, minmax(0, 1fr))",
+                      },
                       columnGap: 1.5,
                       rowGap: 1,
                     }}
@@ -795,7 +1085,7 @@ export const SubscriptionDetailCard = ({
                   <FormControl
                     fullWidth
                     variant="outlined"
-                    sx={{ mt: 1.5, mb: 0.5 }}
+                    sx={{ mt: 1.5, mb: 0.5, display: { xs: "none", sm: "block" } }}
                   >
                     <Select
                       value={selectedMenu}
@@ -821,7 +1111,8 @@ export const SubscriptionDetailCard = ({
             <Box
               sx={{
                 display: "flex",
-                gap: 1,
+                flexDirection: "row",
+                gap: 1.5,
                 mt: 1,
                 pt: 1,
                 borderTop: "1px solid #E0E0E0",
@@ -932,9 +1223,9 @@ export const SubscriptionDetailCard = ({
                         const d = new Date(iso);
                         const dateLabel = isNaN(d)
                           ? iso
-                          : `${d.getFullYear()}-${String(
-                              d.getMonth() + 1
-                            ).padStart(2, "0")}-${String(d.getDate()).padStart(
+                          : `${d.getUTCFullYear()}-${String(
+                              d.getUTCMonth() + 1
+                            ).padStart(2, "0")}-${String(d.getUTCDate()).padStart(
                               2,
                               "0"
                             )}`;

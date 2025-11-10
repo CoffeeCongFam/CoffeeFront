@@ -160,14 +160,13 @@ function MyPage() {
             variant="contained"
             startIcon={isDesktop ? <LogoutRoundedIcon /> : null}
             sx={{
-              minWidth: { xs: 'auto', sm: 'auto' }, // 아이콘만 있을 때 너비 자동 조절
+              minWidth: { xs: 'auto', sm: 'auto' },
               borderRadius: 999,
-              px: { xs: 0, sm: 2.5 }, // 모바일에서 좌우 패딩 제거, 데스크톱은 유지
-              py: { xs: 1, sm: 1 },   // 모바일에서 상하 패딩을 px와 맞춤
+              px: { xs: 0.5, sm: 2.5 },
+              py: { xs: 0.5, sm: 1 },
               fontWeight: 600,
-              fontSize: { xs: "0.75rem", sm: "0.9rem" },
               textTransform: "none",
-              boxShadow: "none",
+              boxShadow: 'none',
               bgcolor: "grey.900",
               color: "common.white",
               "&:hover": {
@@ -176,7 +175,7 @@ function MyPage() {
               },
             }}
           >
-            {isDesktop ? '로그아웃' : <LogoutRoundedIcon />}
+            {isDesktop ? '로그아웃' : <LogoutRoundedIcon sx={{ fontSize: '1.2rem' }} />}
           </Button>
         </Box>
       </Box>
