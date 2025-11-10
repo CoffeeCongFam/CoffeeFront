@@ -60,8 +60,8 @@ function Landing() {
     window.location.href = URI;
   };
 
-  // 로그인 상태 확인용 로그
-  useEffect(() => {
+    // 로그인 상태 확인용 로그
+    useEffect(() => {
     if (!authUser) {
       const cachedUser = TokenService.getUser();
       if (cachedUser) {
@@ -69,14 +69,6 @@ function Landing() {
       }
     }
   }, [authUser, setUser]);
-
-  const handleGoHome = () => {
-    if (authUser?.memberType === "GENERAL") {
-      navigate("/me");
-    } else if (authUser?.memberType === "STORE") {
-      navigate("/store");
-    }
-  };
 
   return (
     <Box
@@ -152,7 +144,7 @@ function Landing() {
             >
               <img
                 src={monkeyLogo}
-                alt="COFFIENS Logo"
+                alt="COFFEIENS Logo"
                 style={{ maxWidth: "380px", height: "auto" }}
               />
             </Box>
@@ -172,11 +164,7 @@ function Landing() {
             }}
           >
             <Typography
-              sx={{
-                color: "#cc5f2b",
-                fontWeight: 600,
-                fontSize: isMobile ? "0.8rem" : "1rem",
-              }}
+              sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}
             >
               우리는 생각한다. 고로 커피를 마신다… ☕
             </Typography>
@@ -190,27 +178,18 @@ function Landing() {
             >
               당신의 하루를 진화시키는
               <br />
-              커피 구독 플랫폼, COFFIENS
+              커피 구독 플랫폼, COFFEIENS
             </Typography>
-            <Typography
-              sx={{
-                color: "#4a3426",
-                fontSize: isMobile ? "0.8rem" : "1rem",
-                mt: 1,
-              }}
-            >
+            <Typography sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" , mt: 1 }}>
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
-              COFFIENS는 소비자에게는 더 현명한 하루를,
+              COFFEIENS는 소비자에게는 더 현명한 하루를,
               <br />
               사장님들께는 꾸준히 찾아오는 단골의 기쁨을 선물합니다.
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 6 }}>
-              {/* 로그인 여부에 따라 버튼 다르게 표시 */}
-              {!authUser ? (
-                <>
-                  <Button
+                <Button
                     variant="contained"
                     sx={{
                       backgroundColor: "#c84436",
@@ -220,51 +199,11 @@ function Landing() {
                       px: isMobile || 6,
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
-                    onClick={() => navigate("/signup")}
-                  >
-                    회원가입
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      borderColor: "#4a3426",
-                      color: "#4a3426",
-                      textTransform: "none",
-                      borderRadius: "9999px",
-                      flex: isMobile && 1,
-                      display: "flex",
-                      px: isMobile || 5,
-                      gap: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      "&:hover": {
-                        borderColor: "#4a3426",
-                        backgroundColor: "rgba(74,52,38,0.05)",
-                      },
-                    }}
                     endIcon={<LoginIcon />}
                     onClick={kakaoLogin}
                   >
-                    로그인
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#c84436",
-                    textTransform: "none",
-                    borderRadius: "9999px",
-                    px: 6,
-                    "&:hover": { backgroundColor: "#b0382b" },
-                  }}
-                  onClick={handleGoHome}
-                >
-                  {authUser.memberType === "GENERAL"
-                    ? "회원 홈으로"
-                    : "점주 홈으로"}
+                    계정 활성화하기
                 </Button>
-              )}
             </Box>
           </Box>
         </Box>
@@ -291,35 +230,25 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography
-              sx={{
-                color: "#cc5f2b",
-                fontWeight: 600,
-                fontSize: isMobile ? "0.8rem" : "1rem",
-              }}
-            >
+            <Typography sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }} >
               매일의 커피, 더 똑똑하게 즐기다
             </Typography>
             <Typography
-              sx={{
-                fontSize: isMobile ? "1.5rem" : "2.3rem",
-                fontWeight: 700,
-                color: "#4a3426",
+              sx={{ 
+                fontSize: isMobile ? "1.5rem" : "2.3rem", 
+                fontWeight: 700, 
+                color: "#4a3426" 
               }}
             >
               매일 마시는 커피,
               <br /> 이제는 구독으로 더 합리적이게
             </Typography>
-            <Typography
-              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
-            >
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
               CoffeeEns는 당신이 자주 가는 동네 카페를 구독으로 연결해줍니다.
               <br />한 달 구독으로 매일의 커피를 더 합리적으로, 줄 서지 않고
               간편하게 즐기세요.
             </Typography>
-            <Typography
-              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
-            >
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
             <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
@@ -360,20 +289,14 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography
-              sx={{
-                color: "#cc5f2b",
-                fontWeight: 600,
-                fontSize: isMobile ? "0.8rem" : "1rem",
-              }}
-            >
+            <Typography  sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}>
               예측 가능한 매출, 사장님의 새로운 루틴
             </Typography>
             <Typography
-              sx={{
-                fontSize: isMobile ? "1.6rem" : "2.3rem",
-                fontWeight: 700,
-                color: "#4a3426",
+              sx={{ 
+                fontSize: isMobile ? "1.6rem" : "2.3rem", 
+                fontWeight: 700, 
+                color: "#4a3426" 
               }}
             >
               {/* 이제 우리 카페에도 사이렌 오더가 생깁니다. */}
@@ -382,23 +305,14 @@ function Landing() {
               매출은 안정적으로
               {/* 매출은 예측 가능하게 */}
             </Typography>
-            <Typography
-              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
-            >
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
               구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게
-              관리하세요. <br />
+              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게 관리하세요.{" "}
+              <br />
               프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                mt: 6,
-                justifyContent: isMobile && "flex-end",
-              }}
-            >
+            <Box sx={{ display: "flex", gap: 1, mt: 6 , justifyContent: isMobile && "flex-end"}}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -438,7 +352,7 @@ function Landing() {
               mb: 2,
             }}
           >
-            지금 COFFIENS에 합류하세요.
+            지금 COFFEIENS에 합류하세요.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
             <Button

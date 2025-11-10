@@ -4,6 +4,7 @@ import App from "../App";
 
 import ErrorPage from "../common/error/ErrorPage";
 import LandingPage from "../pages/home/Landing";
+import Relanding from "../pages/home/Relanding";
 import SignUp from "../pages/home/SignUp";
 
 import CustomerLayout from "../layout/CustomerLayout";
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
 			{
 				path: "auth/kakao/callback",
 				element: <KakaoRedirectProd />,
+			},
+			{
+				path: "relanding",
+				element: <Relanding />,
 			},
 			// 일반 회원
 			{

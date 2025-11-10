@@ -98,6 +98,7 @@ function Profile() {
         // 탈퇴 완료: 탈퇴 모달 닫고, Withdrawal 페이지로 이동
         setIsWithdrawOpen(false);
         setIsWithdrawCompleted(true);
+        
         navigate("/withdrawal", { replace: true });
       } else {
         alert("탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -464,6 +465,16 @@ function Profile() {
                   <br />
                   특히 자주 가는 동네 카페의 구독권 혜택을 더 이상 이용하실 수
                   없습니다.
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textDecoration: "underline",
+                    color: "text.secondary",
+                    mb: 2,
+                  }}
+                >
+                  ※ 탈퇴 후, 90일 이내에 재로그인 시 회원정보 복구가 가능합니다.
                 </Typography>
                 <TextField
                   fullWidth
