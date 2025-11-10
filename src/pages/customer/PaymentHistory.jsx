@@ -41,14 +41,15 @@ export default function PaymentHistory({ paymentList }) {
 
   // 날짜 유틸
   const toDate = (v) => (v ? new Date(v) : new Date(0));
-  const fmtDate = (d) =>
-    new Intl.DateTimeFormat("ko-KR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(d);
+  const fmtDate = (d) => {
+    if (!d) return "-";
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    const h = String(d.getUTCHours()).padStart(2, "0");
+    const min = String(d.getUTCMinutes()).padStart(2, "0");
+    return `${y}.${m}.${day} ${h}:${min}`;
+  };
   const fmtPrice = (n) =>
     typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
 
