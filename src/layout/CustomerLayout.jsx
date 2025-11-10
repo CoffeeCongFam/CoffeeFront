@@ -214,11 +214,13 @@ export default function CustomerLayout() {
             right: 0,
             zIndex: 2000,
             pb: 4,
+            px: 1.5,
           }}
         >
           <BottomNavigation
             sx={{
-              
+                maxWidth: 520, 
+                mx: "auto",  
             }}
             value={bottomValue}
             onChange={(e, newValue) => setBottomValue(newValue)}

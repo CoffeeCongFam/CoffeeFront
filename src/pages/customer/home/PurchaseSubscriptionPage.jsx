@@ -25,15 +25,17 @@ import {
 import axios from "axios";
 import useUserStore from "../../../stores/useUserStore";
 
-// ✅ 결제수단 로고 이미지 import
+// 결제수단 로고 이미지 import
 import kakaopayImg from "../../../assets/kakaopay.png";
 import tosspayImg from "../../../assets/tosspay.png";
 import naverpayImg from "../../../assets/naverpay.png";
 import paycoImg from "../../../assets/payco.png";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function PurchaseSubscriptionPage() {
   const { subId } = useParams();
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
@@ -168,30 +170,63 @@ function PurchaseSubscriptionPage() {
 
   return (
     <>
-      <Box sx={{ p: 3, pb: 10 }}>
-        {/* 뒤로가기 */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+      <Box
+              sx={{
+                p: 3,
+                pb: isAppLike ? "100px" : 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+        {/* 상단 헤더 */}
+        {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
+        <Box
+          sx={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            maxWidth: 900,
+            mb: isAppLike ? 1 : 5,
+            height: 48,
+          }}
+        >
+          {/* 뒤로가기 버튼: 왼쪽 고정 */}
+          <IconButton
+            onClick={handleBack}
+            sx={{
+              position: "absolute",
+              left: 0,
+            }}
+          >
             <ArrowBackIcon />
           </IconButton>
+
+          {/* 제목: 중앙 정렬 */}
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
+          >
+            구독하기
+          </Typography>
         </Box>
 
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography variant="h6">구독하기</Typography>
-        </Box>
+
+       
 
         {/* 구독권 정보 */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <Box sx={{ width: "100%", maxWidth: "900px" }}>
-            <SubscriptItem subscription={subscription} />
+            <SubscriptItem subscription={subscription}  isAppLike={isAppLike} />
           </Box>
         </Box>
 
         {/* 유의사항 */}
         <Box
           sx={{
-            mt: 3,
+            mt: 8,
             width: "100%",
             maxWidth: "900px",
             mx: "auto",
@@ -232,11 +267,14 @@ function PurchaseSubscriptionPage() {
           }}
         >
           <Button
+            fullWidth={isAppLike}
             onClick={() => setPayOpen(true)}
             sx={{
+              borderRadius: isAppLike ? "2rem" : "inherit",
               backgroundColor: "black",
               color: "white",
               px: 4,
+              maxWidth: isAppLike ? 480 : "none",
               "&:hover": { backgroundColor: "#333" },
             }}
           >
@@ -394,7 +432,7 @@ function PurchaseSubscriptionPage() {
                 px: 2,
                 pt: 1,
                 mt: 2,
-                pb: 7
+                pb: 10
               }}
             >
               <Typography

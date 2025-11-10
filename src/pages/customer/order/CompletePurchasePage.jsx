@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography, Divider } from "@mui/material";
+import { Box, IconButton, Typography, Divider, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
@@ -95,28 +95,27 @@ function CompletePurchasePage() {
 
   if (validateError) {
     return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
+      <Box sx={{ p: 3, textAlign: "center" , height:"100%", alignContent: "center", pb: 12}}>
         <Typography variant="h6" sx={{ mb: 1 }}>
           결제 실패
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {validateError}
         </Typography>
-        <Box
+        <Button
           onClick={() => navigate(-1)}
           sx={{
             bgcolor: "black",
             color: "white",
-            px: 5,
-            py: 1.4,
-            borderRadius: 3,
+            px: "4rem",
+            borderRadius: "3rem",
             cursor: "pointer",
             fontWeight: 600,
             display: "inline-block",
           }}
         >
           뒤로가기
-        </Box>
+        </Button>
       </Box>
     );
   }

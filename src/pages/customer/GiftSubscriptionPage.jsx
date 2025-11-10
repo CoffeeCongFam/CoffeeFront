@@ -299,7 +299,11 @@ function GiftSubscriptionPage() {
             gap: 2,
           }}
         >
-          <SubscriptItem subscription={subscription} />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <Box sx={{ width: "100%", maxWidth: "900px" }}>
+            <SubscriptItem subscription={subscription}  isAppLike={isAppLike} />
+          </Box>
+        </Box>
 
           {/* 보내는 사람 / 받는 사람 */}
           <Box
@@ -453,9 +457,9 @@ function GiftSubscriptionPage() {
         {/* 유의사항 */}
         <Box
           sx={{
-            mt: 3,
+            mt: 8,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
             bgcolor: "#fffef6",
             border: "1px solid #fff2c5",
             borderRadius: 2,
@@ -491,14 +495,16 @@ function GiftSubscriptionPage() {
         {/* 하단 결제 버튼 */}
         <Box
           sx={{
-            mt: 4,
+            mt: 2,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
+            mx: "auto",
             display: "flex",
-            justifyContent: "right",
+            justifyContent: "flex-end",
           }}
         >
           <Button
+            fullWidth={isAppLike}
             onClick={() => {
               if (!receiver) {
                 alert("받는 사람을 먼저 선택해 주세요.");
@@ -506,10 +512,12 @@ function GiftSubscriptionPage() {
               }
               setPayOpen(true);
             }}
-            sx={{
+             sx={{
+              borderRadius: isAppLike ? "2rem" : "inherit",
               backgroundColor: "black",
               color: "white",
               px: 4,
+              maxWidth: isAppLike ? 480 : "none",
               "&:hover": { backgroundColor: "#333" },
             }}
           >
@@ -667,7 +675,7 @@ function GiftSubscriptionPage() {
                 px: 2,
                 pt: 1,
                 mt: 2,
-                pb: 7
+                pb: 10
               }}
             >
               <Typography

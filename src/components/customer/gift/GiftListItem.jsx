@@ -4,12 +4,13 @@ import { Box, Typography, Divider } from '@mui/material';
 /**
  * 개별 선물 항목을 출력하는 컴포넌트
  */
-const GiftListItem = ({ messageComponent, date}) => {
+const GiftListItem = ({ messageComponent, date, isAppLike }) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Box
         sx={{
           display: 'flex',
+          flexDirection: isAppLike ? "column" : "row",
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           padding: '12px 0',
