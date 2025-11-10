@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import { Box } from "@mui/material";
+import api from "../../utils/api";
 
 function KakaoRedirectProd() {
   const BASE_URL = import.meta.env.VITE_API_URL;
@@ -26,6 +27,24 @@ function KakaoRedirectProd() {
 
       const data = res.data;
       console.log("백엔드 응답:", data);
+
+      // 90일 이내 탈퇴 회원 안내
+      if (data.isActiveStatus === true) {
+        const proceed = window.confirm(
+          "탈퇴한 계정입니다. 새로운 로그인 창에서 다시 로그인하시겠습니까?"
+        );
+
+        
+        if (proceed) {
+          navigate("/relanding");
+          await api.patch("/member/active", {memberId:data.memberId});
+          
+        } else {
+          // 취소 시 아무 동작 없이 현재 화면 유지
+          console.log("사용자가 로그인 진행을 취소했습니다.");
+        }
+        return;
+      }
 
       // JWT는 쿠키에 httpOnly로 저장되어 있으므로 JS에서 접근 불가
       // SPA 라우팅 판단은 memberType 기반

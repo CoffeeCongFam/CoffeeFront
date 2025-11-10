@@ -15,8 +15,9 @@ const PUBLIC_PATHS = [
   "/kakaoRedirectProd",
   "/customerSignUp",
   "/cafeSignUp",
-  "/MemberSignUp",
+  "/memberSignUp",
   "/withdrawal",
+  "/relanding",
 ];
 
 function connectSSE(addNotification) {
