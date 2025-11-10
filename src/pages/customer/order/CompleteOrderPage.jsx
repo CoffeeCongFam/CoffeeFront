@@ -20,6 +20,7 @@ import {
   requestCancelOrder,
 } from "../../../apis/customerApi";
 import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
+import useNotificationStore from "../../../stores/useNotificationStore";
 
 function orderStatusMessage(status) {
   switch (status) {
@@ -60,20 +61,7 @@ function CompleteOrderPage() {
   const [orderInfo, setOrderInfo] = useState(null);
   const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
 
-  async function updateOrderDetail() {
-    try {
-      console.log("업데이트 요청");
-      const data = await fetchOrderDetail(orderId);
-
-      console.log("업데이트 후>>", data);
-
-      if (data) {
-        setOrderInfo(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+  const { notifications } = useNotificationStore();
 
   // 주문 정보 초기화
   useEffect(() => {
@@ -120,33 +108,22 @@ function CompleteOrderPage() {
     }
   }
 
-  // #TODO. 2) SSE로 상태 실시간 받기
-  // useEffect(() => {
-  //   if (!orderId) return;
+  // SSE 주문 알림 onmessage
+  useEffect(() => {
+    if (!notifications.length) return;
 
-  //   const es = new EventSource(`/api/orders/${orderId}/sse`);
-
-  //   es.onmessage = (e) => {
-  //     const data = JSON.parse(e.data);
-  //     setOrderInfo((prev) =>
-  //       prev
-  //         ? {
-  //             ...prev,
-  //             ...data,
-  //             orderStatus: data.status ?? prev.orderStatus,
-  //           }
-  //         : prev
-  //     );
-  //   };
-
-  //   es.onerror = () => {
-  //     es.close();
-  //   };
-
-  //   return () => {
-  //     es.close();
-  //   };
-  // }, [orderId]); //
+    (async () => {
+      try {
+        console.log("🔁 알림 수신 → 주문 상세 재조회");
+        const data = await fetchOrderDetail(orderId);
+        if (data) {
+          setOrderInfo(data);
+        }
+      } catch (err) {
+        console.error("알림 기반 주문 재조회 실패:", err);
+      }
+    })();
+  }, [notifications, orderId]);
 
   function handleBack() {
     if (orderInfo.orderStatus === "CANCELED") {
