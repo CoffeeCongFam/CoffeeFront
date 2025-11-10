@@ -58,8 +58,13 @@ export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
-  const { notifications, unreadCount, markAsRead, deleteAllNotifications } =
-    useNotificationStore();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    deleteAllNotifications,
+    removeNotification,
+  } = useNotificationStore();
   const { isAppLike } = useAppShellMode(); // 모바일 여부
   const [bottomValue, setBottomValue] = useState(location.pathname);
 
@@ -76,6 +81,20 @@ export default function CustomerLayout() {
 
   function openNotifDrawer() {
     setNotifOpen(true);
+  }
+
+  // 특정 알림 삭제 요청
+  async function handleDeleteNotification(notificationId) {
+    // const ok = window.confirm("해당 알림을 삭제하시겠습니까?");
+    // if (!ok) return;
+
+    try {
+      await deleteNotification(notificationId); // 서버 삭제 API
+      removeNotification(notificationId); // 스토어에서 제거
+    } catch (e) {
+      console.error("알림 삭제 실패:", e);
+      alert("알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   }
 
   // 전체 알림 삭제 요청
@@ -114,6 +133,9 @@ export default function CustomerLayout() {
       } catch (e) {
         console.error("알림 읽음 처리 실패:", e);
       }
+    } else {
+      // 읽은 알림이면
+      //
     }
 
     // 타입별 네비게이션
@@ -247,6 +269,7 @@ export default function CustomerLayout() {
                 key={noti.notificationId}
                 noti={noti}
                 onClick={handleNotificationClick}
+                onDelete={handleDeleteNotification}
               />
             ))}
 
@@ -420,7 +443,7 @@ export default function CustomerLayout() {
           </Box>
         </Box>
         <Divider />
-        <List sx={{ p: 0 }}>
+        <List sx={{ p: 0, width: "100%" }}>
           {notifications.map((noti) => (
             <NotificationItem
               key={noti.notificationId}

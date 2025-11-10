@@ -90,6 +90,18 @@ const useNotificationStore = create((set, get) => ({
       ).length,
     })),
 
+  // 특정 알림 삭제
+  removeNotification: (notificationId) =>
+    set((state) => ({
+      notifications: state.notifications.filter(
+        (n) => n.notificationId !== notificationId
+      ),
+      unreadCount: state.notifications.filter(
+        (n) => !n.isRead && n.notificationId !== notificationId
+      ).length,
+    })),
+
+  // 특정 알림 가져오기
   getNotification: (notificationId) => {
     const n = get().notifications.find(
       (n) => n.notificationId === notificationId

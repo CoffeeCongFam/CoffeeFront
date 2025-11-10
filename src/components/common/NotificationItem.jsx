@@ -31,7 +31,7 @@ function formatDateTime(isoString) {
   return `${date} ${time}`;
 }
 
-export default function NotificationItem({ noti, onClick }) {
+export default function NotificationItem({ noti, onClick, onDelete }) {
   const isRead = !!(noti.readAt || noti.isRead);
 
   let messageText = "";
@@ -44,8 +44,19 @@ export default function NotificationItem({ noti, onClick }) {
     }
   }
 
+  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // 리스트 전체 클릭 막기
+    if (onDelete) onDelete(noti.notificationId);
+  };
+
   const handleClick = () => {
-    if (onClick) onClick(noti); // 👈 전체 알림 객체 전달
+    if (noti.readAt !== "") {
+      console.log("이미 읽은 알림");
+      onClick(noti);
+    } else {
+      onClick(noti);
+    }
+    // if (onClick) onClick(noti);
   };
 
   return (
@@ -59,20 +70,28 @@ export default function NotificationItem({ noti, onClick }) {
           {getNotificationIcon(noti.notificationType)}
         </Avatar>
       </ListItemAvatar>
-      <Box sx={{ ml: 1 }}>
+      <Box sx={{ ml: 1, width: "100%" }}>
         <Box
           sx={{
             display: "flex",
+            width: "100%",
             flexDirection: "row",
             justifyContent: "space-between",
-            alignContent: "center",
             alignItems: "center",
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 600, mb: 0.5, flexGrow: 1 }}
+          >
             {noti.notificationType}
           </Typography>
-          <IconButton aria-label="delete" size="small">
+          <IconButton
+            aria-label="delete"
+            size="small"
+            sx={{ zIndex: 1900 }}
+            onClick={handleDeleteClick}
+          >
             <ClearRoundedIcon fontSize="inherit" />
           </IconButton>
         </Box>
@@ -81,7 +100,7 @@ export default function NotificationItem({ noti, onClick }) {
           {messageText}
         </Typography>
         <Typography variant="caption" sx={{ color: "text.disabled" }}>
-          {formatDateTime(noti.createdAT)}
+          {formatDateTime(noti.createdAt)}
         </Typography>
       </Box>
     </ListItemButton>
