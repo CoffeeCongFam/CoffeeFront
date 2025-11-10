@@ -16,6 +16,7 @@ import { fetchNotificationList } from "./apis/notificationApi";
     "/customerSignUp",
     "/cafeSignUp",
     "/MemberSignUp",
+    "/withdrawal",
   ];
 
   
@@ -165,6 +166,14 @@ function App() {
     }
     // cachedUser , authUser 이미 둘 다 있으면 아무것도 안 함
   }, [location.pathname, authUser, setUser, setPartnerStoreId]);
+
+  // ✅ 랜딩 페이지(/) 또는 탈퇴 페이지(/withdrawal) 진입 시 localStorage 초기화
+  useEffect(() => {
+    if (location.pathname === "/" || location.pathname === "/withdrawal") {
+      localStorage.clear();
+      console.log("✅ localStorage cleared on landing/withdrawal render");
+    }
+  }, [location.pathname]);
 
   return (
     <div>

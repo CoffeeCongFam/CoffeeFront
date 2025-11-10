@@ -6,7 +6,6 @@ import storeUser from "../../assets/store2.png";
 import useAppShellMode from "../../hooks/useAppShellMode";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-
 const userTypeBoxStyle = {
   backgroundColor: "#ffffffff",
   gap: 1,
@@ -19,7 +18,7 @@ const userTypeBoxStyle = {
   alignItems: "center",
   padding: "1rem",
   cursor: "pointer",
-  boxShadow:"0 0 0 2px rgba(111, 78, 55, 0.2)",
+  boxShadow: "0 0 0 2px rgba(111, 78, 55, 0.2)",
 };
 
 const selectedStyle = {
@@ -28,7 +27,7 @@ const selectedStyle = {
 };
 
 function SignUp() {
-  const {isMobile} = useAppShellMode();
+  const { isMobile } = useAppShellMode();
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null); // 'CUSTOMER' | 'OWNER'
@@ -64,7 +63,6 @@ function SignUp() {
     navigate(-1);
   }
 
-
   return (
     <Box
       sx={{
@@ -81,26 +79,30 @@ function SignUp() {
       }}
     >
       {/* 뒤로가기 버튼: 왼쪽 고정 */}
-                      <IconButton
-                        onClick={handleBack}
-                        sx={{
-                          position: "absolute",
-                          top: 12,
-                          left: 12,
-                          zIndex: 2,
-                          bgcolor: "rgba(0,0,0,0.45)",
-                          color: "white",
-                          "&:hover": {
-                            bgcolor: "rgba(0,0,0,0.65)",
-                          },
-                        }}
-                        aria-label="뒤로가기"
-                      >
-                        <ArrowBackIcon />
-                      </IconButton>
+      <IconButton
+        onClick={handleBack}
+        sx={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          zIndex: 2,
+          bgcolor: "rgba(0,0,0,0.45)",
+          color: "white",
+          "&:hover": {
+            bgcolor: "rgba(0,0,0,0.65)",
+          },
+        }}
+        aria-label="뒤로가기"
+      >
+        <ArrowBackIcon />
+      </IconButton>
       <Typography
         variant="h6"
-        sx={{ color: "black", fontSize: isMobile ? "1rem" :"1.3rem", fontWeight: "bold" }}
+        sx={{
+          color: "black",
+          fontSize: isMobile ? "1rem" : "1.3rem",
+          fontWeight: "bold",
+        }}
       >
         어떤 회원으로 가입하시겠어요 ? ☕
       </Typography>
@@ -139,10 +141,8 @@ function SignUp() {
           onClick={() => setSelectedRole("OWNER")}
         >
           <img src={storeUser} style={{ width: "40%" }} />
-          <Typography sx={{ mb: 1 , fontWeight: "bold"}}>점주회원</Typography>
+          <Typography sx={{ mb: 1, fontWeight: "bold" }}>점주회원</Typography>
         </Box>
-
-        
       </Box>
 
       {/* 카카오 로그인 버튼 */}
