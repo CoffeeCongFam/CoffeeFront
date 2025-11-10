@@ -14,6 +14,7 @@ import api, { TokenService } from '../../utils/api';
 import React, { useEffect, useState } from 'react';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
+import useNotificationStore from '../../stores/useNotificationStore';
 
 // 상태 변경 확인을 위한 다이얼로그 컴포넌트
 const ConfirmDialog = ({ open, onClose, onConfirm, title, content }) => {
@@ -66,6 +67,10 @@ const getFormattedMenuList = (menuList) => {
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
   const partnerStoreId = useUserStore((state) => state.partnerStoreId);
+  const setRefreshOrderList = useNotificationStore(
+    (state) => state.setRefreshOrderList
+  );
+  // 주문 조회를 실시간 알림이 오면, 리렌더링 되게 만드는 상태변수
 
   const [orders, setOrders] = useState([]);
 
@@ -94,40 +99,48 @@ function StoreHome() {
   };
 
   // 오늘의 주문 목록 조회 GET
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
-        if (!partnerStoreId || partnerStoreId <= 0) {
-          console.log(
-            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
-            partnerStoreId
-          );
-          return;
-        }
-
-        const response = await api.get(
-          `/stores/orders/today/${partnerStoreId}`
+  const fetchOrders = async () => {
+    try {
+      // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
+      if (!partnerStoreId || partnerStoreId <= 0) {
+        console.log(
+          '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
+          partnerStoreId
         );
-
-        // 백엔드 응답 구조에 맞게 resposne.data.data
-        if (response.data && response.data.data) {
-          setOrders(response.data.data);
-          console.log(
-            '✅ GET 성공, 데이터 로드 완료:',
-            response.data.data.length,
-            '개'
-          );
-        } else {
-          setOrders(response.data.data || []);
-          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
-        }
-      } catch (error) {
-        console.error('오늘의 주문 목록 로딩 실패:', error);
+        return;
       }
-    };
+
+      const response = await api.get(`/stores/orders/today/${partnerStoreId}`);
+
+      // 백엔드 응답 구조에 맞게 resposne.data.data
+      if (response.data && response.data.data) {
+        setOrders(response.data.data);
+        console.log(
+          '✅ GET 성공, 주문 조회 데이터 로드 완료:',
+          response.data.data.length,
+          '개'
+        );
+      } else {
+        setOrders(response.data.data || []);
+        console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
+      }
+    } catch (error) {
+      console.error('오늘의 주문 목록 로딩 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 최초 로딩
+  useEffect(() => {
     fetchOrders();
-  }, [partnerStoreId]);
+
+    setRefreshOrderList(fetchOrders);
+    // 갱신 함수를 Zustand 스토어에 등록??
+
+    // 컴포넌트 언마운트 시 등록된 함수 해제
+    return () => {
+      setRefreshOrderList(null);
+    };
+  }, [partnerStoreId, setRefreshOrderList]);
 
   // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
   // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.

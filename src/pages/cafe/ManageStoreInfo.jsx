@@ -79,14 +79,42 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
   const [imagePreview, setImagePreview] = useState(initialStoreInfo?.storeImg || null);
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
+  const [hoursErrors, setHoursErrors] = useState({});
+  const [isImageDeleted, setIsImageDeleted] = useState(false);
+useEffect(() => {
+    if (!initialStoreInfo) return;
 
-  useEffect(() => {
-    if (initialStoreInfo) {
-      setStoreInfo(initialStoreInfo);
-      setOriginalStoreInfo(initialStoreInfo);
-      setImagePreview(initialStoreInfo?.storeImg || null);
-    }
-  }, [initialStoreInfo]);
+    // 수정 중일 때는 부모에서 내려온 값으로 덮어쓰지 않도록 보호
+    if (isEditingStoreInfo || isEditingHours) return;
+
+    setStoreInfo((prev) => ({
+      ...prev,
+      ...initialStoreInfo,
+      // storeHours는 로컬에 변경된 값이 있으면 그 값을 유지
+      storeHours:
+        prev.storeHours && prev.storeHours.length > 0
+          ? prev.storeHours
+          : initialStoreInfo.storeHours || [],
+          ...(isImageDeleted && { storeImg: null }),
+    }));
+
+    setOriginalStoreInfo((prev) => ({
+      ...prev,
+      ...initialStoreInfo,
+      // 원본도 동일한 기준으로 유지/초기화
+      storeHours:
+        prev.storeHours && prev.storeHours.length > 0
+          ? prev.storeHours
+          : initialStoreInfo.storeHours || [],
+          ...(isImageDeleted && { storeImg: null }),
+    }));
+
+    setImagePreview((prev) => {
+    // ✅ 삭제 플래그가 켜져 있으면 서버에서 이미지 URL이 내려와도 표시하지 않음
+    if (isImageDeleted) return null;
+        return initialStoreInfo?.storeImg ? initialStoreInfo.storeImg : prev;
+      });
+    }, [initialStoreInfo, isEditingStoreInfo, isEditingHours, isImageDeleted]);
 
   const handleClickAddressSearch = async () => {
     try {
@@ -238,15 +266,18 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
     setImageFile(file);
     const url = URL.createObjectURL(file);
     setImagePreview(url);
+    setIsImageDeleted(false);
   };
 
   const handleDeleteImageFile = () => {
+    // ✅ 이미지 삭제: 로컬 파일/프리뷰 + storeInfo.storeImg 모두 비우기
     setImageFile(null);
     setImagePreview(null);
     setStoreInfo((prev) => ({
       ...prev,
-      storeImg: null,
+      storeImg: null,          // ← 서버로도 "이미지 없음" 이라고 보내기 위함
     }));
+    setIsImageDeleted(true);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -287,8 +318,8 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
           return {
             ...hour,
             isClosed: newIsClosed,
-            openTime: hour.openTime || "0900",
-            closeTime: hour.closeTime || "1800",
+            openTime: hour.openTime || "09:00",
+            closeTime: hour.closeTime || "18:00",
           };
         }
 
@@ -304,18 +335,69 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
         storeHours: updatedStoreHours,
       };
     });
+
+    // isClosed 변경 시에는 해당 요일 에러를 즉시 제거
+    if (field === "isClosed") {
+      setHoursErrors((prev) => {
+        const next = { ...prev };
+        delete next[dayOfWeek];
+        return next;
+      });
+    }
   }, []);
-  // 요일별 시간 입력 핸들러 (숫자만, 최대 4자리(HHMM) 저장)
+  // 요일별 시간 입력 핸들러 (백스페이스 정상 동작, 자동 00 미패딩, 자연스러운 입력)
   const handleDayTimeChange = (dayOfWeek, field) => (e) => {
     if (!isEditingHours) return;
 
     let input = e.target.value || "";
-    let digits = input.replace(/\D/g, ""); // 숫자만
+    // 숫자만 추출
+    let digits = input.replace(/\D/g, "");
+
+    // 최대 4자리(HHMM)까지만 허용
     if (digits.length > 4) {
       digits = digits.slice(0, 4);
     }
 
-    _handleHoursChange(dayOfWeek, field, digits);
+    let formatted = "";
+
+    if (digits.length === 0) {
+      // 아무 것도 없으면 빈 문자열 유지 (백스페이스 정상 동작)
+      formatted = "";
+    } else if (digits.length <= 2) {
+      // 1~2자리: 시(HH)만 입력 중 (예: '0', '09')
+      formatted = digits;
+    } else {
+      // 3~4자리: HHMM -> HH:MM (분은 사용자가 입력한 만큼만 반영, 자동 00 패딩 없음)
+      const hours = digits.slice(0, 2);
+      const minutes = digits.slice(2); // 1자리 또는 2자리 그대로 사용
+      formatted = `${hours}:${minutes}`;
+    }
+
+    _handleHoursChange(dayOfWeek, field, formatted);
+
+    const currentHour =
+      mergedStoreHours.find((h) => h.dayOfWeek === dayOfWeek) || {};
+    const isClosed = currentHour.isClosed === "Y";
+    const openValue = field === "openTime" ? formatted : currentHour.openTime;
+    const closeValue =
+      field === "closeTime" ? formatted : currentHour.closeTime;
+
+    let hasError = false;
+    if (!isClosed) {
+      const openFilled = !!openValue;
+      const closeFilled = !!closeValue;
+      hasError = openFilled !== closeFilled;
+    }
+
+    setHoursErrors((prev) => {
+      const next = { ...prev };
+      if (hasError) {
+        next[dayOfWeek] = true;
+      } else {
+        delete next[dayOfWeek];
+      }
+      return next;
+    });
   };
 
   // 매장 정보 수정 (PATCH /api/owners/stores/{partnerStoreId})
@@ -374,6 +456,29 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
         });
       }
 
+      // ✅ 이미지 프리뷰 유지/복원
+      setImagePreview((prev) => {
+        // 1) 새 이미지를 업로드한 상태에서 저장한 경우: 기존 프리뷰(blob URL)를 그대로 유지
+        if (imageFile && prev) {
+          return prev;
+        }
+
+        // 2) 명시적으로 이미지를 삭제한 상태(storeImg === null && 새 파일 없음)라면,
+        //    프리뷰도 비운 상태 유지 (→ "등록된 매장 이미지가 없습니다." 계속 보이게)
+        if (storeInfo.storeImg === null && !imageFile) {
+          return null;
+        }
+
+        // 3) 그 외에는 서버/원본 기준으로 등록된 이미지가 있는 경우: 그 URL로 복원
+        const fallback =
+          storeInfo.storeImg ||
+          originalStoreInfo.storeImg ||
+          initialStoreInfo?.storeImg ||
+          null;
+
+        return fallback ?? prev;
+      });
+
       setSuccessMessage("매장 정보가 성공적으로 수정되었습니다.");
       setIsEditingStoreInfo(false);
       setOriginalStoreInfo(storeInfo);
@@ -384,20 +489,67 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
   };
 
   const handleCancelStoreInfo = () => {
-    // 원본 데이터로 되돌리기
-    setStoreInfo(originalStoreInfo);
-    // 이미지 프리뷰도 원래 상태로 복구
-    setImagePreview(originalStoreInfo?.storeImg || null);
-    // 업로드 중이던 새 파일은 초기화
-    setImageFile(null);
+    // ✅ 매장 기본 정보만 원본으로 되돌리고, 영업시간(storeHours)과 이미지(storeImg 관련)는 건드리지 않는다.
+    setStoreInfo((prev) => ({
+      ...prev,
+      businessNumber: originalStoreInfo.businessNumber,
+      storeName: originalStoreInfo.storeName,
+      roadAddress: originalStoreInfo.roadAddress,
+      detailAddress: originalStoreInfo.detailAddress,
+      detailInfo: originalStoreInfo.detailInfo,
+      tel: originalStoreInfo.tel,
+      xPoint: originalStoreInfo.xPoint,
+      yPoint: originalStoreInfo.yPoint,
+      // storeHours, storeImg 등 나머지 필드는 그대로 유지
+    }));
+
+    // ✅ 이미지 프리뷰/업로드 파일도 원본 상태로 롤백
+    setImagePreview(originalStoreInfo.storeImg || null); // ⬅ 화면에 다시 보여줄 이미지
+    setImageFile(null);                     // 수정 중에 올렸던 새 파일은 버림
+    setIsImageDeleted(false);
+
     // 수정 모드 종료 및 에러 초기화
     setIsEditingStoreInfo(false);
     setError(null);
   };
 
+  const handleCancelStoreHours = () => {
+    // 영업시간 수정 취소 시, 원본으로 되돌리기
+    setStoreInfo((prev) => ({
+      ...prev,
+      storeHours: originalStoreInfo?.storeHours
+        ? [...originalStoreInfo.storeHours]
+        : [],
+    }));
+    setIsEditingHours(false);
+    setError(null);
+    setHoursErrors({});
+  };
+
   const handleSaveStoreHours = async () => {
     setError(null);
     setSuccessMessage(null);
+
+    // ✅ 영업시간 유효성 검사: 시작/종료 중 하나만 입력된 경우 에러 처리
+    const newErrors = {};
+    mergedStoreHours.forEach((hour) => {
+      const isClosed = hour.isClosed === "Y";
+      const openFilled = !!hour.openTime;
+      const closeFilled = !!hour.closeTime;
+
+      // 휴무가 아니고, 시작/종료 입력 상태가 서로 다르면 에러
+      if (!isClosed && openFilled !== closeFilled) {
+        newErrors[hour.dayOfWeek] = true;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setHoursErrors(newErrors);
+      setError("영업시간을 다시 확인해주세요.");
+      return; // ⬅ 저장 요청 보내지 않음
+    }
+
+    setHoursErrors({}); // 통과 시 에러 초기화
 
     try {
       // ✅ 전역 Zustand에서 partnerStoreId 가져오기
@@ -472,6 +624,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
 
       setSuccessMessage("영업시간 및 휴무일 정보가 저장되었습니다.");
       setIsEditingHours(false);
+      // 저장 이후에는 별도의 재조회 없이, 방금 입력한 로컬 상태(storeInfo.storeHours)를 그대로 화면에 보여줍니다.
     } catch (err) {
       console.error("영업시간 정보 저장 실패 :", err);
       setError("영업시간 저장에 실패했습니다. 다시 시도해주세요.");
@@ -1190,7 +1343,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
               {/* 수정 취소 */}
               <Button
                 variant="outlined"
-                onClick={() => setIsEditingHours(false)}
+                onClick={handleCancelStoreHours}
                 size="medium"
                 sx={{
                   borderRadius: 2,
@@ -1333,6 +1486,12 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
                         inputMode: "numeric",
                         maxLength: 5, // 09:00 형태
                       }}
+                       error={Boolean(hoursErrors[hour.dayOfWeek])}
+                      helperText={
+                        hoursErrors[hour.dayOfWeek]
+                          ? "시작/종료시간 모두 입력해주세요"
+                          : " "
+                      }
                       variant="outlined"
                       sx={{
                         flex: 1,
@@ -1384,6 +1543,8 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
                         inputMode: "numeric",
                         maxLength: 5,
                       }}
+                      error={Boolean(hoursErrors[hour.dayOfWeek])}
+                      helperText={" "}
                       variant="outlined"
                       sx={{
                         flex: 1,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
+import { Container, Box, Typography, Paper, Grid, Button, useMediaQuery, useTheme } from '@mui/material';
 import Profile from './Profile';
 import { useNavigate } from 'react-router-dom';
 import SubscriptionPage from './Subscription';
@@ -17,6 +17,9 @@ function MyPage() {
   let navigate = useNavigate();
 
   const { authUser, clearUser } = useUserStore();
+  const theme = useTheme();
+  // sm breakpoint (600px) 이상일 때 true
+  const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const [activeMenu, setActiveMenu] = useState("구독권");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -77,10 +80,10 @@ function MyPage() {
           variant="text"
           fullWidth
           sx={{
-            py: 2,
-            fontSize: "1rem",
+            py: { xs: 1.5, sm: 2 },
+            fontSize: { xs: "0.9rem", sm: "1rem" },
             fontWeight: "bold",
-            color: "text.primary", // 텍스트 색상 유지
+            color: "text.primary",
           }}
           onClick={() => setActiveMenu(menu)}
         >
@@ -109,27 +112,33 @@ function MyPage() {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
+        flexDirection="row"
         mb={3}
       >
         {/* 좌측: 유저 정보 */}
         <Box>
-          <Typography variant="h5" component="h1" fontWeight="bold">
+          <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h1" fontWeight="bold">
             {authUser?.name}님 환영합니다!
           </Typography>
         </Box>
 
         {/* 우측: 트렌디한 네비게이션 & 로그아웃 버튼 그룹 */}
-        <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1.5}>
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          justifyContent="flex-end" 
+          gap={{ xs: 0.5, sm: 1.5 }}
+        >
           {authUser?.memberType == "STORE" && (
             <Button
               onClick={() => navigate('/store/cafeMyPage')}
               variant="contained"
               sx={{
                 borderRadius: 999,
-                px: 2.2,
-                py: 0.8,
+                px: { xs: 1.2, sm: 2.2 },
+                py: { xs: 0.5, sm: 0.8 },
                 fontWeight: 600,
-                fontSize: '0.85rem',
+                fontSize: { xs: '0.7rem', sm: '0.85rem' },
                 textTransform: 'none',
                 boxShadow: 'none',
                 background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
@@ -149,15 +158,15 @@ function MyPage() {
           <Button
             onClick={logout}
             variant="contained"
-            startIcon={<LogoutRoundedIcon />}
+            startIcon={isDesktop ? <LogoutRoundedIcon /> : null}
             sx={{
+              minWidth: { xs: 'auto', sm: 'auto' },
               borderRadius: 999,
-              px: 2.5,
-              py: 1,
+              px: { xs: 0.5, sm: 2.5 },
+              py: { xs: 0.5, sm: 1 },
               fontWeight: 600,
-              fontSize: "0.9rem",
               textTransform: "none",
-              boxShadow: "none",
+              boxShadow: 'none',
               bgcolor: "grey.900",
               color: "common.white",
               "&:hover": {
@@ -166,7 +175,7 @@ function MyPage() {
               },
             }}
           >
-            로그아웃
+            {isDesktop ? '로그아웃' : <LogoutRoundedIcon sx={{ fontSize: '1.2rem' }} />}
           </Button>
         </Box>
       </Box>
