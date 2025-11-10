@@ -56,9 +56,20 @@ function TodayOrderItem({ order, isAppLike }) {
                   {menu.menuName} x {menu.quantity}
                 </Typography>
               ))}
-              <Typography variant="body2" color="text.secondary">
-                {order.subscriptionName} 구독권
-              </Typography>
+              <Box
+                sx={{
+                  dislay: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {order.subscriptionName}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {order.createdAt.split("T")[1].split(".")[0]}
+                </Typography>
+              </Box>
             </Box>
           </Box>
           <Divider />

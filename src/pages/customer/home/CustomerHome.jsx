@@ -29,6 +29,7 @@ function CustomerHome() {
 
   const { isAppLike } = useAppShellMode();
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnboarding, setIsOnboarding] = useState(false); // 온보딩
 
   const [todayDate, setTodayDate] = useState(null);
   const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
@@ -37,7 +38,9 @@ function CustomerHome() {
   const [nearbyCafes, setNearbyCafes] = useState([]);
   const [locError, setLocError] = useState("");
 
+  // ref
   const scrollRef = useRef(null);
+  const subscriptionRef = useRef(null);
 
   useEffect(() => {
     setTodayDate(formatKoreanDateTime(new Date()));
@@ -310,6 +313,7 @@ function CustomerHome() {
         </Box>
       )} */}
 
+      {/* 보유 구독권 목록 */}
       {subscriptions.length <= 0 && (
         <Box
           sx={{
@@ -323,6 +327,10 @@ function CustomerHome() {
             flexDirection: isAppLike ? "column" : "row",
             alignItems: "center",
           }}
+          ref={subscriptionRef}
+          data-step="2" // 툴팁 순서
+          data-intro="이곳에서 사용 가능한 **구독권 잔여 횟수**를 확인하고 바로 주문할 수 있어요." // 툴팁 내용
+          data-position="bottom" // 툴팁 위치
         >
           <Typography>
             보유 구독권이 없습니다. 구독권을 구매해주세요!
@@ -382,8 +390,9 @@ function CustomerHome() {
               },
             }}
           >
-            {subscriptions.map((item) => (
+            {subscriptions.map((item, index) => (
               <Box
+                ref={index === 0 ? subscriptionRef : null}
                 key={item.purchaseId}
                 sx={{
                   scrollSnapAlign: "start",
@@ -403,7 +412,12 @@ function CustomerHome() {
       )}
 
       {/* 내 근처 카페 */}
-      <Box style={{ px: "1rem" }}>
+      <Box
+        sx={{ px: "1rem" }}
+        data-step="4"
+        data-intro="GPS 정보를 기반으로 **500m 내에 있는 근처 카페**들을 보여드려요. 새로운 단골 매장을 찾아보세요!"
+        data-position="top"
+      >
         <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>
