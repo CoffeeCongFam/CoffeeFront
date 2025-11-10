@@ -5,6 +5,7 @@ import App from '../App';
 import ErrorPage from '../common/error/ErrorPage';
 import LandingPage from '../pages/home/Landing';
 import SignUp from '../pages/home/SignUp';
+import Relanding from "../pages/home/Relanding";
 
 import CustomerLayout from '../layout/CustomerLayout';
 import StoreLayout from '../layout/StoreLayout';
@@ -44,81 +45,85 @@ import KakaoRedirectProd from '../pages/home/KakaoRedirectProd';
 import GuidelinePage from '../pages/cafe/GuidelinePage';
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <LandingPage />,
-      },
-      {
-        path: 'withdrawal',
-        element: <Withdrawal />,
-      },
-      {
-        path: 'signup',
-        element: <SignUp />,
-      },
-      {
-        path: 'kakaoRedirect',
-        element: <KakaoRedirect />,
-      },
-      {
-        path: 'customerSignUp',
-        element: <CustomerSignUp />,
-      },
-      {
-        path: 'cafeSignUp',
-        element: <CafeSignUp />,
-      },
-      {
-        path: 'memberSignUp',
-        element: <MemberSignUp />,
-      },
-      {
-        path: 'auth/kakao/callback',
-        element: <KakaoRedirectProd />,
-      },
-      // 일반 회원
-      {
-        path: 'me',
-        element: (
-          // <RequireMemberType allow={["GENERAL"]}>
-          <CustomerLayout />
-          // </RequireMemberType>
-        ),
-        children: [
-          {
-            index: true,
-            element: <CustomerHome />,
-          },
-          {
-            path: 'search',
-            element: <SearchPage />,
-          },
-          {
-            path: 'order',
-            element: <OrderHistory />,
-            // element: <OrderPage />,
-          },
-          {
-            path: 'order/new',
-            element: <CreateOrderPage />,
-          },
-          {
-            path: 'order/:orderId',
-            element: <CompleteOrderPage />,
-          },
-          {
-            path: 'mypage',
-            element: <MyPage />,
-          },
-          {
-            path: 'store/:storeId',
-            element: <StoreDetailPage />,
-          },
+	{
+		path: "/",
+		element: <App />,
+		errorElement: <ErrorPage />,
+		children: [
+			{
+				index: true,
+				element: <LandingPage />,
+			},
+			{
+				path: "withdrawal",
+				element: <Withdrawal />,
+			},
+			{
+				path: "signup",
+				element: <SignUp />,
+			},
+			{
+				path: "kakaoRedirect",
+				element: <KakaoRedirect />,
+			},
+			{
+				path: "customerSignUp",
+				element: <CustomerSignUp />,
+			},
+			{
+				path: "cafeSignUp",
+				element: <CafeSignUp />,
+			},
+			{
+				path: "memberSignUp",
+				element: <MemberSignUp />,
+			},
+			{
+				path: "auth/kakao/callback",
+				element: <KakaoRedirectProd />,
+			},
+			{
+				path: "relanding",
+				element: <Relanding />,
+			},
+			// 일반 회원
+			{
+				path: "me",
+				element: (
+					// <RequireMemberType allow={["GENERAL"]}>
+					<CustomerLayout />
+					// </RequireMemberType>
+				),
+				children: [
+					{
+						index: true,
+						element: <CustomerHome />,
+					},
+					{
+						path: "search",
+						element: <SearchPage />,
+					},
+					{
+						path: "order",
+						element: <OrderHistory />,
+						// element: <OrderPage />,
+					},
+					{
+						path: "order/new",
+						element: <CreateOrderPage />,
+					},
+					{
+						path: "order/:orderId",
+						element: <CompleteOrderPage />,
+					},
+					{
+						path: "mypage",
+						element: <MyPage />,
+					},
+					{
+						path: "store/:storeId",
+						element: <StoreDetailPage />,
+					},
 
           // 구독권 구매
           {

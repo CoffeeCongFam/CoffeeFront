@@ -69,14 +69,6 @@ function Landing() {
       }
     }
   }, [authUser, setUser]);
-  
-    const handleGoHome = () => {
-      if (authUser?.memberType === "GENERAL") {
-        navigate("/me");
-      } else if (authUser?.memberType === "STORE") {
-        navigate("/store");
-      }
-    };
 
   return (
     <Box
@@ -197,10 +189,7 @@ function Landing() {
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 6 }}>
-              {/* 로그인 여부에 따라 버튼 다르게 표시 */}
-              {!authUser ? (
-                <>
-                  <Button
+                <Button
                     variant="contained"
                     sx={{
                       backgroundColor: "#c84436",
@@ -210,53 +199,12 @@ function Landing() {
                       px: isMobile || 6,
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
-                    onClick={() => navigate("/signup")}
-                  >
-                    회원가입
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      borderColor: "#4a3426",
-                      color: "#4a3426",
-                      textTransform: "none",
-                      borderRadius: "9999px",
-                      flex: isMobile && 1,
-                      display: "flex",
-                      px: isMobile || 5,
-                      gap: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      "&:hover": {
-                        borderColor: "#4a3426",
-                        backgroundColor: "rgba(74,52,38,0.05)",
-                      },
-                    }}
                     endIcon={<LoginIcon />}
                     onClick={kakaoLogin}
                   >
-                    로그인
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#c84436",
-                    textTransform: "none",
-                    borderRadius: "9999px",
-                    px: 6,
-                    "&:hover": { backgroundColor: "#b0382b" },
-                  }}
-                  onClick={handleGoHome}
-                >
-                  {authUser.memberType === "GENERAL"
-                    ? "회원 홈으로"
-                    : "점주 홈으로"}
+                    계정 활성화하기
                 </Button>
-              )}
             </Box>
-
           </Box>
         </Box>
       </Element>
