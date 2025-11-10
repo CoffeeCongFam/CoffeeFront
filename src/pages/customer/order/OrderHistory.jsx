@@ -480,7 +480,7 @@ function OrderHistory() {
               size="small"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ width: 140 }}
+              sx={{ width: 120 }}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
@@ -494,7 +494,7 @@ function OrderHistory() {
               size="small"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              sx={{ width: 140 }}
+              sx={{ width: 120 }}
             >
               <MenuItem value="DESC">최신순</MenuItem>
               <MenuItem value="ASC">오래된 순</MenuItem>

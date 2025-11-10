@@ -69,17 +69,9 @@ function SubscriptionItem({ subscription, isAppLike }) {
               /월
             </Typography>
           </Typography>
-
         </Box>
-       
-
-
       </Box>
-       
-
-        
         <Divider />
-
         {/* 매장명 */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.6, mt: 2, mb: 1.5}}>
           <LocationPinIcon
@@ -94,10 +86,7 @@ function SubscriptionItem({ subscription, isAppLike }) {
           >
             {subscription?.storeName}
           </Typography>
-          
         </Box>
-
-
         {/* 간단한 혜택 설명 */}
         <Box
           sx={{

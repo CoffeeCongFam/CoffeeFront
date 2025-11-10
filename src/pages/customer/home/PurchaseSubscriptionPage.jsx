@@ -239,20 +239,26 @@ function PurchaseSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ fontSize: "0.9rem", fontWeight: 600 }}>
               유의사항
             </Typography>
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            • 본 구독권은 {subscription?.store?.storeName} 매장 전용으로 사용
-            가능합니다.
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            • 결제일 기준 30일간 이용 가능하며, 중도 해지는 불가합니다.
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            • 1일 1회 제공 기준이며, 일부 메뉴는 추가 금액이 발생할 수 있습니다.
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column",  gap: 0.5 }}>
+            <Typography variant="body2" sx={{fontSize: "0.8rem", }} color="text.secondary">
+              • 본 구독권은 {subscription?.store?.storeName} 매장 전용으로 사용
+              가능합니다.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+              • 결제일 기준 30일간 이용 가능하며, 중도 해지는 불가합니다.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+              • 1일 {subscription?.maxDailyUsage}회 제공 기준이며, 일부 메뉴는
+              추가 금액이 발생할 수 있습니다.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+              • 선물하기로 받은 구독권은 양도가 제한될 수 있습니다.
+            </Typography>
+          </Box>
         </Box>
 
         {/* 하단 결제 버튼 */}
