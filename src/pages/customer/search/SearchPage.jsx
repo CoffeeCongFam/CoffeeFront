@@ -21,7 +21,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
-import SearchOffRoundedIcon from '@mui/icons-material/SearchOffRounded';
+import SearchOffRoundedIcon from "@mui/icons-material/SearchOffRounded";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SearchCafeInput from "../../../components/customer/search/SearchCafeInput.jsx";
@@ -35,7 +35,7 @@ import CafeStatusChip from "../../../components/customer/cafe/CafeStatusChip.jsx
 import cafeMarkerIcon from "../../../assets/cafeMarkerV2.png"; // 카페용 마커 아이콘
 import Loading from "../../../components/common/Loading.jsx";
 import getDistanceKm from "../../../utils/getDistanceKm";
-import storeDummy from '../../../assets/cafeInfoDummy.png';
+import storeDummy from "../../../assets/cafeInfoDummy.png";
 
 const Panel = styled(Paper)(({ theme }) => ({
   position: "absolute",
@@ -90,9 +90,8 @@ export default function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
   const [cafes, setCafes] = useState([]);
-  const [sortOption, setSortOption] = useState("distance");   // 정렬
-  const [statusFilter, setStatusFilter] = useState("ALL");    // 필터링 (전체 / 영업중 / 영업종료 / 휴무일)
-
+  const [sortOption, setSortOption] = useState("distance"); // 정렬
+  const [statusFilter, setStatusFilter] = useState("ALL"); // 필터링 (전체 / 영업중 / 영업종료 / 휴무일)
 
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
@@ -310,10 +309,10 @@ export default function SearchPage() {
   const sortedCafes = useMemo(() => {
     // 상태 핕터링 적용
     const filtered = cafes.filter((cafe) => {
-      if(statusFilter === "ALL") return true;
+      if (statusFilter === "ALL") return true;
 
-      return cafe.storeStatus === statusFilter;   // "OPEN" / "CLOSED" / "HOLIDAY"
-    })
+      return cafe.storeStatus === statusFilter; // "OPEN" / "CLOSED" / "HOLIDAY"
+    });
 
     // 거리 계산
     // const arr = cafes.map((cafe) => {
@@ -405,7 +404,7 @@ export default function SearchPage() {
           top: 16,
           left: 16,
           right: 16,
-          zIndex: 1300,
+          zIndex: 1100,
           display: "flex",
           gap: 1,
           alignItems: "center",
@@ -481,8 +480,6 @@ export default function SearchPage() {
         <IconButton
           onClick={setCurrentLocation}
           aria-label="current-location"
-          // onMouseEnter={handleCurrentLocPopoverOpen}
-          // onMouseLeave={handleCurrentLocPopoverClose}
           sx={{
             backgroundColor: "white",
             color: "gray",
@@ -495,26 +492,6 @@ export default function SearchPage() {
         >
           <LocationSearchingIcon />
         </IconButton>
-        <Popover
-          id="mouse-over-popover"
-          sx={{ pointerEvents: "none" }}
-          open={open}
-          anchorEl={currentLocRef}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
-          onClose={handleCurrentLocPopoverClose}
-          disableRestoreFocus
-        >
-          <Typography sx={{ p: 1, backgroundColor: "rgba(255, 255, 255, 0)" }}>
-            현재 위치로 이동
-          </Typography>
-        </Popover>
 
         {/* 리스트 토글 */}
         {isAppLike ? (
@@ -569,7 +546,6 @@ export default function SearchPage() {
         >
           <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-
             {/* 영업 상태 필터 */}
             <Select
               size="small"
@@ -610,10 +586,25 @@ export default function SearchPage() {
                 flexDirection: "column",
               }}
             >
-              {
-                sortedCafes.length === 0 &&
-                <Box sx={{flex: 1, display: "flex", flexDirection: "column", gap: "0.7rem", px: 2, py: 3, bgcolor: "#f8f9fa", textAlign: "center"}}>
-                  <SearchOffRoundedIcon sx={{ fontSize: 40, mb: 1, opacity: 0.6 }} />
+              {sortedCafes.length === 0 && (
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.7rem",
+                    px: 2,
+                    pt: 6,
+                    pb: 3,
+                    // bgcolor: "#f8f9fa",
+                    textAlign: "center",
+                  }}
+                >
+                  <SearchOffRoundedIcon
+                    sx={{ fontSize: 40, mb: 1, opacity: 0.6 }}
+                  />
                   <Typography color="text.secondary">
                     조건에 맞는 카페가 없습니다.
                   </Typography>
@@ -621,7 +612,7 @@ export default function SearchPage() {
                     필터를 변경하거나 다른 지역을 검색해보세요 ☕
                   </Typography>
                 </Box>
-              }
+              )}
               {sortedCafes.map((cafe) => {
                 const distanceLabel = formatDistance(cafe.distanceKm);
 
@@ -644,10 +635,8 @@ export default function SearchPage() {
                         filter: "brightness(0.97)",
                         // transform: "translateY(-3px)",
                         // boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-                      }
+                      },
                     }}
-                    
-                    
                   >
                     {/* 썸네일 */}
                     <Box

@@ -211,7 +211,7 @@ function CafeMenuList({ menus = [] }) {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {menu.price ? menu.price.toLocaleString() : "-"}원
+                        {menu.price ? menu.price.toLocaleString() : 0}원
                       </Typography>
                     </Box>
                   </Box>

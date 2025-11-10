@@ -6,36 +6,54 @@ import useUserStore from "./stores/useUserStore";
 import useNotificationStore from "./stores/useNotificationStore";
 import { fetchNotificationList } from "./apis/notificationApi";
 
+// 로그인 없이 접근 가능한 경로
+const PUBLIC_PATHS = [
+  "/", // 랜딩
+  "/signup",
+  "/auth/kakao/callback",
+  "/kakaoRedirect",
+  "/kakaoRedirectProd",
+  "/customerSignUp",
+  "/cafeSignUp",
+  "/MemberSignUp",
+  "/withdrawal",
+];
 
-  // 로그인 없이 접근 가능한 경로
-  const PUBLIC_PATHS = [
-    "/", // 랜딩
-    "/signup",
-    "/auth/kakao/callback",
-    "/kakaoRedirect",
-    "/customerSignUp",
-    "/cafeSignUp",
-    "/MemberSignUp",
-    "/withdrawal",
-  ];
-
-  
 function connectSSE(addNotification) {
   const BASE_URL = import.meta.env.VITE_API_URL;
   const url = `${BASE_URL}/api/common/connect`;
   const source = new EventSource(url, { withCredentials: true });
 
-  source.addEventListener("notification", (event) => {
+  // SSE 연결 성공 로그
+  source.onopen = () => {
+    console.log("✅ SSE connection opened");
+  };
+
+  // onmessage 와 addEventListner 이중으로 잡기 => onmessage를 메인으로 쓰고, addEventListener('notification')은 보조로
+
+  // 기본 message 이벤트 (event: 라벨 없는 경우)
+  source.onmessage = (event) => {
+    console.log("🌐 SSE default message:", event.data);
     try {
-      console.log("🔔 Custom Notification Event Received");
-      console.log(event.data);
       const newNotification = JSON.parse(event.data);
       addNotification(newNotification);
     } catch (e) {
-      console.log("FAILED TO PARSE SSE MESSAGE", e);
+      console.error("❌ Failed to parse SSE message", e);
+    }
+  };
+
+  // 커스텀 이벤트 (event: notification) 지원
+  source.addEventListener("notification", (event) => {
+    console.log("🔔 SSE [notification] event:", event.data);
+    try {
+      const newNotification = JSON.parse(event.data);
+      addNotification(newNotification);
+    } catch (e) {
+      console.error("❌ Failed to parse SSE notification", e);
     }
   });
 
+  // 에러 핸들링
   source.onerror = (error) => {
     console.error("SSE connection error:", error);
   };
@@ -55,8 +73,6 @@ function App() {
     (state) => state.setNotifications
   );
 
-
-
   // ✅ 서버에서 내 정보 가져오기 (쿠키 기반)
   const fetchMe = useCallback(async () => {
     try {
@@ -71,7 +87,9 @@ function App() {
 
         if (userData.partnerStoreId) {
           setPartnerStoreId(userData.partnerStoreId);
-          console.log(`✅ Partner Store ID ${userData.partnerStoreId} 저장 완료.`);
+          console.log(
+            `✅ Partner Store ID ${userData.partnerStoreId} 저장 완료.`
+          );
         }
       }
     } catch (err) {
@@ -79,15 +97,15 @@ function App() {
     }
   }, [setUser, setPartnerStoreId]);
 
-  // 알림 내역 가져오기 
+  // 알림 내역 가져오기
   async function loadNotifications() {
-      try {
-        const list = await fetchNotificationList();
-        setNotifications(list);
-        console.log("🔔 알림 초기 로드 완료.");
-      } catch (err) {
-        console.error("알림 로드 실패:", err);
-      }
+    try {
+      const list = await fetchNotificationList();
+      setNotifications(list);
+      console.log("🔔 알림 초기 로드 완료.");
+    } catch (err) {
+      console.error("알림 로드 실패:", err);
+    }
   }
 
   // ✅ SSE 연결 / 해제

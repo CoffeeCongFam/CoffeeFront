@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Button,
 } from "@mui/material";
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
 import OrderStepper from "../../../components/customer/order/OrderStepper";
@@ -18,6 +19,7 @@ import {
   fetchOrderDetail,
   requestCancelOrder,
 } from "../../../apis/customerApi";
+import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
 
 function orderStatusMessage(status) {
   switch (status) {
@@ -155,14 +157,38 @@ function CompleteOrderPage() {
       <Box sx={{ textAlign: "center", mb: 2 }}>
         <Typography variant="h5" fontWeight="bold">
           {isLoading
-            ? "주문 내역 불러오는 중..."
-            : orderStatusMessage(orderInfo.orderStatus)}
+            && "주문 내역 불러오는 중..."
+            // : orderStatusMessage(orderInfo.orderStatus)
+          }
         </Typography>
       </Box>
+
+
       {!isLoading ? (
         <>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column", 
+            alignItems: "center",    
+            mb: 2,
+          }}
+        >
+          <CheckCircleRoundedIcon sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }} />
+          <Typography
+            fontSize="2rem"
+            textAlign="center"
+            fontWeight="bold"
+          >
+            주문 번호 {orderInfo.orderNumber}번
+          </Typography>
+           <Box sx={{ mt: 2, mb: 4 , width: isAppLike ? "100%": "70%"}}>
+            <OrderProgressBar status={orderInfo.orderStatus} />
+          </Box>
+        </Box>
+
           {/* 스텝퍼 */}
-          <OrderStepper orderStatus={orderInfo.orderStatus} />
+          {/* <OrderStepper orderStatus={orderInfo.orderStatus} /> */}
 
           {/* 주문 카드 */}
           <Box
@@ -177,14 +203,14 @@ function CompleteOrderPage() {
             }}
           >
             {/* 제목 */}
-            <Typography
+            {/* <Typography
               variant="h6"
               textAlign="center"
               mb={2}
               fontWeight={"bold"}
             >
               주문 번호 {orderInfo.orderNumber}번
-            </Typography>
+            </Typography> */}
 
             <Divider sx={{ mb: 2 }} />
 
@@ -196,7 +222,7 @@ function CompleteOrderPage() {
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
-              <Typography color="text.secondary">카페명</Typography>
+              <Typography color="text.secondary" onClick={() => ""}>카페명</Typography>
               <Typography>{orderInfo.store.storeName}</Typography>
             </Box>
             <Box
@@ -248,7 +274,7 @@ function CompleteOrderPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
                 <Typography>{m.menuName}</Typography>
-                <Typography>{m.quantity} 잔</Typography>
+                <Typography>{m.quantity} 개</Typography>
               </Box>
             ))}
 

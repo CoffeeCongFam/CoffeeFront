@@ -201,7 +201,7 @@ function StoreDetailPage() {
 
         {/* 1. 메뉴 탭 */}
         <TabPanel value={tab} index={1}>
-          <CafeMenuList menus={store.menus} />
+          <CafeMenuList menus={store.menus.filter((menu) => menu.deletedAt === "")} />
         </TabPanel>
 
         {/* 2. 구독권 탭 */}

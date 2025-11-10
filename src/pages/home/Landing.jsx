@@ -172,13 +172,13 @@ function Landing() {
             }}
           >
             <Typography
-              sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: "0.95rem" }}
+              sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}
             >
               우리는 생각한다. 고로 커피를 마신다… ☕
             </Typography>
             <Typography
               sx={{
-                fontSize: isMobile ? "1.8rem" : "2.3rem",
+                fontSize: isMobile ? "1.6rem" : "2.3rem",
                 fontWeight: 700,
                 lineHeight: 1.25,
                 color: "#4a3426",
@@ -188,7 +188,7 @@ function Landing() {
               <br />
               커피 구독 플랫폼, COFFEIENS
             </Typography>
-            <Typography sx={{ color: "#4a3426", fontSize: "0.9rem", mt: 1 }}>
+            <Typography sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" , mt: 1 }}>
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
               COFFEIENS는 소비자에게는 더 현명한 하루를,
@@ -206,7 +206,8 @@ function Landing() {
                       backgroundColor: "#c84436",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      px: 6,
+                      flex: isMobile && 1,
+                      px: isMobile || 6,
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
                     onClick={() => navigate("/signup")}
@@ -220,10 +221,11 @@ function Landing() {
                       color: "#4a3426",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      px: 5,
+                      flex: isMobile && 1,
                       display: "flex",
+                      px: isMobile || 5,
                       gap: 1,
-                      justifyContent: "space-between",
+                      justifyContent: "center",
                       alignItems: "center",
                       "&:hover": {
                         borderColor: "#4a3426",
@@ -255,21 +257,6 @@ function Landing() {
               )}
             </Box>
 
-            {/* 다음으로 내려가는 버튼 */}
-            {/* <Link to="customer" smooth duration={500}>
-              <IconButton
-                sx={{
-                  mt: 4,
-                  width: 34,
-                  height: 34,
-                  borderRadius: "9999px",
-                  border: "2px solid #4a3426",
-                  color: "#4a3426",
-                }}
-              >
-                •••
-              </IconButton>
-            </Link> */}
           </Box>
         </Box>
       </Element>
@@ -295,21 +282,25 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography sx={{ color: "#cc5f2b", fontWeight: 600 }}>
+            <Typography sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }} >
               매일의 커피, 더 똑똑하게 즐기다
             </Typography>
             <Typography
-              sx={{ fontSize: "2rem", fontWeight: 700, color: "#4a3426" }}
+              sx={{ 
+                fontSize: isMobile ? "1.5rem" : "2.3rem", 
+                fontWeight: 700, 
+                color: "#4a3426" 
+              }}
             >
               매일 마시는 커피,
               <br /> 이제는 구독으로 더 합리적이게
             </Typography>
-            <Typography sx={{ color: "#4a3426" }}>
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
               CoffeeEns는 당신이 자주 가는 동네 카페를 구독으로 연결해줍니다.
               <br />한 달 구독으로 매일의 커피를 더 합리적으로, 줄 서지 않고
               간편하게 즐기세요.
             </Typography>
-            <Typography sx={{ color: "#4a3426" }}>
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
             <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
@@ -350,24 +341,30 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography sx={{ color: "#cc5f2b", fontWeight: 600 }}>
+            <Typography  sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}>
               예측 가능한 매출, 사장님의 새로운 루틴
             </Typography>
             <Typography
-              sx={{ fontSize: "2rem", fontWeight: 700, color: "#4a3426" }}
+              sx={{ 
+                fontSize: isMobile ? "1.6rem" : "2.3rem", 
+                fontWeight: 700, 
+                color: "#4a3426" 
+              }}
             >
-              이제 우리 카페에도 사이렌 오더가 생깁니다.
-              <br />
-              단골은 늘리고, 매출은 안정적으로
+              {/* 이제 우리 카페에도 사이렌 오더가 생깁니다. */}
+              {/* <br /> */}
+              단골은 늘리고, <br />
+              매출은 안정적으로
+              {/* 매출은 예측 가능하게 */}
             </Typography>
-            <Typography sx={{ color: "#4a3426" }}>
-              CoffeeEns는 구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
+            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
+              구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              매일 찾는 단골 고객을 확보하고, 주문과 결제를 간편하게 관리하세요.{" "}
+              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게 관리하세요.{" "}
               <br />
               프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
+            <Box sx={{ display: "flex", gap: 1, mt: 6 , justifyContent: isMobile && "flex-end"}}>
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"

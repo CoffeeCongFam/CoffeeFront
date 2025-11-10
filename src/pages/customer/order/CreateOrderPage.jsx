@@ -323,10 +323,10 @@ function CreateOrderPage() {
         py: isAppLike ? 2 : 5,
         pb: 10,
         boxSizing: "border-box",
-        overflow: "hidden",  
-        display: "flex", 
+        overflow: "hidden",
+        display: "flex",
         flexDirection: "column",
-        // height: "calc(100vh - 64px)", 
+        // height: "calc(100vh - 64px)",
         ...(isAppLike
           ? {
               minHeight: "calc(100vh - 64px)",
@@ -337,33 +337,33 @@ function CreateOrderPage() {
             }),
       }}
     >
-       <Box
-               sx={{
-                 display: "flex",
-                 flexDirection: "column", // 데스크탑도 무조건 column
-                 gap: 1.5,
-                 mb: 2,
-               }}
-             >
-               {/* 제목 */}
-               <Typography
-                 sx={{
-                   fontSize: { xs: "1.5rem", md: "1.9rem" },
-                   fontWeight: "bold",
-                   lineHeight: 1.1,
-                   mb: "2%",
-                 }}
-               >
-                주문하기
-               </Typography>
-             </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column", // 데스크탑도 무조건 column
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
+        {/* 제목 */}
+        <Typography
+          sx={{
+            fontSize: { xs: "1.5rem", md: "1.9rem" },
+            fontWeight: "bold",
+            lineHeight: 1.1,
+            mb: "2%",
+          }}
+        >
+          주문하기
+        </Typography>
+      </Box>
 
       {/* 헤더 아래 메인 콘텐츠 영역 */}
-      <Box 
+      <Box
         sx={{
           // px: isAppLike ? 0 : 5,
-          flex: 1,                   //  남은 영역 모두 차지
-          minHeight: 0,              //  자식이 flex 안에서 스크롤 가능하도록
+          flex: 1, //  남은 영역 모두 차지
+          minHeight: 0, //  자식이 flex 안에서 스크롤 가능하도록
           display: "flex",
           flexDirection: "column",
         }}
@@ -376,7 +376,7 @@ function CreateOrderPage() {
             gap: 2,
             mb: 3,
             alignItems: { xs: "stretch", md: "stretch" },
-            flexShrink: 0,  // 위 영역은 고정 높이
+            flexShrink: 0, // 위 영역은 고정 높이
           }}
         >
           <Box sx={{ flex: 3 }}>
@@ -477,8 +477,8 @@ function CreateOrderPage() {
             flexDirection: { xs: "column", md: "row" },
             gap: 3,
             alignItems: "stretch",
-            flex: 1,    
-            minHeight: 0,  
+            flex: 1,
+            minHeight: 0,
           }}
         >
           {/* 메뉴 그리드 영역 */}
@@ -488,7 +488,7 @@ function CreateOrderPage() {
               width: "100%",
               display: "flex",
               flexDirection: "column",
-              minHeight: 0,    
+              minHeight: 0,
             }}
           >
             {/* 카테고리 탭 */}
@@ -511,7 +511,7 @@ function CreateOrderPage() {
               <ToggleButton value="DESSERT">디저트</ToggleButton>
             </ToggleButtonGroup>
 
-            <Box 
+            <Box
               sx={{
                 flex: 1,
                 minHeight: 0,
@@ -542,7 +542,7 @@ function CreateOrderPage() {
                   sx={{
                     display: "grid",
                     gridTemplateColumns: {
-                      xs: "repeat(3, minmax(0, 1fr))",
+                      // xs: "repeat(1, minmax(0, 1fr))",
                       md: "repeat(3, minmax(0, 1fr))",
                     },
                     gap: 2,
@@ -563,7 +563,7 @@ function CreateOrderPage() {
                           boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
                           p: 2,
                           display: "flex",
-                          flexDirection: "column",
+                          flexDirection: isAppLike ? "row" : "column",
                           alignItems: "stretch",
                           height: "100%",
                         }}
@@ -656,9 +656,10 @@ function CreateOrderPage() {
                               startIcon={<AddIcon />}
                               onClick={() => handleAddToCart(menu.menuId)}
                               sx={{
+                                width: isAppLike ? "" : "",
                                 borderRadius: 999,
                                 textTransform: "none",
-                                fontSize: "0.8rem",
+                                fontSize: isAppLike ? "0.5rem" : "0.8rem",
                               }}
                             >
                               담기
@@ -679,7 +680,7 @@ function CreateOrderPage() {
               flex: { xs: "0 0 auto", md: 2 },
               minWidth: { xs: "100%", md: 260 },
               display: "flex",
-              mt: { xs: 2, md: 0 },         
+              mt: { xs: 2, md: 0 },
             }}
           >
             <Box

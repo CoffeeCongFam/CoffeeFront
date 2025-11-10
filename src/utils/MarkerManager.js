@@ -154,12 +154,13 @@ export default class MarkerManager {
           ">
             ${cafe.roadAddress ?? ""}
           </div>
-          ${stockInfo}
-          <div style="font-size:12px; color:#444; margin-top:3px;">
-            👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${cafe.reviewCount ?? 0}개
-          </div>
-          <div style="margin-top:6px; display:flex; gap:6px; align-items:center; justify-content: right;">
 
+          <div style="font-size:12px; color:#444; margin-top:3px;">
+             👥 구독권 ${cafe.subscriberCount ?? 0}명 ·  ⭐ 리뷰 ${
+      cafe.reviewCount ?? 0
+    }개
+          </div>
+          <div style=" display:flex; gap:6px; align-items:center; justify-content: right;">
             ${detailButton}
           </div>
         </div>

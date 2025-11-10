@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
+
 function Loading({
   title = "잠시만 기다려주세요",
   message = "따뜻한 커피를 준비 중이에요 ☕️",
