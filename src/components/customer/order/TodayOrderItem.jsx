@@ -27,6 +27,15 @@ function TodayOrderItem({ order, isAppLike }) {
             px: 2,
             py: 2,
             gap: 1,
+            cursor: "pointer",
+            "&:hover": {
+              // backgroundColor: "rgba(141, 141, 141, 0.04)", // 살짝 어둡게
+              // boxShadow: "0 4px 12px rgba(0,0,0,0.1)", // 약한 그림자 추가
+              // transform: "translateY(-2px)", // 살짝 떠오르는 느낌
+            },
+          }}
+          onClick={() => {
+            navigate(`/me/order/${order.orderId}`);
           }}
         >
           {/* 상단 이미지 및 카페, 구독권 이름, 메뉴 */}
