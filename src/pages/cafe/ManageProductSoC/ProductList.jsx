@@ -73,7 +73,7 @@ const ProductList = ({ subscriptions, onCardClick }) => {
       {/* 🚩 subscriptions 배열을 순회하며 개별 카드를 렌더링합니다. */}
       {subscriptions
         .filter((subscription) => !subscription.deletedAt)
-        .sort((a, b) => new Date(b.subscriptionId) - new Date(a.subscriptionId))
+        .sort((a, b) => b.subscriptionId - a.subscriptionId)
         .map((subscription) => {
           // 단일 구독권 객체에 대한 카드 렌더링 로직 (기존 코드를 그대로 사용)
           const statusProps = getStatusProps(subscription.subscriptionStatus);

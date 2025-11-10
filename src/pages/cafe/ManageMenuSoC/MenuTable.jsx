@@ -74,8 +74,8 @@ const tableHeaders = [
 // 메뉴 리스트를 표시하는 테이블 컴포넌트
 export default function MenuTable({ menuList, onEditClick }) {
   const sortedByCreatedAtMenuList = [...(menuList || [])].sort((a, b) => {
-    const dataA = new Date(a.createdAt);
-    const dataB = new Date(b.createdAt);
+    const dataA = new Date(a.createdAt).getTime();
+    const dataB = new Date(b.createdAt).getTime();
 
     // 내림차순 b - a
     return dataB - dataA;
