@@ -66,6 +66,10 @@ function SendGift({ sendGiftList = [] }) {
                 </Typography>
               </Stack>
             </Grid>
+
+              <Grid item xs={2} sx={{ textAlign: "center" }}>
+                <ArrowRightAltIcon sx={{ fontSize: 36 }} />
+              </Grid>
             <Grid item xs={2} sx={{ textAlign: "center" }}>
               <ArrowRightAltIcon sx={{ fontSize: 36 }} />
             </Grid>

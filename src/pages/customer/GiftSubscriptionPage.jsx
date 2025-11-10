@@ -300,7 +300,7 @@ function GiftSubscriptionPage() {
             sx={{
               display: "flex",
               flexDirection: isAppLike ? "column" : "row",
-              gap: 2,
+              gap: isAppLike ? 3 : 2,
               width: "100%",
               maxWidth: "900px",
               marginTop: "20px",
@@ -324,6 +324,7 @@ function GiftSubscriptionPage() {
               </Box>
             </Box>
 
+            {isAppLike || 
             <Box
               sx={{
                 width: 40,
@@ -334,6 +335,8 @@ function GiftSubscriptionPage() {
             >
               <ForwardIcon />
             </Box>
+            }
+
 
             {/* 받는 사람 */}
             <Box
@@ -457,7 +460,7 @@ function GiftSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
               유의사항
             </Typography>
           </Box>
@@ -574,87 +577,91 @@ function GiftSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 1.5,
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
+                gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
+                columnGap: 1.5,
+                rowGap: 1.5,
               }}
             >
-              {paymentMethods.map((method) => (
-                <Box
-                  key={method.label}
-                  onClick={() => {
-                    setSelectedMethod(method.label);
-                    setTimeout(() => confirmPayment(method.pg), 200);
-                  }}
-                  sx={{
-                    bgcolor: method.bgColor,
-                    border: `2px solid ${
-                      selectedMethod === method.label
-                        ? method.color
-                        : "transparent"
-                    }`,
-                    borderRadius: 3,
-                    height: 110,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      boxShadow: `0 4px 12px ${method.color}40`,
-                      borderColor: method.color,
-                      transform: "translateY(-3px)",
-                    },
-                  }}
-                >
-                  {/* 아이콘 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: 40,
-                    }}
-                  >
-                    {React.isValidElement(method.icon) ? (
-                      method.icon
-                    ) : (
-                      <img
-                        src={method.icon}
-                        alt={method.label}
-                        style={{
-                          ...method.imgStyle,
-                          objectFit: "contain",
-                          filter:
-                            method.label === "토스페이"
-                              ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
-                              : "none",
-                        }}
-                      />
-                    )}
-                  </Box>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: method.textColor || "#333",
-                      fontSize: 13,
-                    }}
-                  >
-                    {method.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+               {paymentMethods.map((method) => (
+                              <Box
+                                key={method.label}
+                                onClick={() => {
+                                  setSelectedMethod(method.label);
+                                  setTimeout(() => confirmPayment(method.pg), 200);
+                                }}
+                                sx={{
+                                  bgcolor: method.bgColor,
+                                  border: `2px solid ${
+                                    selectedMethod === method.label
+                                      ? method.color
+                                      : "transparent"
+                                  }`,
+                                  borderRadius: 3,
+                                  height: "100%", 
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  gap: 1,
+                                  cursor: "pointer",
+                                  transition: "all 0.2s ease",
+                                  "&:hover": {
+                                    boxShadow: `0 4px 12px ${method.color}40`,
+                                    borderColor: method.color,
+                                    transform: "translateY(-3px)",
+                                  },
+                                }}
+                              >
+                                {/* 아이콘 */}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: 40,
+                                  }}
+                                >
+                                  {React.isValidElement(method.icon) ? (
+                                    method.icon
+                                  ) : (
+                                    <img
+                                      src={method.icon}
+                                      alt={method.label}
+                                      style={{
+                                        ...method.imgStyle,
+                                        objectFit: "contain",
+                                        filter:
+                                          method.label === "토스페이"
+                                            ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
+                                            : "none",
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+              
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color: method.textColor || "#333",
+                                    fontSize: 13,
+                                  }}
+                                >
+                                  {method.label}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Box>
 
             <Box
               sx={{
                 bgcolor: "#F8F9FA",
                 borderRadius: 2,
-                p: 2,
+                px: 2,
+                pt: 1,
                 mt: 2,
+                pb: 7
               }}
             >
               <Typography

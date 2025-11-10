@@ -192,9 +192,9 @@ function CustomerHome() {
   ) : (
     <Box
       sx={{
-        px: isAppLike ? 2 : 12,
-        py: isAppLike ? 2 : 5,
-        pb: isAppLike ? 9 : 8,
+        px: isAppLike ? 3 : 12,
+        pt: isAppLike ? 5 : 5,
+        pb: isAppLike ? 12 : 8,
         minHeight: "100%",
       }}
     >
@@ -218,12 +218,12 @@ function CustomerHome() {
           }}
         >
           <Typography
-            sx={{ fontSize: isAppLike ? "23px" : "30px", fontWeight: "bold" }}
+            sx={{ fontSize: isAppLike ? "1.2rem" : "30px", fontWeight: "bold" }}
           >
             안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
             잔의 여유를 즐겨보세요.
           </Typography>
-          <Typography>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
+          <Typography sx={{ fontSize: isAppLike ? "0.8rem" : "1rem"}}>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
       </Box>
 
@@ -248,7 +248,7 @@ function CustomerHome() {
           </Typography>
 
           {isAppLike ? (
-            // ✅ 모바일: 가로 캐러셀
+            // 모바일: 가로 캐러셀
             <Box
               sx={{
                 display: "flex",
@@ -413,12 +413,16 @@ function CustomerHome() {
 
       {/* 내 근처 카페 */}
       <Box
-        sx={{ px: "1rem" }}
+        sx={{  }}
         data-step="4"
         data-intro="GPS 정보를 기반으로 **500m 내에 있는 근처 카페**들을 보여드려요. 새로운 단골 매장을 찾아보세요!"
         data-position="top"
       >
-        <Typography sx={{ fontSize: "20px", fontWeight: "bold", mb: 2 }}>
+        <Typography sx={{ 
+          fontSize: isAppLike? "1rem" : "30px", 
+          fontWeight: "bold", 
+          mb: 2 }}
+        >
           내 근처 동네 카페
         </Typography>
 

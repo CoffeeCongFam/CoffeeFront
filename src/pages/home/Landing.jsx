@@ -265,8 +265,8 @@ function Landing() {
                       backgroundColor: "#c84436",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      flex: isMobile && 1,
-                      px: isMobile || 6,
+                      flex: isMobile ? 1 : "initial", 
+                      px: isMobile ? 2 : 6,      
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
                     onClick={() => navigate("/signup")}

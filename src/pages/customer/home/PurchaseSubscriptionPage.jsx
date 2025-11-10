@@ -303,8 +303,10 @@ function PurchaseSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 1.5,
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
+                gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
+                columnGap: 1.5,
+                rowGap: 1.5,
               }}
             >
               {paymentMethods.map((method) => (
@@ -322,7 +324,7 @@ function PurchaseSubscriptionPage() {
                         : "transparent"
                     }`,
                     borderRadius: 3,
-                    height: 110,
+                    height: "100%", 
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -382,8 +384,10 @@ function PurchaseSubscriptionPage() {
               sx={{
                 bgcolor: "#F8F9FA",
                 borderRadius: 2,
-                p: 2,
+                px: 2,
+                pt: 1,
                 mt: 2,
+                pb: 7
               }}
             >
               <Typography

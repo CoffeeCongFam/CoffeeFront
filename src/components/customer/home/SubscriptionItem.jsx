@@ -79,7 +79,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             gap: 1,
             backgroundColor: "rgba(0,0,0,0.25)",
             backdropFilter: "blur(1.5px)",
-            zIndex: 10,
+            zIndex: 100,
           }}
         >
           <CoffeeIcon sx={{ fontSize: 65, color: "#ffffffd2" }} />
