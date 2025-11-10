@@ -85,13 +85,13 @@ function CustomerHome() {
 
       // 환불 안 된 구독권만 남기기
       const activeSubs =
-      (data || []).filter((it) => it.refundedAt === "") || [];
+        (data || []).filter((it) => it.refundedAt === "") || [];
 
       // remainingCount 기준 내림차순 정렬 (주문 잔 수 많은 것 먼저)
       activeSubs.sort((a, b) => {
         const aRemain = a.remainingCount ?? 0;
         const bRemain = b.remainingCount ?? 0;
-        return bRemain - aRemain; 
+        return bRemain - aRemain;
       });
 
       setSubscriptions(activeSubs);
@@ -234,12 +234,13 @@ function CustomerHome() {
             gap: "0.7rem",
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-            {todayDate} 진행 중인 주문 {ongoingOrders.length}건
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1 }}>
+            {todayDate} {isAppLike && <br />} 진행 중인 주문{" "}
+            {ongoingOrders.length}건
           </Typography>
 
           {ongoingOrders.map((order, idx) => (
-            <TodayOrderItem key={idx} order={order} />
+            <TodayOrderItem key={idx} order={order} isAppLike={isAppLike} />
           ))}
         </Box>
       )}
@@ -302,11 +303,11 @@ function CustomerHome() {
             ref={scrollRef}
             sx={{
               display: "flex",
-              gap: isAppLike ? 0 : 2,    
+              gap: isAppLike ? 0 : 2,
               overflowX: "auto",
               scrollSnapType: "x mandatory",
               py: 2,
-              pr: isAppLike ? 0 : 8,   
+              pr: isAppLike ? 0 : 8,
               "&::-webkit-scrollbar": {
                 height: isAppLike ? 0 : 6,
               },
@@ -322,7 +323,7 @@ function CustomerHome() {
                 sx={{
                   scrollSnapAlign: "start",
                   flex: isAppLike ? "0 0 100%" : "0 0 auto",
-                  px: isAppLike ? 0 : 0,  
+                  px: isAppLike ? 0 : 0,
                 }}
               >
                 <SubscriptionItem
@@ -342,11 +343,10 @@ function CustomerHome() {
           내 근처 동네 카페
         </Typography>
 
-        {
-          nearbyCafes && nearbyCafes.length > 0 &&
+        {nearbyCafes && nearbyCafes.length > 0 && (
           <LocalCafeImgList list={nearbyCafes} />
-        }
-      
+        )}
+
         {locError && (
           <Typography color="error" sx={{ mb: 1 }}>
             {locError}
@@ -354,12 +354,11 @@ function CustomerHome() {
         )}
 
         {!locError && nearbyCafes.length === 0 && (
-          <Box sx={{ px: 1, py : 1.5}}>
+          <Box sx={{ px: 1, py: 1.5 }}>
             <Typography sx={{ color: "text.secondary" }}>
               500m 안에 등록된 카페가 아직 없어요 ☕
-            </Typography> 
+            </Typography>
           </Box>
-       
         )}
       </Box>
     </Box>
