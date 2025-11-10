@@ -7,7 +7,7 @@ import {
   CircularProgress,
   Button,
 } from "@mui/material";
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
 import OrderStepper from "../../../components/customer/order/OrderStepper";
@@ -20,6 +20,7 @@ import {
   requestCancelOrder,
 } from "../../../apis/customerApi";
 import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
+import useNotificationStore from "../../../stores/useNotificationStore";
 
 function orderStatusMessage(status) {
   switch (status) {
@@ -60,6 +61,8 @@ function CompleteOrderPage() {
   const [orderInfo, setOrderInfo] = useState(null);
   const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
 
+  const { notifications } = useNotificationStore();
+
   // 주문 정보 초기화
   useEffect(() => {
     let mounted = true;
@@ -82,57 +85,45 @@ function CompleteOrderPage() {
     return () => {
       mounted = false;
     };
-  }, [orderId, orderInfo]);
+  }, [orderId]);
+  // orderInfo 갱신으로 계속 요청되는 문제 수정
 
   // 주문 취소
   async function handleCancelOrder() {
     try {
-      const res = await requestCancelOrder(orderId);
-      if (res !== null) {
-        setOrderInfo((prev) => ({
-          ...prev,
-          orderStatus: "CANCELED",
-          canceledAt: new Date().toISOString(),
-        }));
-        console.log(`✅ ${orderId}번 주문 취소 성공`);
+      await requestCancelOrder(orderId);
+
+      // 서버에서 최종 상태 다시 확인
+      const data = await fetchOrderDetail(orderId);
+      if (data) {
+        setOrderInfo(data);
       }
+
+      console.log(`✅ ${orderId}번 주문 취소 + 상태 갱신 완료`);
     } catch (e) {
       console.error("❌ 주문 취소 오류:", e);
       alert("서버와의 통신 중 오류가 발생했습니다.");
     } finally {
-      console.error("✅ ${orderId}번 주문 취소 성공");
       setOpenCancel(false);
-      // navigate("/me/order");
     }
   }
 
-  // #TODO. 2) SSE로 상태 실시간 받기
-  // useEffect(() => {
-  //   if (!orderId) return;
+  // SSE 주문 알림 onmessage
+  useEffect(() => {
+    if (!notifications.length) return;
 
-  //   const es = new EventSource(`/api/orders/${orderId}/sse`);
-
-  //   es.onmessage = (e) => {
-  //     const data = JSON.parse(e.data);
-  //     setOrderInfo((prev) =>
-  //       prev
-  //         ? {
-  //             ...prev,
-  //             ...data,
-  //             orderStatus: data.status ?? prev.orderStatus,
-  //           }
-  //         : prev
-  //     );
-  //   };
-
-  //   es.onerror = () => {
-  //     es.close();
-  //   };
-
-  //   return () => {
-  //     es.close();
-  //   };
-  // }, [orderId]); //
+    (async () => {
+      try {
+        console.log("🔁 알림 수신 → 주문 상세 재조회");
+        const data = await fetchOrderDetail(orderId);
+        if (data) {
+          setOrderInfo(data);
+        }
+      } catch (err) {
+        console.error("알림 기반 주문 재조회 실패:", err);
+      }
+    })();
+  }, [notifications, orderId]);
 
   function handleBack() {
     if (orderInfo.orderStatus === "CANCELED") {
@@ -141,8 +132,8 @@ function CompleteOrderPage() {
       navigate(-1);
     }
   }
-  function handleGoHome(){
-    navigate("/me")
+  function handleGoHome() {
+    navigate("/me");
   }
 
   return (
@@ -156,36 +147,38 @@ function CompleteOrderPage() {
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 2 }}>
         <Typography variant="h5" fontWeight="bold">
-          {isLoading
-            && "주문 내역 불러오는 중..."
+          {
+            isLoading && "주문 내역 불러오는 중..."
             // : orderStatusMessage(orderInfo.orderStatus)
           }
         </Typography>
       </Box>
 
-
       {!isLoading ? (
         <>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column", 
-            alignItems: "center",    
-            mb: 2,
-          }}
-        >
-          <CheckCircleRoundedIcon sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }} />
-          <Typography
-            fontSize="2rem"
-            textAlign="center"
-            fontWeight="bold"
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mb: 2,
+            }}
           >
-            주문 번호 {orderInfo.orderNumber}번
-          </Typography>
-           <Box sx={{ mt: 2, mb: 4 , width: isAppLike ? "100%": "70%"}}>
-            <OrderProgressBar status={orderInfo.orderStatus} />
+            {orderInfo.orderStatus === "CANCELED" ? (
+              "취소"
+            ) : (
+              <CheckCircleRoundedIcon
+                sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }}
+              />
+            )}
+
+            <Typography fontSize="2rem" textAlign="center" fontWeight="bold">
+              주문 번호 {orderInfo.orderNumber}번
+            </Typography>
+            <Box sx={{ mt: 2, mb: 4, width: isAppLike ? "100%" : "70%" }}>
+              <OrderProgressBar status={orderInfo.orderStatus} />
+            </Box>
           </Box>
-        </Box>
 
           {/* 스텝퍼 */}
           {/* <OrderStepper orderStatus={orderInfo.orderStatus} /> */}
@@ -222,7 +215,9 @@ function CompleteOrderPage() {
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
-              <Typography color="text.secondary" onClick={() => ""}>카페명</Typography>
+              <Typography color="text.secondary" onClick={() => ""}>
+                카페명
+              </Typography>
               <Typography>{orderInfo.store.storeName}</Typography>
             </Box>
             <Box

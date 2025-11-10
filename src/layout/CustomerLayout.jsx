@@ -73,6 +73,7 @@ export default function CustomerLayout() {
   function handleCloseNotif() {
     setNotifOpen(false);
   }
+
   function openNotifDrawer() {
     setNotifOpen(true);
   }
@@ -138,30 +139,6 @@ export default function CustomerLayout() {
       console.error("알림 클릭 후 이동 처리 중 오류:", e);
     }
   }
-
-  // async function readMarkNotification(notificationId) {
-  //   const target = useNotificationStore.getState().getNotification(notificationId);
-
-  //   if (!target) {
-  //     console.warn("❌ 알림을 찾을 수 없음:", notificationId);
-  //     return;
-  //   }
-  //   console.log("📨 클릭된 알림:", target);
-
-  //   if (target.readAt || target.isRead) {
-  //     console.log("✅ 이미 읽은 알림입니다. 요청 생략.");
-  //     return;
-  //   }
-
-  //    try {
-  //     await readNotification(notificationId); // PATCH 요청
-  //     markAsRead(notificationId); // 상태 업데이트
-  //   } catch (e) {
-  //     console.error("알림 읽음 처리 실패:", e);
-  //   } finally {
-  //     console.log("🔄 알림 상태 업데이트 완료");
-  //   }
-  // }
 
   // ------------------------------------------
   // 1) 앱 / 모바일 모드

@@ -70,7 +70,7 @@ function CustomerHome() {
     try {
       const list = await fetchTodayOrderList(); // 오늘 주문 불러오기 (혹은 전체 주문)
       const filtered = (list || []).filter(
-        (o) => !["RECEIVED", "CANCELED"].includes(o.orderStatus)
+        (o) => !["RECEIVED", "CANCELED", "COMPLETED"].includes(o.orderStatus)
         // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
       );
       setOngoingOrders(filtered);
@@ -87,14 +87,17 @@ function CustomerHome() {
       const activeSubs =
         (data || []).filter((it) => it.refundedAt === "") || [];
 
+      // 만료되지 않은 것만 남기기
+      const notExpired = activeSubs.filter((it) => it.isExpired !== "EXPIRED");
+
       // remainingCount 기준 내림차순 정렬 (주문 잔 수 많은 것 먼저)
-      activeSubs.sort((a, b) => {
+      notExpired.sort((a, b) => {
         const aRemain = a.remainingCount ?? 0;
         const bRemain = b.remainingCount ?? 0;
         return bRemain - aRemain;
       });
 
-      setSubscriptions(activeSubs);
+      setSubscriptions(notExpired);
       console.log(data);
     } catch (e) {
       console.log(e);

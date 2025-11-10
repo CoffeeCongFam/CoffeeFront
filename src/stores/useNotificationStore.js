@@ -1,7 +1,7 @@
 // 로그인한 유저 알림 정보 관리 스토어
-import { create } from 'zustand';
+import { create } from "zustand";
 // 🚩 [수정] 알림 API 함수 임포트
-import { fetchNotificationList } from '../apis/notificationApi'; // 경로는 맞는지 확인해주세요.
+import { fetchNotificationList } from "../apis/notificationApi"; // 경로는 맞는지 확인해주세요.
 
 // 알림 구조
 // interface Notification {
@@ -26,7 +26,7 @@ const useNotificationStore = create((set, get) => ({
       // 2. setNotifications 액션을 사용하여 상태를 업데이트합니다.
       get().setNotifications(data);
     } catch (e) {
-      console.error('알림 목록 로드 중 오류 발생:', e);
+      console.error("알림 목록 로드 중 오류 발생:", e);
     }
   },
 
@@ -44,7 +44,7 @@ const useNotificationStore = create((set, get) => ({
   // 새로운 알림을 notifications에 추가하고
   // unreadCount 수 증가
   addNotification: (newNotification) => {
-    console.log('new notification !!!-----------------------', newNotification);
+    console.log("new notification !!!-----------------------", newNotification);
 
     set((state) => ({
       notifications: [
