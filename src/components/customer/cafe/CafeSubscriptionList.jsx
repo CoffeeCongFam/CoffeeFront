@@ -172,7 +172,9 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           justifyContent: "space-between",
           gap: 1,
           mb: 2,
-          alignItems: "center",
+          // alignItems: "center",
+          flexDirection: "column",
+          flex: 1,
         }}
       >
         <ToggleButtonGroup
@@ -180,6 +182,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           exclusive
           onChange={handleFilterChange}
           size="small"
+          sx={{ width: "100%" }}
         >
           <ToggleButton value="ALL">전체 ({counts.ALL})</ToggleButton>
           {/* {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
@@ -202,6 +205,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           sx={{
             display: "flex",
             gap: 1,
+            justifyContent: "flex-end",
             alignItems: "center",
           }}
         >

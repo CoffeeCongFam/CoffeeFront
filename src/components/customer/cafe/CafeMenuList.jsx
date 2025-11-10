@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography, IconButton, Avatar  } from "@mui/material";
+import { Box, Typography, IconButton, Avatar } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import menuDummy from "../../../assets/menuDummy.jpg";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import CakeIcon from '@mui/icons-material/Cake';
+import CakeIcon from "@mui/icons-material/Cake";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 function CafeMenuList({ menus = [] }) {
@@ -58,7 +58,6 @@ function CafeMenuList({ menus = [] }) {
               overflow: "hidden",
             }}
           >
-
             {/* 섹션 헤더 */}
             <Box
               sx={{
@@ -119,42 +118,38 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-                      {
-                        menu?.menuImg ? (
-                          <Box
-                            component="img"
-                            src={menuDummy || menu.menuImg}
-                            alt={menu.menuName}
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              objectFit: "cover",
-                              borderRadius: 1.2,
-                              flexShrink: 0,
-                            }}
-                          />
-                        ) : (
-                          <Avatar
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              bgcolor: "#85766cc4",
-                              // bgcolor: "#ffe082",
-                              // color: "#5a3e2b",
-                              borderRadius: 1.2, // 박스 모양 맞추기
-                              flexShrink: 0,
-                            }}
-                          >
-                            {menu.menuType === "DESSERT" ? (
-                              <CakeIcon sx={{ fontSize: 36 }} />
-                            ) : (
-                              <CoffeeIcon sx={{ fontSize: 36 }} />
-                            )}
-                          </Avatar>
-                        )
-                      }
-
-                      
+                      {menu?.menuImg ? (
+                        <Box
+                          component="img"
+                          src={menu.menuImg || menuDummy}
+                          alt={menu.menuName}
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            objectFit: "cover",
+                            borderRadius: 1.2,
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <Avatar
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            bgcolor: "#85766cc4",
+                            // bgcolor: "#ffe082",
+                            // color: "#5a3e2b",
+                            borderRadius: 1.2, // 박스 모양 맞추기
+                            flexShrink: 0,
+                          }}
+                        >
+                          {menu.menuType === "DESSERT" ? (
+                            <CakeIcon sx={{ fontSize: 36 }} />
+                          ) : (
+                            <CoffeeIcon sx={{ fontSize: 36 }} />
+                          )}
+                        </Avatar>
+                      )}
 
                       <Box
                         sx={{
