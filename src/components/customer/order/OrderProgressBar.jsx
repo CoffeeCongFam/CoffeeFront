@@ -45,8 +45,7 @@ function OrderProgressBar({ status }) {
         {labels.map((label, idx) => {
           const stepValue = (idx + 1) * (100 / labels.length); // 각 단계의 % 기준
           const prevStepValue = idx * (100 / labels.length);
-          const isCurrent =
-            value >= prevStepValue && value < stepValue; // 현재 단계
+          const isCurrent = value >= prevStepValue && value < stepValue; // 현재 단계
           const isDone = value >= stepValue; // 완료된 단계
 
           return (
@@ -55,12 +54,12 @@ function OrderProgressBar({ status }) {
               variant="caption"
               sx={{
                 fontSize: "0.9rem",
-                fontWeight: (isCurrent||isDone) ? "bold" : "normal",
+                fontWeight: isCurrent || isDone ? "bold" : "normal",
                 color: isCurrent
                   ? "#000" // 현재 단계: 검정색
                   : isDone
-                //   ? "text.secondary" // 완료된 단계: 진한 회색
-                  ? "#000" // 완료된 단계: 진한 회색
+                  ? //   ? "text.secondary" // 완료된 단계: 진한 회색
+                    "#000" // 완료된 단계: 진한 회색
                   : "#bbb", // 아직 안 온 단계: 연한 회색
               }}
             >

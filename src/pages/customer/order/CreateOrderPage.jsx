@@ -320,10 +320,10 @@ function CreateOrderPage() {
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
-        py: isAppLike ? 2 : 5,
+        py: isAppLike ? 2 : 2,
         pb: 10,
         boxSizing: "border-box",
-        overflow: "hidden",
+        // overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         // height: "calc(100vh - 64px)",
@@ -518,6 +518,7 @@ function CreateOrderPage() {
                 overflowY: "auto",
                 pr: 1,
                 pb: 1,
+                maxHeight: "500px",
               }}
             >
               {/* 메뉴 카드 그리드 */}
@@ -552,7 +553,6 @@ function CreateOrderPage() {
                     const cartItem = cartItems.find(
                       (ci) => ci.menuId === menu.menuId
                     );
-                    const isBeverage = menu.menuType === "BEVERAGE";
 
                     return (
                       <Box
@@ -609,14 +609,6 @@ function CreateOrderPage() {
                         >
                           {menu.price.toLocaleString()}원
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mb: 1, flexGrow: 1 }}
-                        >
-                          {isBeverage ? "음료" : "디저트"}
-                        </Typography>
-
                         <Box
                           sx={{
                             display: "flex",

@@ -14,7 +14,7 @@ import OrderStepper from "../../../components/customer/order/OrderStepper";
 import OrderCheckModal from "../../../components/customer/order/OrderCancleCheckModal";
 import { useNavigate, useParams } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import {
   fetchOrderDetail,
   requestCancelOrder,
@@ -164,12 +164,21 @@ function CompleteOrderPage() {
               mb: 2,
             }}
           >
-            {orderInfo.orderStatus === "CANCELED" ? (
-              "취소"
-            ) : (
-              <CheckCircleRoundedIcon
-                sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }}
+            {orderInfo.orderStatus === "CANCELED" ||
+            orderInfo.orderStatus === "REJECTED" ? (
+              <CancelRoundedIcon
+                sx={{
+                  color: "red",
+                  fontSize: isAppLike ? "2rem" : "3rem",
+                  mb: 1,
+                }}
               />
+            ) : (
+              <Box>
+                <CheckCircleRoundedIcon
+                  sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }}
+                />
+              </Box>
             )}
 
             <Typography fontSize="2rem" textAlign="center" fontWeight="bold">
@@ -204,6 +213,15 @@ function CompleteOrderPage() {
             >
               주문 번호 {orderInfo.orderNumber}번
             </Typography> */}
+
+            <Box sx={{ textAlign: "center", pb: 1 }}>
+              {(orderInfo.orderStatus === "REJECTED" ||
+                orderInfo.orderStatus === "CANCELED") && (
+                <Typography variant="subtitle2" gutterBottom>
+                  취소된 주문입니다.
+                </Typography>
+              )}
+            </Box>
 
             <Divider sx={{ mb: 2 }} />
 
