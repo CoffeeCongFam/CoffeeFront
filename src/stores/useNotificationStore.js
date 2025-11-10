@@ -17,6 +17,10 @@ const useNotificationStore = create((set, get) => ({
   notifications: [], // 알림 목록
   unreadCount: 0, // 읽지 않은 알림 수
 
+  refreshOrderList: null,
+
+  setRefreshOrderList: (refreshFunc) => set({ refreshOrderList: refreshFunc }),
+
   // 🚩 [추가] 서버에서 알림을 가져와 상태를 업데이트하는 비동기 함수
   fetchAndUpdateNotifications: async () => {
     try {
@@ -45,6 +49,14 @@ const useNotificationStore = create((set, get) => ({
   // unreadCount 수 증가
   addNotification: (newNotification) => {
     console.log('new notification !!!-----------------------', newNotification);
+
+    // 알림 타입이 order이고, refreshOrderList 함수가 등록되어 있다면 호출
+    const refreshFunc = get().refreshOrderList;
+
+    if (newNotification.notificationType === 'ORDER' && refreshFunc) {
+      console.log('새 주문 알림 수신! StoreHome의 주문 목록을 갱신');
+      refreshFunc(); // StoreHome에서 등록한 freshOrder 함수 실행
+    }
 
     set((state) => ({
       notifications: [
