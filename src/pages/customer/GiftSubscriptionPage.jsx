@@ -115,6 +115,9 @@ function GiftSubscriptionPage() {
         throw new Error("PortOne SDK가 로드되지 않았습니다.");
       }
 
+      // (모바일에서는) m_redirect_url = 결제 완료 후 돌아올 내 사이트 주소 필요
+      const redirectUrl = `${window.location.origin}/me/purchase/${created.purchaseId}/complete`;
+
       IMP.init("imp03140165");
 
       IMP.request_pay(
@@ -127,8 +130,11 @@ function GiftSubscriptionPage() {
           buyer_name: authUser.name,
           buyer_email: authUser.email,
           buyer_tel: authUser.tel,
+          m_redirect_url: redirectUrl,  // 리다이렉트 url 추가
         },
         async (response) => {
+          // PC 환경(팝업)에서는 여전히 콜백이 호출됨
+           // 모바일 리디렉션 환경에서는 주로 redirectUrl 쪽에서 처리
           if (response.success) {
             console.log("결제 성공:", response);
 

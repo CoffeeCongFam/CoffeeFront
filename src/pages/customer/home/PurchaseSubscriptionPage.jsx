@@ -68,6 +68,10 @@ function PurchaseSubscriptionPage() {
       const { IMP } = window;
       if (!IMP) throw new Error("PortOne SDK가 로드되지 않았습니다.");
 
+
+      // (모바일에서는) m_redirect_url = 결제 완료 후 돌아올 내 사이트 주소 필요
+      const redirectUrl = `${window.location.origin}/me/purchase/${created.purchaseId}/complete`;
+
       IMP.init("imp03140165");
 
       IMP.request_pay(
@@ -80,6 +84,7 @@ function PurchaseSubscriptionPage() {
           buyer_name: authUser.name,
           buyer_email: authUser.email,
           buyer_tel: authUser.tel,
+          m_redirect_url: redirectUrl,  // 리다이렉트
         },
         async (response) => {
           if (response.success) {
@@ -92,8 +97,10 @@ function PurchaseSubscriptionPage() {
                   merchantUid: response.merchant_uid,
                 }
               );
+              console.log("검증 성공:", validationRes.data);
               navigate(`/me/purchase/${created.purchaseId}/complete`);
             } catch (error) {
+              console.error("결제 검증 실패:", error);
               alert("결제 검증에 실패했습니다. 결제가 승인되지 않았습니다.");
             }
           } else {
@@ -103,7 +110,7 @@ function PurchaseSubscriptionPage() {
         }
       );
     } catch (error) {
-      alert("결제 요청 중 문제가 발생했습니다.");
+      alert("결제 요청 중 문제가 발생했습니다.", error);
       setIsPurchaseLoading(false);
     }
   }

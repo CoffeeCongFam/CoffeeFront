@@ -213,9 +213,13 @@ export default function CustomerLayout() {
             left: 0,
             right: 0,
             zIndex: 2000,
+            pb: 4,
           }}
         >
           <BottomNavigation
+            sx={{
+              
+            }}
             value={bottomValue}
             onChange={(e, newValue) => setBottomValue(newValue)}
             showLabels
