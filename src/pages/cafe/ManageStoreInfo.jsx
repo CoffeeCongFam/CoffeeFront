@@ -80,13 +80,34 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    if (initialStoreInfo) {
-      setStoreInfo(initialStoreInfo);
-      setOriginalStoreInfo(initialStoreInfo);
-      setImagePreview(initialStoreInfo?.storeImg || null);
-    }
-  }, [initialStoreInfo]);
+useEffect(() => {
+    if (!initialStoreInfo) return;
+
+    // 수정 중일 때는 부모에서 내려온 값으로 덮어쓰지 않도록 보호
+    if (isEditingStoreInfo || isEditingHours) return;
+
+    setStoreInfo((prev) => ({
+      ...prev,
+      ...initialStoreInfo,
+      // storeHours는 로컬에 변경된 값이 있으면 그 값을 유지
+      storeHours:
+        prev.storeHours && prev.storeHours.length > 0
+          ? prev.storeHours
+          : initialStoreInfo.storeHours || [],
+    }));
+
+    setOriginalStoreInfo((prev) => ({
+      ...prev,
+      ...initialStoreInfo,
+      // 원본도 동일한 기준으로 유지/초기화
+      storeHours:
+        prev.storeHours && prev.storeHours.length > 0
+          ? prev.storeHours
+          : initialStoreInfo.storeHours || [],
+    }));
+
+    setImagePreview(initialStoreInfo?.storeImg || null);
+  }, [initialStoreInfo, isEditingStoreInfo, isEditingHours]);
 
   const handleClickAddressSearch = async () => {
     try {
@@ -287,8 +308,8 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
           return {
             ...hour,
             isClosed: newIsClosed,
-            openTime: hour.openTime || "0900",
-            closeTime: hour.closeTime || "1800",
+            openTime: hour.openTime || "09:00",
+            closeTime: hour.closeTime || "18:00",
           };
         }
 
@@ -305,17 +326,35 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
       };
     });
   }, []);
-  // 요일별 시간 입력 핸들러 (숫자만, 최대 4자리(HHMM) 저장)
+  // 요일별 시간 입력 핸들러 (백스페이스 정상 동작, 자동 00 미패딩, 자연스러운 입력)
   const handleDayTimeChange = (dayOfWeek, field) => (e) => {
     if (!isEditingHours) return;
 
     let input = e.target.value || "";
-    let digits = input.replace(/\D/g, ""); // 숫자만
+    // 숫자만 추출
+    let digits = input.replace(/\D/g, "");
+
+    // 최대 4자리(HHMM)까지만 허용
     if (digits.length > 4) {
       digits = digits.slice(0, 4);
     }
 
-    _handleHoursChange(dayOfWeek, field, digits);
+    let formatted = "";
+
+    if (digits.length === 0) {
+      // 아무 것도 없으면 빈 문자열 유지 (백스페이스 정상 동작)
+      formatted = "";
+    } else if (digits.length <= 2) {
+      // 1~2자리: 시(HH)만 입력 중 (예: '0', '09')
+      formatted = digits;
+    } else {
+      // 3~4자리: HHMM -> HH:MM (분은 사용자가 입력한 만큼만 반영, 자동 00 패딩 없음)
+      const hours = digits.slice(0, 2);
+      const minutes = digits.slice(2); // 1자리 또는 2자리 그대로 사용
+      formatted = `${hours}:${minutes}`;
+    }
+
+    _handleHoursChange(dayOfWeek, field, formatted);
   };
 
   // 매장 정보 수정 (PATCH /api/owners/stores/{partnerStoreId})
@@ -392,6 +431,18 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
     setImageFile(null);
     // 수정 모드 종료 및 에러 초기화
     setIsEditingStoreInfo(false);
+    setError(null);
+  };
+
+  const handleCancelStoreHours = () => {
+    // 영업시간 수정 취소 시, 원본으로 되돌리기
+    setStoreInfo((prev) => ({
+      ...prev,
+      storeHours: originalStoreInfo?.storeHours
+        ? [...originalStoreInfo.storeHours]
+        : [],
+    }));
+    setIsEditingHours(false);
     setError(null);
   };
 
@@ -472,6 +523,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
 
       setSuccessMessage("영업시간 및 휴무일 정보가 저장되었습니다.");
       setIsEditingHours(false);
+      // 저장 이후에는 별도의 재조회 없이, 방금 입력한 로컬 상태(storeInfo.storeHours)를 그대로 화면에 보여줍니다.
     } catch (err) {
       console.error("영업시간 정보 저장 실패 :", err);
       setError("영업시간 저장에 실패했습니다. 다시 시도해주세요.");
@@ -1190,7 +1242,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
               {/* 수정 취소 */}
               <Button
                 variant="outlined"
-                onClick={() => setIsEditingHours(false)}
+                onClick={handleCancelStoreHours}
                 size="medium"
                 sx={{
                   borderRadius: 2,
