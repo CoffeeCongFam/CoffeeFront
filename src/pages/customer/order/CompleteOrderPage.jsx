@@ -60,6 +60,21 @@ function CompleteOrderPage() {
   const [orderInfo, setOrderInfo] = useState(null);
   const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
 
+  async function updateOrderDetail() {
+    try {
+      console.log("업데이트 요청");
+      const data = await fetchOrderDetail(orderId);
+
+      console.log("업데이트 후>>", data);
+
+      if (data) {
+        setOrderInfo(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   // 주문 정보 초기화
   useEffect(() => {
     let mounted = true;
@@ -88,22 +103,20 @@ function CompleteOrderPage() {
   // 주문 취소
   async function handleCancelOrder() {
     try {
-      const res = await requestCancelOrder(orderId);
-      if (res !== null) {
-        setOrderInfo((prev) => ({
-          ...prev,
-          orderStatus: "CANCELED",
-          canceledAt: new Date().toISOString(),
-        }));
-        console.log(`✅ ${orderId}번 주문 취소 성공`);
+      await requestCancelOrder(orderId);
+
+      // 서버에서 최종 상태 다시 확인
+      const data = await fetchOrderDetail(orderId);
+      if (data) {
+        setOrderInfo(data);
       }
+
+      console.log(`✅ ${orderId}번 주문 취소 + 상태 갱신 완료`);
     } catch (e) {
       console.error("❌ 주문 취소 오류:", e);
       alert("서버와의 통신 중 오류가 발생했습니다.");
     } finally {
-      console.error("✅ ${orderId}번 주문 취소 성공");
       setOpenCancel(false);
-      // navigate("/me/order");
     }
   }
 
@@ -174,9 +187,14 @@ function CompleteOrderPage() {
               mb: 2,
             }}
           >
-            <CheckCircleRoundedIcon
-              sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }}
-            />
+            {orderInfo.orderStatus === "CANCELED" ? (
+              "취소"
+            ) : (
+              <CheckCircleRoundedIcon
+                sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1 }}
+              />
+            )}
+
             <Typography fontSize="2rem" textAlign="center" fontWeight="bold">
               주문 번호 {orderInfo.orderNumber}번
             </Typography>
