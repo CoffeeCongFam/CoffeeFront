@@ -484,7 +484,7 @@ export default function SearchPage() {
                     p: 1,
                     borderRadius: 1.5,
                     cursor: "pointer",
-                    "&:hover": { backgroundColor: grey[100] },
+                    "&:hover": { backgroundColor: "rgba(255, 224, 178, 0.3)" },
                   }}
                 >
                   <Avatar
@@ -493,10 +493,10 @@ export default function SearchPage() {
                     sx={{ width: 40, height: 40 }}
                   />
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#334336" }} noWrap>
                       {cafe.storeName}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap>
+                    <Typography variant="caption" sx={{ color: "#334336" }} noWrap>
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
                   </Box>
@@ -513,10 +513,10 @@ export default function SearchPage() {
           aria-label="current-location"
           sx={{
             backgroundColor: "white",
-            color: "gray",
+            color: "#334336",
             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
             "&:hover": {
-              backgroundColor: "#f5f5f5",
+              backgroundColor: "#fff9f4",
               boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
             },
           }}
@@ -530,9 +530,9 @@ export default function SearchPage() {
             onClick={() => setOpenCafeList((prev) => !prev)}
             aria-label="카페 리스트"
             sx={{
-              backgroundColor: "black",
-              color: "white",
-              "&:hover": { backgroundColor: "#333" },
+              backgroundColor: "#334336",
+              color: "#fff9f4",
+              "&:hover": { backgroundColor: "#334336", opacity: 0.9 },
             }}
           >
             <FormatListBulletedIcon />
@@ -542,10 +542,10 @@ export default function SearchPage() {
             startIcon={<FormatListBulletedIcon />}
             onClick={() => setOpenCafeList((prev) => !prev)}
             sx={{
-              backgroundColor: "black",
-              color: "white",
+              backgroundColor: "#334336",
+              color: "#fff9f4",
               cursor: "pointer",
-              "&:hover": { backgroundColor: "#333" },
+              "&:hover": { backgroundColor: "#334336", opacity: 0.9 },
             }}
           >
             카페 리스트
@@ -575,14 +575,29 @@ export default function SearchPage() {
             borderBottom: `1px solid ${grey[200]}`,
           }}
         >
-          <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
+          <Typography variant="subtitle2" sx={{ color: "#334336" }}>{cafes.length}개 카페</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {/* 영업 상태 필터 */}
             <Select
               size="small"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ fontSize: "0.875rem", height: 32 }}
+              sx={{
+                fontSize: "0.875rem",
+                height: 32,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="ALL">전체</MenuItem>
               <MenuItem value="OPEN">영업중</MenuItem>
@@ -594,13 +609,28 @@ export default function SearchPage() {
               size="small"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              sx={{ fontSize: "0.875rem", height: 32 }}
+              sx={{
+                fontSize: "0.875rem",
+                height: 32,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="distance">거리순</MenuItem>
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
-            <Button size="small" onClick={() => setOpenCafeList(false)}>
+            <Button size="small" onClick={() => setOpenCafeList(false)} sx={{ color: "#334336" }}>
               닫기
             </Button>
           </Box>
@@ -636,10 +666,10 @@ export default function SearchPage() {
                   <SearchOffRoundedIcon
                     sx={{ fontSize: 40, mb: 1, opacity: 0.6 }}
                   />
-                  <Typography color="text.secondary">
+                  <Typography sx={{ color: "#334336" }}>
                     조건에 맞는 카페가 없습니다.
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     필터를 변경하거나 다른 지역을 검색해보세요 ☕
                   </Typography>
                 </Box>
@@ -652,8 +682,9 @@ export default function SearchPage() {
                     key={cafe._mmId ?? cafe.storeId}
                     onClick={() => handleSelectCafe(cafe)}
                     sx={{
-                      bgcolor: "#f8f9fa",
+                      bgcolor: "#fff9f4",
                       borderRadius: 2,
+                      border: "1px solid #ffe0b2",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       p: isAppLike ? 2 : 4,
                       mb: 2,
@@ -663,7 +694,8 @@ export default function SearchPage() {
                       cursor: "pointer",
                       flexDirection: { xs: "column", sm: "row" },
                       "&:hover": {
-                        filter: "brightness(0.97)",
+                        bgcolor: "#fff7e6",
+                        borderColor: "#334336",
                         // transform: "translateY(-3px)",
                         // boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
                       },
@@ -707,13 +739,13 @@ export default function SearchPage() {
 
                       <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}
+                        sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5, color: "#334336" }}
                       >
                         {cafe.storeName}
                       </Typography>
                       <Typography
                         variant="body2"
-                        color="text.secondary"
+                        sx={{ color: "#334336" }}
                         noWrap={false}
                       >
                         {cafe.roadAddress || "주소 정보 없음"}{" "}
@@ -730,13 +762,13 @@ export default function SearchPage() {
                       >
                         <Typography
                           variant="body2"
-                          sx={{ display: "flex", gap: 0.5 }}
+                          sx={{ display: "flex", gap: 0.5, color: "#334336" }}
                         >
                           👥 {cafe.subscriberCount ?? 0}명 구독
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{ display: "flex", gap: 0.5 }}
+                          sx={{ display: "flex", gap: 0.5, color: "#334336" }}
                         >
                           ⭐ {cafe.reviewCount ?? 0}개 리뷰
                         </Typography>
@@ -758,9 +790,8 @@ export default function SearchPage() {
                       {distanceLabel && (
                         <Typography
                           variant="caption"
-                          color="text.secondary"
                           fontSize="0.8rem"
-                          sx={{ whiteSpace: "nowrap" }}
+                          sx={{ whiteSpace: "nowrap", color: "#334336" }}
                         >
                           {distanceLabel}
                         </Typography>
@@ -773,11 +804,15 @@ export default function SearchPage() {
                           startIcon={<span style={{ fontSize: 14 }}>✓</span>}
                           sx={{
                             borderRadius: 999,
-                            borderColor: grey[400],
-                            color: grey[800],
+                            borderColor: "#334336",
+                            color: "#334336",
                             px: 2,
                             whiteSpace: "nowrap",
                             width: { xs: "100%", sm: 150 },
+                            "&:hover": {
+                              borderColor: "#334336",
+                              bgcolor: "rgba(51, 67, 54, 0.05)",
+                            },
                           }}
                         >
                           구독 중인 카페
@@ -792,7 +827,13 @@ export default function SearchPage() {
                           }}
                           sx={{
                             borderRadius: 999,
-                            "&:hover": { bgcolor: "#222", color: "#fff" },
+                            borderColor: "#334336",
+                            color: "#334336",
+                            "&:hover": {
+                              bgcolor: "#334336",
+                              color: "#fff9f4",
+                              borderColor: "#334336",
+                            },
                             whiteSpace: "nowrap",
                             width: { xs: "100%", sm: 150 },
                           }}

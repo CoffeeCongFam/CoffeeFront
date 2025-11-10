@@ -77,7 +77,7 @@ function ReviewItemCard({ review, handleDelete }) {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
                 {storeLabel} 
               </Typography>
               {subscriptionName && (
@@ -98,19 +98,19 @@ function ReviewItemCard({ review, handleDelete }) {
               >
                 <Typography
                   variant="caption"
-                  sx={{ color: "text.secondary", ml: "auto" }}
+                  sx={{ color: "#334336", ml: "auto" }}
                 >
                   {review.updatedAt ? `${review.updatedAt}` : review.createdAt}
                 </Typography>
                 {memberId === authUser.memberId && (
-                  <Button onClick={() => handleDelete(review.reviewId)} sx={{fontSize: "0.8rem",}}>
+                  <Button onClick={() => handleDelete(review.reviewId)} sx={{fontSize: "0.8rem", color: "#334336"}}>
                     삭제
                   </Button>
                 )}
               </Box>
             </Stack>
             <Divider sx={{ my: 1 }} />
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", color: "#334336" }}>
               {contentText}
             </Typography>
           </Box>

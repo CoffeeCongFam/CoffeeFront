@@ -135,6 +135,30 @@ function StoreDetailPage() {
         <ArrowBackIcon />
       </IconButton>
 
+<<<<<<< HEAD
+=======
+                {/* 뒤로가기 버튼: 왼쪽 고정 */}
+                <IconButton
+                  onClick={handleBack}
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    zIndex: 2,
+                    bgcolor: "rgba(51, 67, 54, 0.45)",
+                    color: "#fff9f4",
+                    "&:hover": {
+                      bgcolor: "rgba(51, 67, 54, 0.65)",
+                    },
+                  }}
+                  aria-label="뒤로가기"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+      
+              
+      
+>>>>>>> cad9ab0 (ui 색상 변경)
       {/* 상단 대표 이미지 */}
       <Box
         sx={{
@@ -173,20 +197,32 @@ function StoreDetailPage() {
           {storeStatus && <CafeStatusChip status={storeStatus} />}
           <Typography
             variant={isAppLike ? "h5" : "h4"}
-            sx={{ fontWeight: 700 }}
+            sx={{ fontWeight: 700, color: "#334336" }}
           >
             {store?.storeName || "카페 이름"}
           </Typography>
         </Box>
 
         {/* 탭 */}
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "#ffe0b2" }}>
           <Tabs
             value={tab}
             onChange={handleTabChange}
             aria-label="store detail tabs"
             variant="scrollable"
             scrollButtons="auto"
+            sx={{
+              "& .MuiTab-root": {
+                color: "#3B3026",
+              },
+              "& .Mui-selected": {
+                color: "#334336",
+                fontWeight: 600,
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#334336",
+              },
+            }}
           >
             <Tab label="상세정보" {...a11yProps(0)} />
             <Tab label="메뉴" {...a11yProps(1)} />

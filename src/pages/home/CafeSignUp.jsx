@@ -415,10 +415,21 @@ function StoreForm({ onSuccess }) {
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   textTransform: "none",
+<<<<<<< HEAD
                   backgroundImage: "linear-gradient(135deg, #111827, #4b5563)",
                   boxShadow: "0 6px 16px rgba(15,23,42,0.35)",
+=======
+                  bgcolor: "#334336",
+                  color: "#fff9f4",
+                  boxShadow: "0 6px 16px rgba(51, 67, 54, 0.35)",
+                  "&:hover": {
+                    bgcolor: "#334336",
+                    opacity: 0.9,
+                  },
+>>>>>>> cad9ab0 (ui 색상 변경)
                   "&:disabled": {
-                    backgroundImage: "none",
+                    bgcolor: "#ccc",
+                    color: "#666",
                   },
                 }}
               >
@@ -476,7 +487,7 @@ function StoreForm({ onSuccess }) {
                 variant="outlined"
                 onClick={handleClickAddressSearch}
                 startIcon={
-                  <SearchRounded sx={{ fontSize: 18, color: "primary.main" }} />
+                  <SearchRounded sx={{ fontSize: 18, color: "#334336" }} />
                 }
                 sx={{
                   flexShrink: 0,
@@ -484,7 +495,12 @@ function StoreForm({ onSuccess }) {
                   px: 1.8,
                   fontSize: "0.8rem",
                   textTransform: "none",
-                  borderColor: "primary.light",
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
                 }}
               >
                 주소 찾기
@@ -573,7 +589,7 @@ function StoreForm({ onSuccess }) {
                 }
                 startIcon={
                   <PhotoCameraRounded
-                    sx={{ fontSize: 18, color: "text.secondary" }}
+                    sx={{ fontSize: 18, color: "#334336" }}
                   />
                 }
                 sx={{
@@ -581,6 +597,12 @@ function StoreForm({ onSuccess }) {
                   px: 2,
                   textTransform: "none",
                   fontSize: "0.85rem",
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
                 }}
               >
                 이미지 업로드

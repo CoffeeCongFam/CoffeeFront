@@ -353,8 +353,8 @@ function CompleteOrderPage() {
             justifyContent: "center",
           }}
         >
-          <CircularProgress />
-          <Typography color="text.secondary">
+          <CircularProgress sx={{ color: "#334336" }} />
+          <Typography sx={{ color: "#334336" }}>
             주문 내역을 불러오는 중입니다...
           </Typography>
         </Box>

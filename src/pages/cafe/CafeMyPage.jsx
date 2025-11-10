@@ -104,7 +104,7 @@ function CafeMyPage() {
             py: 2,
             fontSize: "1rem",
             fontWeight: "bold",
-            color: "text.primary",
+            color: "#334336",
           }}
           onClick={() => handleMenuClick(menu)}
         >
@@ -115,7 +115,7 @@ function CafeMyPage() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -123,7 +123,7 @@ function CafeMyPage() {
         mb={3}
       >
         <Box display="flex" alignItems="center" gap={2}>
-          <Typography variant="h5" component="h1" fontWeight="bold">
+          <Typography variant="h5" component="h1" fontWeight="bold" sx={{ color: "#334336" }}>
             {authUser?.name} 점주님 환영합니다!!
           </Typography>
         </Box>
@@ -139,14 +139,14 @@ function CafeMyPage() {
               fontWeight: 600,
               fontSize: "0.85rem",
               textTransform: "none",
-              background: "linear-gradient(90deg, #fff7e6 0%, #ffe6f7 100%)",
-              color: "text.primary",
-              border: "1px solid #f3e0c7",
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              border: "1px solid #334336",
               boxShadow: "none",
               minWidth: 0,
               "&:hover": {
-                background:
-                  "linear-gradient(90deg, #ffe8b3 0%, #ffcce9 100%)",
+                bgcolor: "#334336",
+                opacity: 0.9,
                 boxShadow: 2,
               },
             }}
@@ -166,10 +166,11 @@ function CafeMyPage() {
               fontSize: "0.9rem",
               textTransform: "none",
               boxShadow: "none",
-              bgcolor: "grey.900",
-              color: "common.white",
+              bgcolor: "#334336",
+              color: "#fff9f4",
               "&:hover": {
-                bgcolor: "grey.800",
+                bgcolor: "#334336",
+                opacity: 0.9,
                 boxShadow: 3,
               },
             }}
@@ -179,7 +180,7 @@ function CafeMyPage() {
         </Box>
       </Box>
 
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white" }}>
         <Grid container spacing={1} justifyContent="flex-start">
           {renderGridItems(finalMenus)}
         </Grid>
@@ -187,7 +188,7 @@ function CafeMyPage() {
 
       <Box sx={{ mt: 3 }}>
         {isLoadingStore ? (
-          <Typography color="text.secondary">
+          <Typography sx={{ color: "#334336" }}>
             매장 정보를 불러오는 중입니다...
           </Typography>
         ) : (

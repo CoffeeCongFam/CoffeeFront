@@ -55,11 +55,19 @@ function Withdrawal() {
   return (
     <Box
       sx={{
+<<<<<<< HEAD
         minHeight: "100vh",
         bgcolor: "#fffdf7",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+=======
+        minHeight: '100vh',
+        bgcolor: '#fff9f4',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+>>>>>>> cad9ab0 (ui 색상 변경)
         px: 2,
       }}
     >
@@ -69,7 +77,12 @@ function Withdrawal() {
           maxWidth: 480,
           borderRadius: 4,
           boxShadow: 6,
+<<<<<<< HEAD
           bgcolor: "white",
+=======
+          bgcolor: 'white',
+          border: '1px solid #ffe0b2',
+>>>>>>> cad9ab0 (ui 색상 변경)
         }}
       >
         <CardContent
@@ -79,18 +92,26 @@ function Withdrawal() {
             textAlign: "center",
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 800, mb: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, color: '#334336' }}>
             언젠간 다시 돌아오세요
           </Typography>
+<<<<<<< HEAD
           <Typography
             variant="h6"
             sx={{ fontWeight: 700, mb: 3, color: "primary.main" }}
           >
+=======
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, color: '#334336' }}>
+>>>>>>> cad9ab0 (ui 색상 변경)
             커피엔스의 커피 세상으로
           </Typography>
           <Typography
             variant="body2"
+<<<<<<< HEAD
             sx={{ color: "text.secondary", mb: 4, lineHeight: 1.7 }}
+=======
+            sx={{ color: '#334336', mb: 4, lineHeight: 1.7 }}
+>>>>>>> cad9ab0 (ui 색상 변경)
           >
             매일의 커피 한 잔으로 하루를 진화시키던 그 시간들처럼,
             <br />
@@ -106,7 +127,17 @@ function Withdrawal() {
               px: 4,
               py: 1.2,
               fontWeight: 700,
+<<<<<<< HEAD
               textTransform: "none",
+=======
+              textTransform: 'none',
+              bgcolor: '#334336',
+              color: '#fff9f4',
+              '&:hover': {
+                bgcolor: '#334336',
+                opacity: 0.9,
+              },
+>>>>>>> cad9ab0 (ui 색상 변경)
             }}
           >
             확인

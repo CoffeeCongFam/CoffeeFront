@@ -50,10 +50,10 @@ const ProductList = ({ subscriptions, onCardClick }) => {
           bgcolor: 'grey.50',
         }}
       >
-        <Typography variant="h6" color="text.secondary">
+        <Typography variant="h6" sx={{ color: "#334336" }}>
           현재 등록된 구독권 상품이 없습니다.
         </Typography>
-        <Typography color="text.secondary">
+        <Typography sx={{ color: "#334336" }}>
           새 구독권 등록 버튼을 눌러 상품을 추가하세요.
         </Typography>
       </Box>
@@ -153,8 +153,7 @@ const ProductList = ({ subscriptions, onCardClick }) => {
 
                   <Typography
                     variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 1, height: 40, overflow: 'hidden' }}
+                    sx={{ mb: 1, height: 40, overflow: 'hidden', color: "#334336" }}
                   >
                     {subscription.subscriptionDesc}
                   </Typography>
@@ -170,13 +169,12 @@ const ProductList = ({ subscriptions, onCardClick }) => {
                 >
                   <Typography
                     variant="h5"
-                    color="primary"
-                    sx={{ fontWeight: 'extrabold' }}
+                    sx={{ fontWeight: 'extrabold', color: "#334336" }}
                   >
                     {subscription.price.toLocaleString()}원
                   </Typography>
                   <Box textAlign="right">
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: "#334336" }}>
                       남은 수량
                     </Typography>
                     <Typography

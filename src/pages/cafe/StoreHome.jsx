@@ -360,7 +360,7 @@ function StoreHome() {
   // Grid 시스템에서 전체 너비는 12 - 한 행에 3개 카드 넣으려면 각 카드에 md={4}
   return (
     <div sx={{ p: 3, flexGrow: 1 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ color: "#334336" }}>
         오늘의 주문 현황
       </Typography>
 

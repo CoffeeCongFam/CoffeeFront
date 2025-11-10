@@ -222,7 +222,7 @@ const SubscriptionPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
       <Box
         sx={{
           display: "flex",
@@ -231,20 +231,35 @@ const SubscriptionPage = () => {
           mb: 1.5,
         }}
       >
-        <Typography variant="h6" component="h2" fontWeight="bold">
+        <Typography variant="h6" component="h2" color="#334336" fontWeight="bold">
           구독권
         </Typography>
       </Box>
       <Tabs
         value={activeTab}
         onChange={(_, v) => setActiveTab(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 3 }}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "#ffe0b2", 
+          mt: 0.5, 
+          mb: 3,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+          },
+          "& .Mui-selected": {
+            color: "#334336",
+            fontWeight: 600,
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="all" label="사용 가능한 구독권" />
         <Tab value="expired" label="만료된 구독권" />
       </Tabs>
       {loading ? (
-        <Typography>불러오는 중…</Typography>
+        <Typography sx={{color: "#334336"}}>불러오는 중…</Typography>
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : currentList.length > 0 ? (
@@ -304,10 +319,11 @@ const SubscriptionPage = () => {
               left: 0,
               transform: "translateY(-50%)",
               zIndex: 2,
-              color: "black",
-              backgroundColor: "white",
+              color: "#334336",
+              backgroundColor: "#fff9f4",
+              border: "1px solid #334336",
               boxShadow: 3,
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
+              "&:hover": { backgroundColor: "#fff9f4" },
             }}
           >
             <ArrowBackIosNewIcon fontSize="small" />
@@ -320,10 +336,11 @@ const SubscriptionPage = () => {
               right: 0,
               transform: "translateY(-50%)",
               zIndex: 2,
-              color: "black",
-              backgroundColor: "white",
+              color: "#334336",
+              backgroundColor: "#fff9f4",
+              border: "1px solid #334336",
               boxShadow: 3,
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
+              "&:hover": { backgroundColor: "#fff9f4" },
             }}
           >
             <ArrowForwardIosIcon fontSize="small" />
@@ -331,10 +348,10 @@ const SubscriptionPage = () => {
         </Box>
       ) : (
         <Box sx={{ mt: 6, textAlign: "center" }}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
             구독권 내역이 비어 있습니다.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
           </Typography>
         </Box>

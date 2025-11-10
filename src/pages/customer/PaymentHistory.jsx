@@ -194,13 +194,27 @@ export default function PaymentHistory({ paymentList }) {
   };
 
   return (
-    <Box sx={{ p: 2, mt: 4 }}>
+    <Box sx={{ p: 2, mt: 4, borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white" }}>
       <Header sortOrder={sortOrder} onChangeOrder={setSortOrder} />
 
       <Tabs
         value={tab}
         onChange={(_e, v) => setTab(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5 }}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "#ffe0b2", 
+          mt: 0.5,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+          },
+          "& .Mui-selected": {
+            color: "#334336",
+            fontWeight: 600,
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="all" label={`전체조회 (${items.length})`} />
         <Tab value="refunded" label={`환불내역 (${refundedCount})`} />
@@ -208,7 +222,12 @@ export default function PaymentHistory({ paymentList }) {
 
       {loading && (
         <Box sx={{ mt: 2 }}>
-          <LinearProgress />
+          <LinearProgress
+            sx={{
+              bgcolor: "#ffe0b2",
+              "& .MuiLinearProgress-bar": { bgcolor: "#334336" },
+            }}
+          />
         </Box>
       )}
 
@@ -240,7 +259,7 @@ function Header({ sortOrder, onChangeOrder }) {
       sx={{ mb: 2, px: 1 }}
     >
       <Box sx={{ ml: 2 }}>
-        <Typography variant="h6" component="h2">
+        <Typography variant="h6" component="h2" sx={{ color: "#334336" }}>
           결제 내역
         </Typography>
       </Box>
@@ -404,10 +423,10 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
 function EmptyState() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
         결제 내역이 비어 있습니다.
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "#334336" }}>
         결제 또는 선물하기를 진행하면 이곳에서 내역을 확인할 수 있습니다.
       </Typography>
     </Box>

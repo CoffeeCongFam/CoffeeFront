@@ -644,9 +644,9 @@ useEffect(() => {
           elevation={0}
           sx={{
             p: 4,
-            borderRadius: 4,
-            bgcolor: "rgba(255, 255, 255, 0.95)",
-            border: "1px solid rgba(226, 232, 240, 0.6)",
+            borderRadius: 2,
+            bgcolor: "white",
+            border: "1px solid #ffe0b2",
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04)",
           }}
         >
@@ -666,16 +666,16 @@ useEffect(() => {
                 fontSize: "1.75rem",
                 letterSpacing: "-0.02em",
                 mb: 0.5,
+                color: "#334336",
               }}
             >
               매장 정보
             </Typography>
             <Typography 
               variant="body2" 
-              color="text.secondary" 
               sx={{
                 fontSize: "0.875rem",
-                color: "rgba(100, 116, 139, 0.8)",
+                color: "#334336",
               }}
             >
               오늘 기준 매장 정보를 한 번에 확인하고 수정해 보세요.
@@ -696,7 +696,7 @@ useEffect(() => {
                   textTransform: "none",
                   fontSize: "0.875rem",
                   borderColor: "rgba(148, 163, 184, 0.4)",
-                  color: "text.secondary",
+                  color: "#334336",
                   bgcolor: "transparent",
                   "&:hover": {
                     borderColor: "rgba(148, 163, 184, 0.6)",
@@ -721,11 +721,13 @@ useEffect(() => {
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: "0.875rem",
-                  bgcolor: "#6366f1",
-                  boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
+                  bgcolor: "#334336",
+                  color: "#fff9f4",
+                  boxShadow: "0 2px 8px rgba(51, 67, 54, 0.3)",
                   "&:hover": {
-                    bgcolor: "#4f46e5",
-                    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
+                    bgcolor: "#334336",
+                    opacity: 0.9,
+                    boxShadow: "0 4px 12px rgba(51, 67, 54, 0.4)",
                     transform: "translateY(-1px)",
                   },
                   transition: "all 0.2s ease",
@@ -746,10 +748,12 @@ useEffect(() => {
                 fontWeight: 600,
                 textTransform: "none",
                 fontSize: "0.875rem",
-                bgcolor: "#6366f1",
+                bgcolor: "#334336",
+              color: "#fff9f4",
                 boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
                 "&:hover": {
-                  bgcolor: "#4f46e5",
+                  bgcolor: "#334336",
+                color: "#fff9f4",
                   boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
                   transform: "translateY(-1px)",
                 },
@@ -816,7 +820,7 @@ useEffect(() => {
               <Typography 
                 variant="body2" 
                 sx={{
-                  color: "rgba(100, 116, 139, 0.6)",
+                  color: "#334336",
                   fontSize: "0.875rem",
                 }}
               >
@@ -838,13 +842,13 @@ useEffect(() => {
                   borderRadius: 2,
                   px: 2,
                   py: 1,
-                  borderColor: "rgba(148, 163, 184, 0.4)",
-                  color: "text.primary",
+                  borderColor: "#334336",
+                  color: "#334336",
                   fontWeight: 500,
                   fontSize: "0.875rem",
                   "&:hover": {
-                    borderColor: "#6366f1",
-                    bgcolor: "rgba(99, 102, 241, 0.05)",
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
                   },
                   transition: "all 0.2s ease",
                 }}
@@ -899,6 +903,7 @@ useEffect(() => {
             gap: 1,
             fontSize: "1.25rem",
             letterSpacing: "-0.01em",
+            color: "#334336",
           }}
         >
           매장 정보
@@ -908,7 +913,8 @@ useEffect(() => {
               width: 6,
               height: 6,
               borderRadius: "999px",
-              bgcolor: "#6366f1",
+              bgcolor: "#334336",
+              color: "#fff9f4",
             }}
           />
         </Typography>
@@ -959,7 +965,7 @@ useEffect(() => {
                 fontWeight: 500,
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "#6366f1",
+                color: "#334336",
               },
               "& .MuiInputBase-input": {
                 fontSize: "0.9375rem",
@@ -1013,7 +1019,7 @@ useEffect(() => {
                 fontWeight: 500,
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "#6366f1",
+                color: "#334336",
               },
               "& .MuiInputBase-input": {
                 fontSize: "0.9375rem",
@@ -1051,10 +1057,10 @@ useEffect(() => {
                   pointerEvents: "none",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#6366f1",
+                  borderColor: "#334336",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#4f46e5",
+                  borderColor: "#334336",
                 },
               },
               "& .MuiInputLabel-root.Mui-focused": {
@@ -1111,7 +1117,7 @@ useEffect(() => {
                     borderColor: "#6366f1",
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#4f46e5",
+                    borderColor: "#334336",
                   },
                 },
                 "& .MuiInputBase-input": {
@@ -1132,7 +1138,7 @@ useEffect(() => {
                   },
                 },
                 "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#4f46e5",
+                  color: "#334336",
                 },
               }}
             />
@@ -1153,11 +1159,17 @@ useEffect(() => {
                   py: 0.4,
                   fontSize: "0.75rem",
                   textTransform: "none",
-                  boxShadow: "0 8px 20px rgba(15, 23, 42, 0.18)",
+                  bgcolor: "#334336",
+                  color: "#fff9f4",
+                  boxShadow: "0 8px 20px rgba(51, 67, 54, 0.18)",
                   opacity: 0,
                   transition:
                     "opacity 0.18s ease-out, transform 0.18s ease-out, box-shadow 0.18s ease-out",
                   zIndex: 3,
+                  "&:hover": {
+                    bgcolor: "#334336",
+                    opacity: 0.9,
+                  },
                 }}
               >
                 주소 검색
@@ -1198,11 +1210,11 @@ useEffect(() => {
                     borderColor: "#6366f1",
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#4f46e5",
+                    borderColor: "#334336",
                   },
                 },
                 "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#4f46e5",
+                  color: "#334336",
                 },
               }}
             />
@@ -1219,6 +1231,7 @@ useEffect(() => {
               display: "inline-flex",
               alignItems: "center",
               gap: 1,
+              color: "#334336",
             }}
           >
             매장 설명
@@ -1228,7 +1241,8 @@ useEffect(() => {
                 width: 6,
                 height: 6,
                 borderRadius: "999px",
-                bgcolor: "#6366f1",
+                bgcolor: "#334336",
+              color: "#fff9f4",
               }}
             />
           </Typography>
@@ -1276,15 +1290,15 @@ useEffect(() => {
                       borderColor: "rgba(148, 163, 184, 0.3)",
                     },
                     "&:hover fieldset": {
-                      borderColor: "rgba(99, 102, 241, 0.5)",
+                      borderColor: "rgba(51, 67, 54, 0.5)",
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "#6366f1",
+                      borderColor: "#334336",
                       borderWidth: 2,
                     },
                   },
                   "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#6366f1",
+                    color: "#334336",
                   },
                 }}
               />
@@ -1292,7 +1306,7 @@ useEffect(() => {
               <Typography
                 variant="body1"
                 sx={{
-                  color: storeInfo.detailInfo ? "text.primary" : "text.secondary",
+                  color: "#334336",
                   fontSize: "0.95rem",
                   lineHeight: 1.7,
                   minHeight: "120px",
@@ -1325,6 +1339,7 @@ useEffect(() => {
               gap: 1,
               fontSize: "1.25rem",
               letterSpacing: "-0.01em",
+              color: "#334336",
             }}
           >
             {month}월 영업시간 & 휴무일
@@ -1334,7 +1349,7 @@ useEffect(() => {
                 width: 6,
                 height: 6,
                 borderRadius: "999px",
-                bgcolor: "#0ea5e9",
+                bgcolor: "#334336",
               }}
             />
           </Typography>
@@ -1353,7 +1368,7 @@ useEffect(() => {
                   textTransform: "none",
                   fontSize: "0.875rem",
                   borderColor: "rgba(148, 163, 184, 0.4)",
-                  color: "text.secondary",
+                  color: "#334336",
                   bgcolor: "transparent",
                   "&:hover": {
                     borderColor: "rgba(148, 163, 184, 0.6)",
@@ -1378,11 +1393,13 @@ useEffect(() => {
                   fontWeight: 600,
                   textTransform: "none",
                   fontSize: "0.875rem",
-                  bgcolor: "#6366f1",
-                  boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
+                  bgcolor: "#334336",
+                  color: "#fff9f4",
+                  boxShadow: "0 2px 8px rgba(51, 67, 54, 0.3)",
                   "&:hover": {
-                    bgcolor: "#4f46e5",
-                    boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
+                    bgcolor: "#334336",
+                    opacity: 0.9,
+                    boxShadow: "0 4px 12px rgba(51, 67, 54, 0.4)",
                     transform: "translateY(-1px)",
                   },
                   transition: "all 0.2s ease",
@@ -1403,10 +1420,12 @@ useEffect(() => {
                 fontWeight: 600,
                 textTransform: "none",
                 fontSize: "0.875rem",
-                bgcolor: "#6366f1",
+                bgcolor: "#334336",
+              color: "#fff9f4",
                 boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
                 "&:hover": {
-                  bgcolor: "#4f46e5",
+                  bgcolor: "#334336",
+                color: "#fff9f4",
                   boxShadow: "0 4px 12px rgba(99, 102, 241, 0.4)",
                   transform: "translateY(-1px)",
                 },
@@ -1420,7 +1439,7 @@ useEffect(() => {
         <Typography 
           variant="body2" 
           sx={{
-            color: "rgba(100, 116, 139, 0.8)",
+            color: "#334336",
             mb: 3,
             fontSize: "0.875rem",
           }}
@@ -1506,14 +1525,14 @@ useEffect(() => {
                             borderColor: "rgba(148, 163, 184, 0.4)",
                           },
                           "&:hover fieldset": {
-                            borderColor: "#0ea5e9",
+                            borderColor: "#334336",
                           },
                           "&.Mui-focused fieldset": {
-                            borderColor: "#2563eb",
+                            borderColor: "#334336",
                           },
                         },
                         "& .MuiInputLabel-root.Mui-focused": {
-                          color: "#2563eb",
+                          color: "#334336",
                         },
                       }}
                     />
@@ -1559,14 +1578,14 @@ useEffect(() => {
                             borderColor: "rgba(148, 163, 184, 0.4)",
                           },
                           "&:hover fieldset": {
-                            borderColor: "#0ea5e9",
+                            borderColor: "#334336",
                           },
                           "&.Mui-focused fieldset": {
-                            borderColor: "#2563eb",
+                            borderColor: "#334336",
                           },
                         },
                         "& .MuiInputLabel-root.Mui-focused": {
-                          color: "#2563eb",
+                          color: "#334336",
                         },
                       }}
                     />
@@ -1619,6 +1638,21 @@ useEffect(() => {
                               py: 0.6,
                               fontWeight: 600,
                               textTransform: "none",
+                              ...(isClosed ? {
+                                borderColor: "#334336",
+                                color: "#334336",
+                                "&:hover": {
+                                  borderColor: "#334336",
+                                  bgcolor: "rgba(51, 67, 54, 0.05)",
+                                },
+                              } : {
+                                bgcolor: "#334336",
+                                color: "#fff9f4",
+                                "&:hover": {
+                                  bgcolor: "#334336",
+                                  opacity: 0.9,
+                                },
+                              }),
                             }}
                           >
                             영업
@@ -1639,6 +1673,21 @@ useEffect(() => {
                               py: 0.6,
                               fontWeight: 600,
                               textTransform: "none",
+                              ...(isClosed ? {
+                                bgcolor: "#334336",
+                                color: "#fff9f4",
+                                "&:hover": {
+                                  bgcolor: "#334336",
+                                  opacity: 0.9,
+                                },
+                              } : {
+                                borderColor: "#334336",
+                                color: "#334336",
+                                "&:hover": {
+                                  borderColor: "#334336",
+                                  bgcolor: "rgba(51, 67, 54, 0.05)",
+                                },
+                              }),
                             }}
                           >
                             휴무

@@ -701,8 +701,8 @@ function GiftSubscriptionPage() {
           gap: 2,
         }}
       >
-        <CircularProgress color="inherit" />
-        <Typography variant="body1" sx={{ mt: 1 }}>
+        <CircularProgress sx={{ color: "#334336" }} />
+        <Typography variant="body1" sx={{ mt: 1, color: "#334336" }}>
           결제 진행 중입니다...
         </Typography>
       </Backdrop>

@@ -106,7 +106,7 @@ export default function ManageMenu() {
   return (
     <Container
       maxWidth="xl"
-      sx={{ py: 4, minHeight: '100vh', bgcolor: 'background.default' }}
+      sx={{ py: 4, minHeight: '100vh', bgcolor: 'background.default', borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white", m: 2 }}
     >
       {/* 상단 헤더 및 버튼 */}
       <Box
@@ -115,15 +115,22 @@ export default function ManageMenu() {
         alignItems="center"
         mb={3}
       >
-        <Typography variant="h4" fontWeight="bold" color="text.primary">
+        <Typography variant="h4" fontWeight="bold" sx={{ color: "#334336" }}>
           메뉴 관리
         </Typography>
         <Button
           variant="contained"
-          color="primary"
           startIcon={<AddCircleOutlineIcon />}
           onClick={() => setIsRegModalOpen(true)} // ⬅️ 모달 상태 관리
-          sx={{ fontWeight: 'bold' }}
+          sx={{
+            fontWeight: 'bold',
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+          }}
         >
           메뉴 등록
         </Button>

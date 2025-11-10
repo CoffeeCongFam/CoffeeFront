@@ -308,6 +308,10 @@ function OrderHistory() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+        m: isAppLike ? 2 : 4,
       }}
     >
       {/* 헤더 */}
@@ -325,6 +329,7 @@ function OrderHistory() {
             fontWeight: "bold",
             lineHeight: 1.1,
             mb: "2%",
+            color: "#334336",
           }}
         >
           주문 내역
@@ -470,8 +475,14 @@ function OrderHistory() {
             gap: 2,
           }}
         >
+<<<<<<< HEAD
           <Typography variant="body2" color="text.secondary">
             전체 {filteredAndSortedOrders.length}건
+=======
+          <Typography variant="body2" sx={{ color: "#334336" }}>
+            전체 {orders.length}건
+            {statusFilter !== "ALL" && ` · 필터된 ${filteredAndSortedOrders.length}건`}
+>>>>>>> cad9ab0 (ui 색상 변경)
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -513,7 +524,7 @@ function OrderHistory() {
               py: 5,
             }}
           >
-            <CircularProgress />
+            <CircularProgress sx={{ color: "#334336" }} />
           </Box>
         ) : filteredAndSortedOrders.length === 0 ? (
           <Box
@@ -658,7 +669,7 @@ function OrderHistory() {
                 alignItems: "center",
               }}
             >
-              <CircularProgress size={24} />
+              <CircularProgress size={24} sx={{ color: "#334336" }} />
             </Box>
           ) : (
             <Box sx={{ mx: "auto", maxWidth: 420, p: 3 }}>
@@ -684,7 +695,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography color="text.secondary">카페명</Typography>
+                <Typography sx={{ color: "#334336" }}>카페명</Typography>
                 <Typography>{selectedOrder.store.storeName}</Typography>
               </Box>
 
@@ -695,7 +706,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography color="text.secondary">주문 번호</Typography>
+                <Typography sx={{ color: "#334336" }}>주문 번호</Typography>
                 <Typography>{selectedOrder.orderNumber}</Typography>
               </Box>
 
@@ -706,7 +717,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography color="text.secondary">구독권명</Typography>
+                <Typography sx={{ color: "#334336" }}>구독권명</Typography>
                 <Typography>
                   {handleSubscriptionType(
                     selectedOrder.subscription.subscriptionName
@@ -721,7 +732,7 @@ function OrderHistory() {
                   mb: 2,
                 }}
               >
-                <Typography color="text.secondary">주문 일시</Typography>
+                <Typography sx={{ color: "#334336" }}>주문 일시</Typography>
                 <Typography>
                   {new Date(selectedOrder.createdAt).toLocaleString()}
                 </Typography>
@@ -735,7 +746,7 @@ function OrderHistory() {
                     mb: 2,
                   }}
                 >
-                  <Typography color="text.secondary">취소 일시</Typography>
+                  <Typography sx={{ color: "#334336" }}>취소 일시</Typography>
                   <Typography>
                     {new Date(selectedOrder.canceledAt).toLocaleString()}
                   </Typography>

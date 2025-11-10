@@ -326,6 +326,10 @@ function CreateOrderPage() {
         // overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+        m: isAppLike ? 2 : 4,
         // height: "calc(100vh - 64px)",
         ...(isAppLike
           ? {
@@ -352,6 +356,7 @@ function CreateOrderPage() {
             fontWeight: "bold",
             lineHeight: 1.1,
             mb: "2%",
+            color: "#334336",
           }}
         >
           주문하기
@@ -417,7 +422,7 @@ function CreateOrderPage() {
                       <Typography variant="body2">
                         {inventory.store?.storeName}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: "#334336" }}>
                         {inventory.subName}
                         {typeof inventory.remainingCount === "number"
                           ? ` · 남은잔 ${inventory.remainingCount}잔`
@@ -534,7 +539,7 @@ function CreateOrderPage() {
                     py: "1rem",
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     선택한 구독권에서 주문 가능한 메뉴가 없습니다.
                   </Typography>
                 </Box>
@@ -604,8 +609,7 @@ function CreateOrderPage() {
                         </Typography>
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 1 }}
+                          sx={{ mb: 1, color: "#334336" }}
                         >
                           {menu.price.toLocaleString()}원
                         </Typography>
@@ -710,7 +714,7 @@ function CreateOrderPage() {
               </Box>
               <Box sx={{ flex: 1 }}>
                 {cartWithInfo.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     장바구니에 담긴 메뉴가 없습니다.
                   </Typography>
                 ) : (
@@ -738,7 +742,7 @@ function CreateOrderPage() {
                           >
                             {item.menu?.menuName || item.menu?.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: "#334336" }}>
                             {(item.menu?.price || 0).toLocaleString()}원
                           </Typography>
                         </Box>
@@ -782,7 +786,7 @@ function CreateOrderPage() {
                           mb: 0.5,
                         }}
                       >
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "#334336" }}>
                           합계
                         </Typography>
                         <Typography fontWeight="bold">
@@ -820,7 +824,7 @@ function CreateOrderPage() {
                 }
               >
                 {isLoading ? (
-                  <CircularProgress size={18} sx={{ color: "white" }} />
+                  <CircularProgress size={18} sx={{ color: "#fff9f4" }} />
                 ) : (
                   "주문하기"
                 )}
@@ -840,8 +844,8 @@ function CreateOrderPage() {
             gap: 2,
           }}
         >
-          <CircularProgress color="inherit" />
-          <Typography variant="body1" sx={{ mt: 1 }}>
+          <CircularProgress sx={{ color: "#334336" }} />
+          <Typography variant="body1" sx={{ mt: 1, color: "#334336" }}>
             주문이 진행 중입니다 ...
           </Typography>
         </Backdrop>

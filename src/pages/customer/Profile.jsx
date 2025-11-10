@@ -114,7 +114,7 @@ function Profile() {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#fffdf7",
+          bgcolor: "#fff9f4",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -128,6 +128,7 @@ function Profile() {
             borderRadius: 4,
             boxShadow: 6,
             bgcolor: "white",
+            border: "1px solid #ffe0b2",
           }}
         >
           <CardContent
@@ -142,6 +143,7 @@ function Profile() {
               sx={{
                 fontWeight: 800,
                 mb: 2,
+                color: "#334336",
               }}
             >
               언젠간 다시 돌아오세요
@@ -151,7 +153,7 @@ function Profile() {
               sx={{
                 fontWeight: 700,
                 mb: 3,
-                color: "primary.main",
+                color: "#334336",
               }}
             >
               커피엔스의 커피 세상으로
@@ -159,7 +161,7 @@ function Profile() {
 
             <Typography
               variant="body2"
-              sx={{ color: "text.secondary", mb: 4, lineHeight: 1.7 }}
+              sx={{ color: "#334336", mb: 4, lineHeight: 1.7 }}
             >
               매일의 커피 한 잔으로 하루를 진화시키던 그 시간들처럼,
               <br />
@@ -177,6 +179,12 @@ function Profile() {
                 py: 1.2,
                 fontWeight: 700,
                 textTransform: "none",
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
+                },
               }}
             >
               확인
@@ -196,13 +204,16 @@ function Profile() {
         justifyContent: "center",
         px: 2,
         py: 4,
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
       }}
     >
       <Card
         sx={{
           width: "100%",
           maxWidth: 480,
-          borderRadius: 4,
+          borderRadius: 2,
+          border: "1px solid #ffe0b2",
           boxShadow: 4,
           overflow: "hidden",
         }}
@@ -218,14 +229,8 @@ function Profile() {
             gap: 2,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#334336" }}>
               {user.name}
             </Typography>
           </Box>
@@ -236,7 +241,7 @@ function Profile() {
         <CardContent sx={{ px: 3, py: 2.5 }}>
           <Typography
             variant="subtitle2"
-            sx={{ color: "text.secondary", mb: 1 }}
+            sx={{ color: "#334336", mb: 1 }}
           >
             기본 정보
           </Typography>
@@ -268,7 +273,7 @@ function Profile() {
                   secondary={user.name}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -293,7 +298,7 @@ function Profile() {
                   secondary={user.tel}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -318,7 +323,7 @@ function Profile() {
                   secondary={user.gender === "M" ? "남자" : "여자"}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -368,8 +373,12 @@ function Profile() {
             size="small"
             onClick={handleOpenWithdraw}
             sx={{
-              color: "#555",
-              borderColor: "#555",
+              color: "#334336",
+              borderColor: "#334336",
+              "&:hover": {
+                borderColor: "#334336",
+                bgcolor: "rgba(51, 67, 54, 0.05)",
+              },
             }}
           >
             탈퇴하기
@@ -395,6 +404,7 @@ function Profile() {
             fontSize: 18,
             pb: 1,
             px: 3,
+            color: "#334336",
           }}
         >
           계정 탈퇴 전, 한 번만 더 확인해주세요
@@ -440,25 +450,25 @@ function Profile() {
           >
             {withdrawStep === 1 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
                   당신의 하루를 진화시키는 커피 구독,
                   <br />
                   정말 떠나시겠어요?
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게
-                  만들었던 그 커피 구독 혜택을 다시 한번 생각해 주세요
+                <Typography variant="body2" sx={{ color: "#334336" }}>
+                    사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게 만들었던 
+                    그 커피 구독 혜택을 다시 한번 생각해 주세요
                 </Typography>
               </>
             )}
             {withdrawStep == 2 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
                   정말 탈퇴하시겠습니까?
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "text.secondary", mb: 2 }}
+                  sx={{ color: "#334336", mb: 2 }}
                 >
                   탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두 삭제되며
                   복구가 불가능합니다.
@@ -483,6 +493,19 @@ function Profile() {
                   variant="outlined"
                   value={withdrawInput}
                   onChange={(e) => setWithdrawInput(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#334336",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(51, 67, 54, 0.5)",
+                      },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#334336",
+                    },
+                  }}
                 />
               </>
             )}
@@ -498,7 +521,9 @@ function Profile() {
               gap: 2,
             }}
           >
-            <Button onClick={handleCloseWithdraw}>탈퇴하지 않을래요</Button>
+            <Button onClick={handleCloseWithdraw} sx={{ color: "#334336" }}>
+              탈퇴하지 않을래요
+            </Button>
 
             <Box
               sx={{
@@ -516,7 +541,7 @@ function Profile() {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    bgcolor: step <= withdrawStep ? "primary.main" : "grey.300",
+                    bgcolor: step <= withdrawStep ? "#334336" : "grey.300",
                     transition: "all 0.3s ease",
                   }}
                 />
@@ -524,11 +549,26 @@ function Profile() {
             </Box>
 
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Button onClick={handlePrevStep} disabled={withdrawStep === 1}>
+              <Button
+                onClick={handlePrevStep}
+                disabled={withdrawStep === 1}
+                sx={{ color: "#334336" }}
+              >
                 이전
               </Button>
               {withdrawStep < 2 ? (
-                <Button variant="contained" onClick={handleNextStep}>
+                <Button
+                  variant="contained"
+                  onClick={handleNextStep}
+                  sx={{
+                    bgcolor: "#334336",
+                    color: "#fff9f4",
+                    "&:hover": {
+                      bgcolor: "#334336",
+                      opacity: 0.9,
+                    },
+                  }}
+                >
                   다음
                 </Button>
               ) : (
@@ -536,6 +576,14 @@ function Profile() {
                   variant="contained"
                   color="error"
                   onClick={handleClickWithdrawConfirm}
+                  sx={{
+                    bgcolor: "#334336",
+                    color: "#fff9f4",
+                    "&:hover": {
+                      bgcolor: "#334336",
+                      opacity: 0.9,
+                    },
+                  }}
                 >
                   탈퇴하기
                 </Button>

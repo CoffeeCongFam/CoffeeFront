@@ -204,7 +204,7 @@ export default function MenuEditModal({
   return (
     <Dialog open={open} onClose={resetFormAndClose} maxWidth="sm" fullWidth>
       <DialogTitle
-        sx={{ bgcolor: 'warning.main', color: 'white', fontWeight: 'bold' }}
+        sx={{ bgcolor: '#334336', color: '#fff9f4', fontWeight: 'bold' }}
       >
         <Typography variant="h6" component="span" fontWeight="bold">
           메뉴 수정: {editingMenu.menuName}
@@ -342,7 +342,7 @@ export default function MenuEditModal({
                 variant="rounded"
               />
               <Box flexGrow={1}>
-                <Typography variant="body2" color="text.secondary" mb={1}>
+                <Typography variant="body2" sx={{ color: "#334336" }} mb={1}>
                   {selectedFile
                     ? `선택된 새 파일: ${selectedFile.name}`
                     : '기존 이미지를 사용하거나 새 파일을 선택하세요.'}
@@ -353,7 +353,14 @@ export default function MenuEditModal({
                     component="label"
                     startIcon={<CloudUploadIcon />}
                     size="small"
-                    color="primary"
+                    sx={{
+                      borderColor: "#334336",
+                      color: "#334336",
+                      "&:hover": {
+                        borderColor: "#334336",
+                        bgcolor: "rgba(51, 67, 54, 0.05)",
+                      },
+                    }}
                   >
                     파일 선택
                     <input
@@ -368,8 +375,19 @@ export default function MenuEditModal({
                     variant="outlined"
                     onClick={handleClearImage}
                     size="small"
-                    color="error"
                     disabled={!selectedFile}
+                    sx={{
+                      borderColor: "#334336",
+                      color: "#334336",
+                      "&:hover": {
+                        borderColor: "#334336",
+                        bgcolor: "rgba(51, 67, 54, 0.05)",
+                      },
+                      "&:disabled": {
+                        borderColor: "#ccc",
+                        color: "#999",
+                      },
+                    }}
                   >
                     새 파일 선택 취소
                   </Button>
@@ -383,16 +401,30 @@ export default function MenuEditModal({
         <Button
           onClick={resetFormAndClose}
           variant="outlined"
-          color="error"
-          sx={{ minWidth: 100 }}
+          sx={{
+            minWidth: 100,
+            borderColor: "#334336",
+            color: "#334336",
+            "&:hover": {
+              borderColor: "#334336",
+              bgcolor: "rgba(51, 67, 54, 0.05)",
+            },
+          }}
         >
           취소
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          color="warning"
-          sx={{ minWidth: 120 }}
+          sx={{
+            minWidth: 120,
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+          }}
         >
           수정 완료
         </Button>

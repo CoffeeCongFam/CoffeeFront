@@ -185,10 +185,21 @@ export default function StoreLayout() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
+<<<<<<< HEAD
                   '&.Mui-selected': {
                     backgroundColor: 'primary.light',
                     color: 'white',
                     '& .MuiListItemIcon-root': { color: 'white' },
+=======
+                  color: "#ffe0c2",
+                  "&.Mui-selected": {
+                    backgroundColor: "#435548",
+                    color: "#fff9f4",
+                    "& .MuiListItemIcon-root": { color: "#fff9f4" },
+                  },
+                  "& .MuiListItemIcon-root": {
+                    color: "#ffe0c2",
+>>>>>>> cad9ab0 (ui 색상 변경)
                   },
                 }}
               >
@@ -205,10 +216,18 @@ export default function StoreLayout() {
   return (
     <Box
       sx={{
+<<<<<<< HEAD
         display: 'flex',
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
+=======
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        bgcolor: "#fff9f4",
+>>>>>>> cad9ab0 (ui 색상 변경)
       }}
     >
       <CssBaseline />
@@ -221,8 +240,15 @@ export default function StoreLayout() {
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
+<<<<<<< HEAD
             boxSizing: 'border-box',
             backgroundImage: 'none',
+=======
+            boxSizing: "border-box",
+            backgroundImage: "none",
+            bgcolor: "#334336",
+            borderRight: "none",
+>>>>>>> cad9ab0 (ui 색상 변경)
           },
         }}
         open
@@ -236,8 +262,13 @@ export default function StoreLayout() {
         sx={{
           flexGrow: 1,
           // ml: `${drawerWidth}px`,
+<<<<<<< HEAD
           backgroundColor: '#f9f9f9',
           overflow: 'auto',
+=======
+          backgroundColor: "transparent",
+          overflow: "auto",
+>>>>>>> cad9ab0 (ui 색상 변경)
         }}
       >
         {/* 상단 헤더(AppBar) */}
@@ -248,15 +279,23 @@ export default function StoreLayout() {
           sx={{
             width: `calc(100% - ${drawerWidth}px)`,
             ml: `${drawerWidth}px`,
+<<<<<<< HEAD
             borderBottom: '1px solid #e0e0e0',
           }}
         >
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="h6" noWrap>
+=======
+            borderBottom: "1px solid #ffe0b2",
+          }}
+        >
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" noWrap sx={{ color: "#334336" }}>
+>>>>>>> cad9ab0 (ui 색상 변경)
               {today.toLocaleDateString()}
             </Typography>
             <Box>
-              <IconButton color="inherit" onClick={openNotifDrawer}>
+              <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
                 <Badge badgeContent={unreadCount} color="error">
                   <NotificationsIcon />
                 </Badge>
@@ -293,12 +332,20 @@ export default function StoreLayout() {
             justifyContent: 'space-between',
           }}
         >
-          <Typography variant="h6" fontWeight={700}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: "#334336" }}>
             알림
           </Typography>
+<<<<<<< HEAD
           <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
             <Button onClick={handleCloseNotif} color="gray">
+=======
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Button onClick={handleDeleteAllNotifications} sx={{ color: "#334336" }}>
+              전체 삭제
+            </Button>
+            <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
+>>>>>>> cad9ab0 (ui 색상 변경)
               닫기
             </Button>
           </Box>
@@ -315,7 +362,7 @@ export default function StoreLayout() {
 
           {notifications.length === 0 && (
             <Box sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "#334336" }}>
                 아직 도착한 알림이 없어요 ☕
               </Typography>
             </Box>
