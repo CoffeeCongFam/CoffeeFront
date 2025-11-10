@@ -73,7 +73,9 @@ function CustomerHome() {
         (o) => !["RECEIVED", "CANCELED", "COMPLETED"].includes(o.orderStatus)
         // REJECTED, REQUEST, INPROGRESS, COMPLETED 정도만 남김
       );
-      setOngoingOrders(filtered);
+      setOngoingOrders(
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      );
     } catch (e) {
       console.error(e);
     }
@@ -227,6 +229,66 @@ function CustomerHome() {
         <Box
           sx={{
             width: "100%",
+            mb: 6,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "#fff7e6",
+            border: "1px solid #ffe0b2",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.7rem",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1 }}>
+            {todayDate} {isAppLike && <br />} 진행 중인 주문{" "}
+            {ongoingOrders.length}건
+          </Typography>
+
+          {isAppLike ? (
+            // ✅ 모바일: 가로 캐러셀
+            <Box
+              sx={{
+                display: "flex",
+                overflowX: "auto",
+                gap: 2,
+                py: 1,
+                scrollSnapType: "x mandatory",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+              }}
+            >
+              {ongoingOrders.map((order, idx) => (
+                <Box
+                  key={order.orderId ?? idx}
+                  sx={{
+                    flex: "0 0 100%", // 한 화면에 한 장씩 꽉 차게
+                    scrollSnapAlign: "start",
+                  }}
+                >
+                  <TodayOrderItem order={order} isAppLike={isAppLike} />
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            // 💻 데스크탑: 기존 세로 리스트
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {ongoingOrders.map((order, idx) => (
+                <TodayOrderItem
+                  key={order.orderId ?? idx}
+                  order={order}
+                  isAppLike={isAppLike}
+                />
+              ))}
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* {ongoingOrders.length > 0 && (
+        <Box
+          sx={{
+            width: "100%",
             mb: 4,
             p: 2,
             borderRadius: 2,
@@ -246,7 +308,7 @@ function CustomerHome() {
             <TodayOrderItem key={idx} order={order} isAppLike={isAppLike} />
           ))}
         </Box>
-      )}
+      )} */}
 
       {subscriptions.length <= 0 && (
         <Box
