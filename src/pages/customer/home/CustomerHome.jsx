@@ -274,7 +274,10 @@ function CustomerHome() {
             gap: "0.7rem",
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1, color: "#334336" }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 500, mb: 1, color: "#334336" }}
+          >
             {todayDate} {isAppLike && <br />} 진행 중인 주문{" "}
             {ongoingOrders.length}건
           </Typography>
@@ -503,7 +506,9 @@ function CustomerHome() {
           >
             내 근처 동네 카페
           </Typography>
-          <Typography sx={{ fontSize: isAppLike ? "0.8rem" : "1rem" }}>
+          <Typography
+            sx={{ fontSize: isAppLike ? "0.8rem" : "1rem", color: "#3B3026" }}
+          >
             지금 내 위치 기준으로 가장 가까운 카페를 찾아보세요. 🔎
           </Typography>
         </Box>

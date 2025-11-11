@@ -119,7 +119,13 @@ function CompleteOrderPage() {
 
   return (
     <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          position: isAppLike ? "absolute" : "inherit",
+        }}
+      >
         <IconButton onClick={() => handleBack()} sx={{ mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
@@ -128,10 +134,7 @@ function CompleteOrderPage() {
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 2 }}>
         <Typography variant="h5" fontWeight="bold" sx={{ color: "#334336" }}>
-          {
-            isLoading && "주문 내역 불러오는 중..."
-            // : orderStatusMessage(orderInfo.orderStatus)
-          }
+          {isLoading && "주문 내역 불러오는 중..."}
         </Typography>
       </Box>
 
@@ -317,6 +320,7 @@ function CompleteOrderPage() {
               />
             </Box>
           </Box>
+
           <Box
             sx={{
               mt: 4,

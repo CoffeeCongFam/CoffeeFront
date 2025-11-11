@@ -194,15 +194,23 @@ export default function PaymentHistory({ paymentList }) {
   };
 
   return (
-    <Box sx={{ p: 2, mt: 4, borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white" }}>
+    <Box
+      sx={{
+        p: 2,
+        mt: 4,
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+      }}
+    >
       <Header sortOrder={sortOrder} onChangeOrder={setSortOrder} />
 
       <Tabs
         value={tab}
         onChange={(_e, v) => setTab(v)}
-        sx={{ 
-          borderBottom: 1, 
-          borderColor: "#ffe0b2", 
+        sx={{
+          borderBottom: 1,
+          borderColor: "#ffe0b2",
           mt: 0.5,
           "& .MuiTab-root": {
             color: "#3B3026",
