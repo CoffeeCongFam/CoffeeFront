@@ -37,29 +37,27 @@ function SubscriptionItem({ subscription, isAppLike }) {
         >
           {/* 구독 타입 */}
           <SubTypeChip type={subscription.subscriptionType} />
-        <Box sx={{ mt: 1.3}}>
-           {/* 구독 이름 - 강조 */}
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: "1.15rem",
-              color: "#222", // 진한 텍스트
-              mt: 0.5,
-            }}
-          >
-            {subscription?.subscriptionName}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
-            ₩{subscription.price?.toLocaleString()}
+          <Box sx={{ mt: 1.3}}>
+             {/* 구독 이름 - 강조 */}
             <Typography
-              component="span"
-              sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#222", // 진한 텍스트
+                mt: 0.5,
+              }}
             >
               {subscription?.subscriptionName}
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 800 }}>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
               ₩{subscription.price?.toLocaleString()}
+              <Typography
+                component="span"
+                sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
+              >
+                {subscription?.subscriptionName}
+              </Typography>
               <Typography
                 component="span"
                 sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
