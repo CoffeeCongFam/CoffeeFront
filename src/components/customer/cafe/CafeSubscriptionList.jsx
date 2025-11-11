@@ -185,9 +185,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           exclusive
           onChange={handleFilterChange}
           size="small"
-<<<<<<< HEAD
-          sx={{ width: "100%" }}
-=======
           sx={{
             "& .MuiToggleButton-root": {
               color: "#334336",
@@ -206,7 +203,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
               },
             },
           }}
->>>>>>> cad9ab0 (ui 색상 변경)
         >
           <ToggleButton value="ALL">전체 ({counts.ALL})</ToggleButton>
           {/* {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
@@ -408,32 +404,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     </Typography>
                   </Typography>
                 </Box>
-<<<<<<< HEAD
-                 <Divider />
-                 <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent:"space-between",
-                      gap: 1.5,
-                      flexWrap: "wrap",
-                      color: "text.secondary",
-                      fontSize: "0.9rem",
-                      mb: 1
-                    }}
-                  >
-                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.3, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
-                      <CalendarMonthIcon fontSize="small" />
-                      <span>결제일부터 {sub?.subscriptionPeriod}일간</span>
-                    </Box>
-                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.5, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
-                      <CoffeeIcon fontSize="small" />
-                      <span>매일 {sub?.maxDailyUsage}잔 이용</span>
-                    </Box>
-                  </Box>
-
-                {/* 설명 3칸 - 모바일에서는 세로 */}
-                
-=======
 
                 {/* 설명 3칸 - 모바일에서는 세로 */}
                 <Box
@@ -516,8 +486,6 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     </Typography>
                   </Box>
                 </Box>
-
->>>>>>> cad9ab0 (ui 색상 변경)
                 {/* 잔여 구독권 수량 */}
                 <List sx={{ py: 0 }}>
                   <ListItemButton

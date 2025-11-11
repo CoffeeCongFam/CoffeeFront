@@ -118,40 +118,6 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-<<<<<<< HEAD
-                      {menu?.menuImg ? (
-                        <Box
-                          component="img"
-                          src={menu.menuImg || menuDummy}
-                          alt={menu.menuName}
-                          sx={{
-                            width: { xs: 80, sm: 100 },
-                            height: { xs: 64, sm: 70 },
-                            objectFit: "cover",
-                            borderRadius: 1.2,
-                            flexShrink: 0,
-                          }}
-                        />
-                      ) : (
-                        <Avatar
-                          sx={{
-                            width: { xs: 80, sm: 100 },
-                            height: { xs: 64, sm: 70 },
-                            bgcolor: "#85766cc4",
-                            // bgcolor: "#ffe082",
-                            // color: "#5a3e2b",
-                            borderRadius: 1.2, // 박스 모양 맞추기
-                            flexShrink: 0,
-                          }}
-                        >
-                          {menu.menuType === "DESSERT" ? (
-                            <CakeIcon sx={{ fontSize: 36 }} />
-                          ) : (
-                            <CoffeeIcon sx={{ fontSize: 36 }} />
-                          )}
-                        </Avatar>
-                      )}
-=======
                       {
                         menu?.menuImg ? (
                           <Box
@@ -185,9 +151,6 @@ function CafeMenuList({ menus = [] }) {
                           </Avatar>
                         )
                       }
-
-                      
->>>>>>> cad9ab0 (ui 색상 변경)
 
                       <Box
                         sx={{

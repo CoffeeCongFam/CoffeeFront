@@ -4,14 +4,10 @@ import { Box, Typography, Divider, useMediaQuery, useTheme } from '@mui/material
 /**
  * 개별 선물 항목을 출력하는 컴포넌트
  */
-<<<<<<< HEAD
-const GiftListItem = ({ messageComponent, date, isAppLike }) => {
-=======
+
 const GiftListItem = ({ messageComponent, date}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
->>>>>>> 7237919 (ui 최종)
   return (
     <Box sx={{ width: '100%' }}>
       <Box

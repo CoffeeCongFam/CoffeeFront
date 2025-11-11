@@ -31,13 +31,12 @@ import kakaopayImg from "../../../assets/kakaopay.png";
 import tosspayImg from "../../../assets/tosspay.png";
 import naverpayImg from "../../../assets/naverpay.png";
 import paycoImg from "../../../assets/payco.png";
-import useAppShellMode from "../../../hooks/useAppShellMode";
+// import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function PurchaseSubscriptionPage() {
   const { isAppLike } = useAppShellMode();
   const { subId } = useParams();
   const { authUser } = useUserStore();
-  const { isAppLike } = useAppShellMode();
   const navigate = useNavigate();
 
   const [subscription, setSubscription] = useState({});
@@ -214,16 +213,10 @@ function PurchaseSubscriptionPage() {
             구독하기
           </Typography>
         </Box>
-
-<<<<<<< HEAD
-
-       
-=======
         {/* 제목 */}
         <Box sx={{ textAlign: "center", mb: 2 }}>
           <Typography variant="h6" sx={{ color: "#334336" }}>구독하기</Typography>
         </Box>
->>>>>>> 7237919 (ui 최종)
 
         {/* 구독권 정보 */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -248,11 +241,7 @@ function PurchaseSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-<<<<<<< HEAD
-            <Typography variant="subtitle2" sx={{ fontSize: "0.9rem", fontWeight: 600 }}>
-=======
             <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
->>>>>>> 7237919 (ui 최종)
               유의사항
             </Typography>
           </Box>
@@ -289,12 +278,9 @@ function PurchaseSubscriptionPage() {
             fullWidth={isAppLike}
             onClick={() => setPayOpen(true)}
             sx={{
-<<<<<<< HEAD
               borderRadius: isAppLike ? "2rem" : "inherit",
               backgroundColor: "black",
-=======
               backgroundColor: "#334336",
->>>>>>> 7237919 (ui 최종)
               color: "white",
               px: 4,
               maxWidth: isAppLike ? 480 : "none",
@@ -371,16 +357,12 @@ function PurchaseSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
-<<<<<<< HEAD
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
                 gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
                 columnGap: 1.5,
                 rowGap: 1.5,
-=======
-                gridTemplateColumns: "repeat(3, 1fr)",
                 gap: 1.5,
                 width: "100%",
->>>>>>> 7237919 (ui 최종)
               }}
             >
               {paymentMethods.map((method) => (
@@ -398,14 +380,10 @@ function PurchaseSubscriptionPage() {
                         : "transparent"
                     }`,
                     borderRadius: 3,
-<<<<<<< HEAD
-                    height: "100%", 
-=======
                     height: 110,
                     width: isAppLike ? "100%" : "auto",
                     minWidth: 0,
                     boxSizing: "border-box",
->>>>>>> 7237919 (ui 최종)
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",

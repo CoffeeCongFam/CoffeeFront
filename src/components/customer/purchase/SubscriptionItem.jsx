@@ -178,14 +178,9 @@ function SubscriptionItem({ subscription, isAppLike }) {
           color="warning"
           size="small"
           sx={{ mb: 1, fontWeight: 600 }}
-<<<<<<< HEAD
         /> */}
         <SubTypeChip  status={typeLabel}/>
-        <Typography variant="h5" sx={{ fontWeight: 800 }}>
-=======
-        />
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
->>>>>>> 7237919 (ui 최종)
           ₩{subscription.price?.toLocaleString()}
           <Typography
             component="span"

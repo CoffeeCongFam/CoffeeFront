@@ -257,18 +257,10 @@ function CompletePurchasePage() {
         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, color: "#334336" }}>
           결제 정보
         </Typography>
-
-<<<<<<< HEAD
-        <Row label="승인 일시" value={formatDate(purchase.paidAt)} />
-        <Row label="승인 번호" value={purchase.merchantUid} />
-        <Row label="결제 금액" value={fmtPrice(purchase.paymentAmount)} />
-        <Row label="결제 수단" value={purchase.purchaseType} />
-=======
         <Row label="승인 일시" value={formatDate(purchase.paidAt)} sx={{ color: "#334336" }} />
         <Row label="승인 번호" value={purchase.merchantUid} sx={{ color: "#334336" }} />
         <Row label="결제 금액" value={purchase.paymentAmount} sx={{ color: "#334336" }} />
         <Row label="결제 수단" value={purchase.purchaseType} sx={{ color: "#334336" }} />
->>>>>>> 7237919 (ui 최종)
       </Box>
 
       {/* 하단 확인 버튼 영역 */}

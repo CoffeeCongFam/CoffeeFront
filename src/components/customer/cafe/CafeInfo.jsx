@@ -58,13 +58,8 @@ function CafeInfo({ store }) {
             fontSize="small"
             sx={{ mr: 1, color: "#334336" }}
           />
-<<<<<<< HEAD
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {store.roadAddress} {store.detailAddress}
-=======
           <Typography variant="body2" sx={{ color: "#334336" }}>
             {store.roadAddress}  {store.detailAddress}
->>>>>>> cad9ab0 (ui 색상 변경)
           </Typography>
         </Box>
 

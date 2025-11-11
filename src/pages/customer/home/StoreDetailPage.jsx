@@ -134,9 +134,6 @@ function StoreDetailPage() {
       >
         <ArrowBackIcon />
       </IconButton>
-
-<<<<<<< HEAD
-=======
                 {/* 뒤로가기 버튼: 왼쪽 고정 */}
                 <IconButton
                   onClick={handleBack}
@@ -155,10 +152,6 @@ function StoreDetailPage() {
                 >
                   <ArrowBackIcon />
                 </IconButton>
-      
-              
-      
->>>>>>> cad9ab0 (ui 색상 변경)
       {/* 상단 대표 이미지 */}
       <Box
         sx={{

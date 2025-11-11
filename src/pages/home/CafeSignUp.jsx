@@ -23,11 +23,9 @@ const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
 function StoreForm({ onSuccess }) {
-<<<<<<< HEAD
-=======
+
   const { setPartnerStoreId } = useUserStore();
 
->>>>>>> 7237919 (ui 최종)
   // 상태 관리
   const [formState, setFormState] = useState({
     businessNumber: "", // 사업자번호
@@ -435,10 +433,6 @@ function StoreForm({ onSuccess }) {
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   textTransform: "none",
-<<<<<<< HEAD
-                  backgroundImage: "linear-gradient(135deg, #111827, #4b5563)",
-                  boxShadow: "0 6px 16px rgba(15,23,42,0.35)",
-=======
                   bgcolor: "#334336",
                   color: "#fff9f4",
                   boxShadow: "0 6px 16px rgba(51, 67, 54, 0.35)",
@@ -446,7 +440,6 @@ function StoreForm({ onSuccess }) {
                     bgcolor: "#334336",
                     opacity: 0.9,
                   },
->>>>>>> cad9ab0 (ui 색상 변경)
                   "&:disabled": {
                     bgcolor: "#ccc",
                     color: "#666",
