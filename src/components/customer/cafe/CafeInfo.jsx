@@ -4,16 +4,16 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import React from "react";
 import formatPhoneNumber from "../../../utils/formatPhoneNumber";
 
-  // 🔹 요일 매핑 테이블
-  const dayMap = {
-    MON: "월요일",
-    TUE: "화요일",
-    WED: "수요일",
-    THU: "목요일",
-    FRI: "금요일",
-    SAT: "토요일",
-    SUN: "일요일",
-  };
+// 🔹 요일 매핑 테이블
+const dayMap = {
+  MON: "월요일",
+  TUE: "화요일",
+  WED: "수요일",
+  THU: "목요일",
+  FRI: "금요일",
+  SAT: "토요일",
+  SUN: "일요일",
+};
 
 function formatTime(timeStr) {
   if (!timeStr) return "";
@@ -22,13 +22,11 @@ function formatTime(timeStr) {
   return `${padded.slice(0, 2)}:${padded.slice(2, 4)}`;
 }
 
-
 function CafeInfo({ store }) {
   const subTitleStyle = {
     fontWeight: "bold",
     fontSize: "18px",
   };
-
 
   return (
     <Box
@@ -42,15 +40,15 @@ function CafeInfo({ store }) {
     >
       {/* 소개 */}
       <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" sx={{ mb: 1 }} style={subTitleStyle}>
+        <Typography variant="h6" sx={{ mb: 1, color: "#334336" }} style={subTitleStyle}>
           카페 소개
         </Typography>
-        <Typography variant="body2">{store.detailInfo}</Typography>
+        <Typography variant="body2" sx={{ color: "#334336" }}>{store.detailInfo}</Typography>
       </Box>
 
       {/* 주소 및 연락처 */}
       <Box>
-        <Typography variant="h6" sx={{ mb: 1 }} style={subTitleStyle}>
+        <Typography variant="h6" sx={{ mb: 1, color: "#334336" }} style={subTitleStyle}>
           주소 및 연락처
         </Typography>
 
@@ -58,17 +56,17 @@ function CafeInfo({ store }) {
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <LocationOnIcon
             fontSize="small"
-            sx={{ mr: 1, color: "text.secondary" }}
+            sx={{ mr: 1, color: "#334336" }}
           />
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             {store.roadAddress}  {store.detailAddress}
           </Typography>
         </Box>
 
         {/* 전화번호 */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <PhoneIcon sx={{ mr: 1, color: "text.secondary" }} />
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          <PhoneIcon sx={{ mr: 1, color: "#334336" }} />
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             {formatPhoneNumber(store.storeTel)}
           </Typography>
         </Box>
@@ -76,13 +74,13 @@ function CafeInfo({ store }) {
 
       {/* 운영 시간 */}
       <Box>
-        <Typography variant="h6" sx={{ mb: 1 }} style={subTitleStyle}>
+        <Typography variant="h6" sx={{ mb: 1, color: "#334336" }} style={subTitleStyle}>
           운영 시간
         </Typography>
         <Box
           sx={{ px: 3, py: 2 }}
           style={{
-            border: "1px solid #f0f0f0",
+            border: "1px solid #ffe0b2",
             borderRadius: "8px",
           }}
         >
@@ -95,7 +93,7 @@ function CafeInfo({ store }) {
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  color: "#474747dd",
+                  color: "#334336",
                 }}
               >
                 <Typography
@@ -109,12 +107,13 @@ function CafeInfo({ store }) {
                 <Typography style={{ fontSize: "15px" }}>
                   {day.isClosed === "Y"
                     ? "휴무일"
-                    : `${formatTime(day.openTime)} ~ ${formatTime(day.closeTime)}`}
+                    : // : `${formatTime(day.openTime)} ~ ${formatTime(day.closeTime)}`}
+                      `${day.openTime} ~ ${day.closeTime}`}
                 </Typography>
               </Box>
             ))
           ) : (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "#334336" }}>
               운영 시간이 아직 등록되지 않았습니다.
             </Typography>
           )}
@@ -125,10 +124,10 @@ function CafeInfo({ store }) {
 
       {/* 기타 설명 */}
       <Box>
-        <Typography variant="h6" sx={{ mb: 1 }} style={subTitleStyle}>
+        <Typography variant="h6" sx={{ mb: 1, color: "#334336" }} style={subTitleStyle}>
           기타 설명
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ color: "#334336" }}>
           {store.summary || "매장 설명이 없습니다."}
         </Typography>
       </Box>

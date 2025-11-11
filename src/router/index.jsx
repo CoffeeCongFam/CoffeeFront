@@ -2,10 +2,10 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 
-import ErrorPage from "../common/error/ErrorPage";
-import LandingPage from "../pages/home/Landing";
+import ErrorPage from '../common/error/ErrorPage';
+import LandingPage from '../pages/home/Landing';
+import SignUp from '../pages/home/SignUp';
 import Relanding from "../pages/home/Relanding";
-import SignUp from "../pages/home/SignUp";
 
 import CustomerLayout from '../layout/CustomerLayout';
 import StoreLayout from '../layout/StoreLayout';

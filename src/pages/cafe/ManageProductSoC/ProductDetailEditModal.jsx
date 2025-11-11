@@ -254,8 +254,7 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
             <Button
               onClick={onClose}
               disabled={isSubmitting}
-              color="secondary"
-              sx={{ mr: 1 }}
+              sx={{ mr: 1, color: "#334336" }}
             >
               닫기
             </Button>
@@ -266,7 +265,18 @@ const ProductDetailEditModal = ({ open, subscription, onClose, onSave }) => {
                 !isUpdatable
               } // 저장중 or 상태 변경 가능한지
               variant="contained"
-              color="primary"
+              sx={{
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
+                },
+                "&:disabled": {
+                  bgcolor: "#ccc",
+                  color: "#666",
+                },
+              }}
             >
               {isSubmitting ? '저장 중...' : '판매 상태 수정'}
             </Button>

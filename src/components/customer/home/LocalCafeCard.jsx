@@ -34,7 +34,7 @@ function LocalCafeCard({ store }) {
         }}
       >
         <img
-          src={store?.storeImage}
+          src={store?.storeImg}
           alt={store?.storeName}
           style={{
             width: "100%",
@@ -57,6 +57,7 @@ function LocalCafeCard({ store }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            color: "#334336",
           }}
         >
           {store?.storeName}

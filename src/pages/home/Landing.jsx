@@ -12,9 +12,9 @@ import useAppShellMode from "../../hooks/useAppShellMode";
 import useUserStore from "../../stores/useUserStore";
 
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
-import monkeyLogo from "../../assets/coffeiensLogoTitle.png";
+import monkeyLogo from "../../assets/finalLogo.png";
 import LoginIcon from "@mui/icons-material/Login";
-import api, { TokenService } from "../../utils/api";
+import { TokenService } from "../../utils/api";
 
 function Landing() {
   const { isAppLike } = useAppShellMode();
@@ -39,11 +39,16 @@ function Landing() {
   }, []);
 
   const sections = ["hero", "customer", "store", "cta"];
-  const containerRef = (React.useRef < HTMLDivElement) | (null > null);
+  const containerRef = React.useRef(null);
 
   const handleScroll = (e) => {
-    const { scrollTop, clientHeight } = e.currentTarget;
-    const index = Math.round(scrollTop / clientHeight);
+    const { scrollTop, scrollLeft, clientHeight, clientWidth } =
+      e.currentTarget;
+
+    const index = isMobile
+      ? Math.round(scrollLeft / clientWidth) // 모바일 : 가로 기준
+      : Math.round(scrollTop / clientHeight); // 데스크탑: 세로 기준
+
     const sec = sections[index] || sections[0];
     setActive(sec);
   };
@@ -54,14 +59,13 @@ function Landing() {
 
   // 카카오 로그인 버튼
   const kakaoLogin = async () => {
-
     let URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code`;
-    
+
     window.location.href = URI;
   };
 
-    // 로그인 상태 확인용 로그
-    useEffect(() => {
+  // 로그인 상태 확인용 로그
+  useEffect(() => {
     if (!authUser) {
       const cachedUser = TokenService.getUser();
       if (cachedUser) {
@@ -69,14 +73,14 @@ function Landing() {
       }
     }
   }, [authUser, setUser]);
-  
-    const handleGoHome = () => {
-      if (authUser?.memberType === "GENERAL") {
-        navigate("/me");
-      } else if (authUser?.memberType === "STORE") {
-        navigate("/store");
-      }
-    };
+
+  const handleGoHome = () => {
+    if (authUser?.memberType === "GENERAL") {
+      navigate("/me");
+    } else if (authUser?.memberType === "STORE") {
+      navigate("/store");
+    }
+  };
 
   return (
     <Box
@@ -85,13 +89,18 @@ function Landing() {
       sx={{
         height: "100vh",
         width: "100vw",
-        overflowY: "auto",
-        scrollSnapType: "y mandatory",
+        overflowY: isMobile ? "hidden" : "auto",
+        overflowX: isMobile ? "auto" : "hidden",
+        scrollSnapType: isMobile ? "x mandatory" : "y mandatory",
+        display: isMobile ? "flex" : "block",
+        flexDirection: isMobile ? "row" : "column",
+        scrollBehavior: "smooth",
         backgroundColor: "#f6e4d1",
       }}
     >
-      {/* 오른쪽 점 네비게이션 */}
-      {!isMobile && (
+      {/* 점 네비게이션 */}
+      {!isMobile ? (
+        // 데스크탑: 오른쪽 세로
         <Box
           sx={{
             position: "fixed",
@@ -128,6 +137,44 @@ function Landing() {
             </Link>
           ))}
         </Box>
+      ) : (
+        // 모바일: 아래 가로
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "row",
+            gap: 1.5,
+            zIndex: 10,
+          }}
+        >
+          {sections.map((sec) => (
+            <Link
+              key={sec}
+              to={sec}
+              spy={true}
+              smooth={true}
+              duration={500}
+              offset={0}
+              onSetActive={() => setActive(sec)}
+            >
+              <Box
+                sx={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "9999px",
+                  border: "2px solid #a16246",
+                  backgroundColor: active === sec ? "#a16246" : "transparent",
+                  cursor: "pointer",
+                  transition: "all .2s",
+                }}
+              />
+            </Link>
+          ))}
+        </Box>
       )}
 
       {/* ------------------- 1 챕터 ------------------- */}
@@ -135,6 +182,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             display: "flex",
             scrollSnapAlign: "start",
           }}
@@ -144,7 +192,7 @@ function Landing() {
             <Box
               sx={{
                 flex: 1,
-                backgroundColor: "#fff",
+                backgroundColor: "#334336",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -172,7 +220,11 @@ function Landing() {
             }}
           >
             <Typography
-              sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}
+              sx={{
+                color: "#cc5f2b",
+                fontWeight: 600,
+                fontSize: isMobile ? "0.8rem" : "1rem",
+              }}
             >
               우리는 생각한다. 고로 커피를 마신다… ☕
             </Typography>
@@ -188,7 +240,13 @@ function Landing() {
               <br />
               커피 구독 플랫폼, COFFEIENS
             </Typography>
-            <Typography sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" , mt: 1 }}>
+            <Typography
+              sx={{
+                color: "#4a3426",
+                fontSize: isMobile ? "0.8rem" : "1rem",
+                mt: 1,
+              }}
+            >
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
               COFFEIENS는 소비자에게는 더 현명한 하루를,
@@ -206,8 +264,8 @@ function Landing() {
                       backgroundColor: "#c84436",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      flex: isMobile && 1,
-                      px: isMobile || 6,
+                      flex: isMobile ? 1 : "initial",
+                      px: isMobile ? 2 : 6,
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
                     onClick={() => navigate("/signup")}
@@ -256,7 +314,6 @@ function Landing() {
                 </Button>
               )}
             </Box>
-
           </Box>
         </Box>
       </Element>
@@ -266,6 +323,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
@@ -282,28 +340,45 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }} >
+            <Typography
+              sx={{
+                color: "#cc5f2b",
+                fontWeight: 600,
+                fontSize: isMobile ? "0.8rem" : "1rem",
+              }}
+            >
               매일의 커피, 더 똑똑하게 즐기다
             </Typography>
             <Typography
-              sx={{ 
-                fontSize: isMobile ? "1.5rem" : "2.3rem", 
-                fontWeight: 700, 
-                color: "#4a3426" 
+              sx={{
+                fontSize: isMobile ? "1.6rem" : "2rem",
+                fontWeight: 700,
+                color: "#4a3426",
               }}
             >
               매일 마시는 커피,
               <br /> 이제는 구독으로 더 합리적이게
             </Typography>
-            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
+            <Typography
+              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
+            >
               CoffeeEns는 당신이 자주 가는 동네 카페를 구독으로 연결해줍니다.
-              <br />한 달 구독으로 매일의 커피를 더 합리적으로, 줄 서지 않고
-              간편하게 즐기세요.
+              <br />한 달 구독으로 매일의 커피를 더 합리적으로,{" "}
+              {isAppLike && <br />}줄 서지 않고 간편하게 즐기세요.
             </Typography>
-            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
+            <Typography
+              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
+            >
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 6,
+                justifyContent: isMobile && "flex-end",
+              }}
+            >
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -325,6 +400,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
@@ -341,14 +417,20 @@ function Landing() {
               gap: 2,
             }}
           >
-            <Typography  sx={{ color: "#cc5f2b", fontWeight: 600, fontSize: isMobile ? "0.8rem" : "1rem"  }}>
+            <Typography
+              sx={{
+                color: "#cc5f2b",
+                fontWeight: 600,
+                fontSize: isMobile ? "0.8rem" : "1rem",
+              }}
+            >
               예측 가능한 매출, 사장님의 새로운 루틴
             </Typography>
             <Typography
-              sx={{ 
-                fontSize: isMobile ? "1.6rem" : "2.3rem", 
-                fontWeight: 700, 
-                color: "#4a3426" 
+              sx={{
+                fontSize: isMobile ? "1.6rem" : "2rem",
+                fontWeight: 700,
+                color: "#4a3426",
               }}
             >
               {/* 이제 우리 카페에도 사이렌 오더가 생깁니다. */}
@@ -357,14 +439,23 @@ function Landing() {
               매출은 안정적으로
               {/* 매출은 예측 가능하게 */}
             </Typography>
-            <Typography sx={{ color: "#4a3426" , fontSize: isMobile ? "0.8rem" : "1rem" }}>
+            <Typography
+              sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
+            >
               구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게 관리하세요.{" "}
-              <br />
+              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게
+              관리하세요. <br />
               프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 6 , justifyContent: isMobile && "flex-end"}}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 6,
+                justifyContent: isMobile && "flex-end",
+              }}
+            >
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -387,18 +478,20 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            alignItems: isMobile ? "flex-start" : "center",
+            alignItems: "center",
+            // alignItems: isMobile ? "flex-start" : "center",
             backgroundColor: "#f6e4d1",
             px: isMobile ? 3 : 0,
           }}
         >
           <Typography
             sx={{
-              fontSize: "1.4rem",
+              fontSize: isMobile ? "1.3rem" : "1.5rem",
               fontWeight: 600,
               color: "#4a3426",
               mb: 2,
@@ -406,7 +499,14 @@ function Landing() {
           >
             지금 COFFEIENS에 합류하세요.
           </Typography>
-          <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1.5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Button
               variant="contained"
               sx={{

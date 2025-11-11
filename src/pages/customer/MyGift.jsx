@@ -83,9 +83,11 @@ import {
 } from "../../utils/gift";
 import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 import useUserStore from "../../stores/useUserStore";
+import useAppShellMode from "../../hooks/useAppShellMode";
 
 function MyGift() {
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode
   const memberId = authUser?.memberId ?? 105;
   const [filter, setFilter] = useState("ALL");
   const [openIndex, setOpenIndex] = useState(null);
@@ -100,23 +102,32 @@ function MyGift() {
   // ✅ 날짜 포맷터: "2025.11.08  오후 10시 26분"
   const formatKST = (isoLike) => {
     if (!isoLike) return "";
-    let s = String(isoLike);
-    // Normalize fractional seconds to max 3 digits (milliseconds)
-    // e.g., "2025-11-01T11:52:14.683351" -> "2025-11-01T11:52:14.683"
-    s = s.replace(
-      /(T\d{2}:\d{2}:\d{2}\.)(\d{1,})(.*)?$/,
-      (_, head, frac, tail = "") => head + frac.slice(0, 3) + (tail || "")
-    );
-    const d = new Date(s);
-    if (isNaN(d.getTime())) return "";
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    let h = d.getHours();
-    const m = String(d.getMinutes()).padStart(2, "0");
-    const ampm = h >= 12 ? "오후" : "오전";
-    h = h % 12 || 12;
-    return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+    try {
+      // ISO 문자열을 직접 파싱하여 UTC 시간을 그대로 사용 (시간 더하거나 빼지 않음)
+      // 예: "2025-11-01T11:52:14.683351Z" -> "2025.11.01  오전 11시 52분"
+      const match = String(isoLike).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+      if (match) {
+        const [, yyyy, mm, dd, hh, mi] = match;
+        const h = parseInt(hh, 10);
+        const ampm = h >= 12 ? "오후" : "오전";
+        const h12 = h % 12 || 12;
+        return `${yyyy}.${mm}.${dd}  ${ampm} ${h12}시 ${mi}분`;
+      }
+      // 매칭되지 않으면 Date 객체로 파싱 시도 (UTC 사용)
+      const d = new Date(isoLike);
+      if (isNaN(d.getTime())) return "";
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const dd = String(d.getUTCDate()).padStart(2, "0");
+      let h = d.getUTCHours();
+      const m = String(d.getUTCMinutes()).padStart(2, "0");
+      const ampm = h >= 12 ? "오후" : "오전";
+      h = h % 12 || 12;
+      return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
   };
 
   // ✅ API에서 목록 받아오기 (항상 배열 보장)
@@ -293,7 +304,7 @@ function MyGift() {
         isMineSent,
         isMineReceived,
         node: (
-          <>
+          <Typography component="span" sx={{ color: "#334336" }}>
             <Typography component="span" sx={bold}>
               {item.sender}
             </Typography>
@@ -302,7 +313,7 @@ function MyGift() {
               {item.subscriptionName}
             </Typography>
             을 선물받았습니다!
-          </>
+          </Typography>
         ),
       };
     }
@@ -314,8 +325,8 @@ function MyGift() {
         isMineSent,
         isMineReceived,
         node: (
-          <>
-            <Typography component="span" sx={bold}>
+          <Typography component="span" sx={{ color: "#334336" }}>
+            <Typography component="span" sx={bold} >
               {item.receiver}
             </Typography>
             님께&nbsp;
@@ -323,7 +334,7 @@ function MyGift() {
               {item.subscriptionName}
             </Typography>
             을 선물했습니다!
-          </>
+          </Typography>
         ),
       };
     }
@@ -334,7 +345,7 @@ function MyGift() {
       isMineSent,
       isMineReceived,
       node: (
-        <>
+        <Typography component="span" sx={{ color: "#334336" }}>
           <Typography component="span" sx={bold}>
             {item.sender}
           </Typography>
@@ -347,7 +358,7 @@ function MyGift() {
             {item.subscriptionName}
           </Typography>
           을 선물했습니다!
-        </>
+        </Typography>
       ),
     };
   };
@@ -370,6 +381,8 @@ function MyGift() {
         width: "100%",
         padding: 2,
         backgroundColor: "white",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
       }}
     >
       <Box
@@ -380,7 +393,7 @@ function MyGift() {
           mb: 1.5,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#334336" }}>
           내 선물함
         </Typography>
       </Box>
@@ -388,7 +401,22 @@ function MyGift() {
       <Tabs
         value={filter}
         onChange={(_, v) => setFilter(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 1 }}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "#ffe0b2", 
+          mt: 0.5, 
+          mb: 1,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+          },
+          "& .Mui-selected": {
+            color: "#334336",
+            fontWeight: 600,
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="ALL" label="전체" />
         <Tab value="RECEIVED" label="받은선물" />
@@ -398,10 +426,10 @@ function MyGift() {
       {/* 데이터가 없을 때 표시할 메시지 */}
       {filteredGiftList.length === 0 && (
         <Box sx={{ mt: 6, textAlign: "center" }}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
             선물 내역이 비어 있습니다.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             선물하기 또는 선물을 받으면 이곳에서 내역을 확인할 수 있습니다.
           </Typography>
         </Box>
@@ -412,7 +440,7 @@ function MyGift() {
         filteredGiftList.map((item, index) => {
           const bold = { fontWeight: "bold", color: "black" };
           const messageNode = (
-            <>
+            <Typography component="span" sx={{ color: "#334336" }}>
               <Typography component="span" sx={bold}>
                 {item.receiver}
               </Typography>
@@ -421,7 +449,7 @@ function MyGift() {
                 {item.subscriptionName}
               </Typography>
               을 선물했습니다!
-            </>
+            </Typography>
           );
           const handleClick = () =>
             setOpenIndex(openIndex === index ? null : index);
@@ -442,6 +470,7 @@ function MyGift() {
                   messageComponent={messageNode}
                   date={formatKST(item.paidAt)}
                   isSent={true}
+                  isAppLike={isAppLike}
                 />
               </Button>
 
@@ -503,7 +532,7 @@ function MyGift() {
         filteredGiftList.map((item, index) => {
           const bold = { fontWeight: "bold", color: "black" };
           const messageNode = (
-            <>
+            <Typography component="span" sx={{ color: "#334336" }}>
               <Typography component="span" sx={bold}>
                 {item.sender}
               </Typography>
@@ -512,7 +541,7 @@ function MyGift() {
                 {item.subscriptionName}
               </Typography>
               을 선물받았습니다!
-            </>
+            </Typography>
           );
           const handleClick = () =>
             setOpenIndex(openIndex === index ? null : index);

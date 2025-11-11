@@ -202,20 +202,18 @@ function CafeReviewList({ storeName, storeId }) {
       subscriptionId: selectedSub.subId,
       reviewContent: content,
       rating,
-      reviewImg: null,
     };
 
     console.log(payload);
 
     try {
-      await createReview(payload);
+      // imageFile 을 두 번째 인자로 같이 넘김
+      await createReview(payload, imageFile);
       await getReviewList();
       handleClose();
       handleShowAlert("info", "리뷰 작성이 완료되었습니다.");
-      // alert("리뷰 작성이 완료되었습니다.");
     } catch (e) {
       console.error("리뷰 작성 실패: ", e);
-      // alert("리뷰 작성에 실패했습니다. 서버 로그를 확인해주세요.");
     }
   };
 
@@ -280,13 +278,27 @@ function CafeReviewList({ storeName, storeId }) {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
               displayEmpty
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="LATEST">최신순</MenuItem>
               <MenuItem value="RATING_DESC">평점 높은 순</MenuItem>
               <MenuItem value="RATING_ASC">평점 낮은 순</MenuItem>
             </Select>
           </FormControl>
-          <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
+          <Typography variant="subtitle2" sx={{ color: "#334336" }}>
             리뷰 {localReviews.length}개
           </Typography>
         </Box>
@@ -297,6 +309,12 @@ function CafeReviewList({ storeName, storeId }) {
             width: "fit-content",
             float: "right",
             mb: 2,
+            borderColor: "#334336",
+            color: "#334336",
+            "&:hover": {
+              borderColor: "#334336",
+              bgcolor: "rgba(51, 67, 54, 0.05)",
+            },
           }}
           onClick={handleCreateReview}
         >
@@ -324,7 +342,7 @@ function CafeReviewList({ storeName, storeId }) {
             p: "1rem",
           }}
         >
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             아직 등록된 리뷰가 없습니다.
           </Typography>
         </Box>
@@ -351,6 +369,7 @@ function CafeReviewList({ storeName, storeId }) {
             textAlign: "center",
             fontSize: "1.5rem",
             fontWeight: "bold",
+            color: "#334336",
           }}
         >
           리뷰 작성하기
@@ -361,7 +380,7 @@ function CafeReviewList({ storeName, storeId }) {
               position: "absolute",
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: "#334336",
             }}
           >
             <CloseIcon />
@@ -372,10 +391,11 @@ function CafeReviewList({ storeName, storeId }) {
           <DialogContentText
             sx={{
               mb: 2,
-              backgroundColor: "#f0f0f0ee",
+              backgroundColor: "#fff9f4",
               py: 2,
               px: 3,
               borderRadius: "0.5rem",
+              color: "#334336",
             }}
           >
             <span>
@@ -387,7 +407,10 @@ function CafeReviewList({ storeName, storeId }) {
 
           {/* 구독권 선택 Select 컴포넌트 */}
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="select-subscription-label">
+            <InputLabel
+              id="select-subscription-label"
+              sx={{ color: "#334336" }}
+            >
               리뷰할 구독권 선택
             </InputLabel>
             <Select
@@ -395,6 +418,23 @@ function CafeReviewList({ storeName, storeId }) {
               id="select-subscription"
               value={selectedSub ? selectedSub.subId : ""} // 선택된 ID를 값으로 사용
               label="리뷰할 구독권 선택"
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#334336",
+                },
+              }}
               onChange={async (e) => {
                 // 선택된 ID에 해당하는 구독권 객체를 selectedSub에 저장
                 const subId = e.target.value;
@@ -438,7 +478,7 @@ function CafeReviewList({ storeName, storeId }) {
             required
           />
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, color: "#334336" }}>
               사진 첨부 (선택)
             </Typography>
 
@@ -456,6 +496,14 @@ function CafeReviewList({ storeName, storeId }) {
                 startIcon={<PhotoCamera />}
                 component="label"
                 size="small"
+                sx={{
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
+                }}
               >
                 사진 선택
                 <input
@@ -474,7 +522,7 @@ function CafeReviewList({ storeName, storeId }) {
 
               {/* 선택된 파일명 */}
               {imageFile && (
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                <Typography variant="body2" sx={{ color: "#334336" }}>
                   {imageFile.name}
                 </Typography>
               )}
@@ -490,7 +538,7 @@ function CafeReviewList({ storeName, storeId }) {
                   height: 120,
                   borderRadius: 2,
                   overflow: "hidden",
-                  border: "1px solid #e0e0e0",
+                  border: "1px solid #ffe0b2",
                 }}
               >
                 <Box
@@ -513,9 +561,9 @@ function CafeReviewList({ storeName, storeId }) {
                     position: "absolute",
                     top: 4,
                     right: 4,
-                    bgcolor: "rgba(0,0,0,0.5)",
-                    color: "white",
-                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                    bgcolor: "rgba(51, 67, 54, 0.5)",
+                    color: "#fff9f4",
+                    "&:hover": { bgcolor: "rgba(51, 67, 54, 0.7)" },
                   }}
                 >
                   <DeleteOutline fontSize="small" />
@@ -539,13 +587,38 @@ function CafeReviewList({ storeName, storeId }) {
               variant="standard"
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              sx={{
+                "& .MuiInput-underline:before": {
+                  borderBottomColor: "#ffe0b2",
+                },
+                "& .MuiInput-underline:hover:before": {
+                  borderBottomColor: "#334336",
+                },
+                "& .MuiInput-underline:after": {
+                  borderBottomColor: "#334336",
+                },
+                "& .MuiInputBase-input": {
+                  color: "#334336",
+                },
+              }}
             />
           </form>
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose}>취소</Button>
-          <Button onClick={handleSubmit} form="review-form" variant="contained">
+          <Button onClick={handleClose} sx={{ color: "#334336" }}>
+            취소
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            form="review-form"
+            variant="contained"
+            sx={{
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              "&:hover": { bgcolor: "#334336", opacity: 0.9 },
+            }}
+          >
             작성 완료
           </Button>
         </DialogActions>

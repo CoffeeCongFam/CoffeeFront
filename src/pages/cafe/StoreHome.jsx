@@ -177,7 +177,7 @@ function StoreHome() {
   };
 
   // 팝업을 띄우는 함수
-  const handleConfirmOpen = (orderId, currentStatus) => {
+  const handleConfirmOpen = (orderId, currentStatus, orderNumber) => {
     const actionDetails = getNextActionAndState(currentStatus);
     if (!actionDetails) return; // 버튼 없는 상태(픽업완료 RECEIVED, 거부 REJECTED)는 팝업 띄울 필요 없음
 
@@ -188,19 +188,19 @@ function StoreHome() {
     switch (actionDetails.nextStatus) {
       case 'INPROGRESS':
         newTitle = '주문 접수 확인';
-        newContent = `주문번호 ${orderId}를 접수하시고, 제조를 시작하시겠습니까?`;
+        newContent = `주문번호 #${orderNumber}를 접수하시고, 제조를 시작하시겠습니까?`;
         break;
       case 'COMPLETED':
         newTitle = '제조 완료 알림 확인';
-        newContent = `주문번호 ${orderId}의 제조가 완료되었습니다.`;
+        newContent = `주문번호 #${orderNumber}의 제조가 완료되었습니다.`;
         break;
       case 'RECEIVED':
         newTitle = '수령 완료 처리 확인';
-        newContent = `주문번호 ${orderId}을 고객에게 전달했습니다. 수령 완료 처리하고 주문을 마감하시겠습니까?`;
+        newContent = `주문번호 #${orderNumber}을 고객에게 전달했습니다. 수령 완료 처리하고 주문을 마감하시겠습니까?`;
         break;
       default:
         newTitle = actionDetails.title; // 기본값
-        newContent = `주문 번호 ${orderId}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`;
+        newContent = `주문 번호 #${orderNumber}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`;
         break;
     }
 
@@ -360,7 +360,7 @@ function StoreHome() {
   // Grid 시스템에서 전체 너비는 12 - 한 행에 3개 카드 넣으려면 각 카드에 md={4}
   return (
     <div sx={{ p: 3, flexGrow: 1 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ color: '#334336' }}>
         오늘의 주문 현황
       </Typography>
 
@@ -391,7 +391,7 @@ function StoreHome() {
                     cursor: 'pointer',
                     transition: 'all 0.25s ease',
                     transform: 'translateY(0)',
-                    "&:hover": {
+                    '&:hover': {
                       backgroundColor: '#f9fafb',
                       transform: 'translateY(-4px) scale(1.02)', // 살짝 떠오름
                       boxShadow: '0 6px 14px rgba(0,0,0,0.08)', // 부드러운 그림자 강조
@@ -473,7 +473,11 @@ function StoreHome() {
                       disableElevation
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleConfirmOpen(order.orderId, order.orderStatus);
+                        handleConfirmOpen(
+                          order.orderId,
+                          order.orderStatus,
+                          order.orderNumber
+                        );
                       }}
                       sx={{
                         bgcolor: statusInfo.action || '#0064FF',
@@ -482,7 +486,7 @@ function StoreHome() {
                         py: 1.2,
                         textTransform: 'none',
                         fontWeight: 600,
-                        "&:hover": {
+                        '&:hover': {
                           bgcolor: '#333',
                         },
                       }}

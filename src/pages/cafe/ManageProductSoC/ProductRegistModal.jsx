@@ -371,14 +371,29 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} disabled={isSubmitting} color="secondary">
+        <Button
+          onClick={onClose}
+          disabled={isSubmitting}
+          sx={{ color: "#334336" }}
+        >
           취소
         </Button>
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
           variant="contained"
-          color="primary"
+          sx={{
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+            "&:disabled": {
+              bgcolor: "#ccc",
+              color: "#666",
+            },
+          }}
         >
           {isSubmitting ? '등록 중...' : '등록 완료'}
         </Button>

@@ -86,6 +86,7 @@ export default function SearchPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // (lng, lat)
   const [currentLocRef, setCurrentLocRef] = useState(null);
+  const [isSearchConfirmed, setIsSearchConfirmed] = useState(false);
 
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
@@ -96,9 +97,6 @@ export default function SearchPage() {
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
 
-  const handleCurrentLocPopoverClose = () => {
-    setCurrentLocRef(null);
-  };
 
   // --- utils ---
   function getCurrentPositionAsync(options) {
@@ -110,6 +108,21 @@ export default function SearchPage() {
       navigator.geolocation.getCurrentPosition(resolve, reject, options);
     });
   }
+
+  useEffect(() => {
+    const trimmed = keyword.trim();
+    // 검색어가 있으면 드롭다운을 열고, 검색 확정 상태는 초기화
+    if (trimmed) {
+        setShowSearchResult(true);
+        setIsSearchConfirmed(false); // 검색어를 다시 입력하면 확정 상태를 해제
+    } else {
+        // 검색어가 비면 드롭다운 숨김
+        setShowSearchResult(false);
+        setIsSearchConfirmed(false);
+    }
+}, [keyword]);
+
+
 
   // 1) 네이버 지도 스크립트만 먼저 로딩
   useEffect(() => {
@@ -185,7 +198,7 @@ export default function SearchPage() {
       scaleControl: true,
       mapDataControl: false,
       logoControl: true,
-      zoomControl: true,
+      zoomControl: false,
       zoomControlOptions: { position: maps.Position.RIGHT_CENTER },
     });
     mapRef.current = map;
@@ -200,7 +213,6 @@ export default function SearchPage() {
 
     // 지도 클릭 시 현재 위치 마커 이동(선택)
     maps.Event.addListener(map, "click", (e) => {
-      hereMarkerRef.current?.setPosition(e.coord);
       if (typeof map.panTo === "function") map.panTo(e.coord);
       else map.setCenter(e.coord);
     });
@@ -427,6 +439,25 @@ export default function SearchPage() {
               setShowSearchResult(!!v);
             }}
           />
+          {
+            showSearchResult && filteredCafes.length == 0 && 
+            <Paper
+              elevation={3}
+              sx={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                mt: 1,
+                width: "120%",
+                maxHeight: 280,
+                overflowY: "auto",
+                borderRadius: 2,
+                p: 2
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">검색 결과 없음</Typography>
+            </Paper>
+          }
           {showSearchResult && filteredCafes.length > 0 && (
             <Paper
               elevation={3}
@@ -453,19 +484,19 @@ export default function SearchPage() {
                     p: 1,
                     borderRadius: 1.5,
                     cursor: "pointer",
-                    "&:hover": { backgroundColor: grey[100] },
+                    "&:hover": { backgroundColor: "rgba(255, 224, 178, 0.3)" },
                   }}
                 >
                   <Avatar
-                    src={cafe.storeImage}
+                    src={cafe.storeImg}
                     alt={cafe.storeName}
                     sx={{ width: 40, height: 40 }}
                   />
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#334336" }} noWrap>
                       {cafe.storeName}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap>
+                    <Typography variant="caption" sx={{ color: "#334336" }} noWrap>
                       {cafe.roadAddress || cafe.address || "주소 정보 없음"}
                     </Typography>
                   </Box>
@@ -482,10 +513,10 @@ export default function SearchPage() {
           aria-label="current-location"
           sx={{
             backgroundColor: "white",
-            color: "gray",
+            color: "#334336",
             boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
             "&:hover": {
-              backgroundColor: "#f5f5f5",
+              backgroundColor: "#fff9f4",
               boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
             },
           }}
@@ -499,9 +530,9 @@ export default function SearchPage() {
             onClick={() => setOpenCafeList((prev) => !prev)}
             aria-label="카페 리스트"
             sx={{
-              backgroundColor: "black",
-              color: "white",
-              "&:hover": { backgroundColor: "#333" },
+              backgroundColor: "#334336",
+              color: "#fff9f4",
+              "&:hover": { backgroundColor: "#334336", opacity: 0.9 },
             }}
           >
             <FormatListBulletedIcon />
@@ -511,10 +542,10 @@ export default function SearchPage() {
             startIcon={<FormatListBulletedIcon />}
             onClick={() => setOpenCafeList((prev) => !prev)}
             sx={{
-              backgroundColor: "black",
-              color: "white",
+              backgroundColor: "#334336",
+              color: "#fff9f4",
               cursor: "pointer",
-              "&:hover": { backgroundColor: "#333" },
+              "&:hover": { backgroundColor: "#334336", opacity: 0.9 },
             }}
           >
             카페 리스트
@@ -544,14 +575,29 @@ export default function SearchPage() {
             borderBottom: `1px solid ${grey[200]}`,
           }}
         >
-          <Typography variant="subtitle2">{cafes.length}개 카페</Typography>
+          <Typography variant="subtitle2" sx={{ color: "#334336" }}>{cafes.length}개 카페</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {/* 영업 상태 필터 */}
             <Select
               size="small"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ fontSize: "0.875rem", height: 32 }}
+              sx={{
+                fontSize: "0.875rem",
+                height: 32,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="ALL">전체</MenuItem>
               <MenuItem value="OPEN">영업중</MenuItem>
@@ -563,13 +609,28 @@ export default function SearchPage() {
               size="small"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              sx={{ fontSize: "0.875rem", height: 32 }}
+              sx={{
+                fontSize: "0.875rem",
+                height: 32,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="distance">거리순</MenuItem>
               <MenuItem value="subscribers">구독자순</MenuItem>
               <MenuItem value="reviews">리뷰순</MenuItem>
             </Select>
-            <Button size="small" onClick={() => setOpenCafeList(false)}>
+            <Button size="small" onClick={() => setOpenCafeList(false)} sx={{ color: "#334336" }}>
               닫기
             </Button>
           </Box>
@@ -605,10 +666,10 @@ export default function SearchPage() {
                   <SearchOffRoundedIcon
                     sx={{ fontSize: 40, mb: 1, opacity: 0.6 }}
                   />
-                  <Typography color="text.secondary">
+                  <Typography sx={{ color: "#334336" }}>
                     조건에 맞는 카페가 없습니다.
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     필터를 변경하거나 다른 지역을 검색해보세요 ☕
                   </Typography>
                 </Box>
@@ -621,8 +682,9 @@ export default function SearchPage() {
                     key={cafe._mmId ?? cafe.storeId}
                     onClick={() => handleSelectCafe(cafe)}
                     sx={{
-                      bgcolor: "#f8f9fa",
+                      bgcolor: "#fff9f4",
                       borderRadius: 2,
+                      border: "1px solid #ffe0b2",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       p: isAppLike ? 2 : 4,
                       mb: 2,
@@ -632,7 +694,8 @@ export default function SearchPage() {
                       cursor: "pointer",
                       flexDirection: { xs: "column", sm: "row" },
                       "&:hover": {
-                        filter: "brightness(0.97)",
+                        bgcolor: "#fff7e6",
+                        borderColor: "#334336",
                         // transform: "translateY(-3px)",
                         // boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
                       },
@@ -653,7 +716,7 @@ export default function SearchPage() {
                       }}
                     >
                       <Avatar
-                        src={cafe.storeImage || storeDummy}
+                        src={cafe.storeImg || storeDummy}
                         alt={cafe.storeName}
                         sx={{ width: "100%", height: "100%", borderRadius: 2 }}
                         variant="rounded"
@@ -676,13 +739,13 @@ export default function SearchPage() {
 
                       <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}
+                        sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5, color: "#334336" }}
                       >
                         {cafe.storeName}
                       </Typography>
                       <Typography
                         variant="body2"
-                        color="text.secondary"
+                        sx={{ color: "#334336" }}
                         noWrap={false}
                       >
                         {cafe.roadAddress || "주소 정보 없음"}{" "}
@@ -699,13 +762,13 @@ export default function SearchPage() {
                       >
                         <Typography
                           variant="body2"
-                          sx={{ display: "flex", gap: 0.5 }}
+                          sx={{ display: "flex", gap: 0.5, color: "#334336" }}
                         >
                           👥 {cafe.subscriberCount ?? 0}명 구독
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{ display: "flex", gap: 0.5 }}
+                          sx={{ display: "flex", gap: 0.5, color: "#334336" }}
                         >
                           ⭐ {cafe.reviewCount ?? 0}개 리뷰
                         </Typography>
@@ -727,9 +790,8 @@ export default function SearchPage() {
                       {distanceLabel && (
                         <Typography
                           variant="caption"
-                          color="text.secondary"
                           fontSize="0.8rem"
-                          sx={{ whiteSpace: "nowrap" }}
+                          sx={{ whiteSpace: "nowrap", color: "#334336" }}
                         >
                           {distanceLabel}
                         </Typography>
@@ -742,11 +804,15 @@ export default function SearchPage() {
                           startIcon={<span style={{ fontSize: 14 }}>✓</span>}
                           sx={{
                             borderRadius: 999,
-                            borderColor: grey[400],
-                            color: grey[800],
+                            borderColor: "#334336",
+                            color: "#334336",
                             px: 2,
                             whiteSpace: "nowrap",
                             width: { xs: "100%", sm: 150 },
+                            "&:hover": {
+                              borderColor: "#334336",
+                              bgcolor: "rgba(51, 67, 54, 0.05)",
+                            },
                           }}
                         >
                           구독 중인 카페
@@ -761,7 +827,13 @@ export default function SearchPage() {
                           }}
                           sx={{
                             borderRadius: 999,
-                            "&:hover": { bgcolor: "#222", color: "#fff" },
+                            borderColor: "#334336",
+                            color: "#334336",
+                            "&:hover": {
+                              bgcolor: "#334336",
+                              color: "#fff9f4",
+                              borderColor: "#334336",
+                            },
                             whiteSpace: "nowrap",
                             width: { xs: "100%", sm: 150 },
                           }}

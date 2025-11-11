@@ -320,12 +320,16 @@ function CreateOrderPage() {
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
-        py: isAppLike ? 2 : 2,
-        pb: 10,
+        py: isAppLike ? 2 : 5,
+        pb: isAppLike ? 9 : 8,
         boxSizing: "border-box",
         // overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+        m: isAppLike ? 2 : 4,
         // height: "calc(100vh - 64px)",
         ...(isAppLike
           ? {
@@ -352,6 +356,7 @@ function CreateOrderPage() {
             fontWeight: "bold",
             lineHeight: 1.1,
             mb: "2%",
+            color: "#334336",
           }}
         >
           주문하기
@@ -380,7 +385,10 @@ function CreateOrderPage() {
           }}
         >
           <Box sx={{ flex: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}
+            >
               구독권 선택
             </Typography>
             <Select
@@ -417,7 +425,7 @@ function CreateOrderPage() {
                       <Typography variant="body2">
                         {inventory.store?.storeName}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{ color: "#334336" }}>
                         {inventory.subName}
                         {typeof inventory.remainingCount === "number"
                           ? ` · 남은잔 ${inventory.remainingCount}잔`
@@ -434,11 +442,13 @@ function CreateOrderPage() {
           </Box>
 
           <Box sx={{ flex: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}
+            >
               이용 타입
             </Typography>
             <ToggleButtonGroup
-              color="primary"
               value={orderType}
               exclusive
               onChange={(e, v) => v && setOrderType(v)}
@@ -452,17 +462,35 @@ function CreateOrderPage() {
                   height: "100%",
                   borderRadius: 0,
                 },
+                "& .Mui-selected": {
+                  backgroundColor: "#334336",
+                  color: "#fff9f4",
+                  "&:hover": {
+                    backgroundColor: "#334336",
+                    opacity: 0.9,
+                  },
+                },
               }}
             >
               <ToggleButton
                 value="IN"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.3rem",
+                  color: "#334336",
+                }}
               >
                 매장 이용 <LocalCafeIcon />
               </ToggleButton>
               <ToggleButton
                 value="OUT"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.3rem",
+                  color: "#334336",
+                }}
               >
                 포장 이용 <ShoppingBagTwoToneIcon />
               </ToggleButton>
@@ -479,6 +507,7 @@ function CreateOrderPage() {
             alignItems: "stretch",
             flex: 1,
             minHeight: 0,
+            color: "#334336",
           }}
         >
           {/* 메뉴 그리드 영역 */}
@@ -493,7 +522,6 @@ function CreateOrderPage() {
           >
             {/* 카테고리 탭 */}
             <ToggleButtonGroup
-              color="primary"
               value={activeTab}
               exclusive
               onChange={(e, v) => v && setActiveTab(v)}
@@ -503,12 +531,27 @@ function CreateOrderPage() {
                   textTransform: "none",
                   fontWeight: 600,
                   px: 2,
+                  color: "#334336",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#334336",
+                  color: "#fff9f4",
+                  "&:hover": {
+                    backgroundColor: "#334336",
+                    opacity: 0.9,
+                  },
                 },
               }}
             >
-              <ToggleButton value="ALL">전체</ToggleButton>
-              <ToggleButton value="BEVERAGE">음료</ToggleButton>
-              <ToggleButton value="DESSERT">디저트</ToggleButton>
+              <ToggleButton value="ALL" sx={{ color: "#334336" }}>
+                전체
+              </ToggleButton>
+              <ToggleButton value="BEVERAGE" sx={{ color: "#334336" }}>
+                음료
+              </ToggleButton>
+              <ToggleButton value="DESSERT" sx={{ color: "#334336" }}>
+                디저트
+              </ToggleButton>
             </ToggleButtonGroup>
 
             <Box
@@ -518,7 +561,7 @@ function CreateOrderPage() {
                 overflowY: "auto",
                 pr: 1,
                 pb: 1,
-                maxHeight: "500px",
+                // minHeight: "500px",
               }}
             >
               {/* 메뉴 카드 그리드 */}
@@ -532,9 +575,10 @@ function CreateOrderPage() {
                     alignItems: "center",
                     textAlign: "center",
                     py: "1rem",
+                    color: "#334336",
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     선택한 구독권에서 주문 가능한 메뉴가 없습니다.
                   </Typography>
                 </Box>
@@ -547,6 +591,7 @@ function CreateOrderPage() {
                       md: "repeat(3, minmax(0, 1fr))",
                     },
                     gap: 2,
+                    color: "#334336",
                   }}
                 >
                   {visibleMenus.map((menu) => {
@@ -566,6 +611,7 @@ function CreateOrderPage() {
                           flexDirection: "column",
                           alignItems: "stretch",
                           height: "100%",
+                          color: "#334336",
                         }}
                       >
                         <Box
@@ -604,8 +650,7 @@ function CreateOrderPage() {
                         </Typography>
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 1 }}
+                          sx={{ mb: 1, color: "#334336" }}
                         >
                           {menu.price.toLocaleString()}원
                         </Typography>
@@ -710,7 +755,7 @@ function CreateOrderPage() {
               </Box>
               <Box sx={{ flex: 1 }}>
                 {cartWithInfo.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "#334336" }}>
                     장바구니에 담긴 메뉴가 없습니다.
                   </Typography>
                 ) : (
@@ -738,7 +783,10 @@ function CreateOrderPage() {
                           >
                             {item.menu?.menuName || item.menu?.name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "#334336" }}
+                          >
                             {(item.menu?.price || 0).toLocaleString()}원
                           </Typography>
                         </Box>
@@ -782,7 +830,7 @@ function CreateOrderPage() {
                           mb: 0.5,
                         }}
                       >
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: "#334336" }}>
                           합계
                         </Typography>
                         <Typography fontWeight="bold">
@@ -810,7 +858,7 @@ function CreateOrderPage() {
                 variant="contained"
                 sx={{
                   mt: 2,
-                  bgcolor: "black",
+                  bgcolor: "#334336",
                   "&:hover": { bgcolor: "#222" },
                   textTransform: "none",
                 }}
@@ -820,7 +868,7 @@ function CreateOrderPage() {
                 }
               >
                 {isLoading ? (
-                  <CircularProgress size={18} sx={{ color: "white" }} />
+                  <CircularProgress size={18} sx={{ color: "#fff9f4" }} />
                 ) : (
                   "주문하기"
                 )}
@@ -840,8 +888,8 @@ function CreateOrderPage() {
             gap: 2,
           }}
         >
-          <CircularProgress color="inherit" />
-          <Typography variant="body1" sx={{ mt: 1 }}>
+          <CircularProgress sx={{ color: "#334336" }} />
+          <Typography variant="body1" sx={{ mt: 1, color: "#334336" }}>
             주문이 진행 중입니다 ...
           </Typography>
         </Backdrop>

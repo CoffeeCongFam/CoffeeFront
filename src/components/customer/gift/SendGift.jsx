@@ -24,13 +24,21 @@ function formatPrice(n) {
 function formatPaidAt(iso) {
   if (!iso) return "-";
   try {
+    // ISO 문자열을 직접 파싱하여 UTC 시간을 그대로 사용 (시간 더하거나 빼지 않음)
+    // 예: "2025-10-26T13:28:00.000Z" -> "2025.10.26  13:28"
+    const match = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    if (match) {
+      const [, y, mm, dd, hh, mi] = match;
+      return `${y}.${mm}.${dd}  ${hh}:${mi}`;
+    }
+    // 매칭되지 않으면 Date 객체로 파싱 시도 (UTC 사용)
     const d = new Date(iso);
-    // 2025.10.26  13:28 형태
-    const y = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mi = String(d.getMinutes()).padStart(2, "0");
+    if (isNaN(d.getTime())) return String(iso);
+    const y = d.getUTCFullYear();
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const hh = String(d.getUTCHours()).padStart(2, "0");
+    const mi = String(d.getUTCMinutes()).padStart(2, "0");
     return `${y}.${mm}.${dd}  ${hh}:${mi}`;
   } catch (e) {
     console.log(e);
@@ -66,6 +74,10 @@ function SendGift({ sendGiftList = [] }) {
                 </Typography>
               </Stack>
             </Grid>
+
+              <Grid item xs={2} sx={{ textAlign: "center" }}>
+                <ArrowRightAltIcon sx={{ fontSize: 36 }} />
+              </Grid>
             <Grid item xs={2} sx={{ textAlign: "center" }}>
               <ArrowRightAltIcon sx={{ fontSize: 36 }} />
             </Grid>

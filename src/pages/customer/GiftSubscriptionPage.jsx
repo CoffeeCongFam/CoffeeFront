@@ -115,6 +115,9 @@ function GiftSubscriptionPage() {
         throw new Error("PortOne SDK가 로드되지 않았습니다.");
       }
 
+      // (모바일에서는) m_redirect_url = 결제 완료 후 돌아올 내 사이트 주소 필요
+      const redirectUrl = `${window.location.origin}/me/purchase/${created.purchaseId}/complete`;
+
       IMP.init("imp03140165");
 
       IMP.request_pay(
@@ -127,8 +130,11 @@ function GiftSubscriptionPage() {
           buyer_name: authUser.name,
           buyer_email: authUser.email,
           buyer_tel: authUser.tel,
+          m_redirect_url: redirectUrl,  // 리다이렉트 url 추가
         },
         async (response) => {
+          // PC 환경(팝업)에서는 여전히 콜백이 호출됨
+           // 모바일 리디렉션 환경에서는 주로 redirectUrl 쪽에서 처리
           if (response.success) {
             console.log("결제 성공:", response);
 
@@ -191,14 +197,14 @@ function GiftSubscriptionPage() {
     {
       label: "신용/체크카드",
       pg: "danal_tpay",
-      icon: <CreditCardIcon sx={{ fontSize: 28 }} />,
+      icon: <CreditCardIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#4A90E2",
       bgColor: "#E8F4FF",
     },
     {
       label: "휴대폰 결제",
       pg: "danal_tpay",
-      icon: <PhoneAndroidIcon sx={{ fontSize: 28 }} />,
+      icon: <PhoneAndroidIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#7B68EE",
       bgColor: "#F0EDFF",
     },
@@ -275,7 +281,7 @@ function GiftSubscriptionPage() {
           {/* 제목: 중앙 정렬 */}
           <Typography
             variant="h6"
-            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
+            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold", color: "#334336" }}
           >
             선물하기
           </Typography>
@@ -293,14 +299,18 @@ function GiftSubscriptionPage() {
             gap: 2,
           }}
         >
-          <SubscriptItem subscription={subscription} />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <Box sx={{ width: "100%", maxWidth: "900px" }}>
+            <SubscriptItem subscription={subscription}  isAppLike={isAppLike} />
+          </Box>
+        </Box>
 
           {/* 보내는 사람 / 받는 사람 */}
           <Box
             sx={{
               display: "flex",
               flexDirection: isAppLike ? "column" : "row",
-              gap: 2,
+              gap: isAppLike ? 3 : 2,
               width: "100%",
               maxWidth: "900px",
               marginTop: "20px",
@@ -317,13 +327,14 @@ function GiftSubscriptionPage() {
                 gap: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "bold" }}>보내는 사람</Typography>
+              <Typography sx={{ fontWeight: "bold", color: "#334336" }}>보내는 사람</Typography>
               <Box sx={personBoxSx}>
-                <AccountCircleIcon />
-                <Typography>{authUser?.name}</Typography>
+                <AccountCircleIcon sx={{ color: "#334336" }} />
+                <Typography sx={{ color: "#334336" }}>{authUser?.name}</Typography>
               </Box>
             </Box>
 
+            {isAppLike || 
             <Box
               sx={{
                 width: 40,
@@ -332,8 +343,10 @@ function GiftSubscriptionPage() {
                 alignItems: "center",
               }}
             >
-              <ForwardIcon />
+              <ForwardIcon sx={{ color: "#334336" }} />
             </Box>
+            }
+
 
             {/* 받는 사람 */}
             <Box
@@ -345,7 +358,7 @@ function GiftSubscriptionPage() {
                 gap: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
+              <Typography sx={{ fontWeight: "bold", color: "#334336" }}>받는 사람</Typography>
               {receiver && (
                 <Box
                   sx={{
@@ -354,8 +367,8 @@ function GiftSubscriptionPage() {
                   }}
                 >
                   <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-                    <AccountCircleIcon />
-                    <Typography>{receiver.name}</Typography>
+                    <AccountCircleIcon sx={{ color: "#334336" }} />
+                    <Typography sx={{ color: "#334336" }}>{receiver.name}</Typography>
                   </Box>
                   <IconButton
                     onClick={() => {
@@ -426,7 +439,7 @@ function GiftSubscriptionPage() {
 
           {/* 선물 메시지 입력 영역 */}
           <Box sx={{ mt: 1, width: "100%", maxWidth: 900 }}>
-            <Typography sx={{ fontWeight: "bold", mb: 1 }}>
+            <Typography sx={{ fontWeight: "bold", mb: 1, color: "#334336" }}>
               메시지 카드
             </Typography>
             <TextField
@@ -437,6 +450,22 @@ function GiftSubscriptionPage() {
               placeholder="선물과 함께 보낼 메시지를 입력하세요. (최대 100자)"
               value={giftMessage}
               onChange={(e) => setGiftMessage(e.target.value.slice(0, 100))}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#ffe0b2",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#334336",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#334336",
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#334336",
+                },
+              }}
             />
           </Box>
         </Box>
@@ -444,9 +473,9 @@ function GiftSubscriptionPage() {
         {/* 유의사항 */}
         <Box
           sx={{
-            mt: 3,
+            mt: 8,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
             bgcolor: "#fffef6",
             border: "1px solid #fff2c5",
             borderRadius: 2,
@@ -457,23 +486,23 @@ function GiftSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
               유의사항
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-            <Typography variant="body2" color="text.secondary">
+          <Box sx={{ display: "flex", flexDirection: "column",  gap: 0.5 }}>
+            <Typography variant="body2" sx={{fontSize: "0.8rem", }} color="text.secondary">
               • 본 구독권은 {subscription?.store?.storeName} 매장 전용으로 사용
               가능합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 결제일 기준 30일간 이용 가능하며, 중도 해지는 불가합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 1일 {subscription?.maxDailyUsage}회 제공 기준이며, 일부 메뉴는
               추가 금액이 발생할 수 있습니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 선물하기로 받은 구독권은 양도가 제한될 수 있습니다.
             </Typography>
           </Box>
@@ -482,14 +511,16 @@ function GiftSubscriptionPage() {
         {/* 하단 결제 버튼 */}
         <Box
           sx={{
-            mt: 4,
+            mt: 2,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
+            mx: "auto",
             display: "flex",
-            justifyContent: "right",
+            justifyContent: "flex-end",
           }}
         >
           <Button
+            fullWidth={isAppLike}
             onClick={() => {
               if (!receiver) {
                 alert("받는 사람을 먼저 선택해 주세요.");
@@ -497,10 +528,12 @@ function GiftSubscriptionPage() {
               }
               setPayOpen(true);
             }}
-            sx={{
-              backgroundColor: "black",
+             sx={{
+              borderRadius: isAppLike ? "2rem" : "inherit",
+              backgroundColor: "#334336",
               color: "white",
               px: 4,
+              maxWidth: isAppLike ? 480 : "none",
               "&:hover": { backgroundColor: "#333" },
             }}
           >
@@ -520,7 +553,7 @@ function GiftSubscriptionPage() {
             onClick={(e) => e.stopPropagation()}
             sx={{
               position: "fixed",
-              bottom: 0,
+              bottom: isAppLike ? "56px" : 0,
               left: 0,
               right: 0,
               mx: "auto",
@@ -530,7 +563,7 @@ function GiftSubscriptionPage() {
               boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
               px: 3,
               pt: 2,
-              pb: 4,
+              pb: isAppLike ? "80px" : 4,
             }}
           >
             <Box
@@ -560,10 +593,10 @@ function GiftSubscriptionPage() {
 
             {/* 안내 */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
                 결제 수단 선택
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ color: "#334336" }}>
                 안전하고 편리한 결제 수단을 선택하세요
               </Typography>
             </Box>
@@ -576,6 +609,7 @@ function GiftSubscriptionPage() {
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
                 gap: 1.5,
+                width: "100%",
               }}
             >
               {paymentMethods.map((method) => (
@@ -594,6 +628,9 @@ function GiftSubscriptionPage() {
                     }`,
                     borderRadius: 3,
                     height: 110,
+                    width: isAppLike ? "100%" : "auto",
+                    minWidth: 0,
+                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -653,8 +690,10 @@ function GiftSubscriptionPage() {
               sx={{
                 bgcolor: "#F8F9FA",
                 borderRadius: 2,
-                p: 2,
+                px: 2,
+                pt: 1,
                 mt: 2,
+                pb: 10
               }}
             >
               <Typography
@@ -680,8 +719,8 @@ function GiftSubscriptionPage() {
           gap: 2,
         }}
       >
-        <CircularProgress color="inherit" />
-        <Typography variant="body1" sx={{ mt: 1 }}>
+        <CircularProgress sx={{ color: "#334336" }} />
+        <Typography variant="body1" sx={{ mt: 1, color: "#334336" }}>
           결제 진행 중입니다...
         </Typography>
       </Backdrop>

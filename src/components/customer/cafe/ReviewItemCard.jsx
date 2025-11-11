@@ -10,10 +10,10 @@ import {
   Stack,
   Tooltip,
   Typography,
-  Avatar
+  Avatar,
 } from "@mui/material";
 import React from "react";
-import PhotoIcon from '@mui/icons-material/Photo';
+import PhotoIcon from "@mui/icons-material/Photo";
 
 import useUserStore from "../../../stores/useUserStore";
 
@@ -59,16 +59,20 @@ function ReviewItemCard({ review, handleDelete }) {
                 objectFit: "cover",
                 flexShrink: 0,
               }}
-            /> )
-            : <Avatar 
+            />
+          ) : (
+            <Avatar
               sx={{
                 width: 84,
                 height: 84,
                 borderRadius: 1,
                 objectFit: "cover",
                 flexShrink: 0,
-              }}><PhotoIcon /></Avatar>
-          }
+              }}
+            >
+              <PhotoIcon />
+            </Avatar>
+          )}
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack
               direction="row"
@@ -77,8 +81,11 @@ function ReviewItemCard({ review, handleDelete }) {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                {storeLabel} 
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: "#334336" }}
+              >
+                {storeLabel}
               </Typography>
               {subscriptionName && (
                 <Chip label={subscriptionName} size="small" />
@@ -93,24 +100,30 @@ function ReviewItemCard({ review, handleDelete }) {
                   display: "flex",
                   justifyContent: "flex-end",
                   flexGrow: 1,
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <Typography
                   variant="caption"
-                  sx={{ color: "text.secondary", ml: "auto" }}
+                  sx={{ color: "#334336", ml: "auto" }}
                 >
                   {review.updatedAt ? `${review.updatedAt}` : review.createdAt}
                 </Typography>
                 {memberId === authUser.memberId && (
-                  <Button onClick={() => handleDelete(review.reviewId)} sx={{fontSize: "0.8rem",}}>
+                  <Button
+                    onClick={() => handleDelete(review.reviewId)}
+                    sx={{ fontSize: "0.8rem", color: "#334336" }}
+                  >
                     삭제
                   </Button>
                 )}
               </Box>
             </Stack>
             <Divider sx={{ my: 1 }} />
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+            <Typography
+              variant="body2"
+              sx={{ whiteSpace: "pre-wrap", color: "#334336" }}
+            >
               {contentText}
             </Typography>
           </Box>

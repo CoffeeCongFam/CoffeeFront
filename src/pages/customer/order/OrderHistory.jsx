@@ -14,11 +14,12 @@ import {
   MenuItem,
   Dialog,
   DialogContent,
+  DialogTitle,
   Chip,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 import api from "../../../utils/api";
-import orderHistoryList from "../../../data/customer/orderHistoryList";
 import OrderStatusButton from "../../../components/customer/order/OrderStatusButton";
 import { fetchOrderDetail } from "../../../apis/customerApi";
 
@@ -28,7 +29,6 @@ function handleSubscriptionType(type) {
       return "일반 구독권";
     case "PREMIUM":
       return "프리미엄 구독권";
-    // 실제 백엔드 enum에 맞게 수정해서 쓰면 됨
     default:
       return type || "구독권";
   }
@@ -64,11 +64,6 @@ function formatKoreanDateTime(dateStr) {
   return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
 }
 
-// /api/customer/orders?period=1M -> 한달
-// /api/customer/orders?period=1Y -> 1년
-// /api/customer/orders?period=CUSTOM&startDate=2025-11-06&endDate=2025-11-07 -> 기간설정
-
-
 // 주문 상태 필터링용
 const STATUS_OPTIONS = [
   { value: "ALL", label: "전체" },
@@ -78,7 +73,6 @@ const STATUS_OPTIONS = [
   { value: "CANCELED", label: "주문 취소" },
   { value: "REJECTED", label: "매장 취소" },
 ];
-
 
 async function fetchOrderHistoryApi({
   period,
@@ -97,22 +91,14 @@ async function fetchOrderHistoryApi({
     params.nextCursor = nextCursor;
   }
 
-  console.log(params);
-
   const res = await api.get("/me/orders", { params });
-
-  // 응답 구조: { success, data: { ordersList, nextCursor, hasNext }, message }
   return res.data;
 }
 
 function OrderHistory() {
   const { isAppLike } = useAppShellMode();
 
-  // 오늘 날짜
-  const todayStr = useMemo(
-    () => new Date().toISOString().slice(0, 10),
-    []
-  );
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const [period, setPeriod] = useState("1M");
   const [startDate, setStartDate] = useState("");
@@ -125,34 +111,34 @@ function OrderHistory() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMoreLoading, setIsMoreLoading] = useState(false);
 
-  const [sortOrder, setSortOrder] = useState("DESC"); // 정렬
-  const [statusFilter, setStatusFilter] = useState("ALL");  // 주문 상태 필터링
+  const [sortOrder, setSortOrder] = useState("DESC");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // 모달 상태
+  // 상세 모달
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-  // 정렬된 리스트 메모이제이션
-  // const sortedOrders = useMemo(() => {
-  //   const copy = [...orders];
-  //   copy.sort((a, b) => {
-  //     const aTime = new Date(a.createdAt).getTime();
-  //     const bTime = new Date(b.createdAt).getTime();
-  //     return sortOrder === "DESC" ? bTime - aTime : aTime - bTime;
-  //   });
-  //   return copy;
-  // }, [orders, sortOrder]);
+  // 모바일용 기간 설정 다이얼로그 상태
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [draftPeriod, setDraftPeriod] = useState("1M");
+  const [draftStartDate, setDraftStartDate] = useState("");
+  const [draftEndDate, setDraftEndDate] = useState("");
 
-  // 정렬 + 필터링 적용된 리스트
+  // 기간 텍스트 (상단 요약용)
+  const rangeLabel = useMemo(() => {
+    if (!startDate || !endDate) return "기간 선택";
+    const fmt = (d) => d.replaceAll("-", ".");
+    return `${fmt(startDate)} ~ ${fmt(endDate)}`;
+  }, [startDate, endDate]);
+
+  // 필터 + 정렬 적용된 리스트
   const filteredAndSortedOrders = useMemo(() => {
-    // 1) 상태 필터
     const filtered =
       statusFilter === "ALL"
         ? orders
         : orders.filter((o) => o.orderStatus === statusFilter);
 
-    // 2) 정렬
     const copy = [...filtered];
     copy.sort((a, b) => {
       const aTime = new Date(a.createdAt).getTime();
@@ -162,53 +148,43 @@ function OrderHistory() {
     return copy;
   }, [orders, sortOrder, statusFilter]);
 
-
-  // 1개월 / 1년 선택 시 자동 조회 + 날짜 자동 세팅
+  // 초기: 1개월 범위 세팅 + 조회
   useEffect(() => {
-    if (period === "CUSTOM") return;
-
-    const { startDate, endDate } = getPresetRange(period);
-    setStartDate(startDate);
-    setEndDate(endDate);
-
-    loadOrders({ reset: true, period });
-  }, [period]);
-
-  // 첫 로딩은 1개월 기준
-  useEffect(() => {
-    loadOrders({ reset: true, period: "1M" });
+    const { startDate: s, endDate: e } = getPresetRange("1M");
+    setPeriod("1M");
+    setStartDate(s);
+    setEndDate(e);
+    loadOrders({ reset: true, period: "1M", start: s, end: e });
   }, []);
 
-  async function loadOrders({ reset, period: selectedPeriod, cursor = null }) {
+  // 공통 주문 조회 함수: 항상 start/end를 인자로 받도록 변경
+  async function loadOrders({
+    reset,
+    period: selectedPeriod,
+    cursor = null,
+    start,
+    end,
+  }) {
     try {
-      if (reset) {
-        setIsLoading(true);
-      } else {
-        setIsMoreLoading(true);
-      }
-      console.log("주문 내역 조회");
+      if (reset) setIsLoading(true);
+      else setIsMoreLoading(true);
 
-      // 주문 내역 조회
       const res = await fetchOrderHistoryApi({
         period: selectedPeriod,
-        startDate: selectedPeriod === "CUSTOM" ? startDate : undefined,
-        endDate: selectedPeriod === "CUSTOM" ? endDate : undefined,
+        startDate: selectedPeriod === "CUSTOM" ? start : undefined,
+        endDate: selectedPeriod === "CUSTOM" ? end : undefined,
         nextCursor: cursor ?? null,
       });
 
       const { ordersList, nextCursor: newCursor, hasNext } = res.data;
 
-      if (reset) {
-        setOrders(ordersList || []);
-      } else {
-        setOrders((prev) => [...prev, ...(ordersList || [])]);
-      }
+      if (reset) setOrders(ordersList || []);
+      else setOrders((prev) => [...prev, ...(ordersList || [])]);
 
       setNextCursor(newCursor || null);
       setHasNext(!!hasNext);
     } catch (err) {
       console.log(err);
-      setOrders(orderHistoryList);
       setNextCursor(null);
       setHasNext(false);
     } finally {
@@ -217,31 +193,23 @@ function OrderHistory() {
     }
   }
 
-  async function handleClickOrder(order) {
-    try {
-      setIsDetailLoading(true);
-
-      const detail = await fetchOrderDetail(order.orderId);
-      if (!detail) {
-        alert("주문 상세를 불러오지 못했습니다.");
-        return;
-      }
-
-      setSelectedOrder(detail);
-      setDetailOpen(true);
-    } catch (e) {
-      console.error(e);
-      alert("주문 상세를 불러오지 못했습니다.");
-    } finally {
-      setIsDetailLoading(false);
-    }
-  }
-
+  // 데스크탑용 기간 토글 변경
   function handlePeriodChange(_event, value) {
     if (!value) return;
     setPeriod(value);
+
+    if (value === "CUSTOM") {
+      // 날짜는 입력 후 '조회' 버튼에서 처리
+      return;
+    }
+
+    const { startDate: s, endDate: e } = getPresetRange(value);
+    setStartDate(s);
+    setEndDate(e);
+    loadOrders({ reset: true, period: value, start: s, end: e });
   }
 
+  // 데스크탑용 기간설정 조회
   function handleCustomSearch() {
     if (!startDate || !endDate) {
       alert("조회할 시작일과 종료일을 모두 선택해주세요.");
@@ -256,13 +224,103 @@ function OrderHistory() {
       return;
     }
 
-    // CUSTOM 기준으로 새로 조회
-    loadOrders({ reset: true, period: "CUSTOM" });
+    setPeriod("CUSTOM");
+    loadOrders({
+      reset: true,
+      period: "CUSTOM",
+      start: startDate,
+      end: endDate,
+    });
   }
 
+  // 무한 스크롤용 더보기
   function handleLoadMore() {
     if (!hasNext || !nextCursor) return;
-    loadOrders({ reset: false, period, cursor: nextCursor });
+    loadOrders({
+      reset: false,
+      period,
+      cursor: nextCursor,
+      start: startDate,
+      end: endDate,
+    });
+  }
+
+  async function handleClickOrder(order) {
+    try {
+      setIsDetailLoading(true);
+      const detail = await fetchOrderDetail(order.orderId);
+      if (!detail) {
+        alert("주문 상세를 불러오지 못했습니다.");
+        return;
+      }
+      setSelectedOrder(detail);
+      setDetailOpen(true);
+    } catch (e) {
+      console.error(e);
+      alert("주문 상세를 불러오지 못했습니다.");
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }
+
+  // 모바일: 상단 바 클릭 시 다이얼로그 오픈
+  function openFilterDialog() {
+    setDraftPeriod(period);
+    setDraftStartDate(startDate);
+    setDraftEndDate(endDate);
+    setFilterOpen(true);
+  }
+
+  // 모바일: 다이얼로그 안 토글 변경
+  function handleDraftPeriodChange(_e, value) {
+    if (!value) return;
+    setDraftPeriod(value);
+
+    if (value === "1M" || value === "1Y") {
+      const { startDate: s, endDate: e } = getPresetRange(value);
+      setDraftStartDate(s);
+      setDraftEndDate(e);
+    }
+  }
+
+  // 모바일: 다이얼로그에서 조회 버튼
+  function handleApplyFilter() {
+    let newStart = draftStartDate;
+    let newEnd = draftEndDate;
+
+    // 1M / 1Y 에서 혹시라도 비어있으면 다시 세팅
+    if (draftPeriod === "1M" || draftPeriod === "1Y") {
+      const { startDate: s, endDate: e } = getPresetRange(draftPeriod);
+      newStart = s;
+      newEnd = e;
+    }
+
+    if (draftPeriod === "CUSTOM") {
+      if (!newStart || !newEnd) {
+        alert("조회할 시작일과 종료일을 모두 선택해주세요.");
+        return;
+      }
+      if (newStart > newEnd) {
+        alert("시작일이 종료일보다 클 수 없습니다.");
+        return;
+      }
+      if (newEnd > todayStr || newStart > todayStr) {
+        alert("미래 날짜는 선택할 수 없습니다.");
+        return;
+      }
+    }
+
+    setPeriod(draftPeriod);
+    setStartDate(newStart);
+    setEndDate(newEnd);
+
+    loadOrders({
+      reset: true,
+      period: draftPeriod,
+      start: newStart,
+      end: newEnd,
+    });
+    setFilterOpen(false);
   }
 
   return (
@@ -272,118 +330,176 @@ function OrderHistory() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
+        boxSizing: "border-box",
+        borderRadius: 2,
+        backgroundColor: "white",
+        border: "1px solid #ffe0b2",
+        m: isAppLike ? 2 : 4,
+        ...(isAppLike
+          ? {
+              minHeight: "calc(100vh - 64px)",
+            }
+          : {
+              height: "calc(100vh - 64px)",
+              overflow: "hidden",
+            }),
       }}
     >
       {/* 헤더 */}
       <Box
         sx={{
           display: "flex",
-          flexDirection: "column", // 데스크탑도 무조건 column
+          flexDirection: "column",
           gap: 1.5,
           mb: 2,
         }}
       >
-        {/* 제목 */}
         <Typography
           sx={{
             fontSize: { xs: "1.5rem", md: "1.9rem" },
             fontWeight: "bold",
             lineHeight: 1.1,
             mb: "2%",
+            color: "#334336",
           }}
         >
           주문 내역
-          {/* 나의 주문 현황 */}
         </Typography>
       </Box>
 
-      {/* 기간 선택 영역 */}
-      <Box
-        sx={{
-          borderRadius: 2,
-          border: "1px solid #eee",
-          p: 2,
-          mb: 3,
-          width: "100%",
-        }}
-      >
-        {/* 상단 기간 버튼 */}
+      {/* 모바일: 상단 고정 요약 바 (전체 / 날짜) */}
+      {isAppLike && (
         <Box
           sx={{
-            width: "100%",
-            display: "flex",
-            gap: 1,
-            mb: 5,
-            flex: 1,
-          }}
-        >
-          <ToggleButtonGroup
-            value={period}
-            exclusive
-            onChange={handlePeriodChange}
-            sx={{
-              flex: 1,
-              width: "100%",
-              "& .MuiToggleButton-root": {
-                flex: 1,
-              },
-            }}
-          >
-            <ToggleButton value="1M">1개월</ToggleButton>
-            <ToggleButton value="1Y">1년</ToggleButton>
-            <ToggleButton value="CUSTOM">기간 설정</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
-        {/* 기간 설정일 때만 날짜 입력 활성화 */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: 1.5,
-            alignItems: { xs: "stretch", sm: "center" },
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            bgcolor: "background.paper",
             mb: 2,
+            borderBottom: "1px solid #eee",
           }}
         >
-          <TextField
-            label="시작일"
-            type="date"
-            // size="small"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            disabled={period !== "CUSTOM"}
-            sx={{ flex: 1 }}
-            inputProps={{ max: todayStr }}
-          />
-          <Typography sx={{ display: { xs: "none", sm: "block" } }}>
-            ~
-          </Typography>
-          <TextField
-            label="종료일"
-            type="date"
-            // size="small"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            disabled={period !== "CUSTOM"}
-            sx={{ flex: 1 }}
-            inputProps={{ max: todayStr }}
-          />
-
-          <Button
-            variant="contained"
+          <Box
+            onClick={openFilterDialog}
             sx={{
-              whiteSpace: "nowrap",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              px: 1,
+              py: 1.5,
+              cursor: "pointer",
             }}
-            disabled={period !== "CUSTOM"}
-            onClick={handleCustomSearch}
           >
-            조회
-          </Button>
+            <Typography
+              variant="body2"
+              sx={{ color: "#334336", fontWeight: 600 }}
+            >
+              전체
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {rangeLabel}
+              </Typography>
+              <ExpandMoreIcon fontSize="small" />
+            </Box>
+          </Box>
         </Box>
-      </Box>
-      {/* 총 개수 + 정렬 영역 */}
+      )}
+
+      {/* 데스크탑: 기존 기간 선택 영역 유지 */}
+      {!isAppLike && (
+        <Box
+          sx={{
+            borderRadius: 2,
+            border: "1px solid #eee",
+            p: 2,
+            mb: 3,
+            width: "100%",
+          }}
+        >
+          {/* 상단 기간 버튼 */}
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              gap: 1,
+              mb: 5,
+              flex: 1,
+            }}
+          >
+            <ToggleButtonGroup
+              value={period}
+              exclusive
+              onChange={handlePeriodChange}
+              sx={{
+                flex: 1,
+                width: "100%",
+                "& .MuiToggleButton-root": {
+                  flex: 1,
+                },
+              }}
+            >
+              <ToggleButton value="1M">1개월</ToggleButton>
+              <ToggleButton value="1Y">1년</ToggleButton>
+              <ToggleButton value="CUSTOM">기간 설정</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
+          {/* 기간 설정 */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "row", sm: "row" },
+              gap: 1.5,
+              alignItems: { xs: "stretch", sm: "center" },
+              mb: 2,
+            }}
+          >
+            <TextField
+              label="시작일"
+              type="date"
+              size={isAppLike ? "small" : "medium"}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              disabled={period !== "CUSTOM"}
+              sx={{ flex: 1 }}
+              inputProps={{ max: todayStr }}
+            />
+            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+              ~
+            </Typography>
+            <TextField
+              label="종료일"
+              type="date"
+              size={isAppLike ? "small" : "medium"}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              disabled={period !== "CUSTOM"}
+              sx={{ flex: 1 }}
+              inputProps={{ max: todayStr }}
+            />
+
+            <Button
+              variant="contained"
+              sx={{ whiteSpace: "nowrap" }}
+              disabled={period !== "CUSTOM"}
+              onClick={handleCustomSearch}
+            >
+              조회
+            </Button>
+          </Box>
+        </Box>
+      )}
+
+      {/* 총 개수 + 정렬/상태 필터 */}
       {!isLoading && orders.length > 0 && (
         <Box
           sx={{
@@ -396,18 +512,16 @@ function OrderHistory() {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            전체 {orders.length}건
-            {statusFilter !== "ALL" && ` · 필터된 ${filteredAndSortedOrders.length}건`}
+            전체 {filteredAndSortedOrders.length}건
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
-            {/* ✅ 상태 필터 */}
             <TextField
               select
               size="small"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ width: 140 }}
+              sx={{ width: 120 }}
             >
               {STATUS_OPTIONS.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
@@ -416,13 +530,12 @@ function OrderHistory() {
               ))}
             </TextField>
 
-            {/* 기존 정렬 드롭다운 */}
             <TextField
               select
               size="small"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              sx={{ width: 140 }}
+              sx={{ width: 120 }}
             >
               <MenuItem value="DESC">최신순</MenuItem>
               <MenuItem value="ASC">오래된 순</MenuItem>
@@ -431,7 +544,7 @@ function OrderHistory() {
         </Box>
       )}
 
-      {/* 주문 리스트 영역 */}
+      {/* 주문 리스트 */}
       <Box>
         {isLoading ? (
           <Box
@@ -443,7 +556,7 @@ function OrderHistory() {
           >
             <CircularProgress />
           </Box>
-        ) : orders.length === 0 ? (
+        ) : filteredAndSortedOrders.length === 0 ? (
           <Box
             sx={{
               bgcolor: "#f5f5f5",
@@ -459,11 +572,9 @@ function OrderHistory() {
             <List>
               {filteredAndSortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
-                  <ListItemButton
-                    // 기존: onClick={() => navigate(`/me/order/${order.orderId}`)}
-                    onClick={() => handleClickOrder(order)}
-                  >
+                  <ListItemButton onClick={() => handleClickOrder(order)}>
                     <ListItemText
+                      sx={{ color: "#334336" }}
                       primary={`${order.storeName} ${order.subscriptionName}`}
                       secondary={formatKoreanDateTime(order.createdAt)}
                     />
@@ -474,7 +585,6 @@ function OrderHistory() {
               ))}
             </List>
 
-            {/* 더보기 버튼 */}
             {hasNext && (
               <Box
                 sx={{
@@ -497,6 +607,86 @@ function OrderHistory() {
         )}
       </Box>
 
+      {/* 모바일: 기간 설정 다이얼로그 */}
+      {isAppLike && (
+        <Dialog
+          open={filterOpen}
+          onClose={() => setFilterOpen(false)}
+          fullWidth
+          maxWidth="xs"
+        >
+          <DialogTitle sx={{ fontWeight: "bold" }}>기간 설정</DialogTitle>
+          <DialogContent sx={{ pt: 1, pb: 3 }}>
+            <Box sx={{ mb: 3 }}>
+              <ToggleButtonGroup
+                value={draftPeriod}
+                exclusive
+                onChange={handleDraftPeriodChange}
+                sx={{
+                  width: "100%",
+                  "& .MuiToggleButton-root": {
+                    flex: 1,
+                  },
+                }}
+              >
+                <ToggleButton value="1M">1개월</ToggleButton>
+                <ToggleButton value="1Y">1년</ToggleButton>
+                <ToggleButton value="CUSTOM">기간 설정</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1.5,
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <TextField
+                label="시작일"
+                type="date"
+                size="small"
+                value={draftStartDate}
+                onChange={(e) => setDraftStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                disabled={draftPeriod !== "CUSTOM"}
+                sx={{ flex: 1 }}
+                inputProps={{ max: todayStr }}
+              />
+              <Typography>~</Typography>
+              <TextField
+                label="종료일"
+                type="date"
+                size="small"
+                value={draftEndDate}
+                onChange={(e) => setDraftEndDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                disabled={draftPeriod !== "CUSTOM"}
+                sx={{ flex: 1 }}
+                inputProps={{ max: todayStr }}
+              />
+            </Box>
+
+            <Box sx={{ mt: 5, textAlign: "center" }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleApplyFilter}
+                sx={{
+                  color: "#334336",
+                  px: 8,
+                  borderRadius: 999,
+                  // backgroundColor: "black",
+                }}
+              >
+                조회
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {/* 주문 상세 모달 */}
       <Dialog
         open={detailOpen}
@@ -504,12 +694,7 @@ function OrderHistory() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogContent
-          sx={{
-            p: 0,
-            // bgcolor: "#f5f5f5"
-          }}
-        >
+        <DialogContent sx={{ p: 0 }}>
           {isDetailLoading || !selectedOrder ? (
             <Box
               sx={{
@@ -522,18 +707,7 @@ function OrderHistory() {
               <CircularProgress size={24} />
             </Box>
           ) : (
-            <Box
-              sx={{
-                mt: 0,
-                mx: "auto",
-                maxWidth: 420,
-                // backgroundColor: "white",
-                // borderRadius: 2,
-                p: 3,
-                // boxShadow: 1,
-              }}
-            >
-              {/* 제목 */}
+            <Box sx={{ mx: "auto", maxWidth: 420, p: 3 }}>
               <Typography
                 variant="h6"
                 textAlign="center"
@@ -545,7 +719,6 @@ function OrderHistory() {
 
               <Divider sx={{ mb: 2 }} />
 
-              {/* 주문 정보 섹션 */}
               <Typography variant="subtitle2" gutterBottom>
                 주문 정보
               </Typography>
@@ -617,7 +790,6 @@ function OrderHistory() {
 
               <Divider sx={{ mb: 2 }} />
 
-              {/* 주문 메뉴 섹션 */}
               <Typography variant="subtitle2" gutterBottom>
                 주문 메뉴
               </Typography>
@@ -646,7 +818,6 @@ function OrderHistory() {
                       bgcolor: "black",
                       color: "white",
                     }}
-                    // onClick={() => { /* 주문 취소 로직 추가 예정 */ }}
                   />
                 )}
               </Box>

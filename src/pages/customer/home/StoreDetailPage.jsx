@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography, Divider, Chip, IconButton } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Divider,
+  Chip,
+  IconButton,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CafeInfo from "../../../components/customer/cafe/CafeInfo.jsx";
@@ -35,7 +43,6 @@ function a11yProps(index) {
   };
 }
 
-
 // 매장 상세 정보 페이지
 function StoreDetailPage() {
   const { isAppLike } = useAppShellMode(); // PWA / 모바일 모드
@@ -47,8 +54,6 @@ function StoreDetailPage() {
   const [storeStatus, setStoreStatus] = useState("OPEN"); // OPEN || CLOSED || HOLIDAY
 
   const [tab, setTab] = useState(0);
-
-
 
   useEffect(() => {
     let mounted = true; // 언마운트 후 setState 방지용
@@ -81,11 +86,10 @@ function StoreDetailPage() {
     };
   }, [storeId]);
 
-
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
-  
+
   function handleBack() {
     navigate(-1);
   }
@@ -112,7 +116,24 @@ function StoreDetailPage() {
         position: "relative",
       }}
     >
-
+      {/* 뒤로가기 버튼: 왼쪽 고정 */}
+      <IconButton
+        onClick={handleBack}
+        sx={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          zIndex: 2,
+          bgcolor: "rgba(0,0,0,0.45)",
+          color: "white",
+          "&:hover": {
+            bgcolor: "rgba(0,0,0,0.65)",
+          },
+        }}
+        aria-label="뒤로가기"
+      >
+        <ArrowBackIcon />
+      </IconButton>
                 {/* 뒤로가기 버튼: 왼쪽 고정 */}
                 <IconButton
                   onClick={handleBack}
@@ -121,19 +142,16 @@ function StoreDetailPage() {
                     top: 12,
                     left: 12,
                     zIndex: 2,
-                    bgcolor: "rgba(0,0,0,0.45)",
-                    color: "white",
+                    bgcolor: "rgba(51, 67, 54, 0.45)",
+                    color: "#fff9f4",
                     "&:hover": {
-                      bgcolor: "rgba(0,0,0,0.65)",
+                      bgcolor: "rgba(51, 67, 54, 0.65)",
                     },
                   }}
                   aria-label="뒤로가기"
                 >
                   <ArrowBackIcon />
                 </IconButton>
-      
-              
-      
       {/* 상단 대표 이미지 */}
       <Box
         sx={{
@@ -172,20 +190,32 @@ function StoreDetailPage() {
           {storeStatus && <CafeStatusChip status={storeStatus} />}
           <Typography
             variant={isAppLike ? "h5" : "h4"}
-            sx={{ fontWeight: 700 }}
+            sx={{ fontWeight: 700, color: "#334336" }}
           >
             {store?.storeName || "카페 이름"}
           </Typography>
         </Box>
 
         {/* 탭 */}
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "#ffe0b2" }}>
           <Tabs
             value={tab}
             onChange={handleTabChange}
             aria-label="store detail tabs"
             variant="scrollable"
             scrollButtons="auto"
+            sx={{
+              "& .MuiTab-root": {
+                color: "#3B3026",
+                "&.Mui-selected": {
+                  color: "#334336",
+                  fontWeight: 600,
+                },
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#334336",
+              },
+            }}
           >
             <Tab label="상세정보" {...a11yProps(0)} />
             <Tab label="메뉴" {...a11yProps(1)} />
@@ -201,14 +231,18 @@ function StoreDetailPage() {
 
         {/* 1. 메뉴 탭 */}
         <TabPanel value={tab} index={1}>
-          <CafeMenuList menus={store.menus.filter((menu) => menu.deletedAt === "")} />
+          <CafeMenuList
+            menus={store.menus.filter((menu) => menu.deletedAt === "")}
+          />
         </TabPanel>
 
         {/* 2. 구독권 탭 */}
         <TabPanel value={tab} index={2}>
           <CafeSubscriptionList
             subscriptions={store.subscriptions.filter(
-              (sub) => sub.subscriptionStatus === "ONSALE" || sub.subscriptionStatus === "SOLDOUT"
+              (sub) =>
+                sub.subscriptionStatus === "ONSALE" ||
+                sub.subscriptionStatus === "SOLDOUT"
             )}
           />
         </TabPanel>

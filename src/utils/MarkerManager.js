@@ -58,7 +58,7 @@ export default class MarkerManager {
 
     // 카페 더미 데이터
     const thumbnailSrc =
-      cafe.storeImage && cafe.storeImage.trim() ? cafe.storeImage : cafeDummy;
+      cafe.storeImg && cafe.storeImg.trim() ? cafe.storeImg : cafeDummy;
     // "../assets/cafeInfoDummy.png"
 
     // const actionButton = cafe.isSubscribed
@@ -105,8 +105,8 @@ export default class MarkerManager {
           display:inline-block;
           margin-top:6px;
           text-decoration:none;
-          color:#fff;
-          background:#1976d2;
+          color:#fff9f4;
+          background:#334336;
           border-radius:20px;
           padding:4px 10px;
           font-size:12px;
@@ -144,7 +144,7 @@ export default class MarkerManager {
               ${cafe.distance ? `${cafe.distance}m` : ""}
             </span>
           </div>
-          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all;">
+          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all; color:#334336;">
             ${cafe.storeName ?? ""}
           </div>
           <div style="
