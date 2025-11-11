@@ -33,7 +33,7 @@ const SplashScreen = forwardRef(function SplashScreen(props, ref) {
       >
         <img
           src={monkeyLogo}
-          alt="COFFIENS"
+          alt="COFFEIENS"
           style={{ width: 200, height: "auto" }}
         />
       </Box>

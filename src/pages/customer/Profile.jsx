@@ -98,7 +98,7 @@ function Profile() {
         // 탈퇴 완료: 탈퇴 모달 닫고, Withdrawal 페이지로 이동
         setIsWithdrawOpen(false);
         setIsWithdrawCompleted(true);
-        
+
         navigate("/withdrawal", { replace: true });
       } else {
         alert("탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -167,7 +167,7 @@ function Profile() {
               <br />
               언젠가 다시, 당신의 하루를 깨우는 커피 한 잔이 필요해질 때
               <br />
-              COFFIENS 여기에서 기다리고 있을게요.
+              COFFEIENS 여기에서 기다리고 있을게요.
             </Typography>
 
             <Button
@@ -229,7 +229,13 @@ function Profile() {
             gap: 2,
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#334336" }}>
               {user.name}
             </Typography>
@@ -239,10 +245,7 @@ function Profile() {
         <Divider />
 
         <CardContent sx={{ px: 3, py: 2.5 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ color: "#334336", mb: 1 }}
-          >
+          <Typography variant="subtitle2" sx={{ color: "#334336", mb: 1 }}>
             기본 정보
           </Typography>
 
@@ -450,26 +453,29 @@ function Profile() {
           >
             {withdrawStep === 1 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}
+                >
                   당신의 하루를 진화시키는 커피 구독,
                   <br />
                   정말 떠나시겠어요?
                 </Typography>
                 <Typography variant="body2" sx={{ color: "#334336" }}>
-                    사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게 만들었던 
-                    그 커피 구독 혜택을 다시 한번 생각해 주세요
+                  사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게
+                  만들었던 그 커피 구독 혜택을 다시 한번 생각해 주세요
                 </Typography>
               </>
             )}
             {withdrawStep == 2 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}
+                >
                   정말 탈퇴하시겠습니까?
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#334336", mb: 2 }}
-                >
+                <Typography variant="body2" sx={{ color: "#334336", mb: 2 }}>
                   탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두 삭제되며
                   복구가 불가능합니다.
                   <br />

@@ -202,20 +202,18 @@ function CafeReviewList({ storeName, storeId }) {
       subscriptionId: selectedSub.subId,
       reviewContent: content,
       rating,
-      reviewImg: null,
     };
 
     console.log(payload);
 
     try {
-      await createReview(payload);
+      // imageFile 을 두 번째 인자로 같이 넘김
+      await createReview(payload, imageFile);
       await getReviewList();
       handleClose();
       handleShowAlert("info", "리뷰 작성이 완료되었습니다.");
-      // alert("리뷰 작성이 완료되었습니다.");
     } catch (e) {
       console.error("리뷰 작성 실패: ", e);
-      // alert("리뷰 작성에 실패했습니다. 서버 로그를 확인해주세요.");
     }
   };
 
@@ -409,7 +407,10 @@ function CafeReviewList({ storeName, storeId }) {
 
           {/* 구독권 선택 Select 컴포넌트 */}
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="select-subscription-label" sx={{ color: "#334336" }}>
+            <InputLabel
+              id="select-subscription-label"
+              sx={{ color: "#334336" }}
+            >
               리뷰할 구독권 선택
             </InputLabel>
             <Select
@@ -605,8 +606,19 @@ function CafeReviewList({ storeName, storeId }) {
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} sx={{ color: "#334336" }}>취소</Button>
-          <Button onClick={handleSubmit} form="review-form" variant="contained" sx={{ bgcolor: "#334336", color: "#fff9f4", "&:hover": { bgcolor: "#334336", opacity: 0.9 } }}>
+          <Button onClick={handleClose} sx={{ color: "#334336" }}>
+            취소
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            form="review-form"
+            variant="contained"
+            sx={{
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              "&:hover": { bgcolor: "#334336", opacity: 0.9 },
+            }}
+          >
             작성 완료
           </Button>
         </DialogActions>

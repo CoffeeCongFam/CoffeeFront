@@ -4,7 +4,7 @@
 // `ProductService.js`: 가상의 백엔드 API 호출 및 데이터 처리 로직을 담당합니다.
 
 // 상태 관리와 비즈니스 로직(API 호출, 모달 제어)를 담당하는 컨테이너 역할
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -12,19 +12,19 @@ import {
   CircularProgress,
   Alert,
   Container,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 // 🚩 모든 서브 컴포넌트와 서비스가 같은 디렉토리에 있다고 가정합니다.
-import ProductList from './ManageProductSoC/ProductList';
-import ProductDetailEditModal from './ManageProductSoC/ProductDetailEditModal';
-import ProductRegistModal from './ManageProductSoC/ProductRegistModal';
+import ProductList from "./ManageProductSoC/ProductList";
+import ProductDetailEditModal from "./ManageProductSoC/ProductDetailEditModal";
+import ProductRegistModal from "./ManageProductSoC/ProductRegistModal";
 import {
   fetchSubscriptions,
   registerSubscription,
   updateSubscription,
   fetchAllMenus,
-} from './ManageProductSoC/ProductService';
-import useUserStore from '../../stores/useUserStore';
+} from "./ManageProductSoC/ProductService";
+import useUserStore from "../../stores/useUserStore";
 
 /**
  * 구독권 관리 페이지 (컨테이너 컴포넌트)
@@ -55,8 +55,8 @@ export default function ManageProduct() {
       const data = await fetchSubscriptions();
       setSubscriptions(data);
     } catch (err) {
-      console.error('구독권 목록 로드 실패:', err);
-      setError('구독권 목록을 불러오는 데 실패했습니다.');
+      console.error("구독권 목록 로드 실패:", err);
+      setError("구독권 목록을 불러오는 데 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +68,7 @@ export default function ManageProduct() {
       const menuData = await fetchAllMenus(partnerStoreId);
       setAllMenus(menuData);
     } catch (err) {
-      console.error('전체 메뉴 목록 로드 실패:', err); // 메뉴 로드 실패는 별도 에러 처리 또는 무시
+      console.error("전체 메뉴 목록 로드 실패:", err); // 메뉴 로드 실패는 별도 에러 처리 또는 무시
     }
   }, []);
 
@@ -124,8 +124,8 @@ export default function ManageProduct() {
         handleCloseRegistModal(); // 성공 시 모달 닫기
       }
     } catch (err) {
-      console.error('구독권 등록 실패:', err);
-      setError('구독권 등록 중 오류가 발생했습니다.');
+      console.error("구독권 등록 실패:", err);
+      setError("구독권 등록 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +133,7 @@ export default function ManageProduct() {
 
   // 6. 수정 로직
   const handleUpdateSubscription = async (id, updatedData) => {
-    const confirmed = window.confirm('정말 이 구독권을 수정하시겠습니까?');
+    const confirmed = window.confirm("정말 이 구독권을 수정하시겠습니까?");
     if (!confirmed) return;
 
     setIsLoading(true);
@@ -146,21 +146,36 @@ export default function ManageProduct() {
       }
     } catch (err) {
       console.error(`구독권 수정 실패 (ID: ${id}):`, err);
-      setError('구독권 수정 중 오류가 발생했습니다.');
+      setError("구독권 수정 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        mt: 4,
+        mb: 4,
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        p: 2,
+        backgroundColor: "white",
+      }}
+    >
       <Box
         mb={4}
         display="flex"
         justifyContent="space-between"
         alignItems="center"
       >
-        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ color: "#334336" }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          sx={{ color: "#334336" }}
+        >
           구독권 관리
         </Typography>
         <Button
@@ -195,7 +210,7 @@ export default function ManageProduct() {
 
       {/* 로딩 상태 표시 */}
       {isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
           <CircularProgress sx={{ color: "#334336" }} />
         </Box>
       )}

@@ -132,10 +132,30 @@ export async function fetchStoreList() {
 // /api/customers/stores/nearby?xPoint=37.4979&yPoint=127.0276&radius=2
 
 // 리뷰 작성
-export async function createReview(payload) {
+// form 데이터 기반으로 수정
+export async function createReview(payload, imageFile) {
+  const formData = new FormData();
+
+  formData.append("memberId", payload.memberId);
+  formData.append("partnerStoreId", payload.partnerStoreId);
+  formData.append("subscriptionId", payload.subscriptionId);
+  formData.append("reviewContent", payload.reviewContent);
+  formData.append("rating", String(payload.rating)); // 숫자는 문자열로 변환 안전
   console.log("리뷰 작성 요청>> ", payload);
 
-  await api.post(`/reviews`, payload);
+  // await api.post(`/reviews`, payload);
+  // 파일 필드)
+  if (imageFile) {
+    formData.append("reviewImg", imageFile);
+  }
+
+  const res = await api.post("/api/reviews", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data;
 }
 
 // 리뷰 삭제
