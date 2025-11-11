@@ -71,7 +71,10 @@ function CafeMenuList({ menus = [] }) {
               }}
               onClick={() => toggleSection(type)}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: "#334336" }}
+              >
                 {getTypeLabel(type)}
                 <Typography
                   component="span"
@@ -118,39 +121,37 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-                      {
-                        menu?.menuImg ? (
-                          <Box
-                            component="img"
-                            src={menuDummy || menu.menuImg}
-                            alt={menu.menuName}
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              objectFit: "cover",
-                              borderRadius: 1.2,
-                              flexShrink: 0,
-                            }}
-                          />
-                        ) : (
-                          <Avatar
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              bgcolor: "#334336",
-                              color: "#fff9f4",
-                              borderRadius: 1.2, // 박스 모양 맞추기
-                              flexShrink: 0,
-                            }}
-                          >
-                            {menu.menuType === "DESSERT" ? (
-                              <CakeIcon sx={{ fontSize: 36 }} />
-                            ) : (
-                              <CoffeeIcon sx={{ fontSize: 36 }} />
-                            )}
-                          </Avatar>
-                        )
-                      }
+                      {menu?.menuImg ? (
+                        <Box
+                          component="img"
+                          src={menu.menuImg || menuDummy}
+                          alt={menu.menuName}
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            objectFit: "cover",
+                            borderRadius: 1.2,
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <Avatar
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            bgcolor: "#334336",
+                            color: "#fff9f4",
+                            borderRadius: 1.2, // 박스 모양 맞추기
+                            flexShrink: 0,
+                          }}
+                        >
+                          {menu.menuType === "DESSERT" ? (
+                            <CakeIcon sx={{ fontSize: 36 }} />
+                          ) : (
+                            <CoffeeIcon sx={{ fontSize: 36 }} />
+                          )}
+                        </Avatar>
+                      )}
 
                       <Box
                         sx={{
@@ -160,7 +161,11 @@ function CafeMenuList({ menus = [] }) {
                       >
                         <Typography
                           variant="subtitle1"
-                          sx={{ fontWeight: 500, wordBreak: "keep-all", color: "#334336" }}
+                          sx={{
+                            fontWeight: 500,
+                            wordBreak: "keep-all",
+                            color: "#334336",
+                          }}
                         >
                           {menu.menuName || menu.name}
                         </Typography>
