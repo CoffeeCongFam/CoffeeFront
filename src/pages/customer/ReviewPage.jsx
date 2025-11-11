@@ -157,19 +157,17 @@ function Header({ sortOrder, onChangeOrder }) {
       direction="row"
       alignItems="center"
       justifyContent="space-between"
-      sx={{ mb: 2, px: 1 }}
+      sx={{ mb: 2,  }}
     >
-      <Box sx={{ ml: 2 }}>
+      <Box>
         <Typography variant="h6" component="h2" fontWeight="bold" sx={{ color: "#334336" }}>
           내가 작성한 리뷰
         </Typography>
       </Box>
-      <Box sx={{ mr: 2 }}>
+      <Box >
         <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel id="sort-label">정렬</InputLabel>
           <Select
             labelId="sort-label"
-            label="정렬"
             value={sortOrder}
             onChange={(e) => onChangeOrder(e.target.value)}
           >

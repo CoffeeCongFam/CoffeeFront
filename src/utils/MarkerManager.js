@@ -251,8 +251,8 @@ export default class MarkerManager {
       this.map.setCenter(center);
       if (this.map.getZoom() > 17) this.map.setZoom(17);
     } else if (cafes.length > 1) {
-      this.map.fitBounds(bounds); // 줌이 빠지게 됨.
-      // this.map.setZoom(15); // 줌 기본 세팅
+      // this.map.fitBounds(bounds); // 줌이 빠지게 됨.
+      this.map.setZoom(15); // 줌 기본 세팅
     }
   }
 

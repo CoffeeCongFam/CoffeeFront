@@ -54,12 +54,6 @@ function SubscriptionItem({ subscription, isAppLike }) {
               ₩{subscription.price?.toLocaleString()}
               <Typography
                 component="span"
-                sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
-              >
-                {subscription?.subscriptionName}
-              </Typography>
-              <Typography
-                component="span"
                 sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
               >
                 /월

@@ -14,6 +14,8 @@ import useUserStore from "../../stores/useUserStore";
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/finalLogo.png";
 import LoginIcon from "@mui/icons-material/Login";
+import landingStep2 from "../../assets/landingStep2.png"
+import landingStep3 from "../../assets/landingStep3.png"
 import { TokenService } from "../../utils/api";
 
 function Landing() {
@@ -336,7 +338,7 @@ function Landing() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              px: isMobile ? 3 : 14,
+              px: isMobile ? 3 : 20,
               gap: 2,
             }}
           >
@@ -393,6 +395,28 @@ function Landing() {
               </Link>
             </Box>
           </Box>
+          {/* 오른쪽 이미지 영역 */}
+          <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                pt: 20,
+                mr: 20
+              }}
+            >
+            {
+            !isMobile &&
+            <img 
+              src={landingStep2}
+              alt="COFFEIENS 고객 화면 예시"
+              style={{
+              }}
+            />
+          }
+
+          </Box>
+          
+          
         </Box>
       </Element>
       {/* ------------------- 3 챕터 (점주 타겟)------------------- */}
@@ -413,7 +437,7 @@ function Landing() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              px: isMobile ? 3 : 14,
+              px: isMobile ? 3 : 20,
               gap: 2,
             }}
           >
@@ -444,7 +468,7 @@ function Landing() {
             >
               구독을 통해 꾸준히 방문하는 단골을 만들어줍니다.
               <br />
-              매일 찾는 단골 고객을 확보하고, <br /> 주문과 결제를 간편하게
+              매일 찾는 단골 고객을 확보하고, {isMobile && <br />} 주문과 결제를 간편하게
               관리하세요. <br />
               프랜차이즈의 시스템을 비용 부담 없이 당신의 카페로.
             </Typography>
@@ -470,6 +494,27 @@ function Landing() {
               </Link>
             </Box>
           </Box>
+           {/* 오른쪽 이미지 영역 */}
+          <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                pt: 21,
+                pb: 21,
+                mr: 20
+              }}
+            >
+            {
+            !isMobile &&
+            <img 
+              src={landingStep3}
+              alt="COFFEIENS 점주 화면 예시"
+              style={{
+              }}
+            />
+          }
+
+          </Box>
         </Box>
       </Element>
 
@@ -487,8 +532,15 @@ function Landing() {
             // alignItems: isMobile ? "flex-start" : "center",
             backgroundColor: "#f6e4d1",
             px: isMobile ? 3 : 0,
+            pb: isMobile ? 0 : 5
           }}
         >
+          {/* 상단 이미지 영역 */}
+            {/* <img
+                src={monkeyLogo}
+                alt="COFFEIENS Logo"
+                style={{ maxWidth: "8rem", marginBottom:'1rem', height: "auto" }}
+              /> */}
           <Typography
             sx={{
               fontSize: isMobile ? "1.3rem" : "1.5rem",

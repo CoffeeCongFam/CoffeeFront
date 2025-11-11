@@ -135,7 +135,7 @@ function CompleteOrderPage() {
   }
 
   return (
-    <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: isAppLike ? 6 : 10, minHeight: "100vh", boxSizing: "border-box", }}>
       <Box
         sx={{
           display: "flex",
