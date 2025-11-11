@@ -132,10 +132,32 @@ export async function fetchStoreList() {
 // /api/customers/stores/nearby?xPoint=37.4979&yPoint=127.0276&radius=2
 
 // 리뷰 작성
-export async function createReview(payload) {
-  console.log("리뷰 작성 요청>> ", payload);
+// form 데이터 기반으로 수정
+// 리뷰 작성 (multipart/form-data)
+export async function createReview(payload, imageFile) {
+  const formData = new FormData();
 
-  await api.post(`/reviews`, payload);
+  // JSON을 Blob 형태로 감싸서 "data" 필드로 추가
+  const jsonBlob = new Blob([JSON.stringify(payload)], {
+    type: "application/json",
+  });
+  formData.append("data", jsonBlob);
+
+  // 이미지 파일이 있으면 "file" 필드로 추가
+  if (imageFile) {
+    formData.append("file", imageFile);
+  }
+
+  console.log("📤 리뷰 등록 요청 >>", payload, imageFile);
+
+  //  multipart/form-data 전송
+  const res = await api.post("/reviews", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data;
 }
 
 // 리뷰 삭제

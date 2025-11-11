@@ -200,7 +200,7 @@ function Landing() {
             >
               <img
                 src={monkeyLogo}
-                alt="COFFIENS Logo"
+                alt="COFFEIENS Logo"
                 style={{ maxWidth: "380px", height: "auto" }}
               />
             </Box>
@@ -238,7 +238,7 @@ function Landing() {
             >
               당신의 하루를 진화시키는
               <br />
-              커피 구독 플랫폼, COFFIENS
+              커피 구독 플랫폼, COFFEIENS
             </Typography>
             <Typography
               sx={{
@@ -249,7 +249,7 @@ function Landing() {
             >
               매일의 커피 한 잔이 당신의 하루를 바꾸듯,
               <br />
-              COFFIENS는 소비자에게는 더 현명한 하루를,
+              COFFEIENS는 소비자에게는 더 현명한 하루를,
               <br />
               사장님들께는 꾸준히 찾아오는 단골의 기쁨을 선물합니다.
             </Typography>
@@ -351,7 +351,7 @@ function Landing() {
             </Typography>
             <Typography
               sx={{
-                fontSize: isMobile ? "1.5rem" : "2.3rem",
+                fontSize: isMobile ? "1.6rem" : "2rem",
                 fontWeight: 700,
                 color: "#4a3426",
               }}
@@ -428,7 +428,7 @@ function Landing() {
             </Typography>
             <Typography
               sx={{
-                fontSize: isMobile ? "1.6rem" : "2.3rem",
+                fontSize: isMobile ? "1.6rem" : "2rem",
                 fontWeight: 700,
                 color: "#4a3426",
               }}
@@ -491,13 +491,13 @@ function Landing() {
         >
           <Typography
             sx={{
-              fontSize: isMobile ? "1.3rem" : "2.3rem",
+              fontSize: isMobile ? "1.3rem" : "1.5rem",
               fontWeight: 600,
               color: "#4a3426",
               mb: 2,
             }}
           >
-            지금 COFFIENS에 합류하세요.
+            지금 COFFEIENS에 합류하세요.
           </Typography>
           <Box
             sx={{

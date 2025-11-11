@@ -57,9 +57,9 @@ export const SubscriptionDetailCard = ({
 
   // 경고창
   const [alert, setAlert] = useState({
-      open: false,
-      message: "",
-      severity: "info",
+    open: false,
+    message: "",
+    severity: "info",
   });
 
   // 모바일용 "제공 메뉴" 메시지 Popover
@@ -140,8 +140,7 @@ export const SubscriptionDetailCard = ({
   const paidDate = paidAt ? parseDate(paidAt) : null;
   const formattedPaidDate = paidDate ? formatDate(paidDate) : "-";
 
-  const isGift =
-    isGifted || giftType === "SENT" || giftType === "RECEIVED";
+  const isGift = isGifted || giftType === "SENT" || giftType === "RECEIVED";
 
   const periodRangeLabel = subPeriodLabel;
 
@@ -190,9 +189,12 @@ export const SubscriptionDetailCard = ({
       : typeof cardIsRefunded === "boolean"
       ? cardIsRefunded
       : !!(refundedAt && String(refundedAt).trim() !== "");
-  
+
   const usedHistoryCount = Array.isArray(usedAt) ? usedAt.length : 0;
-  const startDateForRefund = (subStart || subscriptionStart) ? new Date(subStart || subscriptionStart) : null;
+  const startDateForRefund =
+    subStart || subscriptionStart
+      ? new Date(subStart || subscriptionStart)
+      : null;
   const todayForRefund = new Date();
   let diffDaysFromStart = 0;
   if (startDateForRefund && !isNaN(startDateForRefund)) {
@@ -201,15 +203,15 @@ export const SubscriptionDetailCard = ({
   }
   const hasUsedHistory = usedHistoryCount > 0;
   const isOverSevenDays = diffDaysFromStart >= 8;
-  
+
   let refundMessage = null;
   let isRefundable = true;
-  
+
   if (normalizedReasons.length > 0) {
     isRefundable = false;
     const hasOver = normalizedReasons.includes("OVER_PERIOD");
     const hasUsed = normalizedReasons.includes("USED_ALREADY");
-  
+
     if (hasOver && hasUsed) {
       refundMessage = "환불 기간 및 사용내역이 존재하여 환불이 불가능합니다.";
     } else if (hasOver) {
@@ -310,7 +312,7 @@ export const SubscriptionDetailCard = ({
     const pid = purchaseId ?? subscriptionData?.purchaseId;
 
     if (!pid) {
-      handleShowAlert("warning", "환불에 필요한 구매 id 가 없습니다.")
+      handleShowAlert("warning", "환불에 필요한 구매 id 가 없습니다.");
       // window.alert("환불에 필요한 purchaseId가 없습니다.");
       return;
     }
@@ -334,7 +336,8 @@ export const SubscriptionDetailCard = ({
         // );
       }
     } catch (e) {
-      const message = e.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요"
+      const message =
+        e.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요";
       handleShowAlert("error", message);
 
       // window.alert(
@@ -344,7 +347,7 @@ export const SubscriptionDetailCard = ({
   };
 
   // 경고창
-   const handleShowAlert = (type, message) => {
+  const handleShowAlert = (type, message) => {
     setAlert({
       open: true,
       message: message,
@@ -371,12 +374,12 @@ export const SubscriptionDetailCard = ({
         border: "1px solid #ffe0b2",
       }}
     >
-             <CommonAlert
-              open={alert.open}
-              onClose={() => setAlert({ ...alert, open: false })}
-              severity={alert.severity}
-              message={alert.message}
-            />
+      <CommonAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
       <Box
         sx={{
           position: "relative",
@@ -571,17 +574,28 @@ export const SubscriptionDetailCard = ({
                           </Typography>
                         </Box>
                         <Popover
-                          id={openGiftPopover ? "gift-message-popover" : undefined}
+                          id={
+                            openGiftPopover ? "gift-message-popover" : undefined
+                          }
                           open={openGiftPopover}
                           anchorEl={giftAnchorEl}
                           onClose={handleCloseGiftPopover}
-                          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                          transformOrigin={{ vertical: "top", horizontal: "right" }}
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                          }}
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
                           PaperProps={{ sx: { p: 1.5, maxWidth: 280, mt: 1 } }}
                         >
                           <Typography
                             variant="body2"
-                            sx={{ color: "text.primary", whiteSpace: "pre-line" }}
+                            sx={{
+                              color: "text.primary",
+                              whiteSpace: "pre-line",
+                            }}
                           >
                             {giftMessage}
                           </Typography>
@@ -895,8 +909,7 @@ export const SubscriptionDetailCard = ({
                       <Typography
                         variant="caption"
                         sx={{ opacity: 0.85, lineHeight: 1.4 }}
-                      >
-                      </Typography>
+                      ></Typography>
                     </Box>
                   )}
                 </Box>
@@ -946,9 +959,7 @@ export const SubscriptionDetailCard = ({
                       </Typography>
                     </Box>
                     {headerExtra && (
-                      <Box sx={{ flexShrink: 0 }}>
-                        {headerExtra}
-                      </Box>
+                      <Box sx={{ flexShrink: 0 }}>{headerExtra}</Box>
                     )}
                     <Typography
                       variant="body1"
@@ -957,9 +968,7 @@ export const SubscriptionDetailCard = ({
                         color: "#3B3026",
                       }}
                     >
-                      <span style={{ fontWeight: 700 }}>
-                        ₩{formattedPrice}
-                      </span>
+                      <span style={{ fontWeight: 700 }}>₩{formattedPrice}</span>
                       /월
                     </Typography>
                   </Box>
@@ -1086,7 +1095,11 @@ export const SubscriptionDetailCard = ({
                   <FormControl
                     fullWidth
                     variant="outlined"
-                    sx={{ mt: 1.5, mb: 0.5, display: { xs: "none", sm: "block" } }}
+                    sx={{
+                      mt: 1.5,
+                      mb: 0.5,
+                      display: { xs: "none", sm: "block" },
+                    }}
                   >
                     <Select
                       value={selectedMenu}
@@ -1232,10 +1245,9 @@ export const SubscriptionDetailCard = ({
                           ? iso
                           : `${d.getUTCFullYear()}-${String(
                               d.getUTCMonth() + 1
-                            ).padStart(2, "0")}-${String(d.getUTCDate()).padStart(
-                              2,
-                              "0"
-                            )}`;
+                            ).padStart(2, "0")}-${String(
+                              d.getUTCDate()
+                            ).padStart(2, "0")}`;
                         return (
                           <ListItem key={iso} disablePadding sx={{ py: 0.5 }}>
                             <ListItemIcon sx={{ minWidth: 28 }}>
@@ -1313,6 +1325,5 @@ export const SubscriptionDetailCard = ({
         </Box>
       )}
     </Paper>
-    
   );
 };

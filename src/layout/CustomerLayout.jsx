@@ -201,7 +201,7 @@ export default function CustomerLayout() {
               style={{ cursor: "pointer" }}
               onClick={() => navigate("/me")}
             >
-              COFFIENS
+              COFFEIENS
             </Typography>
             <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
               <Badge badgeContent={unreadCount} color="error">
