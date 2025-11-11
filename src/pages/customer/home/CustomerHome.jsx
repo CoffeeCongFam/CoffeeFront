@@ -274,7 +274,7 @@ function CustomerHome() {
             gap: "0.7rem",
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, mb: 1, color: "#334336" }}>
             {todayDate} {isAppLike && <br />} 진행 중인 주문{" "}
             {ongoingOrders.length}건
           </Typography>

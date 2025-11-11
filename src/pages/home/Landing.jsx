@@ -351,7 +351,7 @@ function Landing() {
             </Typography>
             <Typography
               sx={{
-                fontSize: isMobile ? "1.5rem" : "2.3rem",
+                fontSize: isMobile ? "1.6rem" : "2rem",
                 fontWeight: 700,
                 color: "#4a3426",
               }}
@@ -428,7 +428,7 @@ function Landing() {
             </Typography>
             <Typography
               sx={{
-                fontSize: isMobile ? "1.6rem" : "2.3rem",
+                fontSize: isMobile ? "1.6rem" : "2rem",
                 fontWeight: 700,
                 color: "#4a3426",
               }}
@@ -491,7 +491,7 @@ function Landing() {
         >
           <Typography
             sx={{
-              fontSize: isMobile ? "1.3rem" : "2.3rem",
+              fontSize: isMobile ? "1.3rem" : "1.5rem",
               fontWeight: 600,
               color: "#4a3426",
               mb: 2,

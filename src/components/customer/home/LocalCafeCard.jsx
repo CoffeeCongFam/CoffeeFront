@@ -57,6 +57,7 @@ function LocalCafeCard({ store }) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            color: "#334336",
           }}
         >
           {store?.storeName}
