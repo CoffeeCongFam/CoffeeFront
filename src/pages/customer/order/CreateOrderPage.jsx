@@ -385,7 +385,7 @@ function CreateOrderPage() {
           }}
         >
           <Box sx={{ flex: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}>
               구독권 선택
             </Typography>
             <Select
@@ -439,11 +439,10 @@ function CreateOrderPage() {
           </Box>
 
           <Box sx={{ flex: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}>
               이용 타입
             </Typography>
             <ToggleButtonGroup
-              color="primary"
               value={orderType}
               exclusive
               onChange={(e, v) => v && setOrderType(v)}
@@ -457,17 +456,25 @@ function CreateOrderPage() {
                   height: "100%",
                   borderRadius: 0,
                 },
+                "& .Mui-selected": {
+                  backgroundColor: "#334336",
+                  color: "#fff9f4",
+                  "&:hover": {
+                    backgroundColor: "#334336",
+                    opacity: 0.9,
+                  },
+                },
               }}
             >
               <ToggleButton
                 value="IN"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem", color: "#334336" }}
               >
                 매장 이용 <LocalCafeIcon />
               </ToggleButton>
               <ToggleButton
                 value="OUT"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem" }}
+                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem", color: "#334336" }}
               >
                 포장 이용 <ShoppingBagTwoToneIcon />
               </ToggleButton>
@@ -484,6 +491,7 @@ function CreateOrderPage() {
             alignItems: "stretch",
             flex: 1,
             minHeight: 0,
+            color: "#334336",
           }}
         >
           {/* 메뉴 그리드 영역 */}
@@ -498,7 +506,6 @@ function CreateOrderPage() {
           >
             {/* 카테고리 탭 */}
             <ToggleButtonGroup
-              color="primary"
               value={activeTab}
               exclusive
               onChange={(e, v) => v && setActiveTab(v)}
@@ -508,12 +515,21 @@ function CreateOrderPage() {
                   textTransform: "none",
                   fontWeight: 600,
                   px: 2,
+                  color: "#334336",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "#334336",
+                  color: "#fff9f4",
+                  "&:hover": {
+                    backgroundColor: "#334336",
+                    opacity: 0.9,
+                  },
                 },
               }}
             >
-              <ToggleButton value="ALL">전체</ToggleButton>
-              <ToggleButton value="BEVERAGE">음료</ToggleButton>
-              <ToggleButton value="DESSERT">디저트</ToggleButton>
+              <ToggleButton value="ALL" sx={{ color: "#334336" }}>전체</ToggleButton>
+              <ToggleButton value="BEVERAGE" sx={{ color: "#334336" }}>음료</ToggleButton>
+              <ToggleButton value="DESSERT" sx={{ color: "#334336" }}>디저트</ToggleButton>
             </ToggleButtonGroup>
 
             <Box
@@ -537,6 +553,7 @@ function CreateOrderPage() {
                     alignItems: "center",
                     textAlign: "center",
                     py: "1rem",
+                    color: "#334336",
                   }}
                 >
                   <Typography variant="body2" sx={{ color: "#334336" }}>
@@ -552,6 +569,7 @@ function CreateOrderPage() {
                       md: "repeat(3, minmax(0, 1fr))",
                     },
                     gap: 2,
+                    color: "#334336",
                   }}
                 >
                   {visibleMenus.map((menu) => {
@@ -571,6 +589,7 @@ function CreateOrderPage() {
                           flexDirection: "column",
                           alignItems: "stretch",
                           height: "100%",
+                          color: "#334336",
                         }}
                       >
                         <Box

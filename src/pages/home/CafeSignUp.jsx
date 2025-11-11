@@ -16,11 +16,18 @@ import {
 import axios from "axios";
 // L_03 - 카페 정보 등록만 담당하는 등록 api 호출
 import { postCafe } from "../../utils/login";
+import { getStoreInfo } from "../../utils/store";
+import useUserStore from "../../stores/useUserStore";
 const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
 function StoreForm({ onSuccess }) {
+<<<<<<< HEAD
+=======
+  const { setPartnerStoreId } = useUserStore();
+
+>>>>>>> 7237919 (ui 최종)
   // 상태 관리
   const [formState, setFormState] = useState({
     businessNumber: "", // 사업자번호
@@ -90,6 +97,7 @@ function StoreForm({ onSuccess }) {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            Authorization: SERVICE_KEY,
           },
         }
       );
@@ -295,6 +303,18 @@ function StoreForm({ onSuccess }) {
       const result = await postCafe(data);
       if (result) {
         alert("매장 등록 완료!");
+        
+        // ✅ 매장 등록 완료 시 getStoreInfo 호출하여 partnerStoreId 설정
+        try {
+          const storeData = await getStoreInfo();
+          if (storeData?.partnerStoreId) {
+            setPartnerStoreId(storeData.partnerStoreId);
+            console.log("✅ 매장 등록 완료 - partnerStoreId 설정:", storeData.partnerStoreId);
+          }
+        } catch (err) {
+          console.error("매장 정보 조회 실패:", err);
+        }
+        
         // ✅ 컨텍스트별로 후처리 분기:
         // - CafeSignUp에서 사용 시: /store로 이동 (onSuccess 전달)
         // - CafeMyPage에서 사용 시: 기본 동작으로 새로고침
@@ -687,13 +707,12 @@ function StoreForm({ onSuccess }) {
               fontWeight: 700,
               fontSize: "0.95rem",
               textTransform: "none",
-              backgroundImage:
-                "linear-gradient(135deg, #0f172a 0%, #1f2937 40%, #111827 100%)",
-              boxShadow: "0 10px 30px rgba(15,23,42,0.55)",
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              boxShadow: "0 6px 16px rgba(51, 67, 54, 0.35)",
               "&:hover": {
-                backgroundImage:
-                  "linear-gradient(135deg, #020617 0%, #111827 100%)",
-                boxShadow: "0 12px 40px rgba(15,23,42,0.7)",
+                bgcolor: "#334336",
+                opacity: 0.9,
               },
               "&:disabled": {
                 backgroundImage: "none",

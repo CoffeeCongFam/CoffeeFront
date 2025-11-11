@@ -76,6 +76,25 @@ function CafeMyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUser?.partnerStoreId]);
 
+  // ✅ 매장 등록에서 매장 정보로 변경될 때 getStoreInfo 호출하여 partnerStoreId 설정
+  useEffect(() => {
+    if (activeMenu === "매장 정보" && !storeInfo?.partnerStoreId) {
+      (async () => {
+        try {
+          const data = await getStoreInfo();
+          if (data?.partnerStoreId) {
+            setPartnerStoreId(data.partnerStoreId);
+            setStoreInfo(data);
+            console.log("✅ 매장 정보 탭 활성화 - partnerStoreId 설정:", data.partnerStoreId);
+          }
+        } catch (error) {
+          console.error("매장 정보 조회 실패:", error);
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeMenu]);
+
   const logout = () => {
     clearUser();
     handleLogout();
@@ -86,7 +105,7 @@ function CafeMyPage() {
       case "매장 정보":
         return <ManageStoreInfo storeInfo={storeInfo} syncStoreInfo={syncStoreInfo} />;
       case "매장 등록":
-        return <StoreForm />;
+        return <StoreForm onSuccess={syncStoreInfo} />;
       case "내 정보":
         return <Profile />;
       default:

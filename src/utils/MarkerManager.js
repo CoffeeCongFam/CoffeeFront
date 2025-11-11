@@ -105,8 +105,8 @@ export default class MarkerManager {
           display:inline-block;
           margin-top:6px;
           text-decoration:none;
-          color:#fff;
-          background:#1976d2;
+          color:#fff9f4;
+          background:#334336;
           border-radius:20px;
           padding:4px 10px;
           font-size:12px;

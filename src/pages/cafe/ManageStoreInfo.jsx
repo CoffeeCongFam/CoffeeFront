@@ -81,7 +81,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
   const fileInputRef = useRef(null);
   const [hoursErrors, setHoursErrors] = useState({});
   const [isImageDeleted, setIsImageDeleted] = useState(false);
-useEffect(() => {
+  useEffect(() => {
     if (!initialStoreInfo) return;
 
     // 수정 중일 때는 부모에서 내려온 값으로 덮어쓰지 않도록 보호
@@ -406,9 +406,9 @@ useEffect(() => {
     setSuccessMessage(null);
 
     try {
-      // ✅ 전역 Zustand에서 partnerStoreId 사용
-      const { authUser, setUser } = useUserStore.getState();
-      const partnerStoreId = authUser?.partnerStoreId;
+      // ✅ 전역 Zustand에서 partnerStoreId 사용 (authUser와 직접 partnerStoreId 모두 확인)
+      const { authUser, setUser, partnerStoreId: storePartnerStoreId } = useUserStore.getState();
+      const partnerStoreId = authUser?.partnerStoreId || storePartnerStoreId || storeInfo?.partnerStoreId;
 
       if (!partnerStoreId) {
         throw new Error("제휴 매장 ID가 없습니다.");
@@ -552,9 +552,9 @@ useEffect(() => {
     setHoursErrors({}); // 통과 시 에러 초기화
 
     try {
-      // ✅ 전역 Zustand에서 partnerStoreId 가져오기
-      const { authUser } = useUserStore.getState();
-      const partnerStoreId = authUser?.partnerStoreId;
+      // ✅ 전역 Zustand에서 partnerStoreId 가져오기 (authUser와 직접 partnerStoreId 모두 확인)
+      const { authUser, partnerStoreId: storePartnerStoreId } = useUserStore.getState();
+      const partnerStoreId = authUser?.partnerStoreId || storePartnerStoreId || storeInfo?.partnerStoreId;
 
       if (!partnerStoreId) {
         throw new Error("제휴 매장 ID가 없습니다.");
@@ -1610,10 +1610,17 @@ useEffect(() => {
                             py: 0.6,
                             fontWeight: 600,
                             textTransform: "none",
-                            ...(isUndefinedStatus && {
+                            ...(isUndefinedStatus ? {
                               bgcolor: "grey.100",
                               color: "grey.600",
                               borderColor: "grey.400",
+                            } : {
+                              borderColor: "#334336",
+                              color: "#334336",
+                              "&:hover": {
+                                borderColor: "#334336",
+                                bgcolor: "rgba(51, 67, 54, 0.05)",
+                              },
                             }),
                           }}
                         >
@@ -1674,18 +1681,18 @@ useEffect(() => {
                               fontWeight: 600,
                               textTransform: "none",
                               ...(isClosed ? {
-                                bgcolor: "#334336",
+                                bgcolor: "#607064",
                                 color: "#fff9f4",
                                 "&:hover": {
-                                  bgcolor: "#334336",
+                                  bgcolor: "#607064",
                                   opacity: 0.9,
                                 },
                               } : {
-                                borderColor: "#334336",
-                                color: "#334336",
+                                borderColor: "#607064",
+                                color: "#607064",
                                 "&:hover": {
-                                  borderColor: "#334336",
-                                  bgcolor: "rgba(51, 67, 54, 0.05)",
+                                  borderColor: "#607064",
+                                  bgcolor: "rgba(96, 112, 100, 0.05)",
                                 },
                               }),
                             }}
@@ -1705,10 +1712,24 @@ useEffect(() => {
                           py: 0.6,
                           fontWeight: 600,
                           textTransform: "none",
-                          ...(isUndefinedStatus && {
+                          ...(isUndefinedStatus ? {
                             bgcolor: "grey.100",
                             color: "grey.600",
                             borderColor: "grey.400",
+                          } : isClosed ? {
+                            bgcolor: "#607064",
+                            color: "#fff9f4",
+                            "&:hover": {
+                              bgcolor: "#607064",
+                              opacity: 0.9,
+                            },
+                          } : {
+                            bgcolor: "#334336",
+                            color: "#fff9f4",
+                            "&:hover": {
+                              bgcolor: "#334336",
+                              opacity: 0.9,
+                            },
                           }),
                         }}
                       >

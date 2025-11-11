@@ -348,6 +348,7 @@ function OrderHistory() {
             borderBottom: "1px solid #eee",
           }}
         >
+<<<<<<< HEAD
           <Box
             onClick={openFilterDialog}
             sx={{
@@ -357,6 +358,44 @@ function OrderHistory() {
               px: 1,
               py: 1.5,
               cursor: "pointer",
+=======
+          <TextField
+            label="시작일"
+            type="date"
+            // size="small"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            disabled={period !== "CUSTOM"}
+            sx={{ flex: 1 }}
+            inputProps={{ max: todayStr }}
+          />
+          <Typography sx={{ display: { xs: "none", sm: "block" }, color: "#334336" }}>
+            ~
+          </Typography>
+          <TextField
+            label="종료일"
+            type="date"
+            // size="small"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+            disabled={period !== "CUSTOM"}
+            sx={{ flex: 1 }}
+            inputProps={{ max: todayStr }}
+          />
+
+          <Button
+            variant="contained"
+            sx={{
+              whiteSpace: "nowrap",
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              "&:hover": {
+                bgcolor: "#334336",
+                opacity: 0.9,
+              },
+>>>>>>> 7237919 (ui 최종)
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -535,15 +574,23 @@ function OrderHistory() {
               textAlign: "center",
             }}
           >
-            <Typography>해당 기간에 주문 내역이 없습니다.</Typography>
+            <Typography sx={{ color: "#334336" }}>해당 기간에 주문 내역이 없습니다.</Typography>
           </Box>
         ) : (
           <>
             <List>
               {filteredAndSortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
+<<<<<<< HEAD
                   <ListItemButton onClick={() => handleClickOrder(order)}>
                     <ListItemText
+=======
+                  <ListItemButton
+                    // 기존: onClick={() => navigate(`/me/order/${order.orderId}`)}
+                    onClick={() => handleClickOrder(order)}
+                  >
+                    <ListItemText sx={{ color: "#334336" }}
+>>>>>>> 7237919 (ui 최종)
                       primary={`${order.storeName} ${order.subscriptionName}`}
                       secondary={formatKoreanDateTime(order.createdAt)}
                     />

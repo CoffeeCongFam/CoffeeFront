@@ -379,6 +379,13 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                       if (!confirmed) return;
                       onRefund(purchaseId, item.rowKey);
                     }}
+                    sx={{
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      px: { xs: 1.5, sm: 1.5 },
+                      py: { xs: 0.5, sm: 0.75 },
+                      minWidth: { xs: "70px", sm: "64px" },
+                      whiteSpace: "nowrap",
+                    }}
                   >
                     결제 취소
                   </Button>

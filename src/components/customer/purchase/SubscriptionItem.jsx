@@ -137,7 +137,7 @@ function SubscriptionItem({ subscription, isAppLike }) {
     >
       {/* 왼쪽 정보 */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#334336" }}>
           {subscription?.storeName || "카페 이름"}{" "}
           {subscription?.subscriptionName}
         </Typography>
@@ -178,13 +178,18 @@ function SubscriptionItem({ subscription, isAppLike }) {
           color="warning"
           size="small"
           sx={{ mb: 1, fontWeight: 600 }}
+<<<<<<< HEAD
         /> */}
         <SubTypeChip  status={typeLabel}/>
         <Typography variant="h5" sx={{ fontWeight: 800 }}>
+=======
+        />
+        <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
+>>>>>>> 7237919 (ui 최종)
           ₩{subscription.price?.toLocaleString()}
           <Typography
             component="span"
-            sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
+            sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
           >
             /월
           </Typography>

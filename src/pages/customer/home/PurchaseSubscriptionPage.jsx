@@ -24,6 +24,7 @@ import {
 } from "../../../apis/customerApi";
 import axios from "axios";
 import useUserStore from "../../../stores/useUserStore";
+import useAppShellMode from "../../../hooks/useAppShellMode";
 
 // 결제수단 로고 이미지 import
 import kakaopayImg from "../../../assets/kakaopay.png";
@@ -33,6 +34,7 @@ import paycoImg from "../../../assets/payco.png";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 
 function PurchaseSubscriptionPage() {
+  const { isAppLike } = useAppShellMode();
   const { subId } = useParams();
   const { authUser } = useUserStore();
   const { isAppLike } = useAppShellMode();
@@ -122,14 +124,14 @@ function PurchaseSubscriptionPage() {
     {
       label: "신용/체크카드",
       pg: "danal_tpay",
-      icon: <CreditCardIcon sx={{ fontSize: 28 }} />,
+      icon: <CreditCardIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#4A90E2",
       bgColor: "#E8F4FF",
     },
     {
       label: "휴대폰 결제",
       pg: "danal_tpay",
-      icon: <PhoneAndroidIcon sx={{ fontSize: 28 }} />,
+      icon: <PhoneAndroidIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#7B68EE",
       bgColor: "#F0EDFF",
     },
@@ -213,8 +215,15 @@ function PurchaseSubscriptionPage() {
           </Typography>
         </Box>
 
+<<<<<<< HEAD
 
        
+=======
+        {/* 제목 */}
+        <Box sx={{ textAlign: "center", mb: 2 }}>
+          <Typography variant="h6" sx={{ color: "#334336" }}>구독하기</Typography>
+        </Box>
+>>>>>>> 7237919 (ui 최종)
 
         {/* 구독권 정보 */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -239,7 +248,11 @@ function PurchaseSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
+<<<<<<< HEAD
             <Typography variant="subtitle2" sx={{ fontSize: "0.9rem", fontWeight: 600 }}>
+=======
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
+>>>>>>> 7237919 (ui 최종)
               유의사항
             </Typography>
           </Box>
@@ -276,8 +289,12 @@ function PurchaseSubscriptionPage() {
             fullWidth={isAppLike}
             onClick={() => setPayOpen(true)}
             sx={{
+<<<<<<< HEAD
               borderRadius: isAppLike ? "2rem" : "inherit",
               backgroundColor: "black",
+=======
+              backgroundColor: "#334336",
+>>>>>>> 7237919 (ui 최종)
               color: "white",
               px: 4,
               maxWidth: isAppLike ? 480 : "none",
@@ -300,7 +317,7 @@ function PurchaseSubscriptionPage() {
             onClick={(e) => e.stopPropagation()}
             sx={{
               position: "fixed",
-              bottom: 0,
+              bottom: isAppLike ? "56px" : 0,
               left: 0,
               right: 0,
               mx: "auto",
@@ -310,7 +327,7 @@ function PurchaseSubscriptionPage() {
               boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
               px: 3,
               pt: 2,
-              pb: 4,
+              pb: isAppLike ? "80px" : 4,
             }}
           >
             <Box
@@ -340,7 +357,7 @@ function PurchaseSubscriptionPage() {
 
             {/* 안내 */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
                 결제 수단 선택
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -354,10 +371,16 @@ function PurchaseSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
+<<<<<<< HEAD
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
                 gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
                 columnGap: 1.5,
                 rowGap: 1.5,
+=======
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 1.5,
+                width: "100%",
+>>>>>>> 7237919 (ui 최종)
               }}
             >
               {paymentMethods.map((method) => (
@@ -375,7 +398,14 @@ function PurchaseSubscriptionPage() {
                         : "transparent"
                     }`,
                     borderRadius: 3,
+<<<<<<< HEAD
                     height: "100%", 
+=======
+                    height: 110,
+                    width: isAppLike ? "100%" : "auto",
+                    minWidth: 0,
+                    boxSizing: "border-box",
+>>>>>>> 7237919 (ui 최종)
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",

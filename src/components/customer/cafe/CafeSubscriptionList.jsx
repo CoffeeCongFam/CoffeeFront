@@ -698,10 +698,10 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       onClick={() => goToPurchaseSub(sub.subscriptionId)}
                       startIcon={<CreditCardIcon />}
                       sx={{
-                        backgroundColor: isSoldOut ? "#e0e0e0" : "black",
+                        backgroundColor: isSoldOut ? "#e0e0e0" : "#334336",
                         color: isSoldOut ? "text.disabled" : "white",
                         "&:hover": {
-                          backgroundColor: isSoldOut ? "#e0e0e0" : "#222",
+                          backgroundColor: isSoldOut ? "#e0e0e0" : "#334336",
                         },
                       }}
                       disabled={sub.subscriptionStatus === "SOLDOUT"}

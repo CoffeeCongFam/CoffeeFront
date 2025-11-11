@@ -158,12 +158,12 @@ function CompletePurchasePage() {
 
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 3 }}>
-        <Typography variant="h6">
+        <Typography variant="h6" sx={{ color: "#334336" }}>
           {purchase.isGift === "Y"
             ? "선물이 전달되었습니다."
             : "결제가 완료되었습니다."}
         </Typography>
-        {purchase.isGift === "Y" ? <CardGiftcardIcon /> : <WalletIcon />}
+        {purchase.isGift === "Y" ? <CardGiftcardIcon sx={{ color: "#334336" }} /> : <WalletIcon sx={{ color: "#334336" }} />}
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -174,8 +174,9 @@ function CompletePurchasePage() {
           bgcolor: "white",
           borderRadius: 1.5,
           p: 4,
-          boxShadow: 0,
-          backgroundColor: "lemonchiffon",
+          boxShadow: 1,
+          border: "1px solid #3343361a",
+          backgroundColor: "#ffffff",
         }}
       >
         {/* 상단 매장명 */}
@@ -195,8 +196,8 @@ function CompletePurchasePage() {
                 textAlign: "center",
               }}
             >
-              <Typography fontWeight={"bold"}>보내는 사람</Typography>
-              <Typography>{purchase?.sender}</Typography>
+              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>보내는 사람</Typography>
+              <Typography sx={{ color: "#334336" }}>{purchase?.sender}</Typography>
             </Box>
             <Box
               sx={{
@@ -206,7 +207,7 @@ function CompletePurchasePage() {
                 alignItems: "center",
               }}
             >
-              <ForwardIcon />
+              <ForwardIcon sx={{ color: "#334336" }}/>
             </Box>
             <Box
               sx={{
@@ -215,8 +216,8 @@ function CompletePurchasePage() {
                 textAlign: "center",
               }}
             >
-              <Typography fontWeight={"bold"}>받는 사람</Typography>
-              <Typography>{purchase?.receiver}</Typography>
+              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>받는 사람</Typography>
+              <Typography sx={{ color: "#334336" }}>{purchase?.receiver}</Typography>
             </Box>
           </Box>
         )}
@@ -224,24 +225,25 @@ function CompletePurchasePage() {
           <Box
             sx={{
               textAlign: "center",
-              backgroundColor: "#fff48dd7",
+              backgroundColor: "#fff9f4",
               px: "1rem",
               py: "1rem",
               borderRadius: "1rem",
+              border: "1px solid #3343361a",
             }}
           >
-            <Typography>{purchase.giftMessage}</Typography>
+            <Typography sx={{ color: "#334336" }}>{purchase.giftMessage}</Typography>
           </Box>
         )}
         <Divider sx={{ my: 3 }} />
 
         {/* 구독 정보 */}
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, color: "#334336" }}>
           구독 정보
         </Typography>
 
-        <Row label="카페명" value={purchase.storeName} />
-        <Row label="구독권명" value={purchase.subscriptionName} />
+        <Row label="카페명" value={purchase.storeName} sx={{ color: "#334336" }} />
+        <Row label="구독권명" value={purchase.subscriptionName} sx={{ color: "#334336" }} />
         {/* <Row
           label="금액"
           value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
@@ -252,14 +254,21 @@ function CompletePurchasePage() {
         <Divider sx={{ my: 3 }} />
 
         {/* 결제 정보 */}
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, color: "#334336" }}>
           결제 정보
         </Typography>
 
+<<<<<<< HEAD
         <Row label="승인 일시" value={formatDate(purchase.paidAt)} />
         <Row label="승인 번호" value={purchase.merchantUid} />
         <Row label="결제 금액" value={fmtPrice(purchase.paymentAmount)} />
         <Row label="결제 수단" value={purchase.purchaseType} />
+=======
+        <Row label="승인 일시" value={formatDate(purchase.paidAt)} sx={{ color: "#334336" }} />
+        <Row label="승인 번호" value={purchase.merchantUid} sx={{ color: "#334336" }} />
+        <Row label="결제 금액" value={purchase.paymentAmount} sx={{ color: "#334336" }} />
+        <Row label="결제 수단" value={purchase.purchaseType} sx={{ color: "#334336" }} />
+>>>>>>> 7237919 (ui 최종)
       </Box>
 
       {/* 하단 확인 버튼 영역 */}
@@ -274,7 +283,7 @@ function CompletePurchasePage() {
         <Box
           onClick={() => navigate("/me")}
           sx={{
-            bgcolor: "black",
+            bgcolor: "#334336",
             color: "white",
             px: 5,
             py: 1.4,
@@ -291,7 +300,7 @@ function CompletePurchasePage() {
 }
 
 // 한 줄 라벨/값 컴포넌트
-function Row({ label, value }) {
+function Row({ label, value, sx }) {
   return (
     <Box
       sx={{
@@ -301,8 +310,8 @@ function Row({ label, value }) {
         gap: 2,
       }}
     >
-      <Typography sx={{ color: "text.secondary" }}>{label}</Typography>
-      <Typography sx={{ fontWeight: 500 }}>{value}</Typography>
+      <Typography sx={{ color: "text.secondary", ...sx }}>{label}</Typography>
+      <Typography sx={{ fontWeight: 500, ...sx }}>{value}</Typography>
     </Box>
   );
 }

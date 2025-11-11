@@ -214,10 +214,10 @@ function StoreDetailPage() {
             sx={{
               "& .MuiTab-root": {
                 color: "#3B3026",
-              },
-              "& .Mui-selected": {
-                color: "#334336",
-                fontWeight: 600,
+                "&.Mui-selected": {
+                  color: "#334336",
+                  fontWeight: 600,
+                },
               },
               "& .MuiTabs-indicator": {
                 backgroundColor: "#334336",

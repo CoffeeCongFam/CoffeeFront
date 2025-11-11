@@ -207,10 +207,20 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             }}
             fullWidth
             sx={{
+<<<<<<< HEAD
               backgroundColor: "black",
               color: "white",
               borderRadius: "3rem",
               "&:hover": { backgroundColor: "#333" },
+=======
+              backgroundColor: "#334336",
+              color: "#fff9f4",
+              borderRadius: "6px",
+              "&:hover": { 
+                backgroundColor: "#334336",
+                opacity: 0.9,
+              },
+>>>>>>> 7237919 (ui 최종)
               alignItems: "center",
             }}
             endIcon={<CoffeeIcon />}

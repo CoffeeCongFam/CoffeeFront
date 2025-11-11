@@ -245,10 +245,10 @@ const SubscriptionPage = () => {
           mb: 3,
           "& .MuiTab-root": {
             color: "#3B3026",
-          },
-          "& .Mui-selected": {
-            color: "#334336",
-            fontWeight: 600,
+            "&.Mui-selected": {
+              color: "#334336",
+              fontWeight: 600,
+            },
           },
           "& .MuiTabs-indicator": {
             backgroundColor: "#334336",
@@ -261,7 +261,7 @@ const SubscriptionPage = () => {
       {loading ? (
         <Typography sx={{color: "#334336"}}>불러오는 중…</Typography>
       ) : error ? (
-        <Typography color="error">{error}</Typography>
+        <Typography color="error" sx={{ color: "#334336" }}>{error}</Typography>
       ) : currentList.length > 0 ? (
         <Box
           sx={{

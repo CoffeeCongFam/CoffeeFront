@@ -15,10 +15,17 @@ import {
   Divider,
   Typography,
   Button,
+<<<<<<< HEAD
 } from '@mui/material';
 import logo from '../assets/coffeiensLogoTitle.png';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import HomeIcon from '@mui/icons-material/Home';
+=======
+} from "@mui/material";
+import logo from "../assets/finalLogo.png";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import HomeIcon from "@mui/icons-material/Home";
+>>>>>>> 7237919 (ui 최종)
 import {
   History,
   LocalCafe,

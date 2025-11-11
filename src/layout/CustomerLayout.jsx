@@ -28,7 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import logo from "../assets/coffeiensLogoTitle.png";
+import logo from "../assets/finalLogo.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
 import { deleteNotification, readNotification } from "../apis/notificationApi";
@@ -221,7 +221,7 @@ export default function CustomerLayout() {
             left: 0,
             right: 0,
             zIndex: 2000,
-            bgcolor: colorPalette.background,
+            bgcolor: "#334336",
           }}
         >
           <BottomNavigation
@@ -239,16 +239,20 @@ export default function CustomerLayout() {
                 component={NavLink}
                 to={link.to}
                 sx={{
-                  color: colorPalette.mainText,
+                  color: "white",
                   "& .MuiBottomNavigationAction-label": {
                     fontSize: "0.75rem", // 원하는 크기
                     transition: "none",
                   },
                   "&.Mui-selected": {
-                    color: colorPalette.accent1,
+                    color: "#fff9f4",
                     paddingTop: "6px",
+                    "& .MuiSvgIcon-root": {
+                      color: "#fff9f4",
+                    },
                     "& .MuiBottomNavigationAction-label": {
                       fontSize: "0.75rem",
+                      color: "#fff9f4",
                     },
                   },
                 }}
