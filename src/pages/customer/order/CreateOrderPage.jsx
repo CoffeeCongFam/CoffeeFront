@@ -12,6 +12,8 @@ import {
   Button,
   Backdrop,
   CircularProgress,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,6 +34,8 @@ import menuDummy from "../../../assets/menuDummy.jpg";
 
 function CreateOrderPage() {
   const { isAppLike } = useAppShellMode();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // 모바일 감지 보강
   const navigate = useNavigate();
   const { state } = useLocation();
   const subscription = state?.subscription; // 홈화면 구독권 > 주문하기
@@ -690,16 +694,16 @@ function CreateOrderPage() {
                             <Button
                               size="small"
                               variant="contained"
-                              startIcon={!isAppLike ? <AddIcon /> : null} // 모바일에서 아이콘 제거
+                              startIcon={!(isAppLike || isMobile) ? <AddIcon /> : null} // 모바일에서 아이콘 제거 (isAppLike 또는 isMobile 둘 중 하나라도 true면 아이콘 숨김)
                               onClick={() => handleAddToCart(menu.menuId)}
                               sx={{
                                 borderRadius: 999,
                                 textTransform: "none",
                                 fontSize: "0.8rem",
-                                bgcolor: "#334336",
-                                color: "#fff9f4",
+                                bgcolor: "#334336 !important", // MUI 기본 색상 오버라이드
+                                color: "#fff9f4 !important",
                                 "&:hover": {
-                                  bgcolor: "#334336",
+                                  bgcolor: "#334336 !important",
                                   opacity: 0.9,
                                 },
                               }}

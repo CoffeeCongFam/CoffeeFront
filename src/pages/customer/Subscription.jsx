@@ -7,6 +7,8 @@ import {
   Tabs,
   Tab,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { getSubscription } from "../../utils/subscription";
 import Slider from "react-slick";
@@ -139,6 +141,8 @@ function PrevArrow(props) {
 const SubscriptionPage = () => {
   const { authUser } = useUserStore();
   const { isAppLike } = useAppShellMode();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // 모바일 감지 보강
   const CURRENT_MEMBER_ID = authUser?.memberId ?? 1;
   const sliderRef = useRef(null);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'expired'
@@ -195,7 +199,7 @@ const SubscriptionPage = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: !isAppLike, // 모바일에서 화살표 비활성화
+    arrows: !(isAppLike || isMobile), // 모바일에서 화살표 비활성화 (isAppLike 또는 isMobile 둘 중 하나라도 true면 화살표 숨김)
     prevArrow: null, // 기본 화살표 제거
     nextArrow: null, // 기본 화살표 제거
     responsive: [{ breakpoint: 600, settings: { slidesToShow: 1, arrows: false } }],
@@ -316,7 +320,7 @@ const SubscriptionPage = () => {
               );
             })}
           </Slider>
-          {!isAppLike && (
+          {!(isAppLike || isMobile) && (
             <IconButton
               onClick={() => sliderRef.current?.slickPrev()}
               sx={{
@@ -335,7 +339,7 @@ const SubscriptionPage = () => {
               <ArrowBackIosNewIcon fontSize="small" />
             </IconButton>
           )}
-          {!isAppLike && (
+          {!(isAppLike || isMobile) && (
             <IconButton
               onClick={() => sliderRef.current?.slickNext()}
               sx={{
