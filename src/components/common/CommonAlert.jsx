@@ -23,18 +23,17 @@ function CommonAlert({
   autoHideDuration = 3000,
   anchorOrigin = { vertical: "top", horizontal: "center" },
 }) {
-
-    const { isAppLike } = useAppShellMode();
+  const { isAppLike } = useAppShellMode();
   return (
     <Snackbar
       open={open}
       autoHideDuration={autoHideDuration}
       onClose={onClose}
       anchorOrigin={anchorOrigin}
-      sx={{ 
-        width: isAppLike ? "85%" : "auto",
+      sx={{
+        width: isAppLike ? "auto" : "auto",
         maxWidth: isAppLike ? "400px" : "fit-content",
-    }}
+      }}
     >
       <Alert
         onClose={onClose}

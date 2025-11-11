@@ -34,13 +34,9 @@ export default function OrderCancelCheckDialog({ open, setOpen, setIsCancel }) {
         }}
       >
         <Typography variant="h6" component="span">
-          주문을 취소하시겠어요? 
+          주문을 취소하시겠어요?
         </Typography>
-        <IconButton
-          size="small"
-          onClick={handleClose}
-          aria-label="닫기"
-        >
+        <IconButton size="small" onClick={handleClose} aria-label="닫기">
           <ClearRoundedIcon />
         </IconButton>
       </DialogTitle>
