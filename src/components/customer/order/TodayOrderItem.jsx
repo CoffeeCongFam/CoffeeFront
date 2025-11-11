@@ -60,23 +60,41 @@ function TodayOrderItem({ order, isAppLike }) {
               alt={order.storeName}
             />
             <Box>
-              {order.menuList.map((menu) => (
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {menu.menuName} x {menu.quantity}
-                </Typography>
-              ))}
+              <Typography
+                variant="subtitle1"
+                fontWeight="bold"
+                sx={{ mb: 0.5 }}
+              >
+                {order.menuList[0].menuName} x {order.menuList[0].quantity}
+                {order.menuList.length > 0 &&
+                  `외 ${order.menuList.length - 1} 개`}
+              </Typography>
               <Box
                 sx={{
-                  dislay: "flex",
+                  display: "flex",
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  alignItems: "center",
+                  alignContent: "center",
+                  gap: 1,
                 }}
               >
-                <Typography variant="body2" color="text.secondary">
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyItems: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    fontSize: "0.9rem",
+                    color: "text.secondary",
+                  }}
+                >
+                  <LocationPinIcon />
+                  {order.storeName}
+                </Box>
+                <Typography sx={{ fontSize: "0.9rem" }} color="text.secondary">
                   {order.subscriptionName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {order.createdAt.split("T")[1].split(".")[0]}
                 </Typography>
               </Box>
             </Box>
@@ -91,21 +109,9 @@ function TodayOrderItem({ order, isAppLike }) {
               px: 1,
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                justifyItems: "center",
-                alignItems: "center",
-                justifyContent: "center",
-                alignContent: "center",
-                color: "#686868ee",
-                fontSize: "0.9rem",
-              }}
-            >
-              <LocationPinIcon />
-              {order.storeName}{" "}
-            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {order.createdAt.split("T")[1].split(".")[0]}
+            </Typography>
             <OrderStatusButton status={order.orderStatus}></OrderStatusButton>
           </Box>
         </Card>
