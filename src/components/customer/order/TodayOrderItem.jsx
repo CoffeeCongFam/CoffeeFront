@@ -61,13 +61,12 @@ function TodayOrderItem({ order, isAppLike }) {
             />
             <Box>
               <Typography
-                variant="subtitle1"
                 fontWeight="bold"
-                sx={{ mb: 0.5 }}
+                sx={{ fontSize: "0.8rem", mb: 0.5 }}
               >
                 {order.menuList[0].menuName} x {order.menuList[0].quantity}
                 {order.menuList.length > 0 &&
-                  `외 ${order.menuList.length - 1} 개`}
+                  ` 외 ${order.menuList.length - 1} 개`}
               </Typography>
               <Box
                 sx={{

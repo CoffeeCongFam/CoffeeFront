@@ -43,12 +43,28 @@ export default function PaymentHistory({ paymentList }) {
   const toDate = (v) => (v ? new Date(v) : new Date(0));
   const fmtDate = (d) => {
     if (!d) return "-";
-    const y = d.getUTCFullYear();
-    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    const h = String(d.getUTCHours()).padStart(2, "0");
-    const min = String(d.getUTCMinutes()).padStart(2, "0");
-    return `${y}.${m}.${day} ${h}:${min}`;
+    try {
+      // ISO 문자열인 경우 직접 파싱하여 UTC 시간을 그대로 사용 (시간 더하거나 빼지 않음)
+      if (typeof d === "string") {
+        const match = d.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+          const [, y, m, day, h, min] = match;
+          return `${y}.${m}.${day} ${h}:${min}`;
+        }
+      }
+      // Date 객체인 경우 UTC 메서드 사용
+      const dateObj = d instanceof Date ? d : new Date(d);
+      if (isNaN(dateObj.getTime())) return "-";
+      const y = dateObj.getUTCFullYear();
+      const m = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getUTCDate()).padStart(2, "0");
+      const h = String(dateObj.getUTCHours()).padStart(2, "0");
+      const min = String(dateObj.getUTCMinutes()).padStart(2, "0");
+      return `${y}.${m}.${day} ${h}:${min}`;
+    } catch (e) {
+      console.log(e);
+      return "-";
+    }
   };
   const fmtPrice = (n) =>
     typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
@@ -370,7 +386,7 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                 )}
                 {dateValue && (
                   <Typography variant="caption" color="text.secondary">
-                    {dateLabel}: {fmtDate(new Date(dateValue))}
+                    {dateLabel}: {fmtDate(dateValue)}
                   </Typography>
                 )}
               </Box>
