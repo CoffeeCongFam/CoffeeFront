@@ -35,7 +35,7 @@ function MyPage() {
     "구독권",
     "선물함",
     "결제 내역",
-    "리뷰내역",
+    "리뷰 내역",
     "회원 정보",
   ];
 
@@ -89,7 +89,7 @@ function MyPage() {
         return <MyGiftPage />;
       case '결제 내역':
         return <PaymentHistory />;
-      case "리뷰내역":
+      case "리뷰 내역":
         return <ReviewPage />;
       case "회원 정보":
         return <Profile />;

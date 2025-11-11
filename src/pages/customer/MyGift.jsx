@@ -102,23 +102,32 @@ function MyGift() {
   // ✅ 날짜 포맷터: "2025.11.08  오후 10시 26분"
   const formatKST = (isoLike) => {
     if (!isoLike) return "";
-    let s = String(isoLike);
-    // Normalize fractional seconds to max 3 digits (milliseconds)
-    // e.g., "2025-11-01T11:52:14.683351" -> "2025-11-01T11:52:14.683"
-    s = s.replace(
-      /(T\d{2}:\d{2}:\d{2}\.)(\d{1,})(.*)?$/,
-      (_, head, frac, tail = "") => head + frac.slice(0, 3) + (tail || "")
-    );
-    const d = new Date(s);
-    if (isNaN(d.getTime())) return "";
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    let h = d.getHours();
-    const m = String(d.getMinutes()).padStart(2, "0");
-    const ampm = h >= 12 ? "오후" : "오전";
-    h = h % 12 || 12;
-    return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+    try {
+      // ISO 문자열을 직접 파싱하여 UTC 시간을 그대로 사용 (시간 더하거나 빼지 않음)
+      // 예: "2025-11-01T11:52:14.683351Z" -> "2025.11.01  오전 11시 52분"
+      const match = String(isoLike).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+      if (match) {
+        const [, yyyy, mm, dd, hh, mi] = match;
+        const h = parseInt(hh, 10);
+        const ampm = h >= 12 ? "오후" : "오전";
+        const h12 = h % 12 || 12;
+        return `${yyyy}.${mm}.${dd}  ${ampm} ${h12}시 ${mi}분`;
+      }
+      // 매칭되지 않으면 Date 객체로 파싱 시도 (UTC 사용)
+      const d = new Date(isoLike);
+      if (isNaN(d.getTime())) return "";
+      const yyyy = d.getUTCFullYear();
+      const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const dd = String(d.getUTCDate()).padStart(2, "0");
+      let h = d.getUTCHours();
+      const m = String(d.getUTCMinutes()).padStart(2, "0");
+      const ampm = h >= 12 ? "오후" : "오전";
+      h = h % 12 || 12;
+      return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
   };
 
   // ✅ API에서 목록 받아오기 (항상 배열 보장)
