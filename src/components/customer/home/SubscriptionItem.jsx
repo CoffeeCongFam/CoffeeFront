@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import LocationOnIcon from "@mui/icons-material/LocationOn"; 
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import React from "react";
 import dummyImg from "../../../assets/cafeInfoDummy.png";
 import { useNavigate } from "react-router-dom";
@@ -34,24 +34,24 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
   return (
     <Card
       sx={{
-        width: "100%",  
-        maxWidth: isAppLike ? "100%" : 250,    
-        minWidth: isAppLike ? "auto" : 250, 
+        width: "100%",
+        maxWidth: isAppLike ? "100%" : 250,
+        minWidth: isAppLike ? "auto" : 250,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
         m: "0 auto",
-        borderRadius: "10px",
+        borderRadius: "1rem",
         overflow: "hidden",
         bgcolor: "white",
         cursor: "pointer",
-        position: "relative",  
+        position: "relative",
         "&:hover": {
-          // filter: "brightness(0.9)", 
-          transform: "translateY(-3px)", 
-          // boxShadow: "0 4px 12px rgba(0,0,0,0.15)", 
-        }, 
+          // filter: "brightness(0.9)",
+          transform: "translateY(-3px)",
+          // boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        },
       }}
       onClick={() => navigate(`/me/store/${item.store.partnerStoreId}`)}
     >
@@ -101,7 +101,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             height: 100,
             objectFit: "cover",
             backgroundColor: "#ddd",
-            opacity: 0.8
+            opacity: 0.8,
           }}
           image={item.store.storeImg || dummyImg}
           alt={item.store.storeName}
@@ -181,10 +181,6 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             gap: 0.25,
           }}
         >
-          <Typography sx={{ fontSize: "0.8rem", color: "grey.600" }}>
-            ~ {item.subEnd.split("T")[0]}
-          </Typography>
-
           <Typography
             sx={{
               fontSize: "0.8rem",
@@ -194,11 +190,14 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
           >
             남은 이용일: {getRemainingDays(today, item.subEnd) - 1}일
           </Typography>
+          <Typography sx={{ fontSize: "0.8rem", color: "grey.600" }}>
+            {item.subEnd.split("T")[0]} 까지 이용 가능
+          </Typography>
         </Box>
       </CardContent>
 
       {/* 하단 버튼 */}
-       <Box sx={{ width: "100%", px: 2, pb: 2 }}>
+      <Box sx={{ width: "100%", px: 2, pb: 2 }}>
         {item.remainingCount > 0 ? (
           <Button
             onClick={(e) => {
@@ -209,8 +208,8 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             sx={{
               backgroundColor: "#334336",
               color: "#fff9f4",
-              borderRadius: "6px",
-              "&:hover": { 
+              borderRadius: "1.2rem",
+              "&:hover": {
                 backgroundColor: "#334336",
                 opacity: 0.9,
               },
@@ -239,4 +238,3 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
 }
 
 export default SubscriptionItem;
-

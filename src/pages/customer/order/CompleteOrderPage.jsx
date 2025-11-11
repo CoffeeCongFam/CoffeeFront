@@ -22,25 +22,6 @@ import {
 import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
 import useNotificationStore from "../../../stores/useNotificationStore";
 
-function orderStatusMessage(status) {
-  switch (status) {
-    case "REQUEST":
-      return "주문이 접수 중이에요.";
-    case "INPROGRESS":
-      return "음료가 제조 중입니다...";
-    case "COMPLETED":
-      return "메뉴가 제조 완료되었습니다.";
-    case "RECEIVED":
-      return "수령이 완료된 주문입니다.";
-    case "REJECTED":
-      return "해당 주문이 매장에서 거부되었습니다.";
-    case "CANCELED":
-      return "해당 주문은 취소되었습니다.";
-    default:
-      return "주문 상태를 불러오는 중입니다.";
-  }
-}
-
 function handleSubscriptionType(type) {
   switch (type) {
     case "BASIC":
@@ -176,12 +157,21 @@ function CompleteOrderPage() {
             ) : (
               <Box>
                 <CheckCircleRoundedIcon
-                  sx={{ fontSize: isAppLike ? "2rem" : "3rem", mb: 1, color: "#334336" }}
+                  sx={{
+                    fontSize: isAppLike ? "2rem" : "3rem",
+                    mb: 1,
+                    color: "#334336",
+                  }}
                 />
               </Box>
             )}
 
-            <Typography fontSize="2rem" textAlign="center" fontWeight="bold" sx={{ color: "#334336" }}>
+            <Typography
+              fontSize="2rem"
+              textAlign="center"
+              fontWeight="bold"
+              sx={{ color: "#334336" }}
+            >
               주문 번호 {orderInfo.orderNumber}번
             </Typography>
             <Box sx={{ mt: 2, mb: 4, width: isAppLike ? "100%" : "70%" }}>
@@ -222,7 +212,11 @@ function CompleteOrderPage() {
               )}
               {(orderInfo.orderStatus === "REJECTED" ||
                 orderInfo.orderStatus === "CANCELED") && (
-                <Typography variant="subtitle2" gutterBottom sx={{ color: "#334336" }}>
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  sx={{ color: "#334336" }}
+                >
                   취소된 주문입니다.
                 </Typography>
               )}
@@ -231,7 +225,11 @@ function CompleteOrderPage() {
             <Divider sx={{ mb: 2 }} />
 
             {/* 주문 정보 섹션 */}
-            <Typography variant="subtitle2" gutterBottom sx={{ color: "#334336" }}>
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{ color: "#334336" }}
+            >
               주문 정보
             </Typography>
 
@@ -241,13 +239,17 @@ function CompleteOrderPage() {
               <Typography color="text.secondary" onClick={() => ""}>
                 카페명
               </Typography>
-              <Typography sx={{ color: "#334336" }}>{orderInfo.store.storeName}</Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {orderInfo.store.storeName}
+              </Typography>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
               <Typography color="text.secondary">주문 번호</Typography>
-              <Typography sx={{ color: "#334336" }}>{orderInfo.orderNumber}</Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {orderInfo.orderNumber}
+              </Typography>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
@@ -282,7 +284,11 @@ function CompleteOrderPage() {
             <Divider sx={{ mb: 2 }} />
 
             {/* 주문 메뉴 섹션 */}
-            <Typography variant="subtitle2" gutterBottom sx={{ color: "#334336" }}>
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{ color: "#334336" }}
+            >
               주문 메뉴
             </Typography>
 
@@ -292,7 +298,9 @@ function CompleteOrderPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
                 <Typography sx={{ color: "#334336" }}>{m.menuName}</Typography>
-                <Typography sx={{ color: "#334336" }}>{m.quantity} 개</Typography>
+                <Typography sx={{ color: "#334336" }}>
+                  {m.quantity} 개
+                </Typography>
               </Box>
             ))}
 
@@ -317,29 +325,32 @@ function CompleteOrderPage() {
             sx={{
               mt: 4,
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
+              flexDirection: "row",
+              // flexDirection: { xs: "column", sm: "row" },
               gap: 1.5,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={() => navigate("/me/order")}
               sx={{
                 minWidth: 180,
-                bgcolor: "#334336",
+                color: "#334336",
+                // bgcolor: "#334336",
                 "&:hover": { bgcolor: "#222" },
               }}
             >
               주문 내역 보기
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={handleGoHome}
               sx={{
                 minWidth: 180,
-                bgcolor: "#334336",
+                color: "#334336",
+                // bgcolor: "#334336",
                 "&:hover": { bgcolor: "#222" },
               }}
             >

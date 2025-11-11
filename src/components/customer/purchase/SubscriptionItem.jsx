@@ -4,7 +4,6 @@ import { Box, Typography, Chip, Divider } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import useAppShellMode from "../../../hooks/useAppShellMode";
 import SubTypeChip from "../../common/SubTypeChip";
 import LocationPinIcon from "@mui/icons-material/LocationPin";
 
@@ -12,19 +11,11 @@ function SubscriptionItem({ subscription, isAppLike }) {
   console.log("ITEM에서 받음", subscription);
   if (!subscription || !subscription.subscriptionId) return null;
 
-
-  const typeLabel =
-    subscription.subscriptionType === "PREMIUM"
-      ? "PREMIUM"
-      : subscription.subscriptionType === "STANDARD"
-      ? "STANDARD"
-      : "BASIC";
-
-  if(isAppLike){
+  if (isAppLike) {
     return (
       <Box
         sx={{
-          display :"flex",
+          display: "flex",
           flexDirection: "column",
           borderRadius: 2,
           border: "1px solid rgba(0,0,0,0.15)",
@@ -32,55 +23,63 @@ function SubscriptionItem({ subscription, isAppLike }) {
           px: 3,
           py: 2,
           bgcolor: "white",
-        }} 
-      >
-        <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center", 
-          textAlign: "center",  
-          mb: 2.5,              
         }}
       >
-         {/* 구독 타입 */}
-        <SubTypeChip type={subscription?.subscriptionType} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            mb: 2.5,
+          }}
+        >
+          {/* 구독 타입 */}
+          <SubTypeChip type={subscription.subscriptionType} />
 
-        <Box sx={{ mt: 1.3}}>
-           {/* 구독 이름 - 강조 */}
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              fontSize: "1.15rem",
-              color: "#222", // 진한 텍스트
-              mt: 0.5,
-            }}
-          >
-            {subscription?.subscriptionName}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800 }}>
-            ₩{subscription.price?.toLocaleString()}
+          <Box sx={{ mt: 1.3 }}>
+            {/* 구독 이름 - 강조 */}
             <Typography
-              component="span"
-              sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#222", // 진한 텍스트
+                mt: 0.5,
+              }}
             >
-              /월
+              {subscription?.subscriptionName}
             </Typography>
-          </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 800 }}>
+              ₩{subscription.price?.toLocaleString()}
+              <Typography
+                component="span"
+                sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
+              >
+                /월
+              </Typography>
+            </Typography>
+          </Box>
         </Box>
-      </Box>
         <Divider />
         {/* 매장명 */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.6, mt: 2, mb: 1.5}}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.6,
+            mt: 2,
+            mb: 1.5,
+          }}
+        >
           <LocationPinIcon
             sx={{ fontSize: 18, color: "text.secondary", mb: "1px" }}
           />
           <Typography
             variant="body2"
             sx={{
-              color: "text.secondary", // 
+              color: "text.secondary", //
               fontWeight: 400,
             }}
           >
@@ -95,10 +94,10 @@ function SubscriptionItem({ subscription, isAppLike }) {
             flexWrap: "wrap",
             color: "text.secondary",
             fontSize: "0.9rem",
-            mb: 1
+            mb: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <CalendarMonthIcon fontSize="small" />
             <span>결제일 기준 {subscription?.subscriptionPeriod}일 이용</span>
           </Box>
@@ -114,11 +113,9 @@ function SubscriptionItem({ subscription, isAppLike }) {
             {subscription.subscriptionDesc}
           </Typography>
         )} */}
-        
       </Box>
-    )
+    );
   }
-  
 
   return (
     <Box
@@ -179,12 +176,17 @@ function SubscriptionItem({ subscription, isAppLike }) {
           size="small"
           sx={{ mb: 1, fontWeight: 600 }}
         /> */}
-        <SubTypeChip  status={typeLabel}/>
+        <SubTypeChip type={subscription.subscriptionType} />
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
           ₩{subscription.price?.toLocaleString()}
           <Typography
             component="span"
-            sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
+            sx={{
+              fontSize: "1rem",
+              fontWeight: 400,
+              ml: 0.5,
+              color: "#334336",
+            }}
           >
             /월
           </Typography>

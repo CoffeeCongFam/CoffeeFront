@@ -3,7 +3,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import axios from "axios"; 
+import axios from "axios";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { fetchPurchaseInfo } from "../../../apis/customerApi";
@@ -18,17 +18,11 @@ function CompletePurchasePage() {
   const [searchParams] = useSearchParams();
   const impUid = searchParams.get("imp_uid");
   const merchantUid = searchParams.get("merchant_uid");
-  const successParam  = searchParams.get("imp_success");  // "true" | "false" | null
+  const successParam = searchParams.get("imp_success"); // "true" | "false" | null
 
   const [loading, setLoading] = useState(true);
   const [validating, setValidating] = useState(false);
   const [validateError, setValidateError] = useState(null);
-
-
-  
-  const fmtPrice = (n) =>
-    typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "0";
-
 
   async function getPurchaseInfo() {
     const data = await fetchPurchaseInfo(purchaseId);
@@ -36,53 +30,52 @@ function CompletePurchasePage() {
   }
 
   useEffect(() => {
-  async function run() {
-    try {
-      // 1) success / impUid / merchantUid 가 없는 경우: 기존 PC 흐름 (콜백 기반)
-      if (!impUid || !merchantUid || successParam === null) {
+    async function run() {
+      try {
+        // 1) success / impUid / merchantUid 가 없는 경우: 기존 PC 흐름 (콜백 기반)
+        if (!impUid || !merchantUid || successParam === null) {
+          await getPurchaseInfo();
+          return;
+        }
+
+        // 2) success === false 인 경우: 결제 실패
+        if (successParam === "false") {
+          setValidateError("결제가 취소되었거나 실패했습니다.");
+          return;
+        }
+
+        // 3) success=true + impUid/merchantUid 있으면 우선 서버 검증
+        setValidating(true);
+        setValidateError(null);
+
+        await axios.post("/api/payments/validation", {
+          purchaseId,
+          impUid,
+          merchantUid,
+        });
+
+        // 검증이 통과하면 실제 결제/구독 정보 조회
         await getPurchaseInfo();
-        return;
+      } catch (err) {
+        console.error("결제 검증 실패: ", err);
+        setValidateError(
+          "결제 검증에 실패했습니다. 결제가 승인되지 않았습니다."
+        );
+      } finally {
+        setValidating(false);
+        setLoading(false); // ✅ 어떤 경우든 여기서 false 됨
       }
-
-      // 2) success === false 인 경우: 결제 실패
-      if (successParam === "false") {
-        setValidateError("결제가 취소되었거나 실패했습니다.");
-        return;
-      }
-
-      // 3) success=true + impUid/merchantUid 있으면 우선 서버 검증
-      setValidating(true);
-      setValidateError(null);
-
-      await axios.post("/api/payments/validation", {
-        purchaseId,
-        impUid,
-        merchantUid,
-      });
-
-      // 검증이 통과하면 실제 결제/구독 정보 조회
-      await getPurchaseInfo();
-    } catch (err) {
-      console.error("결제 검증 실패: ", err);
-      setValidateError(
-        "결제 검증에 실패했습니다. 결제가 승인되지 않았습니다."
-      );
-    } finally {
-      setValidating(false);
-      setLoading(false);   // ✅ 어떤 경우든 여기서 false 됨
     }
-  }
 
-  run();
-}, [purchaseId, impUid, merchantUid, successParam]);
-
+    run();
+  }, [purchaseId, impUid, merchantUid, successParam]);
 
   function handleBack() {
     navigate(-1);
   }
 
   // if (!purchase) return null;
-   if (validating || loading) {
+  if (validating || loading) {
     return (
       <Box sx={{ width: "100vw", height: "100vh" }}>
         <Loading
@@ -95,7 +88,15 @@ function CompletePurchasePage() {
 
   if (validateError) {
     return (
-      <Box sx={{ p: 3, textAlign: "center" , height:"100%", alignContent: "center", pb: 12}}>
+      <Box
+        sx={{
+          p: 3,
+          textAlign: "center",
+          height: "100%",
+          alignContent: "center",
+          pb: 12,
+        }}
+      >
         <Typography variant="h6" sx={{ mb: 1 }}>
           결제 실패
         </Typography>
@@ -163,7 +164,11 @@ function CompletePurchasePage() {
             ? "선물이 전달되었습니다."
             : "결제가 완료되었습니다."}
         </Typography>
-        {purchase.isGift === "Y" ? <CardGiftcardIcon sx={{ color: "#334336" }} /> : <WalletIcon sx={{ color: "#334336" }} />}
+        {purchase.isGift === "Y" ? (
+          <CardGiftcardIcon sx={{ color: "#334336" }} />
+        ) : (
+          <WalletIcon sx={{ color: "#334336" }} />
+        )}
       </Box>
 
       {/* 실제 내용 카드 */}
@@ -196,8 +201,12 @@ function CompletePurchasePage() {
                 textAlign: "center",
               }}
             >
-              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>보내는 사람</Typography>
-              <Typography sx={{ color: "#334336" }}>{purchase?.sender}</Typography>
+              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>
+                보내는 사람
+              </Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {purchase?.sender}
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -207,7 +216,7 @@ function CompletePurchasePage() {
                 alignItems: "center",
               }}
             >
-              <ForwardIcon sx={{ color: "#334336" }}/>
+              <ForwardIcon sx={{ color: "#334336" }} />
             </Box>
             <Box
               sx={{
@@ -216,8 +225,12 @@ function CompletePurchasePage() {
                 textAlign: "center",
               }}
             >
-              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>받는 사람</Typography>
-              <Typography sx={{ color: "#334336" }}>{purchase?.receiver}</Typography>
+              <Typography fontWeight={"bold"} sx={{ color: "#334336" }}>
+                받는 사람
+              </Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {purchase?.receiver}
+              </Typography>
             </Box>
           </Box>
         )}
@@ -232,35 +245,61 @@ function CompletePurchasePage() {
               border: "1px solid #3343361a",
             }}
           >
-            <Typography sx={{ color: "#334336" }}>{purchase.giftMessage}</Typography>
+            <Typography sx={{ color: "#334336" }}>
+              {purchase.giftMessage}
+            </Typography>
           </Box>
         )}
-        <Divider sx={{ my: 3 }} />
+        {/* <Divider sx={{ my: 3 }} /> */}
 
         {/* 구독 정보 */}
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, color: "#334336" }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 700, mb: 2, color: "#334336" }}
+        >
           구독 정보
         </Typography>
 
-        <Row label="카페명" value={purchase.storeName} sx={{ color: "#334336" }} />
-        <Row label="구독권명" value={purchase.subscriptionName} sx={{ color: "#334336" }} />
-        {/* <Row
-          label="금액"
-          value={`${purchase?.paymentAmount?.toLocaleString()} 원`}
-        /> */}
-        {/* <Row label="결제 주기" value={purchase.cycle} /> */}
-        {/* <Row label="다음 결제 예정일" value={purchase.nextBillingDate} /> */}
+        <Row
+          label="카페명"
+          value={purchase.storeName}
+          sx={{ color: "#334336" }}
+        />
+        <Row
+          label="구독권명"
+          value={purchase.subscriptionName}
+          sx={{ color: "#334336" }}
+        />
 
         <Divider sx={{ my: 3 }} />
 
         {/* 결제 정보 */}
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2, color: "#334336" }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 700, mb: 2, color: "#334336" }}
+        >
           결제 정보
         </Typography>
-        <Row label="승인 일시" value={formatDate(purchase.paidAt)} sx={{ color: "#334336" }} />
-        <Row label="승인 번호" value={purchase.merchantUid} sx={{ color: "#334336" }} />
-        <Row label="결제 금액" value={purchase.paymentAmount} sx={{ color: "#334336" }} />
-        <Row label="결제 수단" value={purchase.purchaseType} sx={{ color: "#334336" }} />
+        <Row
+          label="승인 일시"
+          value={formatDate(purchase.paidAt)}
+          sx={{ color: "#334336" }}
+        />
+        <Row
+          label="승인 번호"
+          value={purchase.merchantUid}
+          sx={{ color: "#334336" }}
+        />
+        <Row
+          label="결제 금액"
+          value={purchase.paymentAmount}
+          sx={{ color: "#334336" }}
+        />
+        <Row
+          label="결제 수단"
+          value={purchase.purchaseType}
+          sx={{ color: "#334336" }}
+        />
       </Box>
 
       {/* 하단 확인 버튼 영역 */}
@@ -272,20 +311,22 @@ function CompletePurchasePage() {
           justifyContent: "center",
         }}
       >
-        <Box
+        <Button
+          variant="outlined"
           onClick={() => navigate("/me")}
           sx={{
-            bgcolor: "#334336",
-            color: "white",
-            px: 5,
-            py: 1.4,
+            color: "#334336",
+            // bgcolor: "#334336",
+            // color: "white",
+            // px: 5,
+            // py: 1.4,
             borderRadius: 3,
-            cursor: "pointer",
+            px: 5,
             fontWeight: 600,
           }}
         >
           확인
-        </Box>
+        </Button>
       </Box>
     </Box>
   );

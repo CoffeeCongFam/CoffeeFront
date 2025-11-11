@@ -55,12 +55,12 @@ const links = [
 ];
 
 const colorPalette = {
-  mainText: '#ffe0c2',
-  background: '#fff9f4',
+  mainText: "#ffe0c2",
+  background: "#fff9f4",
   // background: '#ececec',
   // background: '#ffffff',
-  accent1: '#435548',
-  accent2: '#607064',
+  accent1: "#435548",
+  accent2: "#607064",
 };
 
 export default function CustomerLayout() {
@@ -177,10 +177,23 @@ export default function CustomerLayout() {
   // ------------------------------------------
   if (isAppLike) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", bgcolor: colorPalette.background, color: colorPalette.mainText }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+          bgcolor: colorPalette.background,
+          color: colorPalette.mainText,
+        }}
+      >
         <CssBaseline />
         {/* 상단 바 - 아주 얇게 */}
-        <AppBar position="static" elevation={0} color="inherit" sx={{ bgcolor: 'transparent' }}>
+        <AppBar
+          position="static"
+          elevation={0}
+          color="inherit"
+          sx={{ bgcolor: "transparent" }}
+        >
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Typography
               variant="h6"
@@ -190,10 +203,7 @@ export default function CustomerLayout() {
             >
               COFFIENS
             </Typography>
-            <IconButton
-              onClick={openNotifDrawer}
-              sx={{ color: "#334336" }}
-            >
+            <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
               <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
@@ -222,13 +232,14 @@ export default function CustomerLayout() {
             right: 0,
             zIndex: 2000,
             bgcolor: "#334336",
+            pb: 2.3,
           }}
         >
           <BottomNavigation
             value={bottomValue}
             onChange={(e, newValue) => setBottomValue(newValue)}
             showLabels
-            sx={{ bgcolor: 'transparent' }}
+            sx={{ bgcolor: "transparent" }}
           >
             {links.map((link) => (
               <BottomNavigationAction
@@ -286,7 +297,10 @@ export default function CustomerLayout() {
               알림
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row" }}>
-              <Button onClick={handleDeleteAllNotifications} sx={{ color: "#334336" }}>
+              <Button
+                onClick={handleDeleteAllNotifications}
+                sx={{ color: "#334336" }}
+              >
                 전체 삭제
               </Button>
               <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
@@ -358,7 +372,9 @@ export default function CustomerLayout() {
                   "&.Mui-selected": {
                     backgroundColor: colorPalette.accent1,
                     color: colorPalette.background,
-                    "& .MuiListItemIcon-root": { color: colorPalette.background },
+                    "& .MuiListItemIcon-root": {
+                      color: colorPalette.background,
+                    },
                   },
                   "& .MuiListItemIcon-root": {
                     color: colorPalette.mainText,
@@ -399,8 +415,8 @@ export default function CustomerLayout() {
             boxSizing: "border-box",
             backgroundImage: "none",
             // bgcolor: '#332B26',
-            bgcolor: '#334336',
-            borderRight: 'none',
+            bgcolor: "#334336",
+            borderRight: "none",
           },
         }}
         open
@@ -416,7 +432,7 @@ export default function CustomerLayout() {
           height: "100vh",
           overflow: isSearchPage ? "hidden" : "auto",
           position: "relative",
-          bgcolor: 'transparent',
+          bgcolor: "transparent",
         }}
       >
         {/* 상단 헤더(AppBar) */}
@@ -479,7 +495,10 @@ export default function CustomerLayout() {
             알림
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <Button onClick={handleDeleteAllNotifications} sx={{ color: "#334336" }}>
+            <Button
+              onClick={handleDeleteAllNotifications}
+              sx={{ color: "#334336" }}
+            >
               전체 삭제
             </Button>
             <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>

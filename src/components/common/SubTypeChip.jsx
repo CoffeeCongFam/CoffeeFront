@@ -52,7 +52,6 @@ function SubTypeChip({ type }) {
 
   return (
     <Chip
-    
       label={`${emoji} ${label}`}
       size="small"
       sx={{
