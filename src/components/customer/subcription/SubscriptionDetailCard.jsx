@@ -27,6 +27,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ImageIcon from "@mui/icons-material/Image";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CommonAlert from "../../common/CommonAlert";
+import CommonConfirm from "../../common/CommonConfirm";
 
 // 구독권 상세 정보 컴포넌트
 export const SubscriptionDetailCard = ({
@@ -54,6 +55,12 @@ export const SubscriptionDetailCard = ({
   const openGiftPopover = Boolean(giftAnchorEl);
   const handleOpenGiftPopover = (e) => setGiftAnchorEl(e.currentTarget);
   const handleCloseGiftPopover = () => setGiftAnchorEl(null);
+
+  // 확인창
+  const [confirm, setConfirm] = useState({
+    open: false,
+    targetId: null,
+  });
 
   // 경고창
   const [alert, setAlert] = useState({
@@ -296,16 +303,16 @@ export const SubscriptionDetailCard = ({
 
   const isUsageStatusExpired = subscriptionData?.usageStatus === "EXPIRED";
 
+  const denyConfirmMessage =
+    giftType === "RECEIVED"
+      ? "정말 이 선물을 거절하시겠습니까?"
+      : "정말 결제를 취소하시겠습니까?";
+
   const handleClickRefund = () => {
-    const message =
-      giftType === "RECEIVED"
-        ? "정말 이 선물을 거절하시겠습니까?"
-        : "정말 결제를 취소하시겠습니까?";
-
-    const confirmed = window.confirm(message);
-    if (!confirmed) return;
-
-    handleRefundOrDeny();
+    setConfirm({
+      open: true,
+      targetId: purchaseId,
+    });
   };
 
   const handleRefundOrDeny = async () => {
@@ -343,6 +350,8 @@ export const SubscriptionDetailCard = ({
       // window.alert(
       //   e?.message || "환불처리에 문제가 생겼습니다. 다시 시도해주세요"
       // );
+    } finally {
+      setConfirm({ open: false, targetId: null });
     }
   };
 
@@ -374,12 +383,6 @@ export const SubscriptionDetailCard = ({
         border: "1px solid #ffe0b2",
       }}
     >
-      <CommonAlert
-        open={alert.open}
-        onClose={() => setAlert({ ...alert, open: false })}
-        severity={alert.severity}
-        message={alert.message}
-      />
       <Box
         sx={{
           position: "relative",
@@ -1324,6 +1327,23 @@ export const SubscriptionDetailCard = ({
           )}
         </Box>
       )}
+
+      <CommonConfirm
+        open={confirm.open}
+        onClose={() => setConfirm({ open: false, targetId: null })}
+        onConfirm={handleRefundOrDeny}
+        title="구독권 환불 확인"
+        message={denyConfirmMessage}
+        confirmText="삭제"
+        cancelText="취소"
+      />
+
+      <CommonAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
     </Paper>
   );
 };

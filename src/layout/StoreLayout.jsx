@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -25,10 +25,11 @@ import {
   CardGiftcard,
   LocationOn,
   HelpOutline,
-} from '@mui/icons-material';
-import useNotificationStore from '../stores/useNotificationStore';
-import NotificationItem from '../components/common/NotificationItem';
-import { deleteNotification, readNotification } from '../apis/notificationApi';
+} from "@mui/icons-material";
+import useNotificationStore from "../stores/useNotificationStore";
+import NotificationItem from "../components/common/NotificationItem";
+import { deleteNotification, readNotification } from "../apis/notificationApi";
+import CommonConfirm from "../components/common/CommonConfirm";
 
 const drawerWidth = 240;
 
@@ -36,30 +37,30 @@ const today = new Date();
 
 const links = [
   {
-    to: '/store',
-    label: '홈화면',
+    to: "/store",
+    label: "홈화면",
     icon: <HomeIcon />,
     end: true,
   },
   {
-    to: '/store/pastorders',
-    label: '지난 주문 내역',
+    to: "/store/pastorders",
+    label: "지난 주문 내역",
     icon: <History />,
   },
-  { to: '/store/manageMenu', label: '메뉴 관리', icon: <LocalCafe /> },
+  { to: "/store/manageMenu", label: "메뉴 관리", icon: <LocalCafe /> },
   {
-    to: '/store/manageproduct',
-    label: '구독권 관리',
+    to: "/store/manageproduct",
+    label: "구독권 관리",
     icon: <CardGiftcard />,
   },
   {
-    to: '/store/cafeMyPage',
-    label: '매장 정보',
+    to: "/store/cafeMyPage",
+    label: "매장 정보",
     icon: <LocationOn />,
   },
   {
-    to: '/store/guideLine',
-    label: '가이드라인',
+    to: "/store/guideLine",
+    label: "가이드라인",
     icon: <HelpOutline />,
   },
 ];
@@ -74,6 +75,19 @@ export default function StoreLayout() {
   } = useNotificationStore();
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false); // 알림 토글
+
+  // 확인창
+  const [confirm, setConfirm] = useState({
+    open: false,
+    targetId: null,
+  });
+
+  // 경고창
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   // 🚩 [필수] 컴포넌트 마운트 시 알림 로딩
   useEffect(() => {
@@ -94,10 +108,10 @@ export default function StoreLayout() {
 
   // 전체 알림 삭제 요청
   async function handleDeleteAllNotifications() {
-    console.log('알림 전체 삭제');
+    console.log("알림 전체 삭제");
 
     if (!notifications.length) return;
-    const ok = window.confirm('알림을 모두 삭제하시겠습니까?');
+    const ok = window.confirm("알림을 모두 삭제하시겠습니까?");
     if (!ok) return;
     // 모든 알림 읽음 처리
     try {
@@ -109,8 +123,8 @@ export default function StoreLayout() {
       // 프론트 상태 비우기
       deleteAllNotifications();
     } catch (e) {
-      console.error('전체 알림 삭제 실패:', e);
-      alert('알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error("전체 알림 삭제 실패:", e);
+      alert("알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
   }
 
@@ -118,7 +132,7 @@ export default function StoreLayout() {
   async function handleNotificationClick(noti) {
     const { notificationId, notificationType, notificationContent } = noti;
 
-    console.log('📨 클릭된 알림:', noti);
+    console.log("📨 클릭된 알림:", noti);
 
     // 안 읽은 알림이면 서버에 읽음 처리 + 상태 업데이트
     if (!noti.readAt && !noti.isRead) {
@@ -126,7 +140,7 @@ export default function StoreLayout() {
         await readNotification(notificationId); // PATCH 요청
         markAsRead(notificationId); // Zustand 상태 업데이트
       } catch (e) {
-        console.error('알림 읽음 처리 실패:', e);
+        console.error("알림 읽음 처리 실패:", e);
       }
     }
 
@@ -135,11 +149,11 @@ export default function StoreLayout() {
       // notificationContent 가 { message, targetId } 형태라고 가정
       const content = notificationContent;
       const targetId =
-        content && typeof content === 'object' ? content.targetId : null;
+        content && typeof content === "object" ? content.targetId : null;
 
       // ORDER(주문) 타입 + targetId 있으면 주문 상세로 이동
       if (
-        (notificationType === 'ORDER' || notificationType === '주문') &&
+        (notificationType === "ORDER" || notificationType === "주문") &&
         targetId
       ) {
         navigate(`/store/pastorders`);
@@ -149,7 +163,7 @@ export default function StoreLayout() {
       // 다른 타입들도 나중에 추가 가능
       // else if (notificationType === "GIFT" || notificationType === "선물") { ... }
     } catch (e) {
-      console.error('알림 클릭 후 이동 처리 중 오류:', e);
+      console.error("알림 클릭 후 이동 처리 중 오류:", e);
     }
   }
 
@@ -159,14 +173,14 @@ export default function StoreLayout() {
         <Box
           sx={{
             height: 120,
-            margin: '0 auto',
-            cursor: 'pointer',
-            marginTop: '10px',
-            marginBottom: '10px',
+            margin: "0 auto",
+            cursor: "pointer",
+            marginTop: "10px",
+            marginBottom: "10px",
           }}
-          onClick={() => navigate('/store')}
+          onClick={() => navigate("/store")}
         >
-          <img src={logo} alt="CoffeeEns 로고" style={{ height: '100%' }} />
+          <img src={logo} alt="CoffeeEns 로고" style={{ height: "100%" }} />
         </Box>
       </Toolbar>
       <Divider />
@@ -176,7 +190,7 @@ export default function StoreLayout() {
             key={item.to}
             to={item.to}
             end={item.end}
-            style={{ textDecoration: 'none', color: 'inherit' }}
+            style={{ textDecoration: "none", color: "inherit" }}
           >
             {({ isActive }) => (
               <ListItemButton
@@ -289,23 +303,26 @@ export default function StoreLayout() {
         PaperProps={{
           sx: {
             width: 360,
-            maxWidth: '80vw',
+            maxWidth: "80vw",
           },
         }}
       >
         <Box
           sx={{
             p: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
           <Typography variant="h6" fontWeight={700} sx={{ color: "#334336" }}>
             알림
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <Button onClick={handleDeleteAllNotifications} sx={{ color: "#334336" }}>
+            <Button
+              onClick={handleDeleteAllNotifications}
+              sx={{ color: "#334336" }}
+            >
               전체 삭제
             </Button>
             <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
@@ -332,6 +349,16 @@ export default function StoreLayout() {
           )}
         </List>
       </Drawer>
+
+      <CommonConfirm
+        open={confirm.open}
+        onClose={() => setConfirm({ open: false, targetId: null })}
+        onConfirm={handleConfirmDelete}
+        title="리뷰 삭제 확인"
+        message="이 리뷰를 정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
+      />
     </Box>
   );
 }

@@ -218,7 +218,7 @@ function MyPage() {
       >
         {/* 좌측: 유저 정보 */}
         <Box>
-          <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h1" color="#3B3026" fontWeight="bold">
+          <Typography sx={{fontSize: isAppLike ? "23px" : "30px",}} component="h1" color="#3B3026" fontWeight="bold">
             {authUser?.name}님 환영합니다!
           </Typography>
         </Box>
