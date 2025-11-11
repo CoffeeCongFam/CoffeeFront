@@ -129,7 +129,7 @@ export default function OrderDetailModal({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          bgcolor: "#424242",
+          bgcolor: "#334336",
           color: "white",
           p: 2,
         }}
@@ -212,6 +212,25 @@ export default function OrderDetailModal({
                         : "outlined"
                     }
                     onClick={() => handleSelectReason(reason.code)}
+                    sx={{
+                      ...(selectedReasonCode === reason.code
+                        ? {
+                            bgcolor: "#334336",
+                            color: "#fff9f4",
+                            "&:hover": {
+                              bgcolor: "#334336",
+                              opacity: 0.9,
+                            },
+                          }
+                        : {
+                            borderColor: "#334336",
+                            color: "#334336",
+                            "&:hover": {
+                              borderColor: "#334336",
+                              bgcolor: "rgba(51, 67, 54, 0.05)",
+                            },
+                          }),
+                    }}
                   >
                     {reason.label}
                   </Button>
@@ -225,7 +244,18 @@ export default function OrderDetailModal({
               // 🌟 거절 버튼 클릭 시 handleReject 호출
               onClick={handleReject}
               disabled={!isSubmitEnabled}
-              sx={{ bgcolor: "#424242", "&:hover": { bgcolor: "#212121" } }}
+              sx={{
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
+                },
+                "&:disabled": {
+                  bgcolor: "#ccc",
+                  color: "#666",
+                },
+              }}
             >
               접수 거절
             </Button>

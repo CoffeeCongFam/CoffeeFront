@@ -29,7 +29,6 @@ function CustomerHome() {
 
   const { isAppLike } = useAppShellMode();
   const [isLoading, setIsLoading] = useState(true);
-  const [isOnboarding, setIsOnboarding] = useState(false); // 온보딩
 
   const [activeSubIndex, setActiveSubIndex] = useState(0); // 구독 캐러셀 현재 인덱스
 
@@ -243,12 +242,18 @@ function CustomerHome() {
           }}
         >
           <Typography
-            sx={{ fontSize: isAppLike ? "1.2rem" : "30px", fontWeight: "bold" }}
+            sx={{
+              fontSize: isAppLike ? "1.2rem" : "30px",
+              fontWeight: "bold",
+              color: "#3B3026",
+            }}
           >
             안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
             잔의 여유를 즐겨보세요.
           </Typography>
-          <Typography sx={{ fontSize: isAppLike ? "0.8rem" : "1rem" }}>
+          <Typography
+            sx={{ color: "#3B3026", fontSize: isAppLike ? "0.8rem" : "1rem" }}
+          >
             오늘은 어디에서 커피 한 잔 할까요? ☕️
           </Typography>
         </Box>
@@ -344,7 +349,8 @@ function CustomerHome() {
       {subscriptions.length <= 0 && (
         <Box
           sx={{
-            backgroundColor: "#f0f0f0c9",
+            backgroundColor: "#fff9f4",
+            border: "1px solid #ffe0b2",
             px: "1rem",
             py: "1.5rem",
             borderRadius: "8px",
@@ -359,12 +365,21 @@ function CustomerHome() {
           data-intro="이곳에서 사용 가능한 **구독권 잔여 횟수**를 확인하고 바로 주문할 수 있어요." // 툴팁 내용
           data-position="bottom" // 툴팁 위치
         >
-          <Typography>
+          <Typography sx={{ color: "#334336" }}>
             보유 구독권이 없습니다. 구독권을 구매해주세요!
           </Typography>
           <Button
             endIcon={<OpenInNewIcon />}
             onClick={() => navigate("/me/search")}
+            sx={{
+              color: "#334336",
+              borderColor: "#334336",
+              "&:hover": {
+                borderColor: "#334336",
+                bgcolor: "rgba(51, 67, 54, 0.05)",
+              },
+            }}
+            variant="outlined"
           >
             구독권 구매하러 가기
           </Button>
@@ -483,6 +498,7 @@ function CustomerHome() {
               fontSize: isAppLike ? "1rem" : "30px",
               fontWeight: "bold",
               mb: 0.5,
+              color: "#3B3026",
             }}
           >
             내 근처 동네 카페
@@ -504,8 +520,8 @@ function CustomerHome() {
 
         {!locError && nearbyCafes.length === 0 && (
           <Box sx={{ px: 1, py: 1.5 }}>
-            <Typography sx={{ color: "text.secondary" }}>
-              2km 안에 등록된 카페가 아직 없어요 ☕
+            <Typography sx={{ color: "#3B3026" }}>
+              2km 안에 등록된 카페가 아직 없어요 🔎
             </Typography>
           </Box>
         )}

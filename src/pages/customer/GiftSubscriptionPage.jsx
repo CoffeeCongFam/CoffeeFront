@@ -197,14 +197,14 @@ function GiftSubscriptionPage() {
     {
       label: "신용/체크카드",
       pg: "danal_tpay",
-      icon: <CreditCardIcon sx={{ fontSize: 28 }} />,
+      icon: <CreditCardIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#4A90E2",
       bgColor: "#E8F4FF",
     },
     {
       label: "휴대폰 결제",
       pg: "danal_tpay",
-      icon: <PhoneAndroidIcon sx={{ fontSize: 28 }} />,
+      icon: <PhoneAndroidIcon sx={{ fontSize: 28, color: "#334336" }} />,
       color: "#7B68EE",
       bgColor: "#F0EDFF",
     },
@@ -281,7 +281,7 @@ function GiftSubscriptionPage() {
           {/* 제목: 중앙 정렬 */}
           <Typography
             variant="h6"
-            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
+            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold", color: "#334336" }}
           >
             선물하기
           </Typography>
@@ -327,10 +327,10 @@ function GiftSubscriptionPage() {
                 gap: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "bold" }}>보내는 사람</Typography>
+              <Typography sx={{ fontWeight: "bold", color: "#334336" }}>보내는 사람</Typography>
               <Box sx={personBoxSx}>
-                <AccountCircleIcon />
-                <Typography>{authUser?.name}</Typography>
+                <AccountCircleIcon sx={{ color: "#334336" }} />
+                <Typography sx={{ color: "#334336" }}>{authUser?.name}</Typography>
               </Box>
             </Box>
 
@@ -343,7 +343,7 @@ function GiftSubscriptionPage() {
                 alignItems: "center",
               }}
             >
-              <ForwardIcon />
+              <ForwardIcon sx={{ color: "#334336" }} />
             </Box>
             }
 
@@ -358,7 +358,7 @@ function GiftSubscriptionPage() {
                 gap: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "bold" }}>받는 사람</Typography>
+              <Typography sx={{ fontWeight: "bold", color: "#334336" }}>받는 사람</Typography>
               {receiver && (
                 <Box
                   sx={{
@@ -367,8 +367,8 @@ function GiftSubscriptionPage() {
                   }}
                 >
                   <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-                    <AccountCircleIcon />
-                    <Typography>{receiver.name}</Typography>
+                    <AccountCircleIcon sx={{ color: "#334336" }} />
+                    <Typography sx={{ color: "#334336" }}>{receiver.name}</Typography>
                   </Box>
                   <IconButton
                     onClick={() => {
@@ -439,7 +439,7 @@ function GiftSubscriptionPage() {
 
           {/* 선물 메시지 입력 영역 */}
           <Box sx={{ mt: 1, width: "100%", maxWidth: 900 }}>
-            <Typography sx={{ fontWeight: "bold", mb: 1 }}>
+            <Typography sx={{ fontWeight: "bold", mb: 1, color: "#334336" }}>
               메시지 카드
             </Typography>
             <TextField
@@ -450,6 +450,22 @@ function GiftSubscriptionPage() {
               placeholder="선물과 함께 보낼 메시지를 입력하세요. (최대 100자)"
               value={giftMessage}
               onChange={(e) => setGiftMessage(e.target.value.slice(0, 100))}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#ffe0b2",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#334336",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#334336",
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#334336",
+                },
+              }}
             />
           </Box>
         </Box>
@@ -470,7 +486,7 @@ function GiftSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle2" sx={{ fontSize: "0.9rem", fontWeight: 600 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
               유의사항
             </Typography>
           </Box>
@@ -514,7 +530,7 @@ function GiftSubscriptionPage() {
             }}
              sx={{
               borderRadius: isAppLike ? "2rem" : "inherit",
-              backgroundColor: "black",
+              backgroundColor: "#334336",
               color: "white",
               px: 4,
               maxWidth: isAppLike ? 480 : "none",
@@ -537,7 +553,7 @@ function GiftSubscriptionPage() {
             onClick={(e) => e.stopPropagation()}
             sx={{
               position: "fixed",
-              bottom: 0,
+              bottom: isAppLike ? "56px" : 0,
               left: 0,
               right: 0,
               mx: "auto",
@@ -547,7 +563,7 @@ function GiftSubscriptionPage() {
               boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
               px: 3,
               pt: 2,
-              pb: 4,
+              pb: isAppLike ? "80px" : 4,
             }}
           >
             <Box
@@ -577,10 +593,10 @@ function GiftSubscriptionPage() {
 
             {/* 안내 */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
                 결제 수단 선택
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ color: "#334336" }}>
                 안전하고 편리한 결제 수단을 선택하세요
               </Typography>
             </Box>
@@ -591,82 +607,84 @@ function GiftSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
-                gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
-                columnGap: 1.5,
-                rowGap: 1.5,
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 1.5,
+                width: "100%",
               }}
             >
-               {paymentMethods.map((method) => (
-                              <Box
-                                key={method.label}
-                                onClick={() => {
-                                  setSelectedMethod(method.label);
-                                  setTimeout(() => confirmPayment(method.pg), 200);
-                                }}
-                                sx={{
-                                  bgcolor: method.bgColor,
-                                  border: `2px solid ${
-                                    selectedMethod === method.label
-                                      ? method.color
-                                      : "transparent"
-                                  }`,
-                                  borderRadius: 3,
-                                  height: "100%", 
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: 1,
-                                  cursor: "pointer",
-                                  transition: "all 0.2s ease",
-                                  "&:hover": {
-                                    boxShadow: `0 4px 12px ${method.color}40`,
-                                    borderColor: method.color,
-                                    transform: "translateY(-3px)",
-                                  },
-                                }}
-                              >
-                                {/* 아이콘 */}
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    height: 40,
-                                  }}
-                                >
-                                  {React.isValidElement(method.icon) ? (
-                                    method.icon
-                                  ) : (
-                                    <img
-                                      src={method.icon}
-                                      alt={method.label}
-                                      style={{
-                                        ...method.imgStyle,
-                                        objectFit: "contain",
-                                        filter:
-                                          method.label === "토스페이"
-                                            ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
-                                            : "none",
-                                      }}
-                                    />
-                                  )}
-                                </Box>
-              
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: method.textColor || "#333",
-                                    fontSize: 13,
-                                  }}
-                                >
-                                  {method.label}
-                                </Typography>
-                              </Box>
-                            ))}
-                          </Box>
+              {paymentMethods.map((method) => (
+                <Box
+                  key={method.label}
+                  onClick={() => {
+                    setSelectedMethod(method.label);
+                    setTimeout(() => confirmPayment(method.pg), 200);
+                  }}
+                  sx={{
+                    bgcolor: method.bgColor,
+                    border: `2px solid ${
+                      selectedMethod === method.label
+                        ? method.color
+                        : "transparent"
+                    }`,
+                    borderRadius: 3,
+                    height: 110,
+                    width: isAppLike ? "100%" : "auto",
+                    minWidth: 0,
+                    boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      boxShadow: `0 4px 12px ${method.color}40`,
+                      borderColor: method.color,
+                      transform: "translateY(-3px)",
+                    },
+                  }}
+                >
+                  {/* 아이콘 */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: 40,
+                    }}
+                  >
+                    {React.isValidElement(method.icon) ? (
+                      method.icon
+                    ) : (
+                      <img
+                        src={method.icon}
+                        alt={method.label}
+                        style={{
+                          ...method.imgStyle,
+                          objectFit: "contain",
+                          filter:
+                            method.label === "토스페이"
+                              ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
+                              : "none",
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontWeight: 600,
+                      color: method.textColor || "#333",
+                      fontSize: 13,
+                    }}
+                  >
+                    {method.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
 
             <Box
               sx={{
@@ -701,8 +719,8 @@ function GiftSubscriptionPage() {
           gap: 2,
         }}
       >
-        <CircularProgress color="inherit" />
-        <Typography variant="body1" sx={{ mt: 1 }}>
+        <CircularProgress sx={{ color: "#334336" }} />
+        <Typography variant="body1" sx={{ mt: 1, color: "#334336" }}>
           결제 진행 중입니다...
         </Typography>
       </Backdrop>

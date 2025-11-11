@@ -25,7 +25,20 @@ function SearchCafeInput({ keyword, setKeyword }) {
           backgroundColor: "white",
           "& fieldset": {
             borderRadius: "50px", // fieldset도 동일한 Radius 갖도록 커스텀
+            borderColor: "#ffe0b2",
           },
+          "&:hover fieldset": {
+            borderColor: "#334336",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#334336",
+          },
+        },
+        "& .MuiInputBase-input": {
+          color: "#334336",
+        },
+        "& .MuiInputAdornment-root svg": {
+          color: "#334336",
         },
       }}
     ></TextField>

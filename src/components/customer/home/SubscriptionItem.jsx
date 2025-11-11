@@ -42,7 +42,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
         justifyContent: "space-between",
         alignItems: "center",
         m: "0 auto",
-        borderRadius: "10px",
+        borderRadius: "1rem",
         overflow: "hidden",
         bgcolor: "white",
         cursor: "pointer",
@@ -206,10 +206,13 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             }}
             fullWidth
             sx={{
-              backgroundColor: "black",
-              color: "white",
-              borderRadius: "3rem",
-              "&:hover": { backgroundColor: "#333" },
+              backgroundColor: "#334336",
+              color: "#fff9f4",
+              borderRadius: "1.2rem",
+              "&:hover": {
+                backgroundColor: "#334336",
+                opacity: 0.9,
+              },
               alignItems: "center",
             }}
             endIcon={<CoffeeIcon />}

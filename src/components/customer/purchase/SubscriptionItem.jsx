@@ -36,7 +36,7 @@ function SubscriptionItem({ subscription, isAppLike }) {
           }}
         >
           {/* 구독 타입 */}
-          <SubTypeChip status={subscription.subscriptionType} />
+          <SubTypeChip type={subscription.subscriptionType} />
 
           <Box sx={{ mt: 1.3 }}>
             {/* 구독 이름 - 강조 */}
@@ -134,7 +134,7 @@ function SubscriptionItem({ subscription, isAppLike }) {
     >
       {/* 왼쪽 정보 */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "#334336" }}>
           {subscription?.storeName || "카페 이름"}{" "}
           {subscription?.subscriptionName}
         </Typography>
@@ -176,12 +176,17 @@ function SubscriptionItem({ subscription, isAppLike }) {
           size="small"
           sx={{ mb: 1, fontWeight: 600 }}
         /> */}
-        <SubTypeChip status={subscription.subscriptionType} />
-        <Typography variant="h5" sx={{ fontWeight: 800 }}>
+        <SubTypeChip type={subscription.subscriptionType} />
+        <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
           ₩{subscription.price?.toLocaleString()}
           <Typography
             component="span"
-            sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
+            sx={{
+              fontSize: "1rem",
+              fontWeight: 400,
+              ml: 0.5,
+              color: "#334336",
+            }}
           >
             /월
           </Typography>
