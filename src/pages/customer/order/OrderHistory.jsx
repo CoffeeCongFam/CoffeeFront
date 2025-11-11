@@ -464,7 +464,7 @@ function OrderHistory() {
               sx={{ flex: 1 }}
               inputProps={{ max: todayStr }}
             />
-            <Typography sx={{ display: { xs: "none", sm: "block" } }}>~</Typography>
+            <Typography sx={{ display: { xs: "none", sm: "block", color: "#334336" } }}>~</Typography>
             <TextField
               label="종료일"
               type="date"

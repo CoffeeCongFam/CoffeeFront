@@ -204,14 +204,6 @@ function PurchaseSubscriptionPage() {
           >
             <ArrowBackIcon />
           </IconButton>
-
-          {/* 제목: 중앙 정렬 */}
-          <Typography
-            variant="h6"
-            sx={{ textAlign: "center", flexGrow: 1, fontWeight: "bold" }}
-          >
-            구독하기
-          </Typography>
         </Box>
         {/* 제목 */}
         <Box sx={{ textAlign: "center", mb: 2 }}>

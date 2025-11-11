@@ -60,11 +60,11 @@ function SubscriptionItem({ subscription, isAppLike }) {
           >
             {subscription?.subscriptionName}
           </Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
             ₩{subscription.price?.toLocaleString()}
             <Typography
               component="span"
-              sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5 }}
+              sx={{ fontSize: "1rem", fontWeight: 400, ml: 0.5, color: "#334336" }}
             >
               /월
             </Typography>
@@ -179,7 +179,7 @@ function SubscriptionItem({ subscription, isAppLike }) {
           size="small"
           sx={{ mb: 1, fontWeight: 600 }}
         /> */}
-        <SubTypeChip  status={typeLabel}/>
+        <SubTypeChip type={subscription?.subscriptionType} />
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#334336" }}>
           ₩{subscription.price?.toLocaleString()}
           <Typography
