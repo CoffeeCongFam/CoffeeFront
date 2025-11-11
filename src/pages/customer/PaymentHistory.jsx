@@ -41,14 +41,31 @@ export default function PaymentHistory({ paymentList }) {
 
   // 날짜 유틸
   const toDate = (v) => (v ? new Date(v) : new Date(0));
-  const fmtDate = (d) =>
-    new Intl.DateTimeFormat("ko-KR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(d);
+  const fmtDate = (d) => {
+    if (!d) return "-";
+    try {
+      // ISO 문자열인 경우 직접 파싱하여 UTC 시간을 그대로 사용 (시간 더하거나 빼지 않음)
+      if (typeof d === "string") {
+        const match = d.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+          const [, y, m, day, h, min] = match;
+          return `${y}.${m}.${day} ${h}:${min}`;
+        }
+      }
+      // Date 객체인 경우 UTC 메서드 사용
+      const dateObj = d instanceof Date ? d : new Date(d);
+      if (isNaN(dateObj.getTime())) return "-";
+      const y = dateObj.getUTCFullYear();
+      const m = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getUTCDate()).padStart(2, "0");
+      const h = String(dateObj.getUTCHours()).padStart(2, "0");
+      const min = String(dateObj.getUTCMinutes()).padStart(2, "0");
+      return `${y}.${m}.${day} ${h}:${min}`;
+    } catch (e) {
+      console.log(e);
+      return "-";
+    }
+  };
   const fmtPrice = (n) =>
     typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
 
@@ -193,13 +210,35 @@ export default function PaymentHistory({ paymentList }) {
   };
 
   return (
-    <Box sx={{ p: 2, mt: 4 }}>
+    <Box
+      sx={{
+        p: 2,
+        mt: 4,
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+      }}
+    >
       <Header sortOrder={sortOrder} onChangeOrder={setSortOrder} />
 
       <Tabs
         value={tab}
         onChange={(_e, v) => setTab(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5 }}
+        sx={{
+          borderBottom: 1,
+          borderColor: "#ffe0b2",
+          mt: 0.5,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+          },
+          "& .Mui-selected": {
+            color: "#334336",
+            fontWeight: 600,
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="all" label={`전체조회 (${items.length})`} />
         <Tab value="refunded" label={`환불내역 (${refundedCount})`} />
@@ -207,7 +246,12 @@ export default function PaymentHistory({ paymentList }) {
 
       {loading && (
         <Box sx={{ mt: 2 }}>
-          <LinearProgress />
+          <LinearProgress
+            sx={{
+              bgcolor: "#ffe0b2",
+              "& .MuiLinearProgress-bar": { bgcolor: "#334336" },
+            }}
+          />
         </Box>
       )}
 
@@ -239,7 +283,7 @@ function Header({ sortOrder, onChangeOrder }) {
       sx={{ mb: 2, px: 1 }}
     >
       <Box sx={{ ml: 2 }}>
-        <Typography variant="h6" component="h2">
+        <Typography variant="h6" component="h2" sx={{ color: "#334336" }}>
           결제 내역
         </Typography>
       </Box>
@@ -342,7 +386,7 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                 )}
                 {dateValue && (
                   <Typography variant="caption" color="text.secondary">
-                    {dateLabel}: {fmtDate(new Date(dateValue))}
+                    {dateLabel}: {fmtDate(dateValue)}
                   </Typography>
                 )}
               </Box>
@@ -358,6 +402,13 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
                       );
                       if (!confirmed) return;
                       onRefund(purchaseId, item.rowKey);
+                    }}
+                    sx={{
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      px: { xs: 1.5, sm: 1.5 },
+                      py: { xs: 0.5, sm: 0.75 },
+                      minWidth: { xs: "70px", sm: "64px" },
+                      whiteSpace: "nowrap",
                     }}
                   >
                     결제 취소
@@ -403,10 +454,10 @@ function PaymentItemCard({ item, fmtDate, fmtPrice, onRefund }) {
 function EmptyState() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
         결제 내역이 비어 있습니다.
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "#334336" }}>
         결제 또는 선물하기를 진행하면 이곳에서 내역을 확인할 수 있습니다.
       </Typography>
     </Box>

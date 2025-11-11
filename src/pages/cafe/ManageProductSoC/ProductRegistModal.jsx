@@ -270,7 +270,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
               </Select>
             </FormControl>
             <TextField
-              label="구독 기간 (일) *"
+              label="구독 기간 (일)"
               name="subscriptionPeriod"
               type="number"
               value={formData.subscriptionPeriod}
@@ -304,7 +304,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
 
           {/* 5. 가격 */}
           <TextField
-            label="가격 (원) *"
+            label="가격 (원)"
             name="price"
             type="number"
             value={formData.price}
@@ -343,7 +343,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
             </FormControl>
 
             <TextField
-              label="판매 가능 수량 *"
+              label="판매 가능 수량"
               name="salesLimitQuantity"
               type="number"
               value={formData.salesLimitQuantity}
@@ -357,7 +357,7 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
 
           {/* 8. 일일 최대 사용 횟수 */}
           <TextField
-            label="일일 최대 사용 횟수 *"
+            label="일일 최대 사용 횟수"
             name="maxDailyUsage"
             type="number"
             value={formData.maxDailyUsage}
@@ -371,14 +371,29 @@ const ProductRegistModal = ({ open, allMenus, onClose, onRegister }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} disabled={isSubmitting} color="secondary">
+        <Button
+          onClick={onClose}
+          disabled={isSubmitting}
+          sx={{ color: "#334336" }}
+        >
           취소
         </Button>
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
           variant="contained"
-          color="primary"
+          sx={{
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+            "&:disabled": {
+              bgcolor: "#ccc",
+              color: "#666",
+            },
+          }}
         >
           {isSubmitting ? '등록 중...' : '등록 완료'}
         </Button>

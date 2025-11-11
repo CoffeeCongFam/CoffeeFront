@@ -7,36 +7,20 @@ import {
   CircularProgress,
   Button,
 } from "@mui/material";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
 import OrderStepper from "../../../components/customer/order/OrderStepper";
 import OrderCheckModal from "../../../components/customer/order/OrderCancleCheckModal";
 import { useNavigate, useParams } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
-
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import {
   fetchOrderDetail,
   requestCancelOrder,
 } from "../../../apis/customerApi";
-
-function orderStatusMessage(status) {
-  switch (status) {
-    case "REQUEST":
-      return "주문이 접수 중이에요.";
-    case "INPROGRESS":
-      return "음료가 제조 중입니다...";
-    case "COMPLETED":
-      return "메뉴가 제조 완료되었습니다.";
-    case "RECEIVED":
-      return "수령이 완료된 주문입니다.";
-    case "REJECTED":
-      return "해당 주문이 매장에서 거부되었습니다.";
-    case "CANCELED":
-      return "해당 주문은 취소되었습니다.";
-    default:
-      return "주문 상태를 불러오는 중입니다.";
-  }
-}
+import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
+import useNotificationStore from "../../../stores/useNotificationStore";
 
 function handleSubscriptionType(type) {
   switch (type) {
@@ -57,6 +41,8 @@ function CompleteOrderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState(null);
   const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
+
+  const { notifications } = useNotificationStore();
 
   // 주문 정보 초기화
   useEffect(() => {
@@ -80,57 +66,45 @@ function CompleteOrderPage() {
     return () => {
       mounted = false;
     };
-  }, [orderId, orderInfo]);
+  }, [orderId]);
+  // orderInfo 갱신으로 계속 요청되는 문제 수정
 
   // 주문 취소
   async function handleCancelOrder() {
     try {
-      const res = await requestCancelOrder(orderId);
-      if (res !== null) {
-        setOrderInfo((prev) => ({
-          ...prev,
-          orderStatus: "CANCELED",
-          canceledAt: new Date().toISOString(),
-        }));
-        console.log(`✅ ${orderId}번 주문 취소 성공`);
+      await requestCancelOrder(orderId);
+
+      // 서버에서 최종 상태 다시 확인
+      const data = await fetchOrderDetail(orderId);
+      if (data) {
+        setOrderInfo(data);
       }
+
+      console.log(`✅ ${orderId}번 주문 취소 + 상태 갱신 완료`);
     } catch (e) {
       console.error("❌ 주문 취소 오류:", e);
       alert("서버와의 통신 중 오류가 발생했습니다.");
     } finally {
-      console.error("✅ ${orderId}번 주문 취소 성공");
       setOpenCancel(false);
-      // navigate("/me/order");
     }
   }
 
-  // #TODO. 2) SSE로 상태 실시간 받기
-  // useEffect(() => {
-  //   if (!orderId) return;
+  // SSE 주문 알림 onmessage
+  useEffect(() => {
+    if (!notifications.length) return;
 
-  //   const es = new EventSource(`/api/orders/${orderId}/sse`);
-
-  //   es.onmessage = (e) => {
-  //     const data = JSON.parse(e.data);
-  //     setOrderInfo((prev) =>
-  //       prev
-  //         ? {
-  //             ...prev,
-  //             ...data,
-  //             orderStatus: data.status ?? prev.orderStatus,
-  //           }
-  //         : prev
-  //     );
-  //   };
-
-  //   es.onerror = () => {
-  //     es.close();
-  //   };
-
-  //   return () => {
-  //     es.close();
-  //   };
-  // }, [orderId]); //
+    (async () => {
+      try {
+        console.log("🔁 알림 수신 → 주문 상세 재조회");
+        const data = await fetchOrderDetail(orderId);
+        if (data) {
+          setOrderInfo(data);
+        }
+      } catch (err) {
+        console.error("알림 기반 주문 재조회 실패:", err);
+      }
+    })();
+  }, [notifications, orderId]);
 
   function handleBack() {
     if (orderInfo.orderStatus === "CANCELED") {
@@ -139,13 +113,19 @@ function CompleteOrderPage() {
       navigate(-1);
     }
   }
-  function handleGoHome(){
-    navigate("/me")
+  function handleGoHome() {
+    navigate("/me");
   }
 
   return (
     <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          position: isAppLike ? "absolute" : "inherit",
+        }}
+      >
         <IconButton onClick={() => handleBack()} sx={{ mr: 1 }}>
           <ArrowBackIcon />
         </IconButton>
@@ -153,17 +133,54 @@ function CompleteOrderPage() {
 
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 2 }}>
-        <Typography variant="h5" fontWeight="bold">
-          {isLoading
-            ? "주문 내역 불러오는 중..."
-            : orderStatusMessage(orderInfo.orderStatus)}
+        <Typography variant="h5" fontWeight="bold" sx={{ color: "#334336" }}>
+          {isLoading && "주문 내역 불러오는 중..."}
         </Typography>
       </Box>
+
       {!isLoading ? (
         <>
-          {/* 스텝퍼 */}
-          <OrderStepper orderStatus={orderInfo.orderStatus} />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            {orderInfo.orderStatus === "CANCELED" ||
+            orderInfo.orderStatus === "REJECTED" ? (
+              <CancelRoundedIcon
+                sx={{
+                  color: "red",
+                  fontSize: isAppLike ? "2rem" : "3rem",
+                  mb: 1,
+                }}
+              />
+            ) : (
+              <Box>
+                <CheckCircleRoundedIcon
+                  sx={{
+                    fontSize: isAppLike ? "2rem" : "3rem",
+                    mb: 1,
+                    color: "#334336",
+                  }}
+                />
+              </Box>
+            )}
 
+            <Typography
+              fontSize="2rem"
+              textAlign="center"
+              fontWeight="bold"
+              sx={{ color: "#334336" }}
+            >
+              주문 번호 {orderInfo.orderNumber}번
+            </Typography>
+            <Box sx={{ mt: 2, mb: 4, width: isAppLike ? "100%" : "50%" }}>
+              <OrderProgressBar status={orderInfo.orderStatus} />
+            </Box>
+          </Box>
           {/* 주문 카드 */}
           <Box
             sx={{
@@ -177,39 +194,67 @@ function CompleteOrderPage() {
             }}
           >
             {/* 제목 */}
-            <Typography
+            {/* <Typography
               variant="h6"
               textAlign="center"
               mb={2}
               fontWeight={"bold"}
             >
               주문 번호 {orderInfo.orderNumber}번
-            </Typography>
+            </Typography> */}
+
+            <Box sx={{ textAlign: "center", pb: 1 }}>
+              {orderInfo.orderStatus === "REJECTED" && (
+                <Typography color="warning" gutterBottom>
+                  매장에 의해 취소된 주문입니다.
+                </Typography>
+              )}
+              {(orderInfo.orderStatus === "REJECTED" ||
+                orderInfo.orderStatus === "CANCELED") && (
+                <Typography
+                  variant="subtitle2"
+                  gutterBottom
+                  sx={{ color: "#334336" }}
+                >
+                  취소된 주문입니다.
+                </Typography>
+              )}
+            </Box>
 
             <Divider sx={{ mb: 2 }} />
 
             {/* 주문 정보 섹션 */}
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{ color: "#334336" }}
+            >
               주문 정보
             </Typography>
 
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
-              <Typography color="text.secondary">카페명</Typography>
-              <Typography>{orderInfo.store.storeName}</Typography>
+              <Typography color="text.secondary" onClick={() => ""}>
+                카페명
+              </Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {orderInfo.store.storeName}
+              </Typography>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
               <Typography color="text.secondary">주문 번호</Typography>
-              <Typography>{orderInfo.orderNumber}</Typography>
+              <Typography sx={{ color: "#334336" }}>
+                {orderInfo.orderNumber}
+              </Typography>
             </Box>
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
             >
               <Typography color="text.secondary">구독권명</Typography>
-              <Typography>
+              <Typography sx={{ color: "#334336" }}>
                 {handleSubscriptionType(
                   orderInfo.subscription.subscriptionType
                 )}
@@ -220,7 +265,7 @@ function CompleteOrderPage() {
               sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
             >
               <Typography color="text.secondary">주문 일시</Typography>
-              <Typography>
+              <Typography sx={{ color: "#334336" }}>
                 {new Date(orderInfo.createdAt).toLocaleString()}
               </Typography>
             </Box>
@@ -229,7 +274,7 @@ function CompleteOrderPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
                 <Typography color="text.secondary">취소 일시</Typography>
-                <Typography>
+                <Typography sx={{ color: "#334336" }}>
                   {new Date(orderInfo.canceledAt).toLocaleString()}
                 </Typography>
               </Box>
@@ -238,7 +283,11 @@ function CompleteOrderPage() {
             <Divider sx={{ mb: 2 }} />
 
             {/* 주문 메뉴 섹션 */}
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography
+              variant="subtitle2"
+              gutterBottom
+              sx={{ color: "#334336" }}
+            >
               주문 메뉴
             </Typography>
 
@@ -247,8 +296,10 @@ function CompleteOrderPage() {
                 key={m.menuId}
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>{m.menuName}</Typography>
-                <Typography>{m.quantity} 잔</Typography>
+                <Typography sx={{ color: "#334336" }}>{m.menuName}</Typography>
+                <Typography sx={{ color: "#334336" }}>
+                  {m.quantity} 개
+                </Typography>
               </Box>
             ))}
 
@@ -263,17 +314,19 @@ function CompleteOrderPage() {
                 disabled={orderInfo.orderStatus !== "REQUEST"}
                 style={{
                   width: "fit-content",
-                  backgroundColor: "black",
+                  backgroundColor: "#334336",
                   color: "white",
                 }}
               />
             </Box>
           </Box>
+
           <Box
             sx={{
               mt: 4,
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
+              flexDirection: "row",
+              // flexDirection: { xs: "column", sm: "row" },
               gap: 1.5,
               justifyContent: "center",
               alignItems: "center",
@@ -282,16 +335,23 @@ function CompleteOrderPage() {
             <Button
               variant="outlined"
               onClick={() => navigate("/me/order")}
-              sx={{ minWidth: 180 }}
+              sx={{
+                minWidth: 180,
+                color: "#334336",
+                borderColor: "#334336",
+                "&:hover": { bgcolor: "#222" },
+              }}
             >
               주문 내역 보기
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               onClick={handleGoHome}
               sx={{
                 minWidth: 180,
-                bgcolor: "black",
+                color: "#334336",
+                borderColor: "#334336",
+                // bgcolor: "#334336",
                 "&:hover": { bgcolor: "#222" },
               }}
             >
@@ -310,8 +370,8 @@ function CompleteOrderPage() {
             justifyContent: "center",
           }}
         >
-          <CircularProgress />
-          <Typography color="text.secondary">
+          <CircularProgress sx={{ color: "#334336" }} />
+          <Typography sx={{ color: "#334336" }}>
             주문 내역을 불러오는 중입니다...
           </Typography>
         </Box>

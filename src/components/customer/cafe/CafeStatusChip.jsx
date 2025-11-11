@@ -6,32 +6,32 @@ const STATUS_MAP = {
   PREPARING: {
     label: "정보 없음",
     sx: {
-      backgroundColor: "#F1F3F4",
-      color: "#5F6368",
+      backgroundColor: "#fff9f4",
+      color: "#334336",
       fontWeight: 500,
     },
   },
   OPEN: {
     label: "영업중",
     sx: {
-      backgroundColor: "#E6F4EA",
-      color: "#44a986ff",
+      backgroundColor: "#fff9f4",
+      color: "#334336",
       fontWeight: 600,
     },
   },
   CLOSED: {
     label: "영업종료",
     sx: {
-      backgroundColor: "#F1F3F4",
-      color: "#5F6368",
+      backgroundColor: "#fff9f4",
+      color: "#334336",
       fontWeight: 500,
     },
   },
   HOLIDAY: {
     label: "휴무일",
     sx: {
-      backgroundColor: "#FFF8E1",
-      color: "#B28704",
+      backgroundColor: "#fff9f4",
+      color: "#334336",
       fontWeight: 600,
     },
   },
@@ -41,7 +41,7 @@ const STATUS_MAP = {
 function CafeStatusChip({ status }) {
   const config = STATUS_MAP[status] || {
     label: "정보없음",
-    sx: { backgroundColor: "#ECEFF1", color: "#5F6368" },
+    sx: { backgroundColor: "#fff9f4", color: "#334336" },
   };
 
   return (

@@ -29,6 +29,7 @@ import {
 } from "../../../apis/customerApi";
 import useUserStore from "../../../stores/useUserStore";
 import { DeleteOutline } from "@mui/icons-material";
+import CommonAlert from "../../common/CommonAlert";
 
 function CafeReviewList({ storeName, storeId }) {
   const [localReviews, setLocalReviews] = useState([]);
@@ -46,6 +47,13 @@ function CafeReviewList({ storeName, storeId }) {
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  // 경고창
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   useEffect(() => {
     getReviewList();
@@ -69,18 +77,42 @@ function CafeReviewList({ storeName, storeId }) {
    */
   async function loadUserSubscriptionsForStore() {
     try {
-      // 1. 전체 보유 구독권 조회
+      // 전체 보유 구독권 조회
       const allSubs = await fetchCustomerSubscriptions();
 
-      // 2. 현재 카페의 partnerStoreId와 일치하는 구독권만 필터링
+      // 현재 카페의 partnerStoreId와 일치하는 구독권만 필터링
       const subsForThisStore = (allSubs || []).filter(
         (sub) => sub.store.partnerStoreId === Number(storeId)
       );
 
-      setStoreSubscriptions(subsForThisStore);
-      console.log(`카페 ${storeId}의 보유 구독권 목록 > `, subsForThisStore);
+      // 내 리뷰 목록 가져와서, 이미 리뷰한 구독권 제외
+      let filteredSubs = subsForThisStore;
+      try {
+        const myReviewList = await fetchUserReview();
+        const reviewsArray = Array.isArray(myReviewList)
+          ? myReviewList
+          : Array.isArray(myReviewList?.data)
+          ? myReviewList.data
+          : [];
 
-      return subsForThisStore;
+        const reviewedIds = new Set(
+          reviewsArray.map((review) => review.subscriptionId)
+        );
+
+        filteredSubs = subsForThisStore.filter(
+          (sub) => !reviewedIds.has(sub.subId)
+        );
+      } catch (e) {
+        console.error("내 리뷰 목록 로드 실패:", e);
+      }
+
+      setStoreSubscriptions(filteredSubs);
+      console.log(
+        `카페 ${storeId}의 보유 구독권 목록 (작성 가능만) > `,
+        filteredSubs
+      );
+
+      return filteredSubs;
     } catch (e) {
       console.error("구독권 로드 실패:", e);
       setStoreSubscriptions([]);
@@ -115,7 +147,11 @@ function CafeReviewList({ storeName, storeId }) {
    */
   function handleCreateReview() {
     if (storeSubscriptions.length === 0) {
-      alert("해당 카페에 대한 구매 내역이 없어 리뷰를 작성하실 수 없습니다.");
+      handleShowAlert(
+        "error",
+        "해당 카페에서 리뷰를 작성할 수 있는 구독권이 없습니다."
+      );
+      // alert("해당 카페에 대한 구매 내역이 없어 리뷰를 작성하실 수 없습니다.");
       return;
     }
     // 모달 열기 전에 상태 초기화
@@ -138,19 +174,25 @@ function CafeReviewList({ storeName, storeId }) {
 
   const handleSubmit = async () => {
     if (!memberId) {
-      alert("로그인이 필요합니다.");
+      // alert("로그인이 필요합니다.");
+      handleShowAlert("error", "로그인이 필요합니다.");
       return;
     }
     if (!selectedSub) {
-      alert("리뷰를 작성할 구독권을 선택해주세요.");
+      // alert("리뷰를 작성할 구독권을 선택해주세요.");
+      handleShowAlert("info", "리뷰를 작성할 구독권을 선택해주세요.");
+
       return;
     }
     if (!content || content.trim().length === 0) {
-      alert("리뷰 내용을 작성해주세요.");
+      handleShowAlert("info", "리뷰 내용을 작성해주세요.");
+
+      // alert("리뷰 내용을 작성해주세요.");
       return;
     }
     if (rating === 0) {
-      alert("별점을 선택해주세요.");
+      // alert("별점을 선택해주세요.");
+      handleShowAlert("info", "평점을 입력해주세요.");
       return;
     }
 
@@ -160,19 +202,18 @@ function CafeReviewList({ storeName, storeId }) {
       subscriptionId: selectedSub.subId,
       reviewContent: content,
       rating,
-      reviewImg: null,
     };
 
     console.log(payload);
 
     try {
-      await createReview(payload);
+      // imageFile 을 두 번째 인자로 같이 넘김
+      await createReview(payload, imageFile);
       await getReviewList();
       handleClose();
-      alert("리뷰 작성이 완료되었습니다.");
+      handleShowAlert("info", "리뷰 작성이 완료되었습니다.");
     } catch (e) {
       console.error("리뷰 작성 실패: ", e);
-      alert("리뷰 작성에 실패했습니다. 서버 로그를 확인해주세요.");
     }
   };
 
@@ -189,13 +230,29 @@ function CafeReviewList({ storeName, storeId }) {
 
     try {
       await deleteReview(reviewId);
-      alert("리뷰가 성공적으로 삭제되었습니다.");
+      handleShowAlert("success", "리뷰가 성공적으로 삭제되었습니다.");
+      // alert("리뷰가 성공적으로 삭제되었습니다.");
       await getReviewList(); // 리뷰 목록 리로딩
     } catch (error) {
       console.error("리뷰 삭제 실패:", error);
-      alert("리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      handleShowAlert(
+        "error",
+        "리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
+      // alert("리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   }
+
+  /*
+    경고창
+  */
+  const handleShowAlert = (type, message) => {
+    setAlert({
+      open: true,
+      message: message,
+      severity: type,
+    });
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -221,13 +278,27 @@ function CafeReviewList({ storeName, storeId }) {
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
               displayEmpty
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+              }}
             >
               <MenuItem value="LATEST">최신순</MenuItem>
               <MenuItem value="RATING_DESC">평점 높은 순</MenuItem>
               <MenuItem value="RATING_ASC">평점 낮은 순</MenuItem>
             </Select>
           </FormControl>
-          <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
+          <Typography variant="subtitle2" sx={{ color: "#334336" }}>
             리뷰 {localReviews.length}개
           </Typography>
         </Box>
@@ -238,6 +309,12 @@ function CafeReviewList({ storeName, storeId }) {
             width: "fit-content",
             float: "right",
             mb: 2,
+            borderColor: "#334336",
+            color: "#334336",
+            "&:hover": {
+              borderColor: "#334336",
+              bgcolor: "rgba(51, 67, 54, 0.05)",
+            },
           }}
           onClick={handleCreateReview}
         >
@@ -258,10 +335,14 @@ function CafeReviewList({ storeName, storeId }) {
           ))}
         </Box>
       ) : (
-        <Box sx={{ minHeight: "200px", 
-          // backgroundColor: "#f2f2f2", 
-        p: "1rem" }}>
-          <Typography variant="body2" color="text.secondary">
+        <Box
+          sx={{
+            minHeight: "200px",
+            // backgroundColor: "#f2f2f2",
+            p: "1rem",
+          }}
+        >
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             아직 등록된 리뷰가 없습니다.
           </Typography>
         </Box>
@@ -276,10 +357,21 @@ function CafeReviewList({ storeName, storeId }) {
         sx={{
           "& .MuiDialog-paper": {
             borderRadius: 3,
+            px: 2,
+            py: 3,
           },
         }}
       >
-        <DialogTitle sx={{ m: 0, p: 2 }}>
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 2,
+            textAlign: "center",
+            fontSize: "1.5rem",
+            fontWeight: "bold",
+            color: "#334336",
+          }}
+        >
           리뷰 작성하기
           <IconButton
             aria-label="close"
@@ -288,7 +380,7 @@ function CafeReviewList({ storeName, storeId }) {
               position: "absolute",
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: "#334336",
             }}
           >
             <CloseIcon />
@@ -296,14 +388,29 @@ function CafeReviewList({ storeName, storeId }) {
         </DialogTitle>
 
         <DialogContent sx={{ pt: 1 }}>
-          <DialogContentText sx={{ mb: 2 }}>
-            **{storeName}**은 어떠셨나요? <br />
+          <DialogContentText
+            sx={{
+              mb: 2,
+              backgroundColor: "#fff9f4",
+              py: 2,
+              px: 3,
+              borderRadius: "0.5rem",
+              color: "#334336",
+            }}
+          >
+            <span>
+              <strong>{storeName}</strong>
+            </span>
+            은 어떠셨나요? <br />
             리뷰를 작성할 구독권을 선택하고 평가를 남겨주세요.
           </DialogContentText>
 
           {/* 구독권 선택 Select 컴포넌트 */}
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="select-subscription-label">
+            <InputLabel
+              id="select-subscription-label"
+              sx={{ color: "#334336" }}
+            >
               리뷰할 구독권 선택
             </InputLabel>
             <Select
@@ -311,6 +418,23 @@ function CafeReviewList({ storeName, storeId }) {
               id="select-subscription"
               value={selectedSub ? selectedSub.subId : ""} // 선택된 ID를 값으로 사용
               label="리뷰할 구독권 선택"
+              sx={{
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#ffe0b2",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#334336",
+                },
+                "& .MuiSelect-select": {
+                  color: "#334336",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#334336",
+                },
+              }}
               onChange={async (e) => {
                 // 선택된 ID에 해당하는 구독권 객체를 selectedSub에 저장
                 const subId = e.target.value;
@@ -324,7 +448,11 @@ function CafeReviewList({ storeName, storeId }) {
                   (review) => review.subscriptionId === selected.subId
                 );
                 if (isReviewed) {
-                  alert("이미 리뷰를 작성한 구독권입니다.");
+                  handleShowAlert(
+                    "warning",
+                    "이미 리뷰를 작성한 구독권입니다."
+                  );
+                  // alert("이미 리뷰를 작성한 구독권입니다.");
                   return;
                 }
 
@@ -350,17 +478,32 @@ function CafeReviewList({ storeName, storeId }) {
             required
           />
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, color: "#334336" }}>
               사진 첨부 (선택)
             </Typography>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 2,
+              }}
+            >
               {/* 업로드 버튼 */}
               <Button
                 variant="outlined"
                 startIcon={<PhotoCamera />}
                 component="label"
                 size="small"
+                sx={{
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
+                }}
               >
                 사진 선택
                 <input
@@ -379,7 +522,7 @@ function CafeReviewList({ storeName, storeId }) {
 
               {/* 선택된 파일명 */}
               {imageFile && (
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                <Typography variant="body2" sx={{ color: "#334336" }}>
                   {imageFile.name}
                 </Typography>
               )}
@@ -395,7 +538,7 @@ function CafeReviewList({ storeName, storeId }) {
                   height: 120,
                   borderRadius: 2,
                   overflow: "hidden",
-                  border: "1px solid #e0e0e0",
+                  border: "1px solid #ffe0b2",
                 }}
               >
                 <Box
@@ -418,9 +561,9 @@ function CafeReviewList({ storeName, storeId }) {
                     position: "absolute",
                     top: 4,
                     right: 4,
-                    bgcolor: "rgba(0,0,0,0.5)",
-                    color: "white",
-                    "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                    bgcolor: "rgba(51, 67, 54, 0.5)",
+                    color: "#fff9f4",
+                    "&:hover": { bgcolor: "rgba(51, 67, 54, 0.7)" },
                   }}
                 >
                   <DeleteOutline fontSize="small" />
@@ -431,7 +574,7 @@ function CafeReviewList({ storeName, storeId }) {
           <form id="review-form">
             <TextField
               autoFocus
-              placeholder="리뷰를 작성해주세요. (필수)"
+              placeholder="리뷰를 작성해주세요."
               required
               margin="dense"
               id="review"
@@ -440,20 +583,53 @@ function CafeReviewList({ storeName, storeId }) {
               fullWidth
               multiline
               minRows={3}
+              maxRows={8}
               variant="standard"
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              sx={{
+                "& .MuiInput-underline:before": {
+                  borderBottomColor: "#ffe0b2",
+                },
+                "& .MuiInput-underline:hover:before": {
+                  borderBottomColor: "#334336",
+                },
+                "& .MuiInput-underline:after": {
+                  borderBottomColor: "#334336",
+                },
+                "& .MuiInputBase-input": {
+                  color: "#334336",
+                },
+              }}
             />
           </form>
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose}>취소</Button>
-          <Button onClick={handleSubmit} form="review-form" variant="contained">
+          <Button onClick={handleClose} sx={{ color: "#334336" }}>
+            취소
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            form="review-form"
+            variant="contained"
+            sx={{
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              "&:hover": { bgcolor: "#334336", opacity: 0.9 },
+            }}
+          >
             작성 완료
           </Button>
         </DialogActions>
       </Dialog>
+
+      <CommonAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
     </Box>
   );
 }

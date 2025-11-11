@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
 
+
 function Loading({
   title = "잠시만 기다려주세요",
   message = "따뜻한 커피를 준비 중이에요 ☕️",
@@ -14,8 +15,8 @@ function Loading({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#faf8f5",
-        color: "#6f4e37",
+        bgcolor: "#fff9f4",
+        color: "#334336",
         textAlign: "center",
         gap: 3,
         px: 2,
@@ -25,16 +26,16 @@ function Loading({
         size={60}
         thickness={4}
         sx={{
-          color: "#6f4e37",
+          color: "#334336",
         }}
       />
       <Box>
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#334336" }}>
           {title}
         </Typography>
         <Typography
           variant="body2"
-          sx={{ mt: 1, whiteSpace: "pre-line", color: "text.secondary" }}
+          sx={{ mt: 1, whiteSpace: "pre-line", color: "#334336" }}
         >
           {message}
         </Typography>

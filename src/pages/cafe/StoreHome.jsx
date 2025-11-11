@@ -14,6 +14,7 @@ import api, { TokenService } from '../../utils/api';
 import React, { useEffect, useState } from 'react';
 import OrderDetailModal from './OrderDetailModal';
 import useUserStore from '../../stores/useUserStore';
+import useNotificationStore from '../../stores/useNotificationStore';
 
 // 상태 변경 확인을 위한 다이얼로그 컴포넌트
 const ConfirmDialog = ({ open, onClose, onConfirm, title, content }) => {
@@ -66,6 +67,10 @@ const getFormattedMenuList = (menuList) => {
 // order 데이터만 받고 그 안에 다 있으면 그것만 뿌려주고 prop 내려주면 되니까 편할건데?
 function StoreHome() {
   const partnerStoreId = useUserStore((state) => state.partnerStoreId);
+  const setRefreshOrderList = useNotificationStore(
+    (state) => state.setRefreshOrderList
+  );
+  // 주문 조회를 실시간 알림이 오면, 리렌더링 되게 만드는 상태변수
 
   const [orders, setOrders] = useState([]);
 
@@ -94,40 +99,48 @@ function StoreHome() {
   };
 
   // 오늘의 주문 목록 조회 GET
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
-        if (!partnerStoreId || partnerStoreId <= 0) {
-          console.log(
-            '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
-            partnerStoreId
-          );
-          return;
-        }
-
-        const response = await api.get(
-          `/stores/orders/today/${partnerStoreId}`
+  const fetchOrders = async () => {
+    try {
+      // 백엔드 ID가 Long 타입(>0)이므로, 0이나 null을 거르는 것이 안전합니다.
+      if (!partnerStoreId || partnerStoreId <= 0) {
+        console.log(
+          '⚠️ partnerStoreId가 유효하지 않아 주문 로딩을 건너뜁니다:',
+          partnerStoreId
         );
-
-        // 백엔드 응답 구조에 맞게 resposne.data.data
-        if (response.data && response.data.data) {
-          setOrders(response.data.data);
-          console.log(
-            '✅ GET 성공, 데이터 로드 완료:',
-            response.data.data.length,
-            '개'
-          );
-        } else {
-          setOrders(response.data.data || []);
-          console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
-        }
-      } catch (error) {
-        console.error('오늘의 주문 목록 로딩 실패:', error);
+        return;
       }
-    };
+
+      const response = await api.get(`/stores/orders/today/${partnerStoreId}`);
+
+      // 백엔드 응답 구조에 맞게 resposne.data.data
+      if (response.data && response.data.data) {
+        setOrders(response.data.data);
+        console.log(
+          '✅ GET 성공, 주문 조회 데이터 로드 완료:',
+          response.data.data.length,
+          '개'
+        );
+      } else {
+        setOrders(response.data.data || []);
+        console.log('✅ GET 성공, 하지만 반환된 주문 데이터가 없습니다.');
+      }
+    } catch (error) {
+      console.error('오늘의 주문 목록 로딩 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 최초 로딩
+  useEffect(() => {
     fetchOrders();
-  }, [partnerStoreId]);
+
+    setRefreshOrderList(fetchOrders);
+    // 갱신 함수를 Zustand 스토어에 등록??
+
+    // 컴포넌트 언마운트 시 등록된 함수 해제
+    return () => {
+      setRefreshOrderList(null);
+    };
+  }, [partnerStoreId, setRefreshOrderList]);
 
   // ⭐️ 주문 거부 로직 : 주문 거부 API를 호출하고 상태를 업데이트하는 함수
   // 거절 사유 코드(rejectReasonCode)를 추가로 받는다.
@@ -164,7 +177,7 @@ function StoreHome() {
   };
 
   // 팝업을 띄우는 함수
-  const handleConfirmOpen = (orderId, currentStatus) => {
+  const handleConfirmOpen = (orderId, currentStatus, orderNumber) => {
     const actionDetails = getNextActionAndState(currentStatus);
     if (!actionDetails) return; // 버튼 없는 상태(픽업완료 RECEIVED, 거부 REJECTED)는 팝업 띄울 필요 없음
 
@@ -175,19 +188,19 @@ function StoreHome() {
     switch (actionDetails.nextStatus) {
       case 'INPROGRESS':
         newTitle = '주문 접수 확인';
-        newContent = `주문번호 ${orderId}를 접수하시고, 제조를 시작하시겠습니까?`;
+        newContent = `주문번호 #${orderNumber}를 접수하시고, 제조를 시작하시겠습니까?`;
         break;
       case 'COMPLETED':
         newTitle = '제조 완료 알림 확인';
-        newContent = `주문번호 ${orderId}의 제조가 완료되었습니다.`;
+        newContent = `주문번호 #${orderNumber}의 제조가 완료되었습니다.`;
         break;
       case 'RECEIVED':
         newTitle = '수령 완료 처리 확인';
-        newContent = `주문번호 ${orderId}을 고객에게 전달했습니다. 수령 완료 처리하고 주문을 마감하시겠습니까?`;
+        newContent = `주문번호 #${orderNumber}을 고객에게 전달했습니다. 수령 완료 처리하고 주문을 마감하시겠습니까?`;
         break;
       default:
         newTitle = actionDetails.title; // 기본값
-        newContent = `주문 번호 ${orderId}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`;
+        newContent = `주문 번호 #${orderNumber}의 상태를 ${actionDetails.label}(으)로 변경하시겠습니까?`;
         break;
     }
 
@@ -347,7 +360,7 @@ function StoreHome() {
   // Grid 시스템에서 전체 너비는 12 - 한 행에 3개 카드 넣으려면 각 카드에 md={4}
   return (
     <div sx={{ p: 3, flexGrow: 1 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ color: '#334336' }}>
         오늘의 주문 현황
       </Typography>
 
@@ -369,53 +382,114 @@ function StoreHome() {
           ) {
             return (
               <Grid item xs={12} sm={6} md={4} key={order.orderId}>
-                <Card sx={{ height: '100%', boxShadow: 2 }}>
-                  <Box sx={{ p: 2 }}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    borderRadius: '16px',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    transform: 'translateY(0)',
+                    '&:hover': {
+                      backgroundColor: '#f9fafb',
+                      transform: 'translateY(-4px) scale(1.02)', // 살짝 떠오름
+                      boxShadow: '0 6px 14px rgba(0,0,0,0.08)', // 부드러운 그림자 강조
+                    },
+                  }}
+                  onClick={() => handleModalOpen(order)}
+                >
+                  <Box sx={{ p: 2.5 }}>
+                    {/* 상태 라벨 */}
                     <Typography
                       variant="caption"
                       sx={{
-                        bgcolor: statusInfo.header,
-                        color: 'white',
-                        p: '2px 8px',
+                        bgcolor: statusInfo.header || '#0064FF',
+                        color: '#fff',
+                        fontWeight: 600,
+                        px: 1.2,
+                        py: 0.3,
+                        borderRadius: '8px',
+                        mb: 1.5,
+                        display: 'inline-block',
+                        fontSize: '0.75rem',
                       }}
                     >
                       {statusInfo.name}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {/* 타입, 상세보기 버튼 */}
-                      <Box sx={{ border: 1, padding: 1 }}>
-                        {order.orderNumber}
-                      </Box>
-                      <Typography>
+
+                    {/* 주문 번호 + 타입 */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: '1rem',
+                          fontWeight: 600,
+                          color: '#1e1e1e',
+                        }}
+                      >
+                        #{order.orderNumber}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: '0.875rem',
+                          color: '#6b7280',
+                        }}
+                      >
                         {getOrderTypeLabel(order.orderType)}
                       </Typography>
-                      <Box sx={{ mt: 1, textAlign: 'right' }}>
-                        {/* 상세보기 버튼 */}
-                        <Button
-                          onClick={() => handleModalOpen(order)}
-                          variant="outlined"
-                          size="small"
-                          color="primary"
-                        >
-                          상세 <br />
-                          보기
-                        </Button>
-                      </Box>
                     </Box>
-                    <Typography>{formattedMenuString}</Typography>
-                    <Typography variant="body2" color="text.secondary">
+
+                    {/* 메뉴 목록 */}
+                    <Typography
+                      sx={{
+                        fontSize: '0.9rem',
+                        color: '#374151',
+                        mb: 0.5,
+                      }}
+                    >
+                      {formattedMenuString}
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{ color: '#9ca3af', fontSize: '0.8rem' }}
+                    >
                       {new Date(order.createdAt).toLocaleString()}
                     </Typography>
                   </Box>
-                  {/* 조건부 렌더링 : actionDetails가 있을 때만 버튼 표시? */}
+
+                  {/* 상태 변경 버튼 */}
                   {actionDetails && (
                     <Button
                       fullWidth
                       variant="contained"
-                      onClick={() =>
-                        handleConfirmOpen(order.orderId, order.orderStatus)
-                      }
-                      sx={{ bgcolor: statusInfo.action, color: 'white' }}
+                      disableElevation
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConfirmOpen(
+                          order.orderId,
+                          order.orderStatus,
+                          order.orderNumber
+                        );
+                      }}
+                      sx={{
+                        bgcolor: statusInfo.action || '#0064FF',
+                        color: 'white',
+                        borderRadius: '0 0 16px 16px',
+                        py: 1.2,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: '#333',
+                        },
+                      }}
                     >
                       {actionDetails.label}
                     </Button>

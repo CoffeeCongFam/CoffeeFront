@@ -169,7 +169,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
   return (
     <Dialog open={open} onClose={resetFormAndClose} maxWidth="sm" fullWidth>
       <DialogTitle
-        sx={{ bgcolor: 'primary.main', color: 'white', fontWeight: 'bold' }}
+        sx={{ bgcolor: '#334336', color: '#fff9f4', fontWeight: 'bold' }}
       >
         <Typography variant="h6" component="span" fontWeight="bold">
           신규 메뉴 등록
@@ -206,6 +206,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.menuName}
               helperText={errors.menuName}
+              required
             />
           </Grid>
 
@@ -222,6 +223,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.price}
               helperText={errors.price}
+              required
             />
           </Grid>
 
@@ -257,6 +259,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
               onChange={handleChange}
               error={!!errors.menuDesc}
               helperText={errors.menuDesc}
+              required
             />
           </Grid>
 
@@ -278,7 +281,7 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
                 variant="rounded"
               />
               <Box flexGrow={1}>
-                <Typography variant="body2" color="text.secondary" mb={1}>
+                <Typography variant="body2" sx={{ color: "#334336" }} mb={1}>
                   {selectedFile
                     ? `선택된 파일: ${selectedFile.name}`
                     : '메뉴 이미지를 첨부해주세요.'}
@@ -289,7 +292,14 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
                     component="label"
                     startIcon={<CloudUploadIcon />}
                     size="small"
-                    color="primary"
+                    sx={{
+                      borderColor: "#334336",
+                      color: "#334336",
+                      "&:hover": {
+                        borderColor: "#334336",
+                        bgcolor: "rgba(51, 67, 54, 0.05)",
+                      },
+                    }}
                   >
                     파일 선택
                     <input
@@ -305,7 +315,14 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
                       variant="outlined"
                       onClick={handleClearImage}
                       size="small"
-                      color="error"
+                      sx={{
+                        borderColor: "#334336",
+                        color: "#334336",
+                        "&:hover": {
+                          borderColor: "#334336",
+                          bgcolor: "rgba(51, 67, 54, 0.05)",
+                        },
+                      }}
                     >
                       삭제
                     </Button>
@@ -330,16 +347,30 @@ export default function MenuRegistModal({ open, onClose, onRegister }) {
         <Button
           onClick={resetFormAndClose}
           variant="outlined"
-          color="error"
-          sx={{ minWidth: 100 }}
+          sx={{
+            minWidth: 100,
+            borderColor: "#334336",
+            color: "#334336",
+            "&:hover": {
+              borderColor: "#334336",
+              bgcolor: "rgba(51, 67, 54, 0.05)",
+            },
+          }}
         >
           취소
         </Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          color="primary"
-          sx={{ minWidth: 120 }}
+          sx={{
+            minWidth: 120,
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+          }}
         >
           메뉴 등록 완료
         </Button>

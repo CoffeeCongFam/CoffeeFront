@@ -55,6 +55,7 @@ function SubTypeChip({ type }) {
       label={`${emoji} ${label}`}
       size="small"
       sx={{
+        // alignSelf: "flex-start",
         fontWeight: 600,
         letterSpacing: 0.3,
         ...style,

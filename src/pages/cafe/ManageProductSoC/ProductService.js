@@ -1,5 +1,5 @@
 // 🚩오직 API 통신(백엔드 연결 또는 더미 데이터 조작)만 담당
-import axios from 'axios';
+import axios from "axios";
 
 // /api/owners/subscriptions 구독권 목록 조회
 // /api/owners/subscriptions/{subscriptionId} 구독권 상세정보 조회
@@ -21,7 +21,7 @@ export const fetchSubscriptions = async () => {
     });
     return response.data.data;
   } catch (error) {
-    console.error('구독권 목록 조회 실패 :', error);
+    console.error("구독권 목록 조회 실패 :", error);
     throw error;
   }
 };
@@ -34,13 +34,13 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
   const formData = new FormData();
 
   if (imageFile) {
-    formData.append('file', imageFile);
+    formData.append("file", imageFile);
   }
 
   const subJson = new Blob([JSON.stringify(subscriptionData)], {
-    type: 'application/json',
+    type: "application/json",
   });
-  formData.append('data', subJson); // 백엔드 스펙에 맞게 key 확인
+  formData.append("data", subJson); // 백엔드 스펙에 맞게 key 확인
 
   try {
     const response = await axios.post(url, formData, {
@@ -49,7 +49,7 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
     return response.data.success;
     // API 명세서 상에 RESPONSE를 좀 잘 봤어야 했음
   } catch (error) {
-    console.error('구독권 등록 실패:', error);
+    console.error("구독권 등록 실패:", error);
     throw error;
   }
 };
@@ -59,15 +59,11 @@ export const registerSubscription = async (subscriptionData, imageFile) => {
 
 export const updateSubscription = async (subscriptionId, updateData) => {
   const url = `${API_BASE_URL}/${subscriptionId}`;
-  
+
   try {
-    const response = await axios.patch(
-      url, 
-      updateData,
-      {
-        withCredentials: true
-      }
-    );
+    const response = await axios.patch(url, updateData, {
+      withCredentials: true,
+    });
     return response;
   } catch (error) {
     console.error(`구독권 수정 실패 (ID: ${subscriptionId}):`, error);
@@ -97,11 +93,9 @@ export const softDeleteSubscription = async (subscriptionId) => {
   // 🚩 [실제 axios 코드]
   try {
     const url = `${API_BASE_URL}/${subscriptionId}`;
-    const response = await axios.delete(url,
-      { 
-        withCredentials: true
-      }
-    );
+    const response = await axios.delete(url, {
+      withCredentials: true,
+    });
     return response.data.data || response.data;
   } catch (error) {
     console.error(`구독권 삭제 실패 (ID: ${subscriptionId}):`, error);
@@ -119,13 +113,13 @@ export const fetchAllMenus = async (partnerStoreId) => {
       withCredentials: true,
     }); // 백엔드 응답 구조에 따라 .data.data 또는 .data를 반환하도록 조정
     console.log(
-      '✅ GET 성공, 데이터 로드 완료:',
+      "✅ GET 성공, 데이터 로드 완료:",
       response.data.data.length,
-      '개'
+      "개"
     );
     return response.data.data;
   } catch (error) {
-    console.error('전체 메뉴 목록 조회 실패:', error);
+    console.error("전체 메뉴 목록 조회 실패:", error);
 
     throw error;
   }

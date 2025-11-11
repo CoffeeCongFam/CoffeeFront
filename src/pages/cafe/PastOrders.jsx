@@ -239,11 +239,11 @@ export default function PastOrdersList() {
       <Box
         sx={{
           minHeight: '100vh',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#fff9f4',
           padding: 2,
         }}
       >
-        <StyledPaper elevation={8}>
+        <StyledPaper elevation={8} sx={{ borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white" }}>
           {/* 제목 및 날짜 필터 영역 (수정 없음) */}
           <Box
             display="flex"
@@ -253,11 +253,11 @@ export default function PastOrdersList() {
             mb={4}
             gap={2}
           >
-            <Typography variant="h5" component="h1" fontWeight="bold">
+            <Typography variant="h5" component="h1" fontWeight="bold" sx={{ color: "#334336" }}>
               지난 주문 내역 ({selectedDate.replace(/-/g, '.')})
             </Typography>
             <Box display="flex" alignItems="center" gap={1}>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{ color: "#334336" }}>
                 날짜 선택:
               </Typography>
               <TextField
@@ -266,7 +266,20 @@ export default function PastOrdersList() {
                 value={selectedDate}
                 onChange={handleDateChange}
                 size="small"
-                sx={{ width: { xs: '100%', sm: 180 } }}
+                sx={{
+                  width: { xs: '100%', sm: 180 },
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#334336",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "rgba(51, 67, 54, 0.5)",
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#334336",
+                  },
+                }}
               />
             </Box>
           </Box>
@@ -281,8 +294,8 @@ export default function PastOrdersList() {
           >
             {isLoading ? (
               <Box display="flex" flexDirection="column" alignItems="center">
-                <CircularProgress />
-                <Typography sx={{ mt: 2, color: theme.palette.text.secondary }}>
+                <CircularProgress sx={{ color: "#334336" }} />
+                <Typography sx={{ mt: 2, color: "#334336" }}>
                   주문 내역을 불러오는 중...
                 </Typography>
               </Box>
@@ -315,7 +328,7 @@ export default function PastOrdersList() {
                           sx={{
                             fontWeight: 'bold',
                             fontSize: '0.8rem',
-                            color: theme.palette.text.primary,
+                            color: "#334336",
                           }}
                         >
                           {header}
@@ -385,19 +398,19 @@ export default function PastOrdersList() {
                               </TableCell>
                               <TableCell
                                 align="center"
-                                sx={{ color: theme.palette.text.secondary }}
+                                sx={{ color: "#334336" }}
                               >
                                 {order.subscriptionName}
                               </TableCell>
                               <TableCell
                                 align="center"
-                                sx={{ color: theme.palette.text.secondary }}
+                                sx={{ color: "#334336" }}
                               >
                                 {order.name}
                               </TableCell>
                               <TableCell
                                 align="center"
-                                sx={{ color: theme.palette.text.secondary }}
+                                sx={{ color: "#334336" }}
                               >
                                 {order.tel}
                               </TableCell>
@@ -410,7 +423,7 @@ export default function PastOrdersList() {
                         <TableCell
                           colSpan={8}
                           align="center"
-                          sx={{ py: 4, color: theme.palette.text.disabled }}
+                          sx={{ py: 4, color: "#334336" }}
                         >
                           선택한 날짜에 주문 내역이 없습니다. (KST 09:00 ~ 22:00
                           기준)

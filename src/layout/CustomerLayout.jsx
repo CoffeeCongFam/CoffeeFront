@@ -28,7 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import logo from "../assets/coffeiensLogoTitle.png";
+import logo from "../assets/finalLogo.png";
 import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
 import { deleteNotification, readNotification } from "../apis/notificationApi";
@@ -54,13 +54,28 @@ const links = [
   { to: "/me/mypage", label: "마이페이지", icon: <PersonIcon /> },
 ];
 
+const colorPalette = {
+  mainText: "#ffe0c2",
+  background: "#fff9f4",
+  // background: '#ececec',
+  // background: '#ffffff',
+  accent1: "#435548",
+  accent2: "#607064",
+};
+
 export default function CustomerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname.startsWith("/me/search");
-  const { notifications, unreadCount, markAsRead, deleteAllNotifications } =
-    useNotificationStore();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    deleteAllNotifications,
+    removeNotification,
+  } = useNotificationStore();
   const { isAppLike } = useAppShellMode(); // 모바일 여부
+
   const [bottomValue, setBottomValue] = useState(location.pathname);
 
   const [notifOpen, setNotifOpen] = useState(false); // 알림 토글
@@ -73,8 +88,23 @@ export default function CustomerLayout() {
   function handleCloseNotif() {
     setNotifOpen(false);
   }
+
   function openNotifDrawer() {
     setNotifOpen(true);
+  }
+
+  // 특정 알림 삭제 요청
+  async function handleDeleteNotification(notificationId) {
+    // const ok = window.confirm("해당 알림을 삭제하시겠습니까?");
+    // if (!ok) return;
+
+    try {
+      await deleteNotification(notificationId); // 서버 삭제 API
+      removeNotification(notificationId); // 스토어에서 제거
+    } catch (e) {
+      console.error("알림 삭제 실패:", e);
+      alert("알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   }
 
   // 전체 알림 삭제 요청
@@ -113,6 +143,9 @@ export default function CustomerLayout() {
       } catch (e) {
         console.error("알림 읽음 처리 실패:", e);
       }
+    } else {
+      // 읽은 알림이면
+      //
     }
 
     // 타입별 네비게이션
@@ -139,39 +172,28 @@ export default function CustomerLayout() {
     }
   }
 
-  // async function readMarkNotification(notificationId) {
-  //   const target = useNotificationStore.getState().getNotification(notificationId);
-
-  //   if (!target) {
-  //     console.warn("❌ 알림을 찾을 수 없음:", notificationId);
-  //     return;
-  //   }
-  //   console.log("📨 클릭된 알림:", target);
-
-  //   if (target.readAt || target.isRead) {
-  //     console.log("✅ 이미 읽은 알림입니다. 요청 생략.");
-  //     return;
-  //   }
-
-  //    try {
-  //     await readNotification(notificationId); // PATCH 요청
-  //     markAsRead(notificationId); // 상태 업데이트
-  //   } catch (e) {
-  //     console.error("알림 읽음 처리 실패:", e);
-  //   } finally {
-  //     console.log("🔄 알림 상태 업데이트 완료");
-  //   }
-  // }
-
   // ------------------------------------------
   // 1) 앱 / 모바일 모드
   // ------------------------------------------
   if (isAppLike) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+          bgcolor: colorPalette.background,
+          color: colorPalette.mainText,
+        }}
+      >
         <CssBaseline />
         {/* 상단 바 - 아주 얇게 */}
-        <AppBar position="static" elevation={0} color="inherit">
+        <AppBar
+          position="static"
+          elevation={0}
+          color="inherit"
+          sx={{ bgcolor: "transparent" }}
+        >
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Typography
               variant="h6"
@@ -181,11 +203,7 @@ export default function CustomerLayout() {
             >
               COFFEIENS
             </Typography>
-            <IconButton
-              color="inherit"
-              onClick={openNotifDrawer}
-              // sx={{ zIndex: 1400 }}
-            >
+            <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
               <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
@@ -213,12 +231,15 @@ export default function CustomerLayout() {
             left: 0,
             right: 0,
             zIndex: 2000,
+            bgcolor: "#334336",
+            pb: 2.3,
           }}
         >
           <BottomNavigation
             value={bottomValue}
             onChange={(e, newValue) => setBottomValue(newValue)}
             showLabels
+            sx={{ bgcolor: "transparent" }}
           >
             {links.map((link) => (
               <BottomNavigationAction
@@ -228,6 +249,24 @@ export default function CustomerLayout() {
                 value={link.to}
                 component={NavLink}
                 to={link.to}
+                sx={{
+                  color: "white",
+                  "& .MuiBottomNavigationAction-label": {
+                    fontSize: "0.75rem", // 원하는 크기
+                    transition: "none",
+                  },
+                  "&.Mui-selected": {
+                    color: "#fff9f4",
+                    paddingTop: "6px",
+                    "& .MuiSvgIcon-root": {
+                      color: "#ffc494",
+                    },
+                    "& .MuiBottomNavigationAction-label": {
+                      fontSize: "0.75rem",
+                      color: " #ffc494",
+                    },
+                  },
+                }}
               />
             ))}
           </BottomNavigation>
@@ -242,6 +281,7 @@ export default function CustomerLayout() {
             sx: {
               width: "80vw",
               maxWidth: 360,
+              bgcolor: colorPalette.background,
             },
           }}
         >
@@ -257,8 +297,13 @@ export default function CustomerLayout() {
               알림
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "row" }}>
-              <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
-              <Button onClick={handleCloseNotif} color="gray">
+              <Button
+                onClick={handleDeleteAllNotifications}
+                sx={{ color: "#334336" }}
+              >
+                전체 삭제
+              </Button>
+              <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
                 닫기
               </Button>
             </Box>
@@ -270,6 +315,7 @@ export default function CustomerLayout() {
                 key={noti.notificationId}
                 noti={noti}
                 onClick={handleNotificationClick}
+                onDelete={handleDeleteNotification}
               />
             ))}
 
@@ -322,10 +368,16 @@ export default function CustomerLayout() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
+                  color: colorPalette.mainText,
                   "&.Mui-selected": {
-                    backgroundColor: "primary.light",
-                    color: "white",
-                    "& .MuiListItemIcon-root": { color: "white" },
+                    backgroundColor: colorPalette.accent1,
+                    color: colorPalette.background,
+                    "& .MuiListItemIcon-root": {
+                      color: colorPalette.background,
+                    },
+                  },
+                  "& .MuiListItemIcon-root": {
+                    color: colorPalette.mainText,
                   },
                 }}
               >
@@ -346,6 +398,8 @@ export default function CustomerLayout() {
         width: "100vw",
         height: "100vh",
         overflow: "hidden",
+        bgcolor: colorPalette.background,
+        color: colorPalette.mainText,
       }}
     >
       <CssBaseline />
@@ -360,6 +414,9 @@ export default function CustomerLayout() {
             width: drawerWidth,
             boxSizing: "border-box",
             backgroundImage: "none",
+            // bgcolor: '#332B26',
+            bgcolor: "#334336",
+            borderRight: "none",
           },
         }}
         open
@@ -375,6 +432,7 @@ export default function CustomerLayout() {
           height: "100vh",
           overflow: isSearchPage ? "hidden" : "auto",
           position: "relative",
+          bgcolor: "transparent",
         }}
       >
         {/* 상단 헤더(AppBar) */}
@@ -390,7 +448,7 @@ export default function CustomerLayout() {
           }}
         >
           <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <IconButton color="black" onClick={openNotifDrawer}>
+            <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
               <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
@@ -421,6 +479,7 @@ export default function CustomerLayout() {
           sx: {
             width: 360,
             maxWidth: "80vw",
+            bgcolor: colorPalette.background,
           },
         }}
       >
@@ -436,14 +495,19 @@ export default function CustomerLayout() {
             알림
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row" }}>
-            <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
-            <Button onClick={handleCloseNotif} color="gray">
+            <Button
+              onClick={handleDeleteAllNotifications}
+              sx={{ color: "#334336" }}
+            >
+              전체 삭제
+            </Button>
+            <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
               닫기
             </Button>
           </Box>
         </Box>
         <Divider />
-        <List sx={{ p: 0 }}>
+        <List sx={{ p: 0, width: "100%" }}>
           {notifications.map((noti) => (
             <NotificationItem
               key={noti.notificationId}

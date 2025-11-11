@@ -17,6 +17,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { withdrawal } from "../../utils/member";
 import PersonIcon from "@mui/icons-material/Person";
@@ -32,6 +34,8 @@ import useUserStore from "../../stores/useUserStore";
 function Profile() {
   const { authUser, clearUser } = useUserStore();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [user, setUser] = useState({
     name: authUser?.name || "",
     tel: authUser?.tel || "",
@@ -51,7 +55,6 @@ function Profile() {
     }));
   }, [authUser]);
 
-  
   const [isWithdrawCompleted, setIsWithdrawCompleted] = useState(false);
 
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -65,38 +68,7 @@ function Profile() {
     setWithdrawInput("");
   };
   const handleGoodbyeConfirm = () => {
-    // 1) 주스텐드 유저 정보 초기화
-    try {
-      if (typeof clearUser === "function") {
-        clearUser();
-      }
-    } catch (e) {
-      console.error("clearUser 오류:", e);
-    }
-
-    // 2) 로컬스토리지 초기화
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        window.localStorage.clear();
-      }
-    } catch (e) {
-      console.error("localStorage 초기화 오류:", e);
-    }
-
-    // 3) 쿠키 삭제
-    try {
-      if (typeof document !== "undefined" && document.cookie) {
-        document.cookie.split(";").forEach((cookie) => {
-          const eqPos = cookie.indexOf("=");
-          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-          document.cookie =
-            name.trim() +
-            "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-        });
-      }
-    } catch (e) {
-      console.error("쿠키 삭제 오류:", e);
-    }
+    // 이 함수의 내용은 Withdrawal.jsx 로 이전되었습니다.
   };
   const handleCloseWithdraw = () => {
     setIsWithdrawOpen(false);
@@ -128,9 +100,9 @@ function Profile() {
       console.log("withdrawal 결과:", success);
       if (success) {
         // 탈퇴 완료: 탈퇴 모달 닫고, Withdrawal 페이지로 이동
-        handleGoodbyeConfirm();
         setIsWithdrawOpen(false);
         setIsWithdrawCompleted(true);
+
         navigate("/withdrawal", { replace: true });
       } else {
         alert("탈퇴에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -141,13 +113,12 @@ function Profile() {
     }
   };
 
-
   if (isWithdrawCompleted) {
     return (
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#fffdf7",
+          bgcolor: "#fff9f4",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -161,6 +132,7 @@ function Profile() {
             borderRadius: 4,
             boxShadow: 6,
             bgcolor: "white",
+            border: "1px solid #ffe0b2",
           }}
         >
           <CardContent
@@ -175,6 +147,7 @@ function Profile() {
               sx={{
                 fontWeight: 800,
                 mb: 2,
+                color: "#334336",
               }}
             >
               언젠간 다시 돌아오세요
@@ -184,7 +157,7 @@ function Profile() {
               sx={{
                 fontWeight: 700,
                 mb: 3,
-                color: "primary.main",
+                color: "#334336",
               }}
             >
               커피엔스의 커피 세상으로
@@ -192,13 +165,13 @@ function Profile() {
 
             <Typography
               variant="body2"
-              sx={{ color: "text.secondary", mb: 4, lineHeight: 1.7 }}
+              sx={{ color: "#334336", mb: 4, lineHeight: 1.7 }}
             >
               매일의 커피 한 잔으로 하루를 진화시키던 그 시간들처럼,
               <br />
               언젠가 다시, 당신의 하루를 깨우는 커피 한 잔이 필요해질 때
               <br />
-              COFFEIENS가 여기에서 기다리고 있을게요.
+              COFFEIENS 여기에서 기다리고 있을게요.
             </Typography>
 
             <Button
@@ -210,6 +183,12 @@ function Profile() {
                 py: 1.2,
                 fontWeight: 700,
                 textTransform: "none",
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
+                },
               }}
             >
               확인
@@ -229,13 +208,16 @@ function Profile() {
         justifyContent: "center",
         px: 2,
         py: 4,
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
       }}
     >
       <Card
         sx={{
           width: "100%",
           maxWidth: 480,
-          borderRadius: 4,
+          borderRadius: 2,
+          border: "1px solid #ffe0b2",
           boxShadow: 4,
           overflow: "hidden",
         }}
@@ -251,8 +233,14 @@ function Profile() {
             gap: 2,
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#334336" }}>
               {user.name}
             </Typography>
           </Box>
@@ -261,10 +249,7 @@ function Profile() {
         <Divider />
 
         <CardContent sx={{ px: 3, py: 2.5 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ color: "text.secondary", mb: 1 }}
-          >
+          <Typography variant="subtitle2" sx={{ color: "#334336", mb: 1 }}>
             기본 정보
           </Typography>
 
@@ -295,7 +280,7 @@ function Profile() {
                   secondary={user.name}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -320,7 +305,7 @@ function Profile() {
                   secondary={user.tel}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -342,10 +327,10 @@ function Profile() {
                 </ListItemIcon>
                 <ListItemText
                   primary="성별"
-                  secondary={user.gender === 'M' ? "남자" : "여자"}
+                  secondary={user.gender === "M" ? "남자" : "여자"}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary",
+                    sx: { color: "#334336" },
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -370,7 +355,7 @@ function Profile() {
                   secondary={user.email}
                   primaryTypographyProps={{
                     variant: "caption",
-                    color: "text.secondary"
+                    color: "text.secondary",
                   }}
                   secondaryTypographyProps={{
                     variant: "body2",
@@ -395,8 +380,12 @@ function Profile() {
             size="small"
             onClick={handleOpenWithdraw}
             sx={{
-              color: "#555",
-              borderColor: "#555",
+              color: "#334336",
+              borderColor: "#334336",
+              "&:hover": {
+                borderColor: "#334336",
+                bgcolor: "rgba(51, 67, 54, 0.05)",
+              },
             }}
           >
             탈퇴하기
@@ -410,9 +399,11 @@ function Profile() {
           sx: {
             width: "100%",
             maxWidth: 500,
-            height: "90vh",
+            height: isMobile ? "calc(100vh - 100px)" : "90vh", // 모바일에서 footer 높이 고려
+            maxHeight: isMobile ? "calc(100vh - 100px)" : "90vh",
             borderRadius: 4,
             bgcolor: "#ffffff",
+            m: isMobile ? 1 : 2, // 모바일에서 여백 조정
           },
         }}
       >
@@ -422,11 +413,12 @@ function Profile() {
             fontSize: 18,
             pb: 1,
             px: 3,
+            color: "#334336",
           }}
         >
           계정 탈퇴 전, 한 번만 더 확인해주세요
         </DialogTitle>
-        <DialogContent sx={{ p: 0 }}>
+        <DialogContent sx={{ p: 0, overflowY: "auto", maxHeight: isMobile ? "calc(100vh - 200px)" : "auto" }}>
           {/* 탈퇴 안내 이미지 - 단계별로 변경 */}
           <Box
             sx={{
@@ -467,31 +459,44 @@ function Profile() {
           >
             {withdrawStep === 1 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}
+                >
                   당신의 하루를 진화시키는 커피 구독,
                   <br />
                   정말 떠나시겠어요?
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게 만들었던 
-                    그 커피 구독 혜택을 다시 한번 생각해 주세요
+                <Typography variant="body2" sx={{ color: "#334336" }}>
+                  사장님께 힘이 되었던 당신의 방문과, 당신의 하루를 현명하게
+                  만들었던 그 커피 구독 혜택을 다시 한번 생각해 주세요
                 </Typography>
               </>
             )}
             {withdrawStep == 2 && (
               <>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}
+                >
                   정말 탈퇴하시겠습니까?
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#334336", mb: 2 }}>
+                  탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두 삭제되며
+                  복구가 불가능합니다.
+                  <br />
+                  특히 자주 가는 동네 카페의 구독권 혜택을 더 이상 이용하실 수
+                  없습니다.
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: "text.secondary", mb: 2 }}
+                  sx={{
+                    textDecoration: "underline",
+                    color: "text.secondary",
+                    mb: 2,
+                  }}
                 >
-                  탈퇴 후에는 보유 중인 구독권, 쿠폰, 적립 내역이 모두
-                  삭제되며 복구가 불가능합니다.
-                  <br />
-                  특히 자주 가는 동네 카페의 구독권 혜택을 더 이상
-                  이용하실 수 없습니다.
+                  ※ 탈퇴 후, 90일 이내에 재로그인 시 회원정보 복구가 가능합니다.
                 </Typography>
                 <TextField
                   fullWidth
@@ -500,12 +505,25 @@ function Profile() {
                   variant="outlined"
                   value={withdrawInput}
                   onChange={(e) => setWithdrawInput(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#334336",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(51, 67, 54, 0.5)",
+                      },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#334336",
+                    },
+                  }}
                 />
               </>
             )}
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
+        <DialogActions sx={{ px: 3, py: 2, pb: isMobile ? 5 : 2 }}> {/* 모바일에서 하단 여백 추가 */}
           <Box
             sx={{
               display: "flex",
@@ -515,7 +533,9 @@ function Profile() {
               gap: 2,
             }}
           >
-            <Button onClick={handleCloseWithdraw}>탈퇴하지 않을래요</Button>
+            <Button onClick={handleCloseWithdraw} sx={{ color: "#334336" }}>
+              탈퇴하지 않을래요
+            </Button>
 
             <Box
               sx={{
@@ -533,7 +553,7 @@ function Profile() {
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    bgcolor: step <= withdrawStep ? "primary.main" : "grey.300",
+                    bgcolor: step <= withdrawStep ? "#334336" : "grey.300",
                     transition: "all 0.3s ease",
                   }}
                 />
@@ -544,11 +564,23 @@ function Profile() {
               <Button
                 onClick={handlePrevStep}
                 disabled={withdrawStep === 1}
+                sx={{ color: "#334336" }}
               >
                 이전
               </Button>
               {withdrawStep < 2 ? (
-                <Button variant="contained" onClick={handleNextStep}>
+                <Button
+                  variant="contained"
+                  onClick={handleNextStep}
+                  sx={{
+                    bgcolor: "#334336",
+                    color: "#fff9f4",
+                    "&:hover": {
+                      bgcolor: "#334336",
+                      opacity: 0.9,
+                    },
+                  }}
+                >
                   다음
                 </Button>
               ) : (
@@ -556,6 +588,14 @@ function Profile() {
                   variant="contained"
                   color="error"
                   onClick={handleClickWithdrawConfirm}
+                  sx={{
+                    bgcolor: "#334336",
+                    color: "#fff9f4",
+                    "&:hover": {
+                      bgcolor: "#334336",
+                      opacity: 0.9,
+                    },
+                  }}
                 >
                   탈퇴하기
                 </Button>

@@ -113,11 +113,16 @@ export default function ReviewPage({ reviewList: propReviews }) {
   const empty = !loading && localReviews.length === 0;
 
   return (
-    <Box sx={{ p: 2, mt: 4 }}>
+    <Box sx={{ p: 2, mt: 4, borderRadius: 2, border: "1px solid #ffe0b2", backgroundColor: "white" }}>
       <Header sortOrder={sortOrder} onChangeOrder={setSortOrder} />
       {loading && (
         <Box sx={{ mt: 2 }}>
-          <LinearProgress />
+          <LinearProgress
+            sx={{
+              bgcolor: "#ffe0b2",
+              "& .MuiLinearProgress-bar": { bgcolor: "#334336" },
+            }}
+          />
         </Box>
       )}
 
@@ -155,7 +160,7 @@ function Header({ sortOrder, onChangeOrder }) {
       sx={{ mb: 2, px: 1 }}
     >
       <Box sx={{ ml: 2 }}>
-        <Typography variant="h6" component="h2" fontWeight="bold">
+        <Typography variant="h6" component="h2" fontWeight="bold" sx={{ color: "#334336" }}>
           내가 작성한 리뷰
         </Typography>
       </Box>
@@ -279,10 +284,10 @@ function ReviewItemCard({ review, fmt, onDelete, deleting }) {
 function EmptyState() {
   return (
     <Box sx={{ mt: 6, textAlign: "center" }}>
-      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+      <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
         아직 작성한 리뷰가 없습니다
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={{ color: "#334336" }}>
         주문 후 매장에서 받은 서비스와 음료에 대해 리뷰를 남길 수 있습니다.
       </Typography>
     </Box>

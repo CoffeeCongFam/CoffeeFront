@@ -74,8 +74,8 @@ const tableHeaders = [
 // 메뉴 리스트를 표시하는 테이블 컴포넌트
 export default function MenuTable({ menuList, onEditClick }) {
   const sortedByCreatedAtMenuList = [...(menuList || [])].sort((a, b) => {
-    const dataA = new Date(a.createdAt);
-    const dataB = new Date(b.createdAt);
+    const dataA = new Date(a.createdAt).getTime();
+    const dataB = new Date(b.createdAt).getTime();
 
     // 내림차순 b - a
     return dataB - dataA;
@@ -93,7 +93,7 @@ export default function MenuTable({ menuList, onEditClick }) {
                 sx={{
                   fontWeight: 'bold',
                   width: header.width,
-                  color: 'text.primary',
+                  color: "#334336",
                 }}
               >
                 {header.label}
@@ -139,7 +139,7 @@ export default function MenuTable({ menuList, onEditClick }) {
                   </TableCell>
                   <TableCell
                     align="left"
-                    sx={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                    sx={{ color: "#334336", fontSize: '0.85rem' }}
                   >
                     {menu.menuDesc}
                   </TableCell>
@@ -153,8 +153,15 @@ export default function MenuTable({ menuList, onEditClick }) {
                       <Button
                         size="small"
                         variant="outlined"
-                        // sx={{ mr: 1 }} // ⬅️ Box의 gap 속성을 사용하므로 제거합니다.
                         onClick={() => onEditClick(menu)} // ⬅️ 부모 함수 호출
+                        sx={{
+                          borderColor: "#334336",
+                          color: "#334336",
+                          "&:hover": {
+                            borderColor: "#334336",
+                            bgcolor: "rgba(51, 67, 54, 0.05)",
+                          },
+                        }}
                       >
                         수정
                       </Button>
@@ -168,7 +175,7 @@ export default function MenuTable({ menuList, onEditClick }) {
               <TableCell
                 colSpan={8}
                 align="center"
-                sx={{ py: 4, color: 'text.disabled' }}
+                sx={{ py: 4, color: "#334336" }}
               >
                 등록된 메뉴가 없습니다. 메뉴를 등록해 주세요.
               </TableCell>

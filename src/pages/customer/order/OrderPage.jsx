@@ -61,6 +61,10 @@ function OrderPage() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
+        backgroundColor: "white",
+        m: isAppLike ? 2 : 4,
       }}
     >
       {/* 헤더 영역 - 항상 같은 레이아웃 */}
@@ -78,6 +82,7 @@ function OrderPage() {
             fontSize: { xs: "1.5rem", md: "1.9rem" },
             fontWeight: "bold",
             lineHeight: 1.1,
+            color: "#334336",
           }}
         >
           주문 내역
@@ -143,9 +148,20 @@ function OrderPage() {
           onChange={(e, v) => setTab(v)}
           sx={{
             mb: 2,
-            "& .MuiTab-root": { fontWeight: 600, textTransform: "none" },
-            "& .Mui-selected": { color: "black" },
-            "& .MuiTabs-indicator": { backgroundColor: "black" },
+            borderBottom: 1,
+            borderColor: "#ffe0b2",
+            "& .MuiTab-root": { 
+              fontWeight: 600, 
+              textTransform: "none",
+              color: "#3B3026",
+            },
+            "& .Mui-selected": { 
+              color: "#334336",
+              fontWeight: 600,
+            },
+            "& .MuiTabs-indicator": { 
+              backgroundColor: "#334336",
+            },
           }}
         >
           <Tab label={`진행 중 (${inProgressOrders.length})`} />
@@ -166,7 +182,7 @@ function OrderPage() {
         }}
       >
         {isLoading ? (
-          <CircularProgress sx={{ color: "#999" }} size={40} />
+          <CircularProgress sx={{ color: "#334336" }} size={40} />
         ) : (
           (() => {
             // 현재 탭에 따라 보여줄 주문 리스트 선택

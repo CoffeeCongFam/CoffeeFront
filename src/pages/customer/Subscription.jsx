@@ -7,6 +7,8 @@ import {
   Tabs,
   Tab,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { getSubscription } from "../../utils/subscription";
 import Slider from "react-slick";
@@ -15,6 +17,7 @@ import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import useUserStore from "../../stores/useUserStore";
+import useAppShellMode from "../../hooks/useAppShellMode";
 import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 
 // 구독권 상세 정보 컴포넌트
@@ -137,6 +140,9 @@ function PrevArrow(props) {
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // 모바일 감지 보강
   const CURRENT_MEMBER_ID = authUser?.memberId ?? 1;
   const sliderRef = useRef(null);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'expired'
@@ -193,7 +199,10 @@ const SubscriptionPage = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    responsive: [{ breakpoint: 600, settings: { slidesToShow: 1 } }],
+    arrows: !(isAppLike || isMobile), // 모바일에서 화살표 비활성화 (isAppLike 또는 isMobile 둘 중 하나라도 true면 화살표 숨김)
+    prevArrow: null, // 기본 화살표 제거
+    nextArrow: null, // 기본 화살표 제거
+    responsive: [{ breakpoint: 600, settings: { slidesToShow: 1, arrows: false } }],
   };
 
   // 환불 성공시: 사용가능 목록에서 제거하고 만료 목록에 추가
@@ -222,7 +231,7 @@ const SubscriptionPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
       <Box
         sx={{
           display: "flex",
@@ -231,27 +240,42 @@ const SubscriptionPage = () => {
           mb: 1.5,
         }}
       >
-        <Typography variant="h6" component="h2" fontWeight="bold">
+        <Typography variant="h6" component="h2" color="#334336" fontWeight="bold">
           구독권
         </Typography>
       </Box>
       <Tabs
         value={activeTab}
         onChange={(_, v) => setActiveTab(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 3 }}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "#ffe0b2", 
+          mt: 0.5, 
+          mb: 3,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+            "&.Mui-selected": {
+              color: "#334336",
+              fontWeight: 600,
+            },
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="all" label="사용 가능한 구독권" />
         <Tab value="expired" label="만료된 구독권" />
       </Tabs>
       {loading ? (
-        <Typography>불러오는 중…</Typography>
+        <Typography sx={{color: "#334336"}}>불러오는 중…</Typography>
       ) : error ? (
-        <Typography color="error">{error}</Typography>
+        <Typography color="error" sx={{ color: "#334336" }}>{error}</Typography>
       ) : currentList.length > 0 ? (
         <Box
           sx={{
             position: "relative",
-            padding: "0 44px 72px",
+            padding: { xs: "0 0 72px", sm: "0 44px 72px" }, // 모바일에서 좌우 패딩 제거
             "& .slick-list": { overflow: "hidden", paddingBottom: "24px" },
             "& .slick-dots": { bottom: "-36px" },
           }}
@@ -296,45 +320,51 @@ const SubscriptionPage = () => {
               );
             })}
           </Slider>
-          <IconButton
-            onClick={() => sliderRef.current?.slickPrev()}
-            sx={{
-              position: "absolute",
-              top: "40%",
-              left: 0,
-              transform: "translateY(-50%)",
-              zIndex: 2,
-              color: "black",
-              backgroundColor: "white",
-              boxShadow: 3,
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
-            }}
-          >
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            onClick={() => sliderRef.current?.slickNext()}
-            sx={{
-              position: "absolute",
-              top: "40%",
-              right: 0,
-              transform: "translateY(-50%)",
-              zIndex: 2,
-              color: "black",
-              backgroundColor: "white",
-              boxShadow: 3,
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.8)" },
-            }}
-          >
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
+          {!(isAppLike || isMobile) && (
+            <IconButton
+              onClick={() => sliderRef.current?.slickPrev()}
+              sx={{
+                position: "absolute",
+                top: "40%",
+                left: 0,
+                transform: "translateY(-50%)",
+                zIndex: 2,
+                color: "#334336",
+                backgroundColor: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: 3,
+                "&:hover": { backgroundColor: "#fff9f4" },
+              }}
+            >
+              <ArrowBackIosNewIcon fontSize="small" />
+            </IconButton>
+          )}
+          {!(isAppLike || isMobile) && (
+            <IconButton
+              onClick={() => sliderRef.current?.slickNext()}
+              sx={{
+                position: "absolute",
+                top: "40%",
+                right: 0,
+                transform: "translateY(-50%)",
+                zIndex: 2,
+                color: "#334336",
+                backgroundColor: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: 3,
+                "&:hover": { backgroundColor: "#fff9f4" },
+              }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          )}
         </Box>
       ) : (
         <Box sx={{ mt: 6, textAlign: "center" }}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
             구독권 내역이 비어 있습니다.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             구독권 구매시 이곳에서 구독권을 확인할 수 있습니다.
           </Typography>
         </Box>

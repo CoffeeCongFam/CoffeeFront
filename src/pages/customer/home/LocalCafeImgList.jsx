@@ -5,7 +5,7 @@ import ImageListItemBar from "@mui/material/ImageListItemBar";
 import IconButton from "@mui/material/IconButton";
 import LocationOnIcon from "@mui/icons-material/LocationOn"; // ✅ LocationPinIcon 대신 권장
 import { Box } from "@mui/material";
-import menuDummy from "../../../assets/menuDummy.jpg";
+// import menuDummy from "../../../assets/menuDummy.jpg";
 import { useNavigate } from "react-router-dom";
 import useAppShellMode from "../../../hooks/useAppShellMode";
 
@@ -25,11 +25,20 @@ export default function LocalCafeImgList({ list = [] }) {
           <ImageListItem
             onClick={() => navigate(`/me/store/${item.storeId}`)}
             key={item.storeId || item.partnerStoreId || item.storeName || index}
-            sx={{ cursor: "pointer", position: "relative" }}
+            sx={{
+              cursor: "pointer",
+              position: "relative",
+              bgcolor: "#fff9f4",
+              border: "1px solid #ffe0b2",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
           >
             {/* 썸네일 이미지 */}
             <img
-              src={menuDummy}
+              src={
+                item.storeImg || `https://picsum.photos/400/300?random=${index}`
+              }
               alt={item.storeName}
               loading="lazy"
               style={{
@@ -70,12 +79,20 @@ export default function LocalCafeImgList({ list = [] }) {
               }
               actionIcon={
                 <IconButton
-                  sx={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  sx={{ color: "#fff9f4" }}
                   aria-label={`위치 보기: ${item.storeName}`}
                 >
                   <LocationOnIcon />
                 </IconButton>
               }
+              sx={{
+                "& .MuiImageListItemBar-title": {
+                  color: "#fff9f4",
+                },
+                "& .MuiImageListItemBar-subtitle": {
+                  color: "#fff9f4",
+                },
+              }}
             />
           </ImageListItem>
         ))}

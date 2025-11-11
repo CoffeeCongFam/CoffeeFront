@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { Box, Typography, IconButton, Avatar  } from "@mui/material";
+import { Box, Typography, IconButton, Avatar } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import menuDummy from "../../../assets/menuDummy.jpg";
 import CoffeeIcon from "@mui/icons-material/Coffee";
-import CakeIcon from '@mui/icons-material/Cake';
+import CakeIcon from "@mui/icons-material/Cake";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 function CafeMenuList({ menus = [] }) {
@@ -44,7 +44,7 @@ function CafeMenuList({ menus = [] }) {
   return (
     <Box>
       {Object.keys(grouped).length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "#334336" }}>
           등록된 메뉴가 없습니다.
         </Typography>
       ) : (
@@ -53,12 +53,11 @@ function CafeMenuList({ menus = [] }) {
             key={type}
             sx={{
               mb: 2,
-              border: "1px solid #eee",
+              border: "1px solid #ffe0b2",
               borderRadius: 1,
               overflow: "hidden",
             }}
           >
-
             {/* 섹션 헤더 */}
             <Box
               sx={{
@@ -67,21 +66,24 @@ function CafeMenuList({ menus = [] }) {
                 justifyContent: "space-between",
                 px: 2,
                 py: 1.2,
-                bgcolor: "#f8f8f8ff",
+                bgcolor: "#fff9f4",
                 cursor: "pointer",
               }}
               onClick={() => toggleSection(type)}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: "#334336" }}
+              >
                 {getTypeLabel(type)}
                 <Typography
                   component="span"
-                  sx={{ fontSize: 13, color: "text.secondary", ml: 0.5 }}
+                  sx={{ fontSize: 13, color: "#334336", ml: 0.5 }}
                 >
                   ({grouped[type].length})
                 </Typography>
               </Typography>
-              <IconButton size="small">
+              <IconButton size="small" sx={{ color: "#334336" }}>
                 {openState[type] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             </Box>
@@ -99,12 +101,12 @@ function CafeMenuList({ menus = [] }) {
                       gap: { xs: 1.5, sm: 2 },
                       alignItems: { xs: "stretch", sm: "center" },
                       py: 1.2,
-                      borderBottom: "1px solid #cacacaff",
+                      borderBottom: "1px solid #ffe0b2",
                       "&:last-of-type": { borderBottom: "none" },
                       cursor: "pointer",
                       transition: "background-color 0.2s ease",
                       "&:hover": {
-                        backgroundColor: "#f9f9f9",
+                        backgroundColor: "#fff9f4",
                       },
                     }}
                   >
@@ -119,42 +121,37 @@ function CafeMenuList({ menus = [] }) {
                         minWidth: 0,
                       }}
                     >
-                      {
-                        menu?.menuImg ? (
-                          <Box
-                            component="img"
-                            src={menuDummy || menu.menuImg}
-                            alt={menu.menuName}
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              objectFit: "cover",
-                              borderRadius: 1.2,
-                              flexShrink: 0,
-                            }}
-                          />
-                        ) : (
-                          <Avatar
-                            sx={{
-                              width: { xs: 80, sm: 100 },
-                              height: { xs: 64, sm: 70 },
-                              bgcolor: "#85766cc4",
-                              // bgcolor: "#ffe082",
-                              // color: "#5a3e2b",
-                              borderRadius: 1.2, // 박스 모양 맞추기
-                              flexShrink: 0,
-                            }}
-                          >
-                            {menu.menuType === "DESSERT" ? (
-                              <CakeIcon sx={{ fontSize: 36 }} />
-                            ) : (
-                              <CoffeeIcon sx={{ fontSize: 36 }} />
-                            )}
-                          </Avatar>
-                        )
-                      }
-
-                      
+                      {menu?.menuImg ? (
+                        <Box
+                          component="img"
+                          src={menu.menuImg || menuDummy}
+                          alt={menu.menuName}
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            objectFit: "cover",
+                            borderRadius: 1.2,
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <Avatar
+                          sx={{
+                            width: { xs: 80, sm: 100 },
+                            height: { xs: 64, sm: 70 },
+                            bgcolor: "#334336",
+                            color: "#fff9f4",
+                            borderRadius: 1.2, // 박스 모양 맞추기
+                            flexShrink: 0,
+                          }}
+                        >
+                          {menu.menuType === "DESSERT" ? (
+                            <CakeIcon sx={{ fontSize: 36 }} />
+                          ) : (
+                            <CoffeeIcon sx={{ fontSize: 36 }} />
+                          )}
+                        </Avatar>
+                      )}
 
                       <Box
                         sx={{
@@ -164,18 +161,22 @@ function CafeMenuList({ menus = [] }) {
                       >
                         <Typography
                           variant="subtitle1"
-                          sx={{ fontWeight: 500, wordBreak: "keep-all" }}
+                          sx={{
+                            fontWeight: 500,
+                            wordBreak: "keep-all",
+                            color: "#334336",
+                          }}
                         >
                           {menu.menuName || menu.name}
                         </Typography>
                         {menu.menuDesc && (
                           <Typography
                             variant="body2"
-                            color="text.secondary"
                             sx={{
                               mt: 0.3,
                               display: { xs: "block", sm: "block" },
                               whiteSpace: "normal",
+                              color: "#334336",
                             }}
                           >
                             {menu.menuDesc}
@@ -206,12 +207,12 @@ function CafeMenuList({ menus = [] }) {
                       <Typography
                         variant="subtitle1"
                         sx={{
-                          color: "#4d4d4dff",
+                          color: "#334336",
                           fontWeight: 600,
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {menu.price ? menu.price.toLocaleString() : "-"}원
+                        {menu.price ? menu.price.toLocaleString() : 0}원
                       </Typography>
                     </Box>
                   </Box>

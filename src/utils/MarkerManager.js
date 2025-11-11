@@ -58,7 +58,7 @@ export default class MarkerManager {
 
     // 카페 더미 데이터
     const thumbnailSrc =
-      cafe.storeImage && cafe.storeImage.trim() ? cafe.storeImage : cafeDummy;
+      cafe.storeImg && cafe.storeImg.trim() ? cafe.storeImg : cafeDummy;
     // "../assets/cafeInfoDummy.png"
 
     // const actionButton = cafe.isSubscribed
@@ -105,8 +105,8 @@ export default class MarkerManager {
           display:inline-block;
           margin-top:6px;
           text-decoration:none;
-          color:#fff;
-          background:#1976d2;
+          color:#fff9f4;
+          background:#334336;
           border-radius:20px;
           padding:4px 10px;
           font-size:12px;
@@ -144,7 +144,7 @@ export default class MarkerManager {
               ${cafe.distance ? `${cafe.distance}m` : ""}
             </span>
           </div>
-          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all;">
+          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all; color:#334336;">
             ${cafe.storeName ?? ""}
           </div>
           <div style="
@@ -154,12 +154,13 @@ export default class MarkerManager {
           ">
             ${cafe.roadAddress ?? ""}
           </div>
-          ${stockInfo}
-          <div style="font-size:12px; color:#444; margin-top:3px;">
-            👥 ${cafe.subscriberCount ?? 0}명 · ⭐ ${cafe.reviewCount ?? 0}개
-          </div>
-          <div style="margin-top:6px; display:flex; gap:6px; align-items:center; justify-content: right;">
 
+          <div style="font-size:12px; color:#444; margin-top:3px;">
+             👥 구독권 ${cafe.subscriberCount ?? 0}명 ·  ⭐ 리뷰 ${
+      cafe.reviewCount ?? 0
+    }개
+          </div>
+          <div style=" display:flex; gap:6px; align-items:center; justify-content: right;">
             ${detailButton}
           </div>
         </div>

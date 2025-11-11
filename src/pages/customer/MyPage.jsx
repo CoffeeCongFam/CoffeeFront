@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
+import React, { useEffect, useState, useRef } from 'react';
+import { Container, Box, Typography, Paper, Grid, Button, useMediaQuery, useTheme } from '@mui/material';
 import Profile from './Profile';
 import { useNavigate } from 'react-router-dom';
 import SubscriptionPage from './Subscription';
@@ -12,14 +12,22 @@ import useUserStore from "../../stores/useUserStore";
 import OrderHistory from "./order/OrderHistory";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import Loading from '../../components/common/Loading';
+import useAppShellMode from '../../hooks/useAppShellMode';
 
 function MyPage() {
   let navigate = useNavigate();
 
+  const { isAppLike } = useAppShellMode();
   const { authUser, clearUser } = useUserStore();
+  const theme = useTheme();
+  // sm breakpoint (600px) 이상일 때 true
+  const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const [activeMenu, setActiveMenu] = useState("구독권");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const tabContainerRef = useRef(null);
+  const tabRefs = useRef({});
 
 
   // MUI Paper 구역에 포함되어야 할 최종 버튼 목록
@@ -27,13 +35,34 @@ function MyPage() {
     "구독권",
     "선물함",
     "결제 내역",
-    "리뷰내역",
+    "리뷰 내역",
     "회원 정보",
   ];
 
   useEffect(() => {
     console.log("AUTH USER 변경됨 >>> ", authUser);
   }, [authUser]);
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const container = tabContainerRef.current;
+    const activeEl = tabRefs.current[activeMenu];
+    if (!container || !activeEl) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeEl.getBoundingClientRect();
+
+    const offset =
+      activeRect.left -
+      containerRect.left -
+      containerRect.width / 2 +
+      activeRect.width / 2;
+
+    container.scrollTo({
+      left: container.scrollLeft + offset,
+      behavior: "smooth",
+    });
+  }, [activeMenu, isDesktop]);
 
   const logout = async () => {
     setIsLoggingOut(true);
@@ -60,13 +89,88 @@ function MyPage() {
         return <MyGiftPage />;
       case '결제 내역':
         return <PaymentHistory />;
-      case "리뷰내역":
+      case "리뷰 내역":
         return <ReviewPage />;
       case "회원 정보":
         return <Profile />;
       default:
         return null;
     }
+  };
+
+  // 상단 메뉴 바 렌더링 함수 (데스크탑 / 모바일 분리)
+  const renderMenuBar = () => {
+    // 데스크탑: 기존 Grid 기반 UI 유지
+    if (isDesktop) {
+      return (
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+          <Grid container spacing={1} justifyContent="flex-start">
+            {renderGridItems(finalMenus)}
+          </Grid>
+        </Paper>
+      );
+    }
+
+    // 모바일: 가로 스크롤 가능한 필 탭 스타일
+    return (
+      <Paper
+        elevation={0}
+        sx={{
+          px: 1,
+          py: 0.8,
+          borderRadius: 0,
+          bgcolor: "transparent",
+          borderBottom: "1px solid rgba(0,0,0,0.04)",
+        }}
+      >
+        <Box
+          ref={tabContainerRef}
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 0.75,
+            "::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          {finalMenus.map((menu) => {
+            const isActive = activeMenu === menu;
+            return (
+              <Button
+                key={menu}
+                ref={(el) => {
+                  if (el) tabRefs.current[menu] = el;
+                }}
+                onClick={() => setActiveMenu(menu)}
+                variant="text"
+                sx={{
+                  flexShrink: 0,
+                  borderRadius: 999,
+                  px: 1.6,
+                  py: 0.55,
+                  fontSize: "0.8rem",
+                  fontWeight: isActive ? 700 : 500,
+                  textTransform: "none",
+                  boxShadow: "none",
+                  border: isActive
+                    ? "1px solid rgba(0,0,0,0.08)"
+                    : "1px solid transparent",
+                  bgcolor: isActive ? "rgba(0,0,0,0.04)" : "transparent",
+                  color: isActive ? "text.primary" : "text.secondary",
+                  "&:hover": {
+                    bgcolor: isActive
+                      ? "rgba(0,0,0,0.06)"
+                      : "rgba(0,0,0,0.03)",
+                    boxShadow: "none",
+                  },
+                }}
+              >
+                {menu}
+              </Button>
+            );
+          })}
+        </Box>
+      </Paper>
+    );
   };
 
   // 최종 메뉴 배열을 Grid Item으로 변환하는 함수
@@ -77,10 +181,10 @@ function MyPage() {
           variant="text"
           fullWidth
           sx={{
-            py: 2,
-            fontSize: "1rem",
+            py: { xs: 1.5, sm: 2 },
+            fontSize: { xs: "0.9rem", sm: "1rem" },
             fontWeight: "bold",
-            color: "text.primary", // 텍스트 색상 유지
+            color: "text.primary",
           }}
           onClick={() => setActiveMenu(menu)}
         >
@@ -109,34 +213,42 @@ function MyPage() {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
+        flexDirection="row"
         mb={3}
       >
         {/* 좌측: 유저 정보 */}
         <Box>
-          <Typography variant="h5" component="h1" fontWeight="bold">
+          <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h1" color="#3B3026" fontWeight="bold">
             {authUser?.name}님 환영합니다!
           </Typography>
         </Box>
 
         {/* 우측: 트렌디한 네비게이션 & 로그아웃 버튼 그룹 */}
-        <Box display="flex" alignItems="center" justifyContent="flex-end" gap={1.5}>
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          justifyContent="flex-end" 
+          gap={{ xs: 0.5, sm: 1.5 }}
+        >
           {authUser?.memberType == "STORE" && (
             <Button
               onClick={() => navigate('/store/cafeMyPage')}
               variant="contained"
               sx={{
                 borderRadius: 999,
-                px: 2.2,
-                py: 0.8,
+                px: 2.5,
+                py: 1,
                 fontWeight: 600,
-                fontSize: '0.85rem',
-                textTransform: 'none',
-                boxShadow: 'none',
-                background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
-                color: 'grey.900',
-                border: '1px solid rgba(0,0,0,0.05)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
+                fontSize: "0.85rem",
+                textTransform: "none",
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: "none",
+                minWidth: 0,
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
                   boxShadow: 2,
                 },
               }}
@@ -149,7 +261,7 @@ function MyPage() {
           <Button
             onClick={logout}
             variant="contained"
-            startIcon={<LogoutRoundedIcon />}
+            startIcon={isDesktop ? <LogoutRoundedIcon /> : null}
             sx={{
               borderRadius: 999,
               px: 2.5,
@@ -158,24 +270,21 @@ function MyPage() {
               fontSize: "0.9rem",
               textTransform: "none",
               boxShadow: "none",
-              bgcolor: "grey.900",
-              color: "common.white",
+              bgcolor: "#334336",
+              color: "#fff9f4",
               "&:hover": {
-                bgcolor: "grey.800",
+                bgcolor: "#334336",
+                opacity: 0.9,
                 boxShadow: 3,
               },
             }}
           >
-            로그아웃
+            {isDesktop ? '로그아웃' : <LogoutRoundedIcon sx={{ fontSize: '1.2rem' }} />}
           </Button>
         </Box>
       </Box>
       {/* 상단 메뉴 영역 */}
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Grid container spacing={1} justifyContent="flex-start">
-          {renderGridItems(finalMenus)}
-        </Grid>
-      </Paper>
+      {renderMenuBar()}
 
       {/* 선택된 메뉴 컨텐츠 영역 */}
       <Box sx={{ mt: 3 }}>{renderDrawerContent()}</Box>

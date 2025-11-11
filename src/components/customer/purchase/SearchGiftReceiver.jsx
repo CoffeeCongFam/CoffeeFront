@@ -37,7 +37,17 @@ function SearchGiftReceiver({ keyword, setKeyword, handleSearch }) {
           backgroundColor: "white",
           "& fieldset": {
             borderRadius: "50px",
+            borderColor: "#ffe0b2",
           },
+          "&:hover fieldset": {
+            borderColor: "#334336",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#334336",
+          },
+        },
+        "& .MuiInputLabel-root.Mui-focused": {
+          color: "#334336",
         },
       }}
     />

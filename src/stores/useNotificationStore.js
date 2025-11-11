@@ -1,7 +1,7 @@
 // 로그인한 유저 알림 정보 관리 스토어
-import { create } from 'zustand';
+import { create } from "zustand";
 // 🚩 [수정] 알림 API 함수 임포트
-import { fetchNotificationList } from '../apis/notificationApi'; // 경로는 맞는지 확인해주세요.
+import { fetchNotificationList } from "../apis/notificationApi"; // 경로는 맞는지 확인해주세요.
 
 // 알림 구조
 // interface Notification {
@@ -17,6 +17,10 @@ const useNotificationStore = create((set, get) => ({
   notifications: [], // 알림 목록
   unreadCount: 0, // 읽지 않은 알림 수
 
+  refreshOrderList: null,
+
+  setRefreshOrderList: (refreshFunc) => set({ refreshOrderList: refreshFunc }),
+
   // 🚩 [추가] 서버에서 알림을 가져와 상태를 업데이트하는 비동기 함수
   fetchAndUpdateNotifications: async () => {
     try {
@@ -26,7 +30,7 @@ const useNotificationStore = create((set, get) => ({
       // 2. setNotifications 액션을 사용하여 상태를 업데이트합니다.
       get().setNotifications(data);
     } catch (e) {
-      console.error('알림 목록 로드 중 오류 발생:', e);
+      console.error("알림 목록 로드 중 오류 발생:", e);
     }
   },
 
@@ -44,7 +48,15 @@ const useNotificationStore = create((set, get) => ({
   // 새로운 알림을 notifications에 추가하고
   // unreadCount 수 증가
   addNotification: (newNotification) => {
-    console.log('new notification !!!-----------------------', newNotification);
+    console.log("new notification !!!-----------------------", newNotification);
+
+    // 알림 타입이 order이고, refreshOrderList 함수가 등록되어 있다면 호출
+    const refreshFunc = get().refreshOrderList;
+
+    if (newNotification.notificationType === 'ORDER' && refreshFunc) {
+      console.log('새 주문 알림 수신! StoreHome의 주문 목록을 갱신');
+      refreshFunc(); // StoreHome에서 등록한 freshOrder 함수 실행
+    }
 
     set((state) => ({
       notifications: [
@@ -90,6 +102,18 @@ const useNotificationStore = create((set, get) => ({
       ).length,
     })),
 
+  // 특정 알림 삭제
+  removeNotification: (notificationId) =>
+    set((state) => ({
+      notifications: state.notifications.filter(
+        (n) => n.notificationId !== notificationId
+      ),
+      unreadCount: state.notifications.filter(
+        (n) => !n.isRead && n.notificationId !== notificationId
+      ).length,
+    })),
+
+  // 특정 알림 가져오기
   getNotification: (notificationId) => {
     const n = get().notifications.find(
       (n) => n.notificationId === notificationId
