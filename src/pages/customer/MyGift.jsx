@@ -115,15 +115,15 @@ function MyGift() {
       }
       // 매칭되지 않으면 Date 객체로 파싱 시도 (UTC 사용)
       const d = new Date(isoLike);
-      if (isNaN(d.getTime())) return "";
+    if (isNaN(d.getTime())) return "";
       const yyyy = d.getUTCFullYear();
       const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
       const dd = String(d.getUTCDate()).padStart(2, "0");
       let h = d.getUTCHours();
       const m = String(d.getUTCMinutes()).padStart(2, "0");
-      const ampm = h >= 12 ? "오후" : "오전";
-      h = h % 12 || 12;
-      return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
+    const ampm = h >= 12 ? "오후" : "오전";
+    h = h % 12 || 12;
+    return `${yyyy}.${mm}.${dd}  ${ampm} ${h}시 ${m}분`;
     } catch (e) {
       console.log(e);
       return "";

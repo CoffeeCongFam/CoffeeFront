@@ -7,6 +7,8 @@ import {
   Tabs,
   Tab,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { getSubscription } from "../../utils/subscription";
 import Slider from "react-slick";
@@ -15,6 +17,7 @@ import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import useUserStore from "../../stores/useUserStore";
+import useAppShellMode from "../../hooks/useAppShellMode";
 import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 
 // 구독권 상세 정보 컴포넌트
@@ -137,6 +140,9 @@ function PrevArrow(props) {
 // 구독권 목록을 보여주는 페이지 컴포넌트
 const SubscriptionPage = () => {
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // 모바일 감지 보강
   const CURRENT_MEMBER_ID = authUser?.memberId ?? 1;
   const sliderRef = useRef(null);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'expired'
@@ -193,7 +199,10 @@ const SubscriptionPage = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    responsive: [{ breakpoint: 600, settings: { slidesToShow: 1 } }],
+    arrows: !(isAppLike || isMobile), // 모바일에서 화살표 비활성화 (isAppLike 또는 isMobile 둘 중 하나라도 true면 화살표 숨김)
+    prevArrow: null, // 기본 화살표 제거
+    nextArrow: null, // 기본 화살표 제거
+    responsive: [{ breakpoint: 600, settings: { slidesToShow: 1, arrows: false } }],
   };
 
   // 환불 성공시: 사용가능 목록에서 제거하고 만료 목록에 추가
@@ -266,7 +275,7 @@ const SubscriptionPage = () => {
         <Box
           sx={{
             position: "relative",
-            padding: "0 44px 72px",
+            padding: { xs: "0 0 72px", sm: "0 44px 72px" }, // 모바일에서 좌우 패딩 제거
             "& .slick-list": { overflow: "hidden", paddingBottom: "24px" },
             "& .slick-dots": { bottom: "-36px" },
           }}
@@ -311,40 +320,44 @@ const SubscriptionPage = () => {
               );
             })}
           </Slider>
-          <IconButton
-            onClick={() => sliderRef.current?.slickPrev()}
-            sx={{
-              position: "absolute",
-              top: "40%",
-              left: 0,
-              transform: "translateY(-50%)",
-              zIndex: 2,
-              color: "#334336",
-              backgroundColor: "#fff9f4",
-              border: "1px solid #334336",
-              boxShadow: 3,
-              "&:hover": { backgroundColor: "#fff9f4" },
-            }}
-          >
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            onClick={() => sliderRef.current?.slickNext()}
-            sx={{
-              position: "absolute",
-              top: "40%",
-              right: 0,
-              transform: "translateY(-50%)",
-              zIndex: 2,
-              color: "#334336",
-              backgroundColor: "#fff9f4",
-              border: "1px solid #334336",
-              boxShadow: 3,
-              "&:hover": { backgroundColor: "#fff9f4" },
-            }}
-          >
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
+          {!(isAppLike || isMobile) && (
+            <IconButton
+              onClick={() => sliderRef.current?.slickPrev()}
+              sx={{
+                position: "absolute",
+                top: "40%",
+                left: 0,
+                transform: "translateY(-50%)",
+                zIndex: 2,
+                color: "#334336",
+                backgroundColor: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: 3,
+                "&:hover": { backgroundColor: "#fff9f4" },
+              }}
+            >
+              <ArrowBackIosNewIcon fontSize="small" />
+            </IconButton>
+          )}
+          {!(isAppLike || isMobile) && (
+            <IconButton
+              onClick={() => sliderRef.current?.slickNext()}
+              sx={{
+                position: "absolute",
+                top: "40%",
+                right: 0,
+                transform: "translateY(-50%)",
+                zIndex: 2,
+                color: "#334336",
+                backgroundColor: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: 3,
+                "&:hover": { backgroundColor: "#fff9f4" },
+              }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          )}
         </Box>
       ) : (
         <Box sx={{ mt: 6, textAlign: "center" }}>
