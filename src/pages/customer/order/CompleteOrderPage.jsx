@@ -174,14 +174,10 @@ function CompleteOrderPage() {
             >
               주문 번호 {orderInfo.orderNumber}번
             </Typography>
-            <Box sx={{ mt: 2, mb: 4, width: isAppLike ? "100%" : "70%" }}>
+            <Box sx={{ mt: 2, mb: 4, width: isAppLike ? "100%" : "50%" }}>
               <OrderProgressBar status={orderInfo.orderStatus} />
             </Box>
           </Box>
-
-          {/* 스텝퍼 */}
-          {/* <OrderStepper orderStatus={orderInfo.orderStatus} /> */}
-
           {/* 주문 카드 */}
           <Box
             sx={{

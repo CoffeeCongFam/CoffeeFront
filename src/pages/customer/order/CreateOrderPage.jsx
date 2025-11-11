@@ -320,8 +320,8 @@ function CreateOrderPage() {
     <Box
       sx={{
         px: isAppLike ? 2 : 12,
-        py: isAppLike ? 2 : 2,
-        pb: 10,
+        py: isAppLike ? 2 : 5,
+        pb: isAppLike ? 9 : 8,
         boxSizing: "border-box",
         // overflow: "hidden",
         display: "flex",
@@ -385,7 +385,10 @@ function CreateOrderPage() {
           }}
         >
           <Box sx={{ flex: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}
+            >
               구독권 선택
             </Typography>
             <Select
@@ -439,7 +442,10 @@ function CreateOrderPage() {
           </Box>
 
           <Box sx={{ flex: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ mb: 0.5, fontWeight: 600, color: "#334336" }}
+            >
               이용 타입
             </Typography>
             <ToggleButtonGroup
@@ -468,13 +474,23 @@ function CreateOrderPage() {
             >
               <ToggleButton
                 value="IN"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem", color: "#334336" }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.3rem",
+                  color: "#334336",
+                }}
               >
                 매장 이용 <LocalCafeIcon />
               </ToggleButton>
               <ToggleButton
                 value="OUT"
-                sx={{ display: "flex", flexDirection: "row", gap: "0.3rem", color: "#334336" }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.3rem",
+                  color: "#334336",
+                }}
               >
                 포장 이용 <ShoppingBagTwoToneIcon />
               </ToggleButton>
@@ -527,9 +543,15 @@ function CreateOrderPage() {
                 },
               }}
             >
-              <ToggleButton value="ALL" sx={{ color: "#334336" }}>전체</ToggleButton>
-              <ToggleButton value="BEVERAGE" sx={{ color: "#334336" }}>음료</ToggleButton>
-              <ToggleButton value="DESSERT" sx={{ color: "#334336" }}>디저트</ToggleButton>
+              <ToggleButton value="ALL" sx={{ color: "#334336" }}>
+                전체
+              </ToggleButton>
+              <ToggleButton value="BEVERAGE" sx={{ color: "#334336" }}>
+                음료
+              </ToggleButton>
+              <ToggleButton value="DESSERT" sx={{ color: "#334336" }}>
+                디저트
+              </ToggleButton>
             </ToggleButtonGroup>
 
             <Box
@@ -539,7 +561,7 @@ function CreateOrderPage() {
                 overflowY: "auto",
                 pr: 1,
                 pb: 1,
-                maxHeight: "500px",
+                // minHeight: "500px",
               }}
             >
               {/* 메뉴 카드 그리드 */}
@@ -761,7 +783,10 @@ function CreateOrderPage() {
                           >
                             {item.menu?.menuName || item.menu?.name}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: "#334336" }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "#334336" }}
+                          >
                             {(item.menu?.price || 0).toLocaleString()}원
                           </Typography>
                         </Box>
@@ -833,7 +858,7 @@ function CreateOrderPage() {
                 variant="contained"
                 sx={{
                   mt: 2,
-                  bgcolor: "black",
+                  bgcolor: "#334336",
                   "&:hover": { bgcolor: "#222" },
                   textTransform: "none",
                 }}

@@ -133,23 +133,25 @@ export async function fetchStoreList() {
 
 // 리뷰 작성
 // form 데이터 기반으로 수정
+// 리뷰 작성 (multipart/form-data)
 export async function createReview(payload, imageFile) {
   const formData = new FormData();
 
-  formData.append("memberId", payload.memberId);
-  formData.append("partnerStoreId", payload.partnerStoreId);
-  formData.append("subscriptionId", payload.subscriptionId);
-  formData.append("reviewContent", payload.reviewContent);
-  formData.append("rating", String(payload.rating)); // 숫자는 문자열로 변환 안전
-  console.log("리뷰 작성 요청>> ", payload);
+  // JSON을 Blob 형태로 감싸서 "data" 필드로 추가
+  const jsonBlob = new Blob([JSON.stringify(payload)], {
+    type: "application/json",
+  });
+  formData.append("data", jsonBlob);
 
-  // await api.post(`/reviews`, payload);
-  // 파일 필드)
+  // 이미지 파일이 있으면 "file" 필드로 추가
   if (imageFile) {
-    formData.append("reviewImg", imageFile);
+    formData.append("file", imageFile);
   }
 
-  const res = await api.post("/api/reviews", formData, {
+  console.log("📤 리뷰 등록 요청 >>", payload, imageFile);
+
+  //  multipart/form-data 전송
+  const res = await api.post("/reviews", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

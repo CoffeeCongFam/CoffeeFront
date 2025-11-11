@@ -158,7 +158,13 @@ function OrderHistory() {
   }, []);
 
   // 공통 주문 조회 함수: 항상 start/end를 인자로 받도록 변경
-  async function loadOrders({ reset, period: selectedPeriod, cursor = null, start, end }) {
+  async function loadOrders({
+    reset,
+    period: selectedPeriod,
+    cursor = null,
+    start,
+    end,
+  }) {
     try {
       if (reset) setIsLoading(true);
       else setIsMoreLoading(true);
@@ -219,13 +225,24 @@ function OrderHistory() {
     }
 
     setPeriod("CUSTOM");
-    loadOrders({ reset: true, period: "CUSTOM", start: startDate, end: endDate });
+    loadOrders({
+      reset: true,
+      period: "CUSTOM",
+      start: startDate,
+      end: endDate,
+    });
   }
 
   // 무한 스크롤용 더보기
   function handleLoadMore() {
     if (!hasNext || !nextCursor) return;
-    loadOrders({ reset: false, period, cursor: nextCursor, start: startDate, end: endDate });
+    loadOrders({
+      reset: false,
+      period,
+      cursor: nextCursor,
+      start: startDate,
+      end: endDate,
+    });
   }
 
   async function handleClickOrder(order) {
@@ -297,7 +314,12 @@ function OrderHistory() {
     setStartDate(newStart);
     setEndDate(newEnd);
 
-    loadOrders({ reset: true, period: draftPeriod, start: newStart, end: newEnd });
+    loadOrders({
+      reset: true,
+      period: draftPeriod,
+      start: newStart,
+      end: newEnd,
+    });
     setFilterOpen(false);
   }
 
@@ -308,10 +330,19 @@ function OrderHistory() {
         py: isAppLike ? 2 : 5,
         pb: isAppLike ? 9 : 8,
         minHeight: "100%",
+        boxSizing: "border-box",
         borderRadius: 2,
-        border: "1px solid #ffe0b2",
         backgroundColor: "white",
+        border: "1px solid #ffe0b2",
         m: isAppLike ? 2 : 4,
+        ...(isAppLike
+          ? {
+              minHeight: "calc(100vh - 64px)",
+            }
+          : {
+              height: "calc(100vh - 64px)",
+              overflow: "hidden",
+            }),
       }}
     >
       {/* 헤더 */}
@@ -349,57 +380,34 @@ function OrderHistory() {
           }}
         >
           <Box
+            onClick={openFilterDialog}
             sx={{
               display: "flex",
-              flexDirection: "row",
-              gap: 1.5,
+              justifyContent: "space-between",
               alignItems: "center",
               px: 1,
               py: 1.5,
+              cursor: "pointer",
             }}
           >
-            <TextField
-              label="시작일"
-              type="date"
-              size="small"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              disabled={period !== "CUSTOM"}
-              sx={{ flex: 1 }}
-              inputProps={{ max: todayStr }}
-            />
-            <Typography sx={{ display: { xs: "none", sm: "block" }, color: "#334336" }}>
-              ~
+            <Typography
+              variant="body2"
+              sx={{ color: "#334336", fontWeight: 600 }}
+            >
+              전체
             </Typography>
-            <TextField
-              label="종료일"
-              type="date"
-              size="small"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              disabled={period !== "CUSTOM"}
-              sx={{ flex: 1 }}
-              inputProps={{ max: todayStr }}
-            />
-
-            <Button
-              variant="contained"
-              onClick={handleCustomSearch}
-              disabled={period !== "CUSTOM"}
+            <Box
               sx={{
-                whiteSpace: "nowrap",
-                bgcolor: "#334336",
-                color: "#fff9f4",
-                "&:hover": {
-                  bgcolor: "#334336",
-                  opacity: 0.9,
-                },
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
               }}
             >
-              조회
-            </Button>
+              <Typography variant="body2" color="text.secondary">
+                {rangeLabel}
+              </Typography>
+              <ExpandMoreIcon fontSize="small" />
+            </Box>
           </Box>
         </Box>
       )}
@@ -464,7 +472,9 @@ function OrderHistory() {
               sx={{ flex: 1 }}
               inputProps={{ max: todayStr }}
             />
-            <Typography sx={{ display: { xs: "none", sm: "block" } }}>~</Typography>
+            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+              ~
+            </Typography>
             <TextField
               label="종료일"
               type="date"
@@ -501,9 +511,8 @@ function OrderHistory() {
             gap: 2,
           }}
         >
-          <Typography variant="body2" sx={{ color: "#334336" }}>
-            전체 {orders.length}건
-            {statusFilter !== "ALL" && ` · 필터된 ${filteredAndSortedOrders.length}건`}
+          <Typography variant="body2" color="text.secondary">
+            전체 {filteredAndSortedOrders.length}건
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -545,7 +554,7 @@ function OrderHistory() {
               py: 5,
             }}
           >
-            <CircularProgress sx={{ color: "#334336" }} />
+            <CircularProgress />
           </Box>
         ) : filteredAndSortedOrders.length === 0 ? (
           <Box
@@ -556,18 +565,16 @@ function OrderHistory() {
               textAlign: "center",
             }}
           >
-            <Typography sx={{ color: "#334336" }}>해당 기간에 주문 내역이 없습니다.</Typography>
+            <Typography>해당 기간에 주문 내역이 없습니다.</Typography>
           </Box>
         ) : (
           <>
             <List>
               {filteredAndSortedOrders.map((order) => (
                 <React.Fragment key={order.orderId}>
-                  <ListItemButton
-                    // 기존: onClick={() => navigate(`/me/order/${order.orderId}`)}
-                    onClick={() => handleClickOrder(order)}
-                  >
-                    <ListItemText sx={{ color: "#334336" }}
+                  <ListItemButton onClick={() => handleClickOrder(order)}>
+                    <ListItemText
+                      sx={{ color: "#334336" }}
                       primary={`${order.storeName} ${order.subscriptionName}`}
                       secondary={formatKoreanDateTime(order.createdAt)}
                     />
@@ -664,10 +671,14 @@ function OrderHistory() {
             <Box sx={{ mt: 5, textAlign: "center" }}>
               <Button
                 fullWidth
-                
-                variant="contained"
+                variant="outlined"
                 onClick={handleApplyFilter}
-                sx={{ px: 8, borderRadius: 999, backgroundColor: "black" }}
+                sx={{
+                  color: "#334336",
+                  px: 8,
+                  borderRadius: 999,
+                  // backgroundColor: "black",
+                }}
               >
                 조회
               </Button>
@@ -693,7 +704,7 @@ function OrderHistory() {
                 alignItems: "center",
               }}
             >
-              <CircularProgress size={24} sx={{ color: "#334336" }} />
+              <CircularProgress size={24} />
             </Box>
           ) : (
             <Box sx={{ mx: "auto", maxWidth: 420, p: 3 }}>
@@ -719,7 +730,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography sx={{ color: "#334336" }}>카페명</Typography>
+                <Typography color="text.secondary">카페명</Typography>
                 <Typography>{selectedOrder.store.storeName}</Typography>
               </Box>
 
@@ -730,7 +741,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography sx={{ color: "#334336" }}>주문 번호</Typography>
+                <Typography color="text.secondary">주문 번호</Typography>
                 <Typography>{selectedOrder.orderNumber}</Typography>
               </Box>
 
@@ -741,7 +752,7 @@ function OrderHistory() {
                   mb: 1,
                 }}
               >
-                <Typography sx={{ color: "#334336" }}>구독권명</Typography>
+                <Typography color="text.secondary">구독권명</Typography>
                 <Typography>
                   {handleSubscriptionType(
                     selectedOrder.subscription.subscriptionName
@@ -756,7 +767,7 @@ function OrderHistory() {
                   mb: 2,
                 }}
               >
-                <Typography sx={{ color: "#334336" }}>주문 일시</Typography>
+                <Typography color="text.secondary">주문 일시</Typography>
                 <Typography>
                   {new Date(selectedOrder.createdAt).toLocaleString()}
                 </Typography>
@@ -770,7 +781,7 @@ function OrderHistory() {
                     mb: 2,
                   }}
                 >
-                  <Typography sx={{ color: "#334336" }}>취소 일시</Typography>
+                  <Typography color="text.secondary">취소 일시</Typography>
                   <Typography>
                     {new Date(selectedOrder.canceledAt).toLocaleString()}
                   </Typography>
