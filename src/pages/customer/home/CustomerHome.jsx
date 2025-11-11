@@ -29,7 +29,8 @@ function CustomerHome() {
 
   const { isAppLike } = useAppShellMode();
   const [isLoading, setIsLoading] = useState(true);
-  const [isOnboarding, setIsOnboarding] = useState(false); // 온보딩
+
+  const [activeSubIndex, setActiveSubIndex] = useState(0); // 구독 캐러셀 현재 인덱스
 
   const [todayDate, setTodayDate] = useState(null);
   const [ongoingOrders, setOngoingOrders] = useState([]); // 진행 중인 주문 내역
@@ -43,25 +44,31 @@ function CustomerHome() {
   const subscriptionRef = useRef(null);
 
   useEffect(() => {
-    setTodayDate(formatKoreanDateTime(new Date()));
-    loadToday(); // 오늘 날짜
-    loadOngoingOrders(); // 진행 중인 주문 조회
-    loadSubscriptions(); // 보유 구독권 조회
+    try {
+      setTodayDate(formatKoreanDateTime(new Date()));
+      loadToday(); // 오늘 날짜
+      loadOngoingOrders(); // 진행 중인 주문 조회
+      loadSubscriptions(); // 보유 구독권 조회
 
-    // 위치 가져와서 근처 카페 요청
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          loadNearbyCafes(coords);
-        },
-        (err) => {
-          console.log("위치 권한 거부", err);
-          setLocError("위치 권한을 허용하면 근처 카페를 보여줄 수 있어요.");
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      setLocError("이 브라우저에서는 위치 정보를 사용할 수 없어요.");
+      // 위치 가져와서 근처 카페 요청
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            loadNearbyCafes(coords);
+          },
+          (err) => {
+            console.log("위치 권한 거부", err);
+            setLocError("위치 권한을 허용하면 근처 카페를 보여줄 수 있어요.");
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        setLocError("이 브라우저에서는 위치 정보를 사용할 수 없어요.");
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -106,9 +113,26 @@ function CustomerHome() {
       console.log(data);
     } catch (e) {
       console.log(e);
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  const handleSubScroll = () => {
+    if (!isAppLike || !scrollRef.current) return;
+
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const index = Math.round(scrollLeft / clientWidth);
+    setActiveSubIndex(index);
+  };
+
+  const handleDotClick = (index) => {
+    if (!scrollRef.current) return;
+    const { clientWidth } = scrollRef.current;
+
+    scrollRef.current.scrollTo({
+      left: clientWidth * index,
+      behavior: "smooth",
+    });
+    setActiveSubIndex(index);
   };
 
   //
@@ -218,12 +242,20 @@ function CustomerHome() {
           }}
         >
           <Typography
-            sx={{ fontSize: isAppLike ? "23px" : "30px", color: "#3B3026", fontWeight: "bold" }}
+            sx={{
+              fontSize: isAppLike ? "1.2rem" : "30px",
+              fontWeight: "bold",
+              color: "#3B3026",
+            }}
           >
             안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
             잔의 여유를 즐겨보세요.
           </Typography>
-          <Typography sx={{color: "#3B3026"}}>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
+          <Typography
+            sx={{ color: "#3B3026", fontSize: isAppLike ? "0.8rem" : "1rem" }}
+          >
+            오늘은 어디에서 커피 한 잔 할까요? ☕️
+          </Typography>
         </Box>
       </Box>
 
@@ -333,13 +365,13 @@ function CustomerHome() {
           data-intro="이곳에서 사용 가능한 **구독권 잔여 횟수**를 확인하고 바로 주문할 수 있어요." // 툴팁 내용
           data-position="bottom" // 툴팁 위치
         >
-          <Typography sx ={{color: "#334336"}}>
+          <Typography sx={{ color: "#334336" }}>
             보유 구독권이 없습니다. 구독권을 구매해주세요!
           </Typography>
           <Button
             endIcon={<OpenInNewIcon />}
             onClick={() => navigate("/me/search")}
-            sx ={{
+            sx={{
               color: "#334336",
               borderColor: "#334336",
               "&:hover": {
@@ -363,47 +395,59 @@ function CustomerHome() {
           }}
         >
           {/* 오른쪽 위 네비 버튼 */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: -20,
-              right: 0,
-              zIndex: 1,
-              display: "flex",
-              gap: 0.5,
-            }}
-          >
-            <IconButton
-              onClick={() => scrollBy(-260)}
-              size="small"
+          {!isAppLike && (
+            <Box
               sx={{
-                bgcolor: "#fff9f4",
-                border: '1px solid #334336',
+                position: "absolute",
+                top: -20,
+                right: 0,
+                zIndex: 1,
+                display: "flex",
+                gap: 0.5,
               }}
             >
-              <ArrowBackIosNewIcon
-                fontSize="small"
-                sx={{ color: "#334336" }}
-              />
-            </IconButton>
-            <IconButton
-              onClick={() => scrollBy(260)}
-              size="small"
+              <IconButton onClick={() => scrollBy(-260)} size="small">
+                <ArrowBackIosNewIcon fontSize="small" />
+              </IconButton>
+              <IconButton onClick={() => scrollBy(260)} size="small">
+                <ArrowForwardIosIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
+          {isAppLike && subscriptions.length > 1 && (
+            <Box
               sx={{
-                bgcolor: "#fff9f4",
-                border: '1px solid #334336',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 1,
+                mt: 1,
               }}
             >
-              <ArrowForwardIosIcon
-                fontSize="small"
-                sx={{ color: "#334336" }}
-              />
-            </IconButton>
-          </Box>
+              {subscriptions.map((_, idx) => (
+                <Box
+                  key={idx}
+                  onClick={() => handleDotClick(idx)}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    bgcolor:
+                      idx === activeSubIndex ? "#334336" : "rgba(0, 0, 0, 0.2)",
+                    transform:
+                      idx === activeSubIndex ? "scale(1.2)" : "scale(1)",
+                    transition: "all 0.2s ease",
+                  }}
+                />
+              ))}
+            </Box>
+          )}
 
           {/* 실제 캐러셀 영역 */}
           <Box
             ref={scrollRef}
+            onScroll={handleSubScroll}
             sx={{
               display: "flex",
               gap: isAppLike ? 0 : 2,
@@ -427,7 +471,7 @@ function CustomerHome() {
                 sx={{
                   scrollSnapAlign: "start",
                   flex: isAppLike ? "0 0 100%" : "0 0 auto",
-                  px: isAppLike ? 0 : 0,
+                  px: isAppLike ? 1 : 0,
                 }}
               >
                 <SubscriptionItem
@@ -442,10 +486,27 @@ function CustomerHome() {
       )}
 
       {/* 내 근처 카페 */}
-      <Box style={{ px: "1rem" }}>
-        <Typography sx={{ fontSize: "20px", color: "#3B3026", fontWeight: "bold", mb: 2 }}>
-          내 근처 동네 카페
-        </Typography>
+      <Box
+        sx={{}}
+        data-step="4"
+        data-intro="GPS 정보를 기반으로 **500m 내에 있는 근처 카페**들을 보여드려요. 새로운 단골 매장을 찾아보세요!"
+        data-position="top"
+      >
+        <Box sx={{ mb: 2 }}>
+          <Typography
+            sx={{
+              fontSize: isAppLike ? "1rem" : "30px",
+              fontWeight: "bold",
+              mb: 0.5,
+              color: "#3B3026",
+            }}
+          >
+            내 근처 동네 카페
+          </Typography>
+          <Typography sx={{ fontSize: isAppLike ? "0.8rem" : "1rem" }}>
+            지금 내 위치 기준으로 가장 가까운 카페를 찾아보세요. 🔎
+          </Typography>
+        </Box>
 
         {nearbyCafes && nearbyCafes.length > 0 && (
           <LocalCafeImgList list={nearbyCafes} />
@@ -460,7 +521,7 @@ function CustomerHome() {
         {!locError && nearbyCafes.length === 0 && (
           <Box sx={{ px: 1, py: 1.5 }}>
             <Typography sx={{ color: "#3B3026" }}>
-              500m 안에 등록된 카페가 아직 없어요 ☕
+              2km 안에 등록된 카페가 아직 없어요 🔎
             </Typography>
           </Box>
         )}

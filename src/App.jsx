@@ -2,17 +2,15 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import api, { TokenService } from "./utils/api";
-import { Fade } from "@mui/material"; 
+import { Fade } from "@mui/material";
 import useUserStore from "./stores/useUserStore";
 import useNotificationStore from "./stores/useNotificationStore";
 import { fetchNotificationList } from "./apis/notificationApi";
 import useAppShellMode from "./hooks/useAppShellMode";
 import SplashScreen from "./pages/home/SplashScreen";
 
-
 const SPLASH_DURATION = 2600; // 스플래시 유지 시간 (2.6초)
-const SPLASH_FADE = 800;      // 페이드 시간 (0.8초)
-
+const SPLASH_FADE = 1000; // 페이드 시간 (0.8초)
 
 // 로그인 없이 접근 가능한 경로
 const PUBLIC_PATHS = [
@@ -29,7 +27,6 @@ const PUBLIC_PATHS = [
 ];
 
 function connectSSE(addNotification) {
-
   const BASE_URL = import.meta.env.VITE_API_URL;
   const url = `${BASE_URL}/api/common/connect`;
   const source = new EventSource(url, { withCredentials: true });
@@ -82,6 +79,7 @@ function App() {
   const [showSplash, setShowSplash] = useState(() => {
     const already = sessionStorage.getItem("coffiens_splash_shown");
     return !already; // 저장된 게 없으면 true
+    // return true;
   });
 
   const addNotification = useNotificationStore(
@@ -105,9 +103,7 @@ function App() {
 
         if (userData.partnerStoreId) {
           setPartnerStoreId(userData.partnerStoreId);
-          console.log(
-            `Partner Store ID ${userData.partnerStoreId} 저장 완료.`
-          );
+          console.log(`Partner Store ID ${userData.partnerStoreId} 저장 완료.`);
         }
       }
     } catch (err) {
@@ -208,24 +204,18 @@ function App() {
     }
   }, [location.pathname]);
 
-
   return (
     <>
-    <div>
-      <main>
-        <Outlet />
-      </main>
-    </div>
-    {isAppLike && (
-      <Fade
-        in={showSplash}
-        timeout={SPLASH_FADE}
-        unmountOnExit
-      >
-        <SplashScreen />
-      </Fade>
-    )}
-
+      <div>
+        <main>
+          <Outlet />
+        </main>
+      </div>
+      {isAppLike && (
+        <Fade in={showSplash} timeout={SPLASH_FADE} unmountOnExit>
+          <SplashScreen />
+        </Fade>
+      )}
     </>
   );
 }

@@ -71,7 +71,6 @@ function PurchaseSubscriptionPage() {
       const { IMP } = window;
       if (!IMP) throw new Error("PortOne SDK가 로드되지 않았습니다.");
 
-
       // (모바일에서는) m_redirect_url = 결제 완료 후 돌아올 내 사이트 주소 필요
       const redirectUrl = `${window.location.origin}/me/purchase/${created.purchaseId}/complete`;
 
@@ -87,7 +86,7 @@ function PurchaseSubscriptionPage() {
           buyer_name: authUser.name,
           buyer_email: authUser.email,
           buyer_tel: authUser.tel,
-          m_redirect_url: redirectUrl,  // 리다이렉트
+          m_redirect_url: redirectUrl, // 리다이렉트
         },
         async (response) => {
           if (response.success) {
@@ -172,14 +171,14 @@ function PurchaseSubscriptionPage() {
   return (
     <>
       <Box
-              sx={{
-                p: 3,
-                pb: isAppLike ? "100px" : 10,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
+        sx={{
+          p: 3,
+          pb: isAppLike ? "100px" : 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         {/* 상단 헤더 */}
         {/* 뒤로가기 + 제목 한 줄에 배치 (제목 가운데 정렬) */}
         <Box
@@ -205,15 +204,11 @@ function PurchaseSubscriptionPage() {
             <ArrowBackIcon />
           </IconButton>
         </Box>
-        {/* 제목 */}
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          <Typography variant="h6" sx={{ color: "#334336" }}>구독하기</Typography>
-        </Box>
 
         {/* 구독권 정보 */}
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <Box sx={{ width: "100%", maxWidth: "900px" }}>
-            <SubscriptItem subscription={subscription}  isAppLike={isAppLike} />
+            <SubscriptItem subscription={subscription} isAppLike={isAppLike} />
           </Box>
         </Box>
 
@@ -233,23 +228,42 @@ function PurchaseSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#334336" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ fontSize: "0.9rem", fontWeight: 600, color: "#334336" }}
+            >
               유의사항
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column",  gap: 0.5 }}>
-            <Typography variant="body2" sx={{fontSize: "0.8rem", }} color="text.secondary">
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{ fontSize: "0.8rem" }}
+              color="text.secondary"
+            >
               • 본 구독권은 {subscription?.store?.storeName} 매장 전용으로 사용
               가능합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.8rem" }}
+            >
               • 결제일 기준 30일간 이용 가능하며, 중도 해지는 불가합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.8rem" }}
+            >
               • 1일 {subscription?.maxDailyUsage}회 제공 기준이며, 일부 메뉴는
               추가 금액이 발생할 수 있습니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.8rem" }}
+            >
               • 선물하기로 받은 구독권은 양도가 제한될 수 있습니다.
             </Typography>
           </Box>
@@ -263,15 +277,14 @@ function PurchaseSubscriptionPage() {
             maxWidth: "900px",
             mx: "auto",
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: isAppLike ? "center" : "flex-end",
           }}
         >
           <Button
             fullWidth={isAppLike}
             onClick={() => setPayOpen(true)}
             sx={{
-              borderRadius: isAppLike ? "2rem" : "inherit",
-              backgroundColor: "black",
+              borderRadius: isAppLike ? "2rem" : "0.5rem",
               backgroundColor: "#334336",
               color: "white",
               px: 4,
@@ -335,7 +348,10 @@ function PurchaseSubscriptionPage() {
 
             {/* 안내 */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, mb: 0.5, color: "#334336" }}
+              >
                 결제 수단 선택
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -350,7 +366,7 @@ function PurchaseSubscriptionPage() {
               sx={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
-                gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
+                gridAutoRows: 110, // 각 행 높이를 110px로 고정
                 columnGap: 1.5,
                 rowGap: 1.5,
                 gap: 1.5,
@@ -372,10 +388,7 @@ function PurchaseSubscriptionPage() {
                         : "transparent"
                     }`,
                     borderRadius: 3,
-                    height: 110,
-                    width: isAppLike ? "100%" : "auto",
-                    minWidth: 0,
-                    boxSizing: "border-box",
+                    height: "100%",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -438,7 +451,7 @@ function PurchaseSubscriptionPage() {
                 px: 2,
                 pt: 1,
                 mt: 2,
-                pb: 10
+                pb: 10,
               }}
             >
               <Typography

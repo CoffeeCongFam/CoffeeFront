@@ -14,7 +14,7 @@ import useUserStore from "../../stores/useUserStore";
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
 import monkeyLogo from "../../assets/finalLogo.png";
 import LoginIcon from "@mui/icons-material/Login";
-import api, { TokenService } from "../../utils/api";
+import { TokenService } from "../../utils/api";
 
 function Landing() {
   const { isAppLike } = useAppShellMode();
@@ -42,10 +42,11 @@ function Landing() {
   const containerRef = React.useRef(null);
 
   const handleScroll = (e) => {
-    const { scrollTop, scrollLeft, clientHeight, clientWidth } = e.currentTarget;
+    const { scrollTop, scrollLeft, clientHeight, clientWidth } =
+      e.currentTarget;
 
     const index = isMobile
-      ? Math.round(scrollLeft / clientWidth)   // 모바일 : 가로 기준
+      ? Math.round(scrollLeft / clientWidth) // 모바일 : 가로 기준
       : Math.round(scrollTop / clientHeight); // 데스크탑: 세로 기준
 
     const sec = sections[index] || sections[0];
@@ -58,9 +59,8 @@ function Landing() {
 
   // 카카오 로그인 버튼
   const kakaoLogin = async () => {
-
     let URI = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_KEY}&redirect_uri=${LOGIN_REDIRECT_URI}&response_type=code`;
-    
+
     window.location.href = URI;
   };
 
@@ -98,7 +98,6 @@ function Landing() {
         backgroundColor: "#f6e4d1",
       }}
     >
-
       {/* 점 네비게이션 */}
       {!isMobile ? (
         // 데스크탑: 오른쪽 세로
@@ -265,8 +264,8 @@ function Landing() {
                       backgroundColor: "#c84436",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      flex: isMobile ? 1 : "initial", 
-                      px: isMobile ? 2 : 6,      
+                      flex: isMobile ? 1 : "initial",
+                      px: isMobile ? 2 : 6,
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
                     onClick={() => navigate("/signup")}
@@ -364,15 +363,22 @@ function Landing() {
               sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
             >
               CoffeeEns는 당신이 자주 가는 동네 카페를 구독으로 연결해줍니다.
-              <br />한 달 구독으로 매일의 커피를 더 합리적으로, 줄 서지 않고
-              간편하게 즐기세요.
+              <br />한 달 구독으로 매일의 커피를 더 합리적으로,{" "}
+              {isAppLike && <br />}줄 서지 않고 간편하게 즐기세요.
             </Typography>
             <Typography
               sx={{ color: "#4a3426", fontSize: isMobile ? "0.8rem" : "1rem" }}
             >
               좋아하는 카페가 ‘나만의 사이렌 오더’가 됩니다.
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, mt: 6 }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 6,
+                justifyContent: isMobile && "flex-end",
+              }}
+            >
               <Link to="cta" smooth duration={500}>
                 <Button
                   variant="contained"
@@ -477,7 +483,8 @@ function Landing() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            alignItems: isMobile ? "flex-start" : "center",
+            alignItems: "center",
+            // alignItems: isMobile ? "flex-start" : "center",
             backgroundColor: "#f6e4d1",
             px: isMobile ? 3 : 0,
           }}
@@ -492,7 +499,14 @@ function Landing() {
           >
             지금 COFFIENS에 합류하세요.
           </Typography>
-          <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1.5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Button
               variant="contained"
               sx={{
