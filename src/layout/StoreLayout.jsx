@@ -15,10 +15,10 @@ import {
   Divider,
   Typography,
   Button,
-} from '@mui/material';
-import logo from '../assets/coffeiensLogoTitle.png';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import HomeIcon from '@mui/icons-material/Home';
+} from "@mui/material";
+import logo from "../assets/finalLogo.png";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import HomeIcon from "@mui/icons-material/Home";
 import {
   History,
   LocalCafe,
@@ -185,10 +185,15 @@ export default function StoreLayout() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
-                  '&.Mui-selected': {
-                    backgroundColor: 'primary.light',
-                    color: 'white',
-                    '& .MuiListItemIcon-root': { color: 'white' },
+
+                  color: "#ffe0c2",
+                  "&.Mui-selected": {
+                    backgroundColor: "#435548",
+                    color: "#fff9f4",
+                    "& .MuiListItemIcon-root": { color: "#fff9f4" },
+                  },
+                  "& .MuiListItemIcon-root": {
+                    color: "#ffe0c2",
                   },
                 }}
               >
@@ -205,10 +210,11 @@ export default function StoreLayout() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
+        display: "flex",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        bgcolor: "#fff9f4",
       }}
     >
       <CssBaseline />
@@ -221,8 +227,10 @@ export default function StoreLayout() {
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
+            boxSizing: "border-box",
+            backgroundImage: "none",
+            bgcolor: "#334336",
+            borderRight: "none",
           },
         }}
         open
@@ -236,8 +244,8 @@ export default function StoreLayout() {
         sx={{
           flexGrow: 1,
           // ml: `${drawerWidth}px`,
-          backgroundColor: '#f9f9f9',
-          overflow: 'auto',
+          backgroundColor: "transparent",
+          overflow: "auto",
         }}
       >
         {/* 상단 헤더(AppBar) */}
@@ -248,15 +256,15 @@ export default function StoreLayout() {
           sx={{
             width: `calc(100% - ${drawerWidth}px)`,
             ml: `${drawerWidth}px`,
-            borderBottom: '1px solid #e0e0e0',
+            borderBottom: "1px solid #ffe0b2",
           }}
         >
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6" noWrap>
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" noWrap sx={{ color: "#334336" }}>
               {today.toLocaleDateString()}
             </Typography>
             <Box>
-              <IconButton color="inherit" onClick={openNotifDrawer}>
+              <IconButton onClick={openNotifDrawer} sx={{ color: "#334336" }}>
                 <Badge badgeContent={unreadCount} color="error">
                   <NotificationsIcon />
                 </Badge>
@@ -293,12 +301,14 @@ export default function StoreLayout() {
             justifyContent: 'space-between',
           }}
         >
-          <Typography variant="h6" fontWeight={700}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: "#334336" }}>
             알림
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            <Button onClick={handleDeleteAllNotifications}>전체 삭제</Button>
-            <Button onClick={handleCloseNotif} color="gray">
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Button onClick={handleDeleteAllNotifications} sx={{ color: "#334336" }}>
+              전체 삭제
+            </Button>
+            <Button onClick={handleCloseNotif} sx={{ color: "#334336" }}>
               닫기
             </Button>
           </Box>
@@ -315,7 +325,7 @@ export default function StoreLayout() {
 
           {notifications.length === 0 && (
             <Box sx={{ p: 2 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: "#334336" }}>
                 아직 도착한 알림이 없어요 ☕
               </Typography>
             </Box>

@@ -16,11 +16,16 @@ import {
 import axios from "axios";
 // L_03 - 카페 정보 등록만 담당하는 등록 api 호출
 import { postCafe } from "../../utils/login";
+import { getStoreInfo } from "../../utils/store";
+import useUserStore from "../../stores/useUserStore";
 const JAVASCRIPT_API_KEY = import.meta.env.VITE_JAVASCRIPT_API_KEY;
 
 const SERVICE_KEY = import.meta.env.VITE_SERVICE_KEY;
 
 function StoreForm({ onSuccess }) {
+
+  const { setPartnerStoreId } = useUserStore();
+
   // 상태 관리
   const [formState, setFormState] = useState({
     businessNumber: "", // 사업자번호
@@ -90,6 +95,7 @@ function StoreForm({ onSuccess }) {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            Authorization: SERVICE_KEY,
           },
         }
       );
@@ -295,6 +301,18 @@ function StoreForm({ onSuccess }) {
       const result = await postCafe(data);
       if (result) {
         alert("매장 등록 완료!");
+        
+        // ✅ 매장 등록 완료 시 getStoreInfo 호출하여 partnerStoreId 설정
+        try {
+          const storeData = await getStoreInfo();
+          if (storeData?.partnerStoreId) {
+            setPartnerStoreId(storeData.partnerStoreId);
+            console.log("✅ 매장 등록 완료 - partnerStoreId 설정:", storeData.partnerStoreId);
+          }
+        } catch (err) {
+          console.error("매장 정보 조회 실패:", err);
+        }
+        
         // ✅ 컨텍스트별로 후처리 분기:
         // - CafeSignUp에서 사용 시: /store로 이동 (onSuccess 전달)
         // - CafeMyPage에서 사용 시: 기본 동작으로 새로고침
@@ -415,10 +433,16 @@ function StoreForm({ onSuccess }) {
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   textTransform: "none",
-                  backgroundImage: "linear-gradient(135deg, #111827, #4b5563)",
-                  boxShadow: "0 6px 16px rgba(15,23,42,0.35)",
+                  bgcolor: "#334336",
+                  color: "#fff9f4",
+                  boxShadow: "0 6px 16px rgba(51, 67, 54, 0.35)",
+                  "&:hover": {
+                    bgcolor: "#334336",
+                    opacity: 0.9,
+                  },
                   "&:disabled": {
-                    backgroundImage: "none",
+                    bgcolor: "#ccc",
+                    color: "#666",
                   },
                 }}
               >
@@ -476,7 +500,7 @@ function StoreForm({ onSuccess }) {
                 variant="outlined"
                 onClick={handleClickAddressSearch}
                 startIcon={
-                  <SearchRounded sx={{ fontSize: 18, color: "primary.main" }} />
+                  <SearchRounded sx={{ fontSize: 18, color: "#334336" }} />
                 }
                 sx={{
                   flexShrink: 0,
@@ -484,7 +508,12 @@ function StoreForm({ onSuccess }) {
                   px: 1.8,
                   fontSize: "0.8rem",
                   textTransform: "none",
-                  borderColor: "primary.light",
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
                 }}
               >
                 주소 찾기
@@ -573,7 +602,7 @@ function StoreForm({ onSuccess }) {
                 }
                 startIcon={
                   <PhotoCameraRounded
-                    sx={{ fontSize: 18, color: "text.secondary" }}
+                    sx={{ fontSize: 18, color: "#334336" }}
                   />
                 }
                 sx={{
@@ -581,6 +610,12 @@ function StoreForm({ onSuccess }) {
                   px: 2,
                   textTransform: "none",
                   fontSize: "0.85rem",
+                  borderColor: "#334336",
+                  color: "#334336",
+                  "&:hover": {
+                    borderColor: "#334336",
+                    bgcolor: "rgba(51, 67, 54, 0.05)",
+                  },
                 }}
               >
                 이미지 업로드
@@ -665,13 +700,12 @@ function StoreForm({ onSuccess }) {
               fontWeight: 700,
               fontSize: "0.95rem",
               textTransform: "none",
-              backgroundImage:
-                "linear-gradient(135deg, #0f172a 0%, #1f2937 40%, #111827 100%)",
-              boxShadow: "0 10px 30px rgba(15,23,42,0.55)",
+              bgcolor: "#334336",
+              color: "#fff9f4",
+              boxShadow: "0 6px 16px rgba(51, 67, 54, 0.35)",
               "&:hover": {
-                backgroundImage:
-                  "linear-gradient(135deg, #020617 0%, #111827 100%)",
-                boxShadow: "0 12px 40px rgba(15,23,42,0.7)",
+                bgcolor: "#334336",
+                opacity: 0.9,
               },
               "&:disabled": {
                 backgroundImage: "none",

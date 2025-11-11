@@ -25,7 +25,14 @@ export default function LocalCafeImgList({ list = [] }) {
           <ImageListItem
             onClick={() => navigate(`/me/store/${item.storeId}`)}
             key={item.storeId || item.partnerStoreId || item.storeName || index}
-            sx={{ cursor: "pointer", position: "relative" }}
+            sx={{
+              cursor: "pointer",
+              position: "relative",
+              bgcolor: "#fff9f4",
+              border: "1px solid #ffe0b2",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
           >
             {/* 썸네일 이미지 */}
             <img
@@ -72,12 +79,20 @@ export default function LocalCafeImgList({ list = [] }) {
               }
               actionIcon={
                 <IconButton
-                  sx={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  sx={{ color: "#fff9f4" }}
                   aria-label={`위치 보기: ${item.storeName}`}
                 >
                   <LocationOnIcon />
                 </IconButton>
               }
+              sx={{
+                "& .MuiImageListItemBar-title": {
+                  color: "#fff9f4",
+                },
+                "& .MuiImageListItemBar-subtitle": {
+                  color: "#fff9f4",
+                },
+              }}
             />
           </ImageListItem>
         ))}

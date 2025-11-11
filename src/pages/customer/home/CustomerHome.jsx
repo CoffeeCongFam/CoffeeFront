@@ -218,12 +218,12 @@ function CustomerHome() {
           }}
         >
           <Typography
-            sx={{ fontSize: isAppLike ? "1.2rem" : "30px", fontWeight: "bold" }}
+            sx={{ fontSize: isAppLike ? "23px" : "30px", color: "#3B3026", fontWeight: "bold" }}
           >
             안녕하세요 {authUser?.name} 님 👋, {isAppLike && <br />} 오늘도 한
             잔의 여유를 즐겨보세요.
           </Typography>
-          <Typography sx={{ fontSize: isAppLike ? "0.8rem" : "1rem"}}>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
+          <Typography sx={{color: "#3B3026"}}>오늘은 어디에서 커피 한 잔 할까요? ☕️</Typography>
         </Box>
       </Box>
 
@@ -317,7 +317,8 @@ function CustomerHome() {
       {subscriptions.length <= 0 && (
         <Box
           sx={{
-            backgroundColor: "#f0f0f0c9",
+            backgroundColor: "#fff9f4",
+            border: "1px solid #ffe0b2",
             px: "1rem",
             py: "1.5rem",
             borderRadius: "8px",
@@ -332,12 +333,21 @@ function CustomerHome() {
           data-intro="이곳에서 사용 가능한 **구독권 잔여 횟수**를 확인하고 바로 주문할 수 있어요." // 툴팁 내용
           data-position="bottom" // 툴팁 위치
         >
-          <Typography>
+          <Typography sx ={{color: "#334336"}}>
             보유 구독권이 없습니다. 구독권을 구매해주세요!
           </Typography>
           <Button
             endIcon={<OpenInNewIcon />}
             onClick={() => navigate("/me/search")}
+            sx ={{
+              color: "#334336",
+              borderColor: "#334336",
+              "&:hover": {
+                borderColor: "#334336",
+                bgcolor: "rgba(51, 67, 54, 0.05)",
+              },
+            }}
+            variant="outlined"
           >
             구독권 구매하러 가기
           </Button>
@@ -363,11 +373,31 @@ function CustomerHome() {
               gap: 0.5,
             }}
           >
-            <IconButton onClick={() => scrollBy(-260)} size="small">
-              <ArrowBackIosNewIcon fontSize="small" />
+            <IconButton
+              onClick={() => scrollBy(-260)}
+              size="small"
+              sx={{
+                bgcolor: "#fff9f4",
+                border: '1px solid #334336',
+              }}
+            >
+              <ArrowBackIosNewIcon
+                fontSize="small"
+                sx={{ color: "#334336" }}
+              />
             </IconButton>
-            <IconButton onClick={() => scrollBy(260)} size="small">
-              <ArrowForwardIosIcon fontSize="small" />
+            <IconButton
+              onClick={() => scrollBy(260)}
+              size="small"
+              sx={{
+                bgcolor: "#fff9f4",
+                border: '1px solid #334336',
+              }}
+            >
+              <ArrowForwardIosIcon
+                fontSize="small"
+                sx={{ color: "#334336" }}
+              />
             </IconButton>
           </Box>
 
@@ -412,17 +442,8 @@ function CustomerHome() {
       )}
 
       {/* 내 근처 카페 */}
-      <Box
-        sx={{  }}
-        data-step="4"
-        data-intro="GPS 정보를 기반으로 **500m 내에 있는 근처 카페**들을 보여드려요. 새로운 단골 매장을 찾아보세요!"
-        data-position="top"
-      >
-        <Typography sx={{ 
-          fontSize: isAppLike? "1rem" : "30px", 
-          fontWeight: "bold", 
-          mb: 2 }}
-        >
+      <Box style={{ px: "1rem" }}>
+        <Typography sx={{ fontSize: "20px", color: "#3B3026", fontWeight: "bold", mb: 2 }}>
           내 근처 동네 카페
         </Typography>
 
@@ -438,7 +459,7 @@ function CustomerHome() {
 
         {!locError && nearbyCafes.length === 0 && (
           <Box sx={{ px: 1, py: 1.5 }}>
-            <Typography sx={{ color: "text.secondary" }}>
+            <Typography sx={{ color: "#3B3026" }}>
               500m 안에 등록된 카페가 아직 없어요 ☕
             </Typography>
           </Box>

@@ -153,23 +153,34 @@ export default function ManageProduct() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
       <Box
         mb={4}
         display="flex"
         justifyContent="space-between"
         alignItems="center"
       >
-        <Typography variant="h4" component="h1" fontWeight="bold">
+        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ color: "#334336" }}>
           구독권 관리
         </Typography>
         <Button
           variant="contained"
-          color="primary"
           startIcon={<AddIcon />}
           onClick={handleOpenRegistModal}
           disabled={isLoading}
-          sx={{ height: 56 }}
+          sx={{
+            height: 56,
+            bgcolor: "#334336",
+            color: "#fff9f4",
+            "&:hover": {
+              bgcolor: "#334336",
+              opacity: 0.9,
+            },
+            "&:disabled": {
+              bgcolor: "#ccc",
+              color: "#666",
+            },
+          }}
         >
           새 구독권 등록
         </Button>
@@ -185,7 +196,7 @@ export default function ManageProduct() {
       {/* 로딩 상태 표시 */}
       {isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-          <CircularProgress />
+          <CircularProgress sx={{ color: "#334336" }} />
         </Box>
       )}
 

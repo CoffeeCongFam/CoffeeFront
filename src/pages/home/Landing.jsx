@@ -12,7 +12,7 @@ import useAppShellMode from "../../hooks/useAppShellMode";
 import useUserStore from "../../stores/useUserStore";
 
 import kakaoBtn from "../../assets/kakaoLoginIcon.png";
-import monkeyLogo from "../../assets/coffeiensLogoTitle.png";
+import monkeyLogo from "../../assets/finalLogo.png";
 import LoginIcon from "@mui/icons-material/Login";
 import api, { TokenService } from "../../utils/api";
 
@@ -193,7 +193,7 @@ function Landing() {
             <Box
               sx={{
                 flex: 1,
-                backgroundColor: "#fff",
+                backgroundColor: "#334336",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

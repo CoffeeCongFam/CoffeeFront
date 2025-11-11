@@ -218,12 +218,7 @@ function MyPage() {
       >
         {/* 좌측: 유저 정보 */}
         <Box>
-          <Typography 
-          sx={{
-          fontSize: isAppLike ? "23px" : "30px",
-          fontWeight: "bold",
-          mb: 2,
-        }} component="h1" fontWeight="bold">
+          <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h1" color="#3B3026" fontWeight="bold">
             {authUser?.name}님 환영합니다!
           </Typography>
         </Box>
@@ -241,17 +236,19 @@ function MyPage() {
               variant="contained"
               sx={{
                 borderRadius: 999,
-                px: { xs: 1.2, sm: 2.2 },
-                py: { xs: 0.5, sm: 0.8 },
+                px: 2.5,
+                py: 1,
                 fontWeight: 600,
-                fontSize: { xs: '0.7rem', sm: '0.85rem' },
-                textTransform: 'none',
-                boxShadow: 'none',
-                background: 'linear-gradient(135deg, #fff7e6 0%, #ffe6f7 100%)',
-                color: 'grey.900',
-                border: '1px solid rgba(0,0,0,0.05)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #ffe8b3 0%, #ffcce9 100%)',
+                fontSize: "0.85rem",
+                textTransform: "none",
+                bgcolor: "#334336",
+                color: "#fff9f4",
+                border: "1px solid #334336",
+                boxShadow: "none",
+                minWidth: 0,
+                "&:hover": {
+                  bgcolor: "#334336",
+                  opacity: 0.9,
                   boxShadow: 2,
                 },
               }}
@@ -266,17 +263,18 @@ function MyPage() {
             variant="contained"
             startIcon={isDesktop ? <LogoutRoundedIcon /> : null}
             sx={{
-              minWidth: { xs: 'auto', sm: 'auto' },
               borderRadius: 999,
-              px: { xs: 0.5, sm: 2.5 },
-              py: { xs: 0.5, sm: 1 },
+              px: 2.5,
+              py: 1,
               fontWeight: 600,
+              fontSize: "0.9rem",
               textTransform: "none",
-              boxShadow: 'none',
-              bgcolor: "grey.900",
-              color: "common.white",
+              boxShadow: "none",
+              bgcolor: "#334336",
+              color: "#fff9f4",
               "&:hover": {
-                bgcolor: "grey.800",
+                bgcolor: "#334336",
+                opacity: 0.9,
                 boxShadow: 3,
               },
             }}

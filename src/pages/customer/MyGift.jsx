@@ -295,7 +295,7 @@ function MyGift() {
         isMineSent,
         isMineReceived,
         node: (
-          <>
+          <Typography component="span" sx={{ color: "#334336" }}>
             <Typography component="span" sx={bold}>
               {item.sender}
             </Typography>
@@ -304,7 +304,7 @@ function MyGift() {
               {item.subscriptionName}
             </Typography>
             을 선물받았습니다!
-          </>
+          </Typography>
         ),
       };
     }
@@ -316,8 +316,8 @@ function MyGift() {
         isMineSent,
         isMineReceived,
         node: (
-          <>
-            <Typography component="span" sx={bold}>
+          <Typography component="span" sx={{ color: "#334336" }}>
+            <Typography component="span" sx={bold} >
               {item.receiver}
             </Typography>
             님께&nbsp;
@@ -325,7 +325,7 @@ function MyGift() {
               {item.subscriptionName}
             </Typography>
             을 선물했습니다!
-          </>
+          </Typography>
         ),
       };
     }
@@ -336,7 +336,7 @@ function MyGift() {
       isMineSent,
       isMineReceived,
       node: (
-        <>
+        <Typography component="span" sx={{ color: "#334336" }}>
           <Typography component="span" sx={bold}>
             {item.sender}
           </Typography>
@@ -349,7 +349,7 @@ function MyGift() {
             {item.subscriptionName}
           </Typography>
           을 선물했습니다!
-        </>
+        </Typography>
       ),
     };
   };
@@ -372,6 +372,8 @@ function MyGift() {
         width: "100%",
         padding: 2,
         backgroundColor: "white",
+        borderRadius: 2,
+        border: "1px solid #ffe0b2",
       }}
     >
       <Box
@@ -382,7 +384,7 @@ function MyGift() {
           mb: 1.5,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#334336" }}>
           내 선물함
         </Typography>
       </Box>
@@ -390,7 +392,22 @@ function MyGift() {
       <Tabs
         value={filter}
         onChange={(_, v) => setFilter(v)}
-        sx={{ borderBottom: 1, borderColor: "divider", mt: 0.5, mb: 1 }}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "#ffe0b2", 
+          mt: 0.5, 
+          mb: 1,
+          "& .MuiTab-root": {
+            color: "#3B3026",
+          },
+          "& .Mui-selected": {
+            color: "#334336",
+            fontWeight: 600,
+          },
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#334336",
+          },
+        }}
       >
         <Tab value="ALL" label="전체" />
         <Tab value="RECEIVED" label="받은선물" />
@@ -400,10 +417,10 @@ function MyGift() {
       {/* 데이터가 없을 때 표시할 메시지 */}
       {filteredGiftList.length === 0 && (
         <Box sx={{ mt: 6, textAlign: "center" }}>
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, color: "#334336" }}>
             선물 내역이 비어 있습니다.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: "#334336" }}>
             선물하기 또는 선물을 받으면 이곳에서 내역을 확인할 수 있습니다.
           </Typography>
         </Box>
@@ -414,7 +431,7 @@ function MyGift() {
         filteredGiftList.map((item, index) => {
           const bold = { fontWeight: "bold", color: "black" };
           const messageNode = (
-            <>
+            <Typography component="span" sx={{ color: "#334336" }}>
               <Typography component="span" sx={bold}>
                 {item.receiver}
               </Typography>
@@ -423,7 +440,7 @@ function MyGift() {
                 {item.subscriptionName}
               </Typography>
               을 선물했습니다!
-            </>
+            </Typography>
           );
           const handleClick = () =>
             setOpenIndex(openIndex === index ? null : index);
@@ -506,7 +523,7 @@ function MyGift() {
         filteredGiftList.map((item, index) => {
           const bold = { fontWeight: "bold", color: "black" };
           const messageNode = (
-            <>
+            <Typography component="span" sx={{ color: "#334336" }}>
               <Typography component="span" sx={bold}>
                 {item.sender}
               </Typography>
@@ -515,7 +532,7 @@ function MyGift() {
                 {item.subscriptionName}
               </Typography>
               을 선물받았습니다!
-            </>
+            </Typography>
           );
           const handleClick = () =>
             setOpenIndex(openIndex === index ? null : index);

@@ -32,7 +32,7 @@ import SubTypeChip from "../../common/SubTypeChip";
 import SubscriptionCard from "../../../components/customer/cafe/SubscriptionCard";
 
 const subDescBoxStyle = {
-  backgroundColor: "#F2F2F2",
+  backgroundColor: "#fff9f4",
   padding: "12px 14px",
   borderRadius: "8px",
   width: "100%",
@@ -40,6 +40,7 @@ const subDescBoxStyle = {
   flexDirection: "column",
   gap: "0.8rem",
   justifyContent: "space-around",
+  border: "1px solid #ffe0b2",
 };
 
 function CafeSubscriptionList({ subscriptions = [] }) {
@@ -184,7 +185,24 @@ function CafeSubscriptionList({ subscriptions = [] }) {
           exclusive
           onChange={handleFilterChange}
           size="small"
-          sx={{ width: "100%" }}
+          sx={{
+            "& .MuiToggleButton-root": {
+              color: "#334336",
+              borderColor: "#ffe0b2",
+              "&.Mui-selected": {
+                backgroundColor: "#334336",
+                color: "#fff9f4",
+                "&:hover": {
+                  backgroundColor: "#334336",
+                  opacity: 0.9,
+                },
+              },
+              "&:hover": {
+                backgroundColor: "rgba(51, 67, 54, 0.05)",
+                borderColor: "#334336",
+              },
+            },
+          }}
         >
           <ToggleButton value="ALL">전체 ({counts.ALL})</ToggleButton>
           {/* {["STANDARD", "BASIC", "PREMIUM"].map((type) =>
@@ -215,13 +233,14 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             onClick={() => goToPage(-1)}
             size="small"
             disabled={currentIndex === 0} // 첫 페이지면 비활성화
+            sx={{ color: "#334336" }}
           >
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
 
           <Typography
             variant="caption"
-            sx={{ minWidth: 56, textAlign: "center" }}
+            sx={{ minWidth: 56, textAlign: "center", color: "#334336" }}
           >
             {filteredList.length === 0
               ? "0 / 0"
@@ -232,6 +251,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             onClick={() => goToPage(1)}
             size="small"
             disabled={currentIndex === filteredList.length - 1} // 마지막 페이지면 비활성화
+            sx={{ color: "#334336" }}
           >
             <ArrowForwardIosIcon fontSize="small" />
           </IconButton>
@@ -252,7 +272,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
             height: isAppLike ? 0 : 6,
           },
           "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#ccc",
+            backgroundColor: "#334336",
             borderRadius: 8,
           },
         }}
@@ -267,7 +287,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
               p: "1rem",
             }}
           >
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "#334336" }}>
               이 조건에 맞는 구독권이 없습니다.
             </Typography>
           </Box>
@@ -289,9 +309,9 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                 key={sub.subscriptionId}
                 sx={{
                   position: "relative",
-                  border: isSoldOut ? "1px solid #ffcdd2" : "1px solid #e0e0e0",
+                  border: isSoldOut ? "1px solid #ffe0b2" : "1px solid #ffe0b2",
                   borderRadius: 2,
-                  backgroundColor: isSoldOut ? "#fafafa" : "white",
+                  backgroundColor: isSoldOut ? "#fff9f4" : "white",
                   p: 2,
                   minHeight: 380,
                   height: "100%",
@@ -331,7 +351,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     sx={{
                       position: "absolute",
                       inset: 0,
-                      bgcolor: "rgba(0, 0, 0, 0.44)",
+                      bgcolor: "rgba(51, 67, 54, 0.44)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -346,7 +366,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         borderRadius: 999,
                         // bgcolor: "rgba(0,0,0,0.75)",
                         // color: "white",
-                        color: "#ffffffff",
+                        color: "#fff9f4",
                         fontSize: "2rem",
                         fontWeight: 600,
                       }}
@@ -363,6 +383,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     sx={{
                       fontWeight: 600,
                       mt: "0.5rem",
+                      color: "#334336",
                     }}
                   >
                     {sub.subscriptionName}
@@ -371,42 +392,100 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     sx={{
                       fontWeight: 800,
                       fontSize: 28,
-                      color: isSoldOut ? "text.disabled" : "inherit",
+                      color: isSoldOut ? "#ccc" : "#334336",
                     }}
                   >
                     ₩{sub.price?.toLocaleString()}
                     <Typography
                       component="span"
-                      sx={{ fontSize: 14, ml: 0.5, fontWeight: 400 }}
+                      sx={{ fontSize: 14, ml: 0.5, fontWeight: 400, color: "#334336" }}
                     >
                       /월
                     </Typography>
                   </Typography>
                 </Box>
-                 <Divider />
-                 <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent:"space-between",
-                      gap: 1.5,
-                      flexWrap: "wrap",
-                      color: "text.secondary",
-                      fontSize: "0.9rem",
-                      mb: 1
-                    }}
-                  >
-                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.3, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
-                      <CalendarMonthIcon fontSize="small" />
-                      <span>결제일부터 {sub?.subscriptionPeriod}일간</span>
-                    </Box>
-                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.5, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
-                      <CoffeeIcon fontSize="small" />
-                      <span>매일 {sub?.maxDailyUsage}잔 이용</span>
+
+                {/* 설명 3칸 - 모바일에서는 세로 */}
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      // xs: "1fr",
+                      xs: "repeat(3, minmax(0, 1fr))",
+                      sm: "repeat(3, minmax(0, 1fr))",
+                    },
+                    gap: 1,
+                  }}
+                >
+                  <Box sx={subDescBoxStyle}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#334336" }}>
+                      금액
+                    </Typography>
+                    <Box>
+                      <Typography
+                        sx={{
+                          textAlign: "right",
+                          fontSize: { xs: "0.8rem", sm: "1rem" },
+                          color: "#334336",
+                        }}
+                      >
+                        월 {sub.price?.toLocaleString()}원
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 10,
+                          color: "#334336",
+                          textAlign: "right",
+                        }}
+                      >
+                        한 잔당 약 ₩
+                        {sub.price
+                          ? Math.round(sub.price / 30).toLocaleString()
+                          : 0}
+                      </Typography>
                     </Box>
                   </Box>
 
-                {/* 설명 3칸 - 모바일에서는 세로 */}
-                
+                  <Box sx={subDescBoxStyle}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#334336" }}>
+                      구독 주기
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        textAlign: "right",
+                        fontSize: { xs: "0.8rem", sm: "1rem" },
+                        color: "#334336",
+                      }}
+                    >
+                      {sub.subscriptionPeriod} 일
+                    </Typography>
+                  </Box>
+
+                  <Box sx={subDescBoxStyle}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#334336" }}>
+                      사용 가능
+                    </Typography>
+                    <Typography
+                      sx={{
+                        textAlign: "right",
+                        fontSize: { xs: "0.8rem", sm: "1rem" },
+                        color: "#334336",
+                      }}
+                    >
+                      매일, 하루 {sub.maxDailyUsage} 번
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: 10,
+                        color: "#334336",
+                        textAlign: "right",
+                      }}
+                    >
+                      결제일부터 사용 가능
+                    </Typography>
+                  </Box>
+                </Box>
                 {/* 잔여 구독권 수량 */}
                 <List sx={{ py: 0 }}>
                   <ListItemButton
@@ -428,7 +507,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         primary="잔여 구독권 수량"
                         primaryTypographyProps={{
                           fontSize: "0.9rem",
-                          color: "#4d4d4d",
+                          color: "#334336",
                         }}
                       />
                     </Box>
@@ -439,7 +518,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         px: 1.5,
                         py: 0.4,
                         borderRadius: 999,
-                        bgcolor: isSoldOut ? "#b6b6b6ff" : "#f1f3f4",
+                        bgcolor: isSoldOut ? "#ccc" : "#fff9f4",
                         minWidth: 54,
                         textAlign: "center",
                         display: "flex",
@@ -451,13 +530,13 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                         sx={{
                           fontSize: "0.8rem",
                           fontWeight: 600,
-                          color: "#202124",
+                          color: "#334336",
                         }}
                       >
                         {sub.remainSalesQuantity || 0} 개
                       </Typography>
                       <ConfirmationNumber
-                        sx={{ fontSize: 20, color: "#4d4d4d" }}
+                        sx={{ fontSize: 20, color: "#334336" }}
                       />
                     </Box>
                   </ListItemButton>
@@ -477,7 +556,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       primary="구독권 설명"
                       primaryTypographyProps={{
                         fontSize: "0.9rem",
-                        color: "#4d4d4d",
+                        color: "#334336",
                       }}
                     />
                     {openDescId === sub.subscriptionId ? (
@@ -494,7 +573,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     <Box sx={{ px: 2, py: 1 }}>
                       <Typography
                         variant="body2"
-                        sx={{ color: "text.secondary", whiteSpace: "pre-line" }}
+                        sx={{ color: "#334336", whiteSpace: "pre-line" }}
                       >
                         {sub.subscriptionDesc || "설명 정보가 없습니다."}
                       </Typography>
@@ -516,7 +595,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       primary="이용 가능 메뉴"
                       primaryTypographyProps={{
                         fontSize: "0.9rem",
-                        color: "#4d4d4d",
+                        color: "#334336",
                       }}
                     />
                     {openMenuId === sub.subscriptionId ? (
@@ -544,7 +623,7 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                             primary={menu.menuName}
                             primaryTypographyProps={{
                               fontSize: "0.8rem",
-                              color: "#333",
+                              color: "#334336",
                             }}
                           />
                         </ListItemButton>
@@ -568,10 +647,11 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     onClick={() => goToSendGift(sub.subscriptionId)}
                     startIcon={<CardGiftcardIcon />}
                     sx={{
-                      backgroundColor: isSoldOut ? "#e0e0e0" : "black",
-                      color: isSoldOut ? "text.disabled" : "white",
+                      backgroundColor: isSoldOut ? "#ccc" : "#334336",
+                      color: isSoldOut ? "#666" : "#fff9f4",
                       "&:hover": {
-                        backgroundColor: isSoldOut ? "#e0e0e0" : "#222",
+                        backgroundColor: isSoldOut ? "#ccc" : "#334336",
+                        opacity: 0.9,
                       },
                     }}
                     disabled={sub.subscriptionStatus === "SOLDOUT"}
@@ -586,10 +666,10 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       onClick={() => goToPurchaseSub(sub.subscriptionId)}
                       startIcon={<CreditCardIcon />}
                       sx={{
-                        backgroundColor: isSoldOut ? "#e0e0e0" : "black",
+                        backgroundColor: isSoldOut ? "#e0e0e0" : "#334336",
                         color: isSoldOut ? "text.disabled" : "white",
                         "&:hover": {
-                          backgroundColor: isSoldOut ? "#e0e0e0" : "#222",
+                          backgroundColor: isSoldOut ? "#e0e0e0" : "#334336",
                         },
                       }}
                       disabled={sub.subscriptionStatus === "SOLDOUT"}
@@ -603,9 +683,9 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                       onClick={() => goToOrder(sub)}
                       startIcon={<CoffeeIcon />}
                       sx={{
-                        backgroundColor: "black",
-                        color: "white",
-                        "&:hover": { backgroundColor: "#222" },
+                        backgroundColor: "#334336",
+                        color: "#fff9f4",
+                        "&:hover": { backgroundColor: "#334336", opacity: 0.9 },
                       }}
                     >
                       주문하기
