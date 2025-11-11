@@ -17,6 +17,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { withdrawal } from "../../utils/member";
 import PersonIcon from "@mui/icons-material/Person";
@@ -32,6 +34,8 @@ import useUserStore from "../../stores/useUserStore";
 function Profile() {
   const { authUser, clearUser } = useUserStore();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [user, setUser] = useState({
     name: authUser?.name || "",
     tel: authUser?.tel || "",
@@ -395,9 +399,11 @@ function Profile() {
           sx: {
             width: "100%",
             maxWidth: 500,
-            height: "90vh",
+            height: isMobile ? "calc(100vh - 100px)" : "90vh", // 모바일에서 footer 높이 고려
+            maxHeight: isMobile ? "calc(100vh - 100px)" : "90vh",
             borderRadius: 4,
             bgcolor: "#ffffff",
+            m: isMobile ? 1 : 2, // 모바일에서 여백 조정
           },
         }}
       >
@@ -412,7 +418,7 @@ function Profile() {
         >
           계정 탈퇴 전, 한 번만 더 확인해주세요
         </DialogTitle>
-        <DialogContent sx={{ p: 0 }}>
+        <DialogContent sx={{ p: 0, overflowY: "auto", maxHeight: isMobile ? "calc(100vh - 200px)" : "auto" }}>
           {/* 탈퇴 안내 이미지 - 단계별로 변경 */}
           <Box
             sx={{
@@ -517,7 +523,7 @@ function Profile() {
             )}
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2 }}>
+        <DialogActions sx={{ px: 3, py: 2, pb: isMobile ? 5 : 2 }}> {/* 모바일에서 하단 여백 추가 */}
           <Box
             sx={{
               display: "flex",

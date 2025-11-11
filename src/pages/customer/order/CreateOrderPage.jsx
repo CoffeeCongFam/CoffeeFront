@@ -690,12 +690,18 @@ function CreateOrderPage() {
                             <Button
                               size="small"
                               variant="contained"
-                              startIcon={<AddIcon />}
+                              startIcon={!isAppLike ? <AddIcon /> : null} // 모바일에서 아이콘 제거
                               onClick={() => handleAddToCart(menu.menuId)}
                               sx={{
                                 borderRadius: 999,
                                 textTransform: "none",
                                 fontSize: "0.8rem",
+                                bgcolor: "#334336",
+                                color: "#fff9f4",
+                                "&:hover": {
+                                  bgcolor: "#334336",
+                                  opacity: 0.9,
+                                },
                               }}
                             >
                               담기
