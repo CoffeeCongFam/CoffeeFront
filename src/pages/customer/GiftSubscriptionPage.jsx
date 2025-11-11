@@ -115,6 +115,9 @@ function GiftSubscriptionPage() {
         throw new Error("PortOne SDK가 로드되지 않았습니다.");
       }
 
+      // (모바일에서는) m_redirect_url = 결제 완료 후 돌아올 내 사이트 주소 필요
+      const redirectUrl = `${window.location.origin}/me/purchase/${created.purchaseId}/complete`;
+
       IMP.init("imp03140165");
 
       IMP.request_pay(
@@ -127,8 +130,11 @@ function GiftSubscriptionPage() {
           buyer_name: authUser.name,
           buyer_email: authUser.email,
           buyer_tel: authUser.tel,
+          m_redirect_url: redirectUrl,  // 리다이렉트 url 추가
         },
         async (response) => {
+          // PC 환경(팝업)에서는 여전히 콜백이 호출됨
+           // 모바일 리디렉션 환경에서는 주로 redirectUrl 쪽에서 처리
           if (response.success) {
             console.log("결제 성공:", response);
 
@@ -293,14 +299,18 @@ function GiftSubscriptionPage() {
             gap: 2,
           }}
         >
-          <SubscriptItem subscription={subscription} />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <Box sx={{ width: "100%", maxWidth: "900px" }}>
+            <SubscriptItem subscription={subscription}  isAppLike={isAppLike} />
+          </Box>
+        </Box>
 
           {/* 보내는 사람 / 받는 사람 */}
           <Box
             sx={{
               display: "flex",
               flexDirection: isAppLike ? "column" : "row",
-              gap: 2,
+              gap: isAppLike ? 3 : 2,
               width: "100%",
               maxWidth: "900px",
               marginTop: "20px",
@@ -324,6 +334,7 @@ function GiftSubscriptionPage() {
               </Box>
             </Box>
 
+            {isAppLike || 
             <Box
               sx={{
                 width: 40,
@@ -334,6 +345,8 @@ function GiftSubscriptionPage() {
             >
               <ForwardIcon />
             </Box>
+            }
+
 
             {/* 받는 사람 */}
             <Box
@@ -444,9 +457,9 @@ function GiftSubscriptionPage() {
         {/* 유의사항 */}
         <Box
           sx={{
-            mt: 3,
+            mt: 8,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
             bgcolor: "#fffef6",
             border: "1px solid #fff2c5",
             borderRadius: 2,
@@ -457,23 +470,23 @@ function GiftSubscriptionPage() {
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <ErrorIcon color="warning" sx={{ mr: 1 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ fontSize: "0.9rem", fontWeight: 600 }}>
               유의사항
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-            <Typography variant="body2" color="text.secondary">
+          <Box sx={{ display: "flex", flexDirection: "column",  gap: 0.5 }}>
+            <Typography variant="body2" sx={{fontSize: "0.8rem", }} color="text.secondary">
               • 본 구독권은 {subscription?.store?.storeName} 매장 전용으로 사용
               가능합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 결제일 기준 30일간 이용 가능하며, 중도 해지는 불가합니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 1일 {subscription?.maxDailyUsage}회 제공 기준이며, 일부 메뉴는
               추가 금액이 발생할 수 있습니다.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{fontSize: "0.8rem", }} >
               • 선물하기로 받은 구독권은 양도가 제한될 수 있습니다.
             </Typography>
           </Box>
@@ -482,14 +495,16 @@ function GiftSubscriptionPage() {
         {/* 하단 결제 버튼 */}
         <Box
           sx={{
-            mt: 4,
+            mt: 2,
             width: "100%",
-            maxWidth: 900,
+            maxWidth: "900px",
+            mx: "auto",
             display: "flex",
-            justifyContent: "right",
+            justifyContent: "flex-end",
           }}
         >
           <Button
+            fullWidth={isAppLike}
             onClick={() => {
               if (!receiver) {
                 alert("받는 사람을 먼저 선택해 주세요.");
@@ -497,10 +512,12 @@ function GiftSubscriptionPage() {
               }
               setPayOpen(true);
             }}
-            sx={{
+             sx={{
+              borderRadius: isAppLike ? "2rem" : "inherit",
               backgroundColor: "black",
               color: "white",
               px: 4,
+              maxWidth: isAppLike ? 480 : "none",
               "&:hover": { backgroundColor: "#333" },
             }}
           >
@@ -574,87 +591,91 @@ function GiftSubscriptionPage() {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 1.5,
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))", // 3열 고정
+                gridAutoRows: 110,                                // 각 행 높이를 110px로 고정
+                columnGap: 1.5,
+                rowGap: 1.5,
               }}
             >
-              {paymentMethods.map((method) => (
-                <Box
-                  key={method.label}
-                  onClick={() => {
-                    setSelectedMethod(method.label);
-                    setTimeout(() => confirmPayment(method.pg), 200);
-                  }}
-                  sx={{
-                    bgcolor: method.bgColor,
-                    border: `2px solid ${
-                      selectedMethod === method.label
-                        ? method.color
-                        : "transparent"
-                    }`,
-                    borderRadius: 3,
-                    height: 110,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 1,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      boxShadow: `0 4px 12px ${method.color}40`,
-                      borderColor: method.color,
-                      transform: "translateY(-3px)",
-                    },
-                  }}
-                >
-                  {/* 아이콘 */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: 40,
-                    }}
-                  >
-                    {React.isValidElement(method.icon) ? (
-                      method.icon
-                    ) : (
-                      <img
-                        src={method.icon}
-                        alt={method.label}
-                        style={{
-                          ...method.imgStyle,
-                          objectFit: "contain",
-                          filter:
-                            method.label === "토스페이"
-                              ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
-                              : "none",
-                        }}
-                      />
-                    )}
-                  </Box>
-
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: method.textColor || "#333",
-                      fontSize: 13,
-                    }}
-                  >
-                    {method.label}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+               {paymentMethods.map((method) => (
+                              <Box
+                                key={method.label}
+                                onClick={() => {
+                                  setSelectedMethod(method.label);
+                                  setTimeout(() => confirmPayment(method.pg), 200);
+                                }}
+                                sx={{
+                                  bgcolor: method.bgColor,
+                                  border: `2px solid ${
+                                    selectedMethod === method.label
+                                      ? method.color
+                                      : "transparent"
+                                  }`,
+                                  borderRadius: 3,
+                                  height: "100%", 
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  gap: 1,
+                                  cursor: "pointer",
+                                  transition: "all 0.2s ease",
+                                  "&:hover": {
+                                    boxShadow: `0 4px 12px ${method.color}40`,
+                                    borderColor: method.color,
+                                    transform: "translateY(-3px)",
+                                  },
+                                }}
+                              >
+                                {/* 아이콘 */}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    height: 40,
+                                  }}
+                                >
+                                  {React.isValidElement(method.icon) ? (
+                                    method.icon
+                                  ) : (
+                                    <img
+                                      src={method.icon}
+                                      alt={method.label}
+                                      style={{
+                                        ...method.imgStyle,
+                                        objectFit: "contain",
+                                        filter:
+                                          method.label === "토스페이"
+                                            ? "drop-shadow(0 1px 1px rgba(0,0,0,0.1))"
+                                            : "none",
+                                      }}
+                                    />
+                                  )}
+                                </Box>
+              
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color: method.textColor || "#333",
+                                    fontSize: 13,
+                                  }}
+                                >
+                                  {method.label}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Box>
 
             <Box
               sx={{
                 bgcolor: "#F8F9FA",
                 borderRadius: 2,
-                p: 2,
+                px: 2,
+                pt: 1,
                 mt: 2,
+                pb: 10
               }}
             >
               <Typography

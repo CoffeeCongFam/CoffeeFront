@@ -86,6 +86,7 @@ export default function SearchPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentLoc, setCurrentLoc] = useState({ xPoint: null, yPoint: null }); // (lng, lat)
   const [currentLocRef, setCurrentLocRef] = useState(null);
+  const [isSearchConfirmed, setIsSearchConfirmed] = useState(false);
 
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
@@ -96,9 +97,6 @@ export default function SearchPage() {
   const [openCafeList, setOpenCafeList] = useState(false);
   const [showSearchResult, setShowSearchResult] = useState(false);
 
-  const handleCurrentLocPopoverClose = () => {
-    setCurrentLocRef(null);
-  };
 
   // --- utils ---
   function getCurrentPositionAsync(options) {
@@ -110,6 +108,21 @@ export default function SearchPage() {
       navigator.geolocation.getCurrentPosition(resolve, reject, options);
     });
   }
+
+  useEffect(() => {
+    const trimmed = keyword.trim();
+    // 검색어가 있으면 드롭다운을 열고, 검색 확정 상태는 초기화
+    if (trimmed) {
+        setShowSearchResult(true);
+        setIsSearchConfirmed(false); // 검색어를 다시 입력하면 확정 상태를 해제
+    } else {
+        // 검색어가 비면 드롭다운 숨김
+        setShowSearchResult(false);
+        setIsSearchConfirmed(false);
+    }
+}, [keyword]);
+
+
 
   // 1) 네이버 지도 스크립트만 먼저 로딩
   useEffect(() => {
@@ -185,7 +198,7 @@ export default function SearchPage() {
       scaleControl: true,
       mapDataControl: false,
       logoControl: true,
-      zoomControl: true,
+      zoomControl: false,
       zoomControlOptions: { position: maps.Position.RIGHT_CENTER },
     });
     mapRef.current = map;
@@ -200,7 +213,6 @@ export default function SearchPage() {
 
     // 지도 클릭 시 현재 위치 마커 이동(선택)
     maps.Event.addListener(map, "click", (e) => {
-      hereMarkerRef.current?.setPosition(e.coord);
       if (typeof map.panTo === "function") map.panTo(e.coord);
       else map.setCenter(e.coord);
     });
@@ -427,6 +439,25 @@ export default function SearchPage() {
               setShowSearchResult(!!v);
             }}
           />
+          {
+            showSearchResult && filteredCafes.length == 0 && 
+            <Paper
+              elevation={3}
+              sx={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                mt: 1,
+                width: "120%",
+                maxHeight: 280,
+                overflowY: "auto",
+                borderRadius: 2,
+                p: 2
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">검색 결과 없음</Typography>
+            </Paper>
+          }
           {showSearchResult && filteredCafes.length > 0 && (
             <Paper
               elevation={3}
@@ -457,7 +488,7 @@ export default function SearchPage() {
                   }}
                 >
                   <Avatar
-                    src={cafe.storeImage}
+                    src={cafe.storeImg}
                     alt={cafe.storeName}
                     sx={{ width: 40, height: 40 }}
                   />
@@ -653,7 +684,7 @@ export default function SearchPage() {
                       }}
                     >
                       <Avatar
-                        src={cafe.storeImage || storeDummy}
+                        src={cafe.storeImg || storeDummy}
                         alt={cafe.storeName}
                         sx={{ width: "100%", height: "100%", borderRadius: 2 }}
                         variant="rounded"

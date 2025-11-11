@@ -39,11 +39,15 @@ function Landing() {
   }, []);
 
   const sections = ["hero", "customer", "store", "cta"];
-  const containerRef = (React.useRef < HTMLDivElement) | (null > null);
+  const containerRef = React.useRef(null);
 
   const handleScroll = (e) => {
-    const { scrollTop, clientHeight } = e.currentTarget;
-    const index = Math.round(scrollTop / clientHeight);
+    const { scrollTop, scrollLeft, clientHeight, clientWidth } = e.currentTarget;
+
+    const index = isMobile
+      ? Math.round(scrollLeft / clientWidth)   // 모바일 : 가로 기준
+      : Math.round(scrollTop / clientHeight); // 데스크탑: 세로 기준
+
     const sec = sections[index] || sections[0];
     setActive(sec);
   };
@@ -85,13 +89,19 @@ function Landing() {
       sx={{
         height: "100vh",
         width: "100vw",
-        overflowY: "auto",
-        scrollSnapType: "y mandatory",
+        overflowY: isMobile ? "hidden" : "auto",
+        overflowX: isMobile ? "auto" : "hidden",
+        scrollSnapType: isMobile ? "x mandatory" : "y mandatory",
+        display: isMobile ? "flex" : "block",
+        flexDirection: isMobile ? "row" : "column",
+        scrollBehavior: "smooth",
         backgroundColor: "#f6e4d1",
       }}
     >
-      {/* 오른쪽 점 네비게이션 */}
-      {!isMobile && (
+
+      {/* 점 네비게이션 */}
+      {!isMobile ? (
+        // 데스크탑: 오른쪽 세로
         <Box
           sx={{
             position: "fixed",
@@ -128,6 +138,44 @@ function Landing() {
             </Link>
           ))}
         </Box>
+      ) : (
+        // 모바일: 아래 가로
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "row",
+            gap: 1.5,
+            zIndex: 10,
+          }}
+        >
+          {sections.map((sec) => (
+            <Link
+              key={sec}
+              to={sec}
+              spy={true}
+              smooth={true}
+              duration={500}
+              offset={0}
+              onSetActive={() => setActive(sec)}
+            >
+              <Box
+                sx={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "9999px",
+                  border: "2px solid #a16246",
+                  backgroundColor: active === sec ? "#a16246" : "transparent",
+                  cursor: "pointer",
+                  transition: "all .2s",
+                }}
+              />
+            </Link>
+          ))}
+        </Box>
       )}
 
       {/* ------------------- 1 챕터 ------------------- */}
@@ -135,6 +183,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             display: "flex",
             scrollSnapAlign: "start",
           }}
@@ -216,8 +265,8 @@ function Landing() {
                       backgroundColor: "#c84436",
                       textTransform: "none",
                       borderRadius: "9999px",
-                      flex: isMobile && 1,
-                      px: isMobile || 6,
+                      flex: isMobile ? 1 : "initial", 
+                      px: isMobile ? 2 : 6,      
                       "&:hover": { backgroundColor: "#b0382b" },
                     }}
                     onClick={() => navigate("/signup")}
@@ -275,6 +324,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
@@ -344,6 +394,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
@@ -421,6 +472,7 @@ function Landing() {
         <Box
           sx={{
             height: "100vh",
+            minWidth: isMobile ? "100vw" : "100%",
             scrollSnapAlign: "start",
             display: "flex",
             flexDirection: "column",
@@ -432,7 +484,7 @@ function Landing() {
         >
           <Typography
             sx={{
-              fontSize: "1.4rem",
+              fontSize: isMobile ? "1.3rem" : "2.3rem",
               fontWeight: 600,
               color: "#4a3426",
               mb: 2,

@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import LocationOnIcon from "@mui/icons-material/LocationOn"; 
 import React from "react";
 import dummyImg from "../../../assets/cafeInfoDummy.png";
 import { useNavigate } from "react-router-dom";
@@ -79,7 +80,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             gap: 1,
             backgroundColor: "rgba(0,0,0,0.25)",
             backdropFilter: "blur(1.5px)",
-            zIndex: 10,
+            zIndex: 100,
           }}
         >
           <CoffeeIcon sx={{ fontSize: 65, color: "#ffffffd2" }} />
@@ -109,7 +110,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
 
       {/* 본문 */}
       <CardContent sx={{ width: "100%", p: 2, pt: 1.5 }}>
-        {/* 1줄 : 카페 이름 + 구독권명만 왼쪽에 */}
+        {/* 구독권 이름 */}
         <Box
           sx={{
             display: "flex",
@@ -123,14 +124,14 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             <Typography
               variant="subtitle1"
               fontWeight="700"
-              noWrap={!isAppLike}   // 데스크탑에서만 한 줄로
+              noWrap={!isAppLike} // 데스크탑에서만 한 줄로
               sx={{
                 flex: 1,
                 cursor: "default",
                 ...(isAppLike
                   ? {
                       display: "-webkit-box",
-                      WebkitLineClamp: 2,        // 모바일: 최대 2줄까지
+                      WebkitLineClamp: 2, // 모바일: 최대 2줄까지
                       WebkitBoxOrient: "vertical",
                       overflow: "hidden",
                     }
@@ -141,33 +142,63 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
                     }),
               }}
             >
-              {item.store.storeName} - {item.subName}
+              {item.subName}
             </Typography>
           </Tooltip>
         </Box>
 
-        <Typography
-          variant="body2"
-          sx={{ fontSize: "12px", textAlign: "right", color: "grey.600" }}
-        >
-          {item.subStart.split("T")[0]} ~ {item.subEnd.split("T")[0]}
-        </Typography>
-
-        <Typography
+        {/* ✅ 스토어 이름 + 로케이션 아이콘 */}
+        <Box
           sx={{
-            fontSize: "12px",
-            textAlign: "right",
-            mt: 0.5,
-            color: "#ff5e14ff",
-            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            mb: 0.5,
           }}
         >
-          남은 이용일: {getRemainingDays(today, item.subEnd) - 1}일
-        </Typography>
+          <LocationOnIcon sx={{ fontSize: 16, color: "grey.600" }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: "grey.800",
+              fontWeight: 500,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.store.storeName}
+          </Typography>
+        </Box>
+
+        {/* ✅ 날짜 + 남은 이용일 세로 정렬 */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end", // 오른쪽 정렬
+            mt: 0.5,
+            gap: 0.25,
+          }}
+        >
+          <Typography sx={{ fontSize: "0.8rem", color: "grey.600" }}>
+            ~ {item.subEnd.split("T")[0]}
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: "0.8rem",
+              color: "#ff5e14ff",
+              fontWeight: 500,
+            }}
+          >
+            남은 이용일: {getRemainingDays(today, item.subEnd) - 1}일
+          </Typography>
+        </Box>
       </CardContent>
 
       {/* 하단 버튼 */}
-      <Box sx={{ width: "100%", px: 2, pb: 2 }}>
+       <Box sx={{ width: "100%", px: 2, pb: 2 }}>
         {item.remainingCount > 0 ? (
           <Button
             onClick={(e) => {
@@ -178,7 +209,7 @@ function SubscriptionItem({ today, item, handleOrderClick }) {
             sx={{
               backgroundColor: "black",
               color: "white",
-              borderRadius: "6px",
+              borderRadius: "3rem",
               "&:hover": { backgroundColor: "#333" },
               alignItems: "center",
             }}

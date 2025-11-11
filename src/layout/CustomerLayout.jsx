@@ -213,6 +213,7 @@ export default function CustomerLayout() {
             left: 0,
             right: 0,
             zIndex: 2000,
+            pb: isAppLike ? 3: 2
           }}
         >
           <BottomNavigation
@@ -228,6 +229,18 @@ export default function CustomerLayout() {
                 value={link.to}
                 component={NavLink}
                 to={link.to}
+                sx={{
+                   "& .MuiBottomNavigationAction-label": {
+                      fontSize: "0.75rem", // 원하는 크기
+                      transition: "none",
+                    },
+                    "&.Mui-selected .MuiBottomNavigationAction-label": {
+                      fontSize: "0.75rem",
+                    },
+                     "&.Mui-selected": {
+                      paddingTop: "6px",
+                    },
+                }}
               />
             ))}
           </BottomNavigation>

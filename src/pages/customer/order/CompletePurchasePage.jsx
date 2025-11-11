@@ -1,18 +1,34 @@
-import { Box, IconButton, Typography, Divider } from "@mui/material";
+import { Box, IconButton, Typography, Divider, Button } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ForwardIcon from "@mui/icons-material/Forward";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import axios from "axios"; 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { fetchPurchaseInfo } from "../../../apis/customerApi";
 import formatDate from "../../../utils/formatDate";
+import Loading from "../../../components/common/Loading";
 
 function CompletePurchasePage() {
   const { purchaseId } = useParams();
   const navigate = useNavigate();
 
   const [purchase, setPurchase] = useState(null);
+  const [searchParams] = useSearchParams();
+  const impUid = searchParams.get("imp_uid");
+  const merchantUid = searchParams.get("merchant_uid");
+  const successParam  = searchParams.get("imp_success");  // "true" | "false" | null
+
+  const [loading, setLoading] = useState(true);
+  const [validating, setValidating] = useState(false);
+  const [validateError, setValidateError] = useState(null);
+
+
+  
+  const fmtPrice = (n) =>
+    typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "0";
+
 
   async function getPurchaseInfo() {
     const data = await fetchPurchaseInfo(purchaseId);
@@ -20,18 +36,117 @@ function CompletePurchasePage() {
   }
 
   useEffect(() => {
-    // TODO: purchaseId 로 실제 결제 완료 내역 조회
-    getPurchaseInfo();
-  }, [purchaseId]);
+  async function run() {
+    try {
+      // 1) success / impUid / merchantUid 가 없는 경우: 기존 PC 흐름 (콜백 기반)
+      if (!impUid || !merchantUid || successParam === null) {
+        await getPurchaseInfo();
+        return;
+      }
+
+      // 2) success === false 인 경우: 결제 실패
+      if (successParam === "false") {
+        setValidateError("결제가 취소되었거나 실패했습니다.");
+        return;
+      }
+
+      // 3) success=true + impUid/merchantUid 있으면 우선 서버 검증
+      setValidating(true);
+      setValidateError(null);
+
+      await axios.post("/api/payments/validation", {
+        purchaseId,
+        impUid,
+        merchantUid,
+      });
+
+      // 검증이 통과하면 실제 결제/구독 정보 조회
+      await getPurchaseInfo();
+    } catch (err) {
+      console.error("결제 검증 실패: ", err);
+      setValidateError(
+        "결제 검증에 실패했습니다. 결제가 승인되지 않았습니다."
+      );
+    } finally {
+      setValidating(false);
+      setLoading(false);   // ✅ 어떤 경우든 여기서 false 됨
+    }
+  }
+
+  run();
+}, [purchaseId, impUid, merchantUid, successParam]);
+
 
   function handleBack() {
     navigate(-1);
   }
 
-  if (!purchase) return null;
+  // if (!purchase) return null;
+   if (validating || loading) {
+    return (
+      <Box sx={{ width: "100vw", height: "100vh" }}>
+        <Loading
+          title={"결제 처리 중"}
+          message={"결제 정보를 확인하고 있습니다..."}
+        />
+      </Box>
+    );
+  }
 
-  const fmtPrice = (n) =>
-    typeof n === "number" ? new Intl.NumberFormat("ko-KR").format(n) : n ?? "-";
+  if (validateError) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" , height:"100%", alignContent: "center", pb: 12}}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          결제 실패
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          {validateError}
+        </Typography>
+        <Button
+          onClick={() => navigate(-1)}
+          sx={{
+            bgcolor: "black",
+            color: "white",
+            px: "4rem",
+            borderRadius: "3rem",
+            cursor: "pointer",
+            fontWeight: 600,
+            display: "inline-block",
+          }}
+        >
+          뒤로가기
+        </Button>
+      </Box>
+    );
+  }
+
+  // 검증은 통과했는데 purchase 정보가 없는 경우
+  if (!purchase) {
+    console.log(purchase);
+
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          결제 정보를 찾을 수 없습니다.
+        </Typography>
+        <Box
+          onClick={() => navigate("/me")}
+          sx={{
+            bgcolor: "black",
+            color: "white",
+            px: 5,
+            py: 1.4,
+            borderRadius: 3,
+            cursor: "pointer",
+            fontWeight: 600,
+            display: "inline-block",
+          }}
+        >
+          홈으로
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>

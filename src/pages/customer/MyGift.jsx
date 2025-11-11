@@ -83,9 +83,11 @@ import {
 } from "../../utils/gift";
 import { SubscriptionDetailCard } from "../../components/customer/subcription/SubscriptionDetailCard";
 import useUserStore from "../../stores/useUserStore";
+import useAppShellMode from "../../hooks/useAppShellMode";
 
 function MyGift() {
   const { authUser } = useUserStore();
+  const { isAppLike } = useAppShellMode
   const memberId = authUser?.memberId ?? 105;
   const [filter, setFilter] = useState("ALL");
   const [openIndex, setOpenIndex] = useState(null);
@@ -442,6 +444,7 @@ function MyGift() {
                   messageComponent={messageNode}
                   date={formatKST(item.paidAt)}
                   isSent={true}
+                  isAppLike={isAppLike}
                 />
               </Button>
 

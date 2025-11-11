@@ -12,10 +12,12 @@ import useUserStore from "../../stores/useUserStore";
 import OrderHistory from "./order/OrderHistory";
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import Loading from '../../components/common/Loading';
+import useAppShellMode from '../../hooks/useAppShellMode';
 
 function MyPage() {
   let navigate = useNavigate();
 
+  const { isAppLike } = useAppShellMode();
   const { authUser, clearUser } = useUserStore();
   const theme = useTheme();
   // sm breakpoint (600px) 이상일 때 true
@@ -216,7 +218,12 @@ function MyPage() {
       >
         {/* 좌측: 유저 정보 */}
         <Box>
-          <Typography variant={{ xs: 'h6', sm: 'h5' }} component="h1" fontWeight="bold">
+          <Typography 
+          sx={{
+          fontSize: isAppLike ? "23px" : "30px",
+          fontWeight: "bold",
+          mb: 2,
+        }} component="h1" fontWeight="bold">
             {authUser?.name}님 환영합니다!
           </Typography>
         </Box>

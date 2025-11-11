@@ -100,7 +100,7 @@ export default function NotificationItem({ noti, onClick, onDelete }) {
           {messageText}
         </Typography>
         <Typography variant="caption" sx={{ color: "text.disabled" }}>
-          {formatDateTime(noti.createdAt)}
+          {formatDateTime(noti.createdAT)}
         </Typography>
       </Box>
     </ListItemButton>

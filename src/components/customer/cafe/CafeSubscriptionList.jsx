@@ -12,8 +12,10 @@ import {
   ListItemIcon,
   Collapse,
   Chip,
+  Divider,
 } from "@mui/material";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -381,86 +383,30 @@ function CafeSubscriptionList({ subscriptions = [] }) {
                     </Typography>
                   </Typography>
                 </Box>
-
-                {/* 설명 3칸 - 모바일에서는 세로 */}
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      // xs: "1fr",
-                      xs: "repeat(3, minmax(0, 1fr))",
-                      sm: "repeat(3, minmax(0, 1fr))",
-                    },
-                    gap: 1,
-                  }}
-                >
-                  <Box sx={subDescBoxStyle}>
-                    <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
-                      금액
-                    </Typography>
-                    <Box>
-                      <Typography
-                        sx={{
-                          textAlign: "right",
-                          fontSize: { xs: "0.8rem", sm: "1rem" },
-                        }}
-                      >
-                        월 {sub.price?.toLocaleString()}원
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: 10,
-                          color: "#ff39caff",
-                          textAlign: "right",
-                        }}
-                      >
-                        한 잔당 약 ₩
-                        {sub.price
-                          ? Math.round(sub.price / 30).toLocaleString()
-                          : 0}
-                      </Typography>
+                 <Divider />
+                 <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent:"space-between",
+                      gap: 1.5,
+                      flexWrap: "wrap",
+                      color: "text.secondary",
+                      fontSize: "0.9rem",
+                      mb: 1
+                    }}
+                  >
+                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.3, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
+                      <CalendarMonthIcon fontSize="small" />
+                      <span>결제일부터 {sub?.subscriptionPeriod}일간</span>
+                    </Box>
+                    <Box sx={{ fontSize:"0.8rem", flex: 1, display: "flex", alignItems: "center", gap: 0.5, backgroundColor:"#eeeeeeda", borderRadius:"1rem", px: '0.9rem', py: "1rem"}}>
+                      <CoffeeIcon fontSize="small" />
+                      <span>매일 {sub?.maxDailyUsage}잔 이용</span>
                     </Box>
                   </Box>
 
-                  <Box sx={subDescBoxStyle}>
-                    <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
-                      구독 주기
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        textAlign: "right",
-                        fontSize: { xs: "0.8rem", sm: "1rem" },
-                      }}
-                    >
-                      {sub.subscriptionPeriod} 일
-                    </Typography>
-                  </Box>
-
-                  <Box sx={subDescBoxStyle}>
-                    <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
-                      사용 가능
-                    </Typography>
-                    <Typography
-                      sx={{
-                        textAlign: "right",
-                        fontSize: { xs: "0.8rem", sm: "1rem" },
-                      }}
-                    >
-                      매일, 하루 {sub.maxDailyUsage} 번
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: 10,
-                        color: "#ff39caff",
-                        textAlign: "right",
-                      }}
-                    >
-                      결제일부터 사용 가능
-                    </Typography>
-                  </Box>
-                </Box>
-
+                {/* 설명 3칸 - 모바일에서는 세로 */}
+                
                 {/* 잔여 구독권 수량 */}
                 <List sx={{ py: 0 }}>
                   <ListItemButton
