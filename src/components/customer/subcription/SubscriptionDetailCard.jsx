@@ -173,7 +173,7 @@ export const SubscriptionDetailCard = ({
   const dailyLabel =
     giftType === "RECEIVED" ? "일일 잔여" : "일일 사용가능 횟수";
   const dailyContent = isDailyUsedUp
-    ? `${resolvedMaxDaily ?? 0}잔 당일 사용횟수 소진`
+    ? `당일 사용횟수 소진`
     : `${resolvedMaxDaily ?? 0}잔`;
 
   const formattedPrice = price.toLocaleString();

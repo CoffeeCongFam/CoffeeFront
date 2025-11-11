@@ -259,11 +259,11 @@ export default function CustomerLayout() {
                     color: "#fff9f4",
                     paddingTop: "6px",
                     "& .MuiSvgIcon-root": {
-                      color: "#fff9f4",
+                      color: "#ffc494",
                     },
                     "& .MuiBottomNavigationAction-label": {
                       fontSize: "0.75rem",
-                      color: "#fff9f4",
+                      color: " #ffc494",
                     },
                   },
                 }}

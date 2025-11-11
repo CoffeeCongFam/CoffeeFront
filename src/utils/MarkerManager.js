@@ -144,7 +144,7 @@ export default class MarkerManager {
               ${cafe.distance ? `${cafe.distance}m` : ""}
             </span>
           </div>
-          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all;">
+          <div style="font-weight:700; font-size:14px; margin:4px 0; word-break:keep-all; color:#334336;">
             ${cafe.storeName ?? ""}
           </div>
           <div style="

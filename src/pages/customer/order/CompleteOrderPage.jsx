@@ -127,7 +127,7 @@ function CompleteOrderPage() {
 
       {/* 상단 상태 메시지 */}
       <Box sx={{ textAlign: "center", mb: 2 }}>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" fontWeight="bold" sx={{ color: "#334336" }}>
           {
             isLoading && "주문 내역 불러오는 중..."
             // : orderStatusMessage(orderInfo.orderStatus)

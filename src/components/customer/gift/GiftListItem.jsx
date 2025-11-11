@@ -1,11 +1,6 @@
-import React from "react";
-import {
-  Box,
-  Typography,
-  Divider,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import React from 'react';
+import { Box, Typography, Divider, useMediaQuery, useTheme } from '@mui/material';
+import useAppShellMode from '../../../hooks/useAppShellMode';
 
 /**
  * 개별 선물 항목을 출력하는 컴포넌트
@@ -13,13 +8,14 @@ import {
 
 const GiftListItem = ({ messageComponent, date, isAppLike }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isAppLike: isAppLikeMode } = useAppShellMode();
   return (
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
           display: "flex",
-          flexDirection: isAppLike ? "column" : "row",
+          flexDirection: isAppLikeMode ? "column" : "row",
           alignItems: "flex-start",
           justifyContent: "space-between",
           padding: "12px 0",
