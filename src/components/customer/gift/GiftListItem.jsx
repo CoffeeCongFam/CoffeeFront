@@ -9,13 +9,13 @@ import useAppShellMode from '../../../hooks/useAppShellMode';
 const GiftListItem = ({ messageComponent, date, isAppLike }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { isAppLike } = useAppShellMode();
+  const { isAppLike: isAppLikeMode } = useAppShellMode();
   return (
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
           display: "flex",
-          flexDirection: isAppLike ? "column" : "row",
+          flexDirection: isAppLikeMode ? "column" : "row",
           alignItems: "flex-start",
           justifyContent: "space-between",
           padding: "12px 0",
