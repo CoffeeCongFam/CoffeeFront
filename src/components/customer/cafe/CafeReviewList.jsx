@@ -30,6 +30,7 @@ import {
 import useUserStore from "../../../stores/useUserStore";
 import { DeleteOutline } from "@mui/icons-material";
 import CommonAlert from "../../common/CommonAlert";
+import CommonConfirm from "../../common/CommonConfirm";
 
 function CafeReviewList({ storeName, storeId }) {
   const [localReviews, setLocalReviews] = useState([]);
@@ -47,6 +48,12 @@ function CafeReviewList({ storeName, storeId }) {
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+
+  // 확인창
+  const [confirm, setConfirm] = useState({
+    open: false,
+    targetId: null,
+  });
 
   // 경고창
   const [alert, setAlert] = useState({
@@ -151,7 +158,6 @@ function CafeReviewList({ storeName, storeId }) {
         "error",
         "해당 카페에서 리뷰를 작성할 수 있는 구독권이 없습니다."
       );
-      // alert("해당 카페에 대한 구매 내역이 없어 리뷰를 작성하실 수 없습니다.");
       return;
     }
     // 모달 열기 전에 상태 초기화
@@ -221,25 +227,28 @@ function CafeReviewList({ storeName, storeId }) {
    * 리뷰 삭제 처리 함수
    * @param {number} reviewId 삭제할 리뷰의 ID
    */
-  async function handleDelete(reviewId) {
-    const isConfirmed = window.confirm("정말로 이 리뷰를 삭제하시겠습니까?");
+  // 삭제 요청 → 확인 모달만 띄움
+  function handleDelete(reviewId) {
+    setConfirm({
+      open: true,
+      targetId: reviewId,
+    });
+  }
 
-    if (!isConfirmed) {
-      return;
-    }
-
+  // 확인 버튼 눌렀을 때 실행
+  async function handleConfirmDelete() {
     try {
-      await deleteReview(reviewId);
+      await deleteReview(confirm.targetId);
       handleShowAlert("success", "리뷰가 성공적으로 삭제되었습니다.");
-      // alert("리뷰가 성공적으로 삭제되었습니다.");
-      await getReviewList(); // 리뷰 목록 리로딩
+      await getReviewList();
     } catch (error) {
       console.error("리뷰 삭제 실패:", error);
       handleShowAlert(
         "error",
         "리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
       );
-      // alert("리뷰 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setConfirm({ open: false, targetId: null });
     }
   }
 
@@ -629,6 +638,15 @@ function CafeReviewList({ storeName, storeId }) {
         onClose={() => setAlert({ ...alert, open: false })}
         severity={alert.severity}
         message={alert.message}
+      />
+      <CommonConfirm
+        open={confirm.open}
+        onClose={() => setConfirm({ open: false, targetId: null })}
+        onConfirm={handleConfirmDelete}
+        title="리뷰 삭제 확인"
+        message="이 리뷰를 정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
       />
     </Box>
   );

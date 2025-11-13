@@ -624,6 +624,7 @@ export default function ManageStoreInfo({ storeInfo: initialStoreInfo, syncStore
 
       setSuccessMessage("영업시간 및 휴무일 정보가 저장되었습니다.");
       setIsEditingHours(false);
+	  window.location.reload();
       // 저장 이후에는 별도의 재조회 없이, 방금 입력한 로컬 상태(storeInfo.storeHours)를 그대로 화면에 보여줍니다.
     } catch (err) {
       console.error("영업시간 정보 저장 실패 :", err);

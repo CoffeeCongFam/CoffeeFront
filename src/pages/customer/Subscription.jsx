@@ -231,7 +231,7 @@ const SubscriptionPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
+    <Container maxWidth="md" sx={{mb: 4, borderRadius: 2, border: "1px solid #ffe0b2", p: 2, backgroundColor: "white" }}>
       <Box
         sx={{
           display: "flex",

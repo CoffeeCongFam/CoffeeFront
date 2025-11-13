@@ -33,6 +33,7 @@ import useAppShellMode from "../hooks/useAppShellMode";
 import useNotificationStore from "../stores/useNotificationStore";
 import { deleteNotification, readNotification } from "../apis/notificationApi";
 import NotificationItem from "../components/common/NotificationItem";
+import CommonAlert from "../components/common/CommonAlert";
 
 const drawerWidth = 240;
 
@@ -80,6 +81,21 @@ export default function CustomerLayout() {
 
   const [notifOpen, setNotifOpen] = useState(false); // 알림 토글
 
+  // 경고창
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleShowAlert = (type, message) => {
+    setAlert({
+      open: true,
+      message: message,
+      severity: type,
+    });
+  };
+
   // 페이지 이동 시 알림 드로어 자동 닫기
   useEffect(() => {
     setNotifOpen(false);
@@ -103,7 +119,10 @@ export default function CustomerLayout() {
       removeNotification(notificationId); // 스토어에서 제거
     } catch (e) {
       console.error("알림 삭제 실패:", e);
-      alert("알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      handleShowAlert(
+        "error",
+        "알림 삭제 중 오류가 발생했습니다. 다시 시도해주세요."
+      );
     }
   }
 
@@ -125,7 +144,10 @@ export default function CustomerLayout() {
       deleteAllNotifications();
     } catch (e) {
       console.error("전체 알림 삭제 실패:", e);
-      alert("알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      handleShowAlert(
+        "error",
+        "알림 전체 삭제 중 오류가 발생했습니다. 다시 시도해주세요."
+      );
     }
   }
 
@@ -525,6 +547,13 @@ export default function CustomerLayout() {
           )}
         </List>
       </Drawer>
+
+      <CommonAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
     </Box>
   );
 }

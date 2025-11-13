@@ -21,6 +21,7 @@ import {
 } from "../../../apis/customerApi";
 import OrderProgressBar from "../../../components/customer/order/OrderProgressBar";
 import useNotificationStore from "../../../stores/useNotificationStore";
+import CommonConfirm from "../../../components/common/CommonConfirm";
 
 function handleSubscriptionType(type) {
   switch (type) {
@@ -40,7 +41,12 @@ function CompleteOrderPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState(null);
-  const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
+  const [confirmCancel, setConfirmCancel] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+  // const [openCancel, setOpenCancel] = useState(false); // 주문 취소 확인 모달
 
   const { notifications } = useNotificationStore();
 
@@ -69,8 +75,16 @@ function CompleteOrderPage() {
   }, [orderId]);
   // orderInfo 갱신으로 계속 요청되는 문제 수정
 
+  // 주문 취소 요청 → 확인 모달만 띄움
+  function handleDelete(orderId) {
+    setConfirmCancel({
+      open: true,
+      targetId: orderId,
+    });
+  }
+
   // 주문 취소
-  async function handleCancelOrder() {
+  async function handleConfirmCancel() {
     try {
       await requestCancelOrder(orderId);
 
@@ -85,7 +99,10 @@ function CompleteOrderPage() {
       console.error("❌ 주문 취소 오류:", e);
       alert("서버와의 통신 중 오류가 발생했습니다.");
     } finally {
-      setOpenCancel(false);
+      setConfirmCancel({
+        open: false,
+        targetId: null,
+      });
     }
   }
 
@@ -118,7 +135,7 @@ function CompleteOrderPage() {
   }
 
   return (
-    <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: 10 }}>
+    <Box sx={{ px: isAppLike ? 3 : 12, py: 3, pb: isAppLike ? 6 : 10, minHeight: "100vh", boxSizing: "border-box", }}>
       <Box
         sx={{
           display: "flex",
@@ -305,7 +322,7 @@ function CompleteOrderPage() {
 
             <Box sx={{ mt: 3, textAlign: "right" }}>
               <Chip
-                onClick={() => setOpenCancel(!openCancel)}
+                onClick={handleDelete}
                 label={
                   orderInfo.orderStatus === "CANCELED"
                     ? "주문 취소 완료"
@@ -377,10 +394,14 @@ function CompleteOrderPage() {
         </Box>
       )}
 
-      <OrderCheckModal
-        open={openCancel}
-        setOpen={setOpenCancel}
-        setIsCancel={handleCancelOrder}
+      <CommonConfirm
+        open={confirmCancel.open}
+        onClose={() => setConfirmCancel({ open: false, targetId: null })}
+        onConfirm={handleConfirmCancel}
+        title="주문을 취소하시겠어요?"
+        message="이미 제조가 시작된 경우, 취소가 어려울 수 있습니다."
+        confirmText="취소 확인"
+        cancelText="닫기"
       />
     </Box>
   );
