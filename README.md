@@ -44,6 +44,34 @@
 
 ## 기술 스택
 
+#### 🟩 BACKEND
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-6DB33F?logo=springboot&logoColor=white)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?logo=spring&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?logo=springsecurity&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
+![MyBatis](https://img.shields.io/badge/MyBatis-black?logo=MyBatis&logoColor=white)
+![JJWT](https://img.shields.io/badge/JJWT-0.11.5-blue)
+
+#### 🟦 FRONTEND
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+![Material UI](https://img.shields.io/badge/MUI-007FFF?logo=mui&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-443D3D?logo=react&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
+
+#### 🟥 Infrastructure
+![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-F80000?logo=oracle&logoColor=white)
+![Oracle Object Storage](https://img.shields.io/badge/Oracle%20Object%20Storage-F80000?logo=oracle&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?logo=docker&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white)
+
+#### 🟧 Database
+![Oracle DB](https://img.shields.io/badge/Oracle%20Database-F80000?logo=oracle&logoColor=white)
+
 <br>
 
 ## 아키텍처
@@ -63,6 +91,7 @@
 <br>
 
 ### 1. 위치 기반 매장 탐색
+---
  <p>
     <img style="width: 75%;" alt="image" src="https://github.com/user-attachments/assets/df1d4206-5e7e-4425-bc3f-857f37135a6d" />
     <img style="width: 75%;"  alt="image" src="https://github.com/user-attachments/assets/9a716558-47a7-4e61-9788-c0b5292750f3" />
@@ -71,11 +100,13 @@
 
 
 ### 2. 구독권
+---
   <p>
     <img style="width: 75%;" alt="image" src="https://github.com/user-attachments/assets/1d6141c0-a528-420c-aa9b-3b6c1448d9b9" />
   </p>
 
 ### 3. 주문
+---
  <p>
   <img  style="width: 75%;"  height="999" alt="image" src="https://github.com/user-attachments/assets/11c06c64-06f3-4f86-9f2e-859d00b4b773" />
   </p>
